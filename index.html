@@ -93,12 +93,17 @@ select.fi option{background:var(--bg2)}
     <div><div style="font-size:18px;font-weight:600">Intervenciones</div><div style="font-size:12px;color:var(--text3)" id="home-count"></div></div>
     <button class="btn btn-g" style="width:auto;padding:10px 18px" onclick="nuevaInter()">+ Nueva</button>
   </div>
-  <div style="display:flex;gap:8px;margin-bottom:16px">
+  <div style="display:flex;gap:8px;margin-bottom:8px">
     <button class="btn btn-s" style="flex:1;font-size:13px" onclick="exportarDatos()">&#128228; Exportar</button>
     <label class="btn btn-s" style="flex:1;font-size:13px;text-align:center;cursor:pointer;margin:0">
       &#128229; Importar<input type="file" accept=".json" onchange="importarDatos(this)" style="display:none">
     </label>
   </div>
+  <div style="display:flex;gap:8px;margin-bottom:16px">
+    <button class="btn btn-s" style="flex:1;font-size:13px;background:rgba(66,133,244,.15);border-color:rgba(66,133,244,.4);color:#4285f4" onclick="driveGuardar()">&#9729; Drive: Guardar</button>
+    <button class="btn btn-s" style="flex:1;font-size:13px;background:rgba(66,133,244,.15);border-color:rgba(66,133,244,.4);color:#4285f4" onclick="driveCargar()">&#9729; Drive: Cargar</button>
+  </div>
+  <div id="drive-status" style="display:none;font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:12px;text-align:center"></div>
   <div id="inter-list"></div>
 </div>
 <div id="view-nueva" class="view">
@@ -216,6 +221,18 @@ select.fi option{background:var(--bg2)}
   <button class="btn btn-g" style="margin-bottom:24px" onclick="marcarListo()">&#9989; Ver resumen evweb</button>
 </div>
 <div id="view-scan" class="view">
+  <div class="card">
+    <div class="ct">Google Drive (sincronización)</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">
+      Para sincronizar entre compu y celular. Necesita un <b>Client ID</b> de Google Cloud (gratuito).<br>
+      <a href="https://console.cloud.google.com/" target="_blank" style="color:var(--blue)">console.cloud.google.com</a> → Credenciales → OAuth 2.0 → aplicación web → agregar origen <b>https://TU-USUARIO.github.io</b>
+    </p>
+    <div class="fr">
+      <input class="fi" type="text" id="cfg-drive-id" placeholder="xxxxxxx.apps.googleusercontent.com" style="flex:1;font-size:12px">
+      <button class="btn btn-g" style="width:auto;padding:10px 14px" onclick="saveDriveId()">Guardar</button>
+    </div>
+    <div id="drive-id-status" style="font-size:12px;margin-top:8px;color:var(--text3)"></div>
+  </div>
   <div class="card">
     <div class="ct">API Key Gemini (Gratis)</div>
     <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Gratis en <b>aistudio.google.com</b> &rarr; Get API Key. 1500 req/d&iacute;a sin tarjeta.</p>
@@ -374,6 +391,9 @@ select.fi option{background:var(--bg2)}
 var S={intervs:[],cur:null,hist:['home'],recog:null,recField:null,pendFiles:[],key:'',signData:null,vitals:[]};
 try{S.intervs=JSON.parse(localStorage.getItem('af_i')||'[]');}catch(e){}
 S.key=localStorage.getItem('af_k')||'';
+// Load saved drive client id
+var _did=localStorage.getItem('af_drive_id')||'';
+if(_did){var _el=document.getElementById('cfg-drive-id');if(_el)_el.value=_did;}
 // Cirujanos aprendidos
 var cirujanos=[];
 try{cirujanos=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e){}
@@ -1944,6 +1964,171 @@ function importarDatos(input){
   };
   reader.readAsText(file);
   input.value='';
+}
+
+// ═══════════════════════════════════════════════════
+// GOOGLE DRIVE SYNC
+// ═══════════════════════════════════════════════════
+var DRIVE_CLIENT_ID='';  // Set by user in config
+var DRIVE_FILE_NAME='AnesFact_backup.json';
+var DRIVE_TOKEN=null;
+var DRIVE_FILE_ID=null;
+
+function driveStatus(msg,color){
+  var el=document.getElementById('drive-status');
+  if(!el)return;
+  el.style.display='block';
+  el.style.background=color==='ok'?'rgba(29,185,84,.1)':color==='err'?'rgba(248,81,73,.1)':'rgba(56,139,253,.1)';
+  el.style.color=color==='ok'?'var(--green)':color==='err'?'var(--red)':'var(--blue)';
+  el.style.border='1px solid '+(color==='ok'?'rgba(29,185,84,.3)':color==='err'?'rgba(248,81,73,.3)':'rgba(56,139,253,.3)');
+  el.textContent=msg;
+}
+
+function getDriveClientId(){
+  var id=localStorage.getItem('af_drive_id')||'';
+  if(!id){
+    id=prompt('Ingresá tu Google Client ID (Google Cloud Console):','');
+    if(id)localStorage.setItem('af_drive_id',id.trim());
+  }
+  return id?id.trim():'';
+}
+
+function driveAuth(callback){
+  var clientId=getDriveClientId();
+  if(!clientId){driveStatus('Falta configurar el Client ID de Google','err');return;}
+  // Load Google Identity Services if not loaded
+  if(!window.google||!window.google.accounts){
+    var script=document.createElement('script');
+    script.src='https://accounts.google.com/gsi/client';
+    script.onload=function(){driveAuthInner(clientId,callback);};
+    script.onerror=function(){driveStatus('Error al cargar Google Sign-In','err');};
+    document.head.appendChild(script);
+  } else {
+    driveAuthInner(clientId,callback);
+  }
+}
+
+function driveAuthInner(clientId,callback){
+  try {
+    var client=google.accounts.oauth2.initTokenClient({
+      client_id:clientId,
+      scope:'https://www.googleapis.com/auth/drive.file',
+      callback:function(resp){
+        if(resp.error){driveStatus('Error de autenticación: '+resp.error,'err');return;}
+        DRIVE_TOKEN=resp.access_token;
+        callback();
+      }
+    });
+    client.requestAccessToken();
+  } catch(e) {
+    driveStatus('Error Google Auth: '+e.message,'err');
+  }
+}
+
+function driveGuardar(){
+  driveStatus('Conectando con Google...','info');
+  driveAuth(function(){
+    var data={
+      intervs:S.intervs,
+      cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),
+      key:S.key||'',
+      guardado:new Date().toISOString(),
+      version:'AnesFact v6'
+    };
+    var json=JSON.stringify(data,null,2);
+    // Search for existing file first
+    fetch('https://www.googleapis.com/drive/v3/files?q=name%3D%22'+DRIVE_FILE_NAME+'%22+and+trashed%3Dfalse&fields=files(id,name)',{
+      headers:{Authorization:'Bearer '+DRIVE_TOKEN}
+    })
+    .then(function(r){return r.json();})
+    .then(function(res){
+      var fileId=res.files&&res.files.length?res.files[0].id:null;
+      driveUpload(json,fileId);
+    })
+    .catch(function(e){driveStatus('Error buscando archivo: '+e.message,'err');});
+  });
+}
+
+function driveUpload(json,fileId){
+  driveStatus('Subiendo datos...','info');
+  var boundary='anesfact_boundary';
+  var metadata={name:DRIVE_FILE_NAME,mimeType:'application/json'};
+  var body='--'+boundary+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'
+    +JSON.stringify(metadata)+'\r\n--'+boundary+'\r\nContent-Type: application/json\r\n\r\n'
+    +json+'\r\n--'+boundary+'--';
+  var method=fileId?'PATCH':'POST';
+  var url=fileId
+    ?'https://www.googleapis.com/upload/drive/v3/files/'+fileId+'?uploadType=multipart'
+    :'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+  fetch(url,{
+    method:method,
+    headers:{Authorization:'Bearer '+DRIVE_TOKEN,'Content-Type':'multipart/related; boundary='+boundary},
+    body:body
+  })
+  .then(function(r){return r.json();})
+  .then(function(res){
+    if(res.id){
+      DRIVE_FILE_ID=res.id;
+      driveStatus('✓ Guardado en Drive correctamente ('+new Date().toLocaleTimeString()+')','ok');
+    } else {
+      driveStatus('Error al guardar: '+(res.error&&res.error.message||'desconocido'),'err');
+    }
+  })
+  .catch(function(e){driveStatus('Error subiendo: '+e.message,'err');});
+}
+
+function driveCargar(){
+  driveStatus('Conectando con Google...','info');
+  driveAuth(function(){
+    fetch('https://www.googleapis.com/drive/v3/files?q=name%3D%22'+DRIVE_FILE_NAME+'%22+and+trashed%3Dfalse&fields=files(id,name,modifiedTime)',{
+      headers:{Authorization:'Bearer '+DRIVE_TOKEN}
+    })
+    .then(function(r){return r.json();})
+    .then(function(res){
+      if(!res.files||!res.files.length){
+        driveStatus('No se encontró backup en Drive. Guardá primero desde la compu.','err');
+        return;
+      }
+      var file=res.files[0];
+      driveStatus('Descargando backup ('+new Date(file.modifiedTime).toLocaleString()+')...','info');
+      return fetch('https://www.googleapis.com/drive/v3/files/'+file.id+'?alt=media',{
+        headers:{Authorization:'Bearer '+DRIVE_TOKEN}
+      });
+    })
+    .then(function(r){if(r&&r.ok)return r.text();})
+    .then(function(txt){
+      if(!txt)return;
+      try{
+        var data=JSON.parse(txt);
+        var nueva=data.intervs||[];
+        var existentes=S.intervs||[];
+        var ids=existentes.map(function(i){return i.id;});
+        var agregados=0;
+        nueva.forEach(function(i){if(ids.indexOf(i.id)<0){existentes.push(i);agregados++;}});
+        S.intervs=existentes;
+        localStorage.setItem('af_i',JSON.stringify(S.intervs));
+        if(data.cirujanos&&data.cirujanos.length){
+          try{
+            var local=JSON.parse(localStorage.getItem('af_ciru')||'[]');
+            data.cirujanos.forEach(function(c){if(local.indexOf(c)<0)local.push(c);});
+            localStorage.setItem('af_ciru',JSON.stringify(local));
+          }catch(e2){}
+        }
+        if(data.key&&!S.key){S.key=data.key;localStorage.setItem('af_k',S.key);}
+        renderHome();
+        driveStatus('✓ '+agregados+' nuevos registros importados desde Drive','ok');
+      }catch(e){driveStatus('Error al leer backup: '+e.message,'err');}
+    })
+    .catch(function(e){driveStatus('Error descargando: '+e.message,'err');});
+  });
+}
+
+function saveDriveId(){
+  var id=(document.getElementById('cfg-drive-id').value||'').trim();
+  if(!id){toast('Ingresá el Client ID');return;}
+  localStorage.setItem('af_drive_id',id);
+  document.getElementById('drive-id-status').textContent='Client ID guardado ✓';
+  toast('Client ID de Drive guardado');
 }
 (function(){
   var ua=document.getElementById('upload-area');
