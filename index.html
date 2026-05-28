@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AnesFact v6</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AnesFact">
+<meta name="theme-color" content="#1DB954">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
 :root{--bg:#0D1117;--bg2:#161B22;--bg3:#21262D;--border:#30363D;--text:#E6EDF3;--text2:#8B949E;--text3:#6E7681;--green:#1DB954;--red:#F85149;--yellow:#E3B341;--blue:#388BFD;--r:10px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -99,11 +106,11 @@ select.fi option{background:var(--bg2)}
       &#128229; Importar<input type="file" accept=".json" onchange="importarDatos(this)" style="display:none">
     </label>
   </div>
-  <div style="display:flex;gap:8px;margin-bottom:16px">
-    <button class="btn btn-s" style="flex:1;font-size:13px;background:rgba(66,133,244,.15);border-color:rgba(66,133,244,.4);color:#4285f4" onclick="driveGuardar()">&#9729; Drive: Guardar</button>
-    <button class="btn btn-s" style="flex:1;font-size:13px;background:rgba(66,133,244,.15);border-color:rgba(66,133,244,.4);color:#4285f4" onclick="driveCargar()">&#9729; Drive: Cargar</button>
+  <div style="display:flex;gap:8px;margin-bottom:8px">
+    <button class="btn btn-s" style="flex:1;font-size:13px;background:rgba(66,133,244,.15);border-color:rgba(66,133,244,.4);color:#4285f4" onclick="syncGuardar()">&#9729; Sync: Guardar</button>
+    <button class="btn btn-s" style="flex:1;font-size:13px;background:rgba(66,133,244,.15);border-color:rgba(66,133,244,.4);color:#4285f4" onclick="syncCargar()">&#9729; Sync: Cargar</button>
   </div>
-  <div id="drive-status" style="display:none;font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:12px;text-align:center"></div>
+  <div id="sync-status" style="display:none;font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:8px;text-align:center"></div>
   <div id="inter-list"></div>
 </div>
 <div id="view-nueva" class="view">
@@ -221,17 +228,36 @@ select.fi option{background:var(--bg2)}
   <button class="btn btn-g" style="margin-bottom:24px" onclick="marcarListo()">&#9989; Ver resumen evweb</button>
 </div>
 <div id="view-scan" class="view">
+
   <div class="card">
-    <div class="ct">Google Drive (sincronización)</div>
+    <div class="ct">&#9729; Sincronización entre dispositivos</div>
     <p style="font-size:12px;color:var(--text2);margin-bottom:10px">
-      Para sincronizar entre compu y celular. Necesita un <b>Client ID</b> de Google Cloud (gratuito).<br>
-      <a href="https://console.cloud.google.com/" target="_blank" style="color:var(--blue)">console.cloud.google.com</a> → Credenciales → OAuth 2.0 → aplicación web → agregar origen <b>https://TU-USUARIO.github.io</b>
+      Peg&#225; la URL de tu Google Apps Script para sincronizar entre compu y celu sin configuraciones complejas.
     </p>
-    <div class="fr">
-      <input class="fi" type="text" id="cfg-drive-id" placeholder="xxxxxxx.apps.googleusercontent.com" style="flex:1;font-size:12px">
-      <button class="btn btn-g" style="width:auto;padding:10px 14px" onclick="saveDriveId()">Guardar</button>
+    <div class="field">
+      <label>URL del Apps Script</label>
+      <div class="fr">
+        <input class="fi" type="text" id="cfg-sync-url" placeholder="https://script.google.com/macros/s/..." style="flex:1;font-size:11px">
+        <button class="btn btn-g" style="width:auto;padding:10px 14px;flex-shrink:0" onclick="saveSyncUrl()">OK</button>
+      </div>
     </div>
-    <div id="drive-id-status" style="font-size:12px;margin-top:8px;color:var(--text3)"></div>
+    <div id="sync-url-status" style="font-size:12px;margin-top:4px;color:var(--text3)"></div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;margin-top:10px;font-size:11px;color:var(--text2);line-height:1.6">
+      <b style="color:var(--text)">C&#243;mo configurar (una sola vez):</b><br>
+      1. Ir a <a href="https://script.google.com" target="_blank" style="color:var(--blue)">script.google.com</a> con la cuenta de Gmail<br>
+      2. <b>Nuevo proyecto</b> &rarr; borrar el c&#243;digo que trae<br>
+      3. Pegar el c&#243;digo que aparece abajo &rarr; <b>Guardar</b><br>
+      4. <b>Implementar &rarr; Nueva implementaci&#243;n &rarr; Aplicaci&#243;n web</b><br>
+      5. Ejecutar como: <b>Yo</b> &middot; Acceso: <b>Cualquier persona</b> &rarr; Implementar<br>
+      6. Copiar la URL y pegarla arriba
+    </div>
+    <div style="margin-top:10px">
+      <button class="btn btn-s" style="font-size:12px" onclick="mostrarCodigoScript()">&#128196; Ver c&#243;digo para copiar</button>
+    </div>
+    <div id="script-code-panel" style="display:none;margin-top:10px">
+      <textarea id="script-code-text" class="fi" rows="8" style="font-size:10px;font-family:monospace" readonly></textarea>
+      <button class="btn btn-g" style="margin-top:6px;font-size:12px" onclick="copiarCodigoScript()">&#128203; Copiar c&#243;digo</button>
+    </div>
   </div>
   <div class="card">
     <div class="ct">API Key Gemini (Gratis)</div>
@@ -384,6 +410,17 @@ select.fi option{background:var(--bg2)}
 </div>
 <div id="view-resumen" class="view"><div id="resumen-cont"></div></div>
 <div id="toast"></div>
+
+<!-- QR Sync Modal -->
+<div id="qr-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;overflow-y:auto;padding:20px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);max-width:460px;margin:0 auto;padding:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-size:16px;font-weight:600" id="qr-title">Enviar datos por QR</div>
+      <button onclick="cerrarQR()" style="background:none;border:none;color:var(--text2);font-size:26px;cursor:pointer">&times;</button>
+    </div>
+    <div id="qr-body"></div>
+  </div>
+</div>
 <script>
 // ═══════════════════════════════════════════════════
 // STATE
@@ -391,9 +428,9 @@ select.fi option{background:var(--bg2)}
 var S={intervs:[],cur:null,hist:['home'],recog:null,recField:null,pendFiles:[],key:'',signData:null,vitals:[]};
 try{S.intervs=JSON.parse(localStorage.getItem('af_i')||'[]');}catch(e){}
 S.key=localStorage.getItem('af_k')||'';
-// Load saved drive client id
-var _did=localStorage.getItem('af_drive_id')||'';
-if(_did){var _el=document.getElementById('cfg-drive-id');if(_el)_el.value=_did;}
+  // Load saved sync URL
+  var _syncUrl=localStorage.getItem('af_sync_url')||'';
+  if(_syncUrl){var _su=document.getElementById('cfg-sync-url');if(_su)_su.value=_syncUrl;}
 // Cirujanos aprendidos
 var cirujanos=[];
 try{cirujanos=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e){}
@@ -1966,8 +2003,7 @@ function importarDatos(input){
   input.value='';
 }
 
-// ═══════════════════════════════════════════════════
-// GOOGLE DRIVE SYNC
+
 // ═══════════════════════════════════════════════════
 var DRIVE_CLIENT_ID='';  // Set by user in config
 var DRIVE_FILE_NAME='AnesFact_backup.json';
@@ -2123,13 +2159,125 @@ function driveCargar(){
   });
 }
 
-function saveDriveId(){
-  var id=(document.getElementById('cfg-drive-id').value||'').trim();
-  if(!id){toast('Ingresá el Client ID');return;}
-  localStorage.setItem('af_drive_id',id);
-  document.getElementById('drive-id-status').textContent='Client ID guardado ✓';
-  toast('Client ID de Drive guardado');
+// ═══════════════════════════════════════════════════
+// SYNC VIA GOOGLE APPS SCRIPT
+// ═══════════════════════════════════════════════════
+var APPS_SCRIPT_CODE = [
+  'function doGet(e){',
+  '  var action = e.parameter.action || "load";',
+  '  var props = PropertiesService.getUserProperties();',
+  '  if(action === "save"){',
+  '    var data = e.parameter.data || "{}";',
+  '    props.setProperty("anesfact_backup", Utilities.newBlob(Utilities.base64Decode(data)).getDataAsString());',
+  '    return ContentService.createTextOutput(JSON.stringify({ok:true}))',
+  '      .setMimeType(ContentService.MimeType.JSON);',
+  '  }',
+  '  var saved = props.getProperty("anesfact_backup") || "{}";',
+  '  return ContentService.createTextOutput(saved)',
+  '    .setMimeType(ContentService.MimeType.JSON);',
+  '}'
+].join('\n');
+
+function syncStatus(msg, color){
+  var el=document.getElementById('sync-status');
+  if(!el)return;
+  el.style.display='block';
+  el.style.background=color==='ok'?'rgba(29,185,84,.1)':color==='err'?'rgba(248,81,73,.1)':'rgba(56,139,253,.1)';
+  el.style.color=color==='ok'?'var(--green)':color==='err'?'var(--red)':'var(--blue)';
+  el.style.border='1px solid '+(color==='ok'?'rgba(29,185,84,.3)':color==='err'?'rgba(248,81,73,.3)':'rgba(56,139,253,.3)');
+  el.textContent=msg;
 }
+
+function getSyncUrl(){
+  return localStorage.getItem('af_sync_url')||'';
+}
+
+function saveSyncUrl(){
+  var url=(document.getElementById('cfg-sync-url').value||'').trim();
+  if(!url){toast('Pegá la URL del script');return;}
+  localStorage.setItem('af_sync_url',url);
+  document.getElementById('sync-url-status').textContent='URL guardada ✓';
+  toast('URL de sincronización guardada');
+}
+
+function mostrarCodigoScript(){
+  var panel=document.getElementById('script-code-panel');
+  var ta=document.getElementById('script-code-text');
+  if(panel&&ta){
+    panel.style.display='block';
+    ta.value=APPS_SCRIPT_CODE;
+  }
+}
+
+function copiarCodigoScript(){
+  var ta=document.getElementById('script-code-text');
+  if(ta){ta.select();document.execCommand('copy');toast('Código copiado ✓');}
+}
+
+function syncGuardar(){
+  var url=getSyncUrl();
+  if(!url){toast('Configurá la URL del script primero');return;}
+  syncStatus('Guardando...','info');
+  var data={
+    intervs:S.intervs,
+    cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),
+    key:S.key||'',
+    guardado:new Date().toISOString(),
+    version:'AnesFact v6'
+  };
+  try{
+    var json=JSON.stringify(data);
+    var b64=btoa(unescape(encodeURIComponent(json)));
+    var saveUrl=url+'?action=save&data='+encodeURIComponent(b64);
+    fetch(saveUrl)
+    .then(function(r){return r.json();})
+    .then(function(res){
+      if(res.ok){
+        syncStatus('✓ Guardado ('+new Date().toLocaleTimeString()+')','ok');
+        toast('Datos guardados en la nube ✓');
+      } else {
+        syncStatus('Error al guardar','err');
+      }
+    })
+    .catch(function(e){syncStatus('Error: '+e.message,'err');});
+  }catch(e){syncStatus('Error al preparar datos: '+e.message,'err');}
+}
+
+function syncCargar(){
+  var url=getSyncUrl();
+  if(!url){toast('Configurá la URL del script primero (icón de cámara → Sincronización)');return;}
+  syncStatus('Cargando datos...','info');
+  // GET works normally with CORS on Apps Script
+  fetch(url+'?t='+Date.now())
+  .then(function(r){
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    return r.text();
+  })
+  .then(function(txt){
+    var data;
+    try{data=JSON.parse(txt);}catch(e){throw new Error('Respuesta inválida del script');}
+    if(!data||!data.intervs){syncStatus('No hay backup guardado aún. Guardá primero desde la compu.','err');return;}
+    var nueva=data.intervs||[];
+    var existentes=S.intervs||[];
+    var ids=existentes.map(function(i){return i.id;});
+    var agregados=0;
+    nueva.forEach(function(i){if(ids.indexOf(i.id)<0){existentes.push(i);agregados++;}});
+    S.intervs=existentes;
+    localStorage.setItem('af_i',JSON.stringify(S.intervs));
+    if(data.cirujanos&&data.cirujanos.length){
+      var local=[];try{local=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e2){}
+      data.cirujanos.forEach(function(c){if(local.indexOf(c)<0)local.push(c);});
+      localStorage.setItem('af_ciru',JSON.stringify(local));
+    }
+    if(data.key&&!S.key){S.key=data.key;localStorage.setItem('af_k',S.key);}
+    renderHome();
+    syncStatus('✓ '+agregados+' nuevos registros importados','ok');
+    toast(agregados+' registros nuevos cargados ✓');
+  })
+  .catch(function(e){syncStatus('Error: '+e.message+'. Verificá la URL del script.','err');});
+}
+
+function saveDriveId(){saveSyncUrl();}
 (function(){
   var ua=document.getElementById('upload-area');
   if(ua){ua.addEventListener('dragover',function(e){e.preventDefault();ua.style.borderColor='var(--green)';});ua.addEventListener('dragleave',function(){ua.style.borderColor='var(--border)';});ua.addEventListener('drop',function(e){e.preventDefault();ua.style.borderColor='var(--border)';onFiles(e.dataTransfer.files);});}
@@ -2137,6 +2285,27 @@ function saveDriveId(){
   renderHome();
 })();
 
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js')
+      .then(function(reg){ console.log('SW registered'); })
+      .catch(function(e){ console.log('SW error:', e); });
+  });
+  // Handle share target - check URL params on load
+  window.addEventListener('load', function(){
+    var params = new URLSearchParams(window.location.search);
+    var sharedUrl = params.get('url') || params.get('text');
+    if(sharedUrl){
+      // Store for IA extraction
+      setTimeout(function(){
+        go('scan');
+        toast('Contenido compartido recibido - subí la imagen para extraer');
+      }, 500);
+    }
+  });
+}
 </script>
 </body>
 </html>
