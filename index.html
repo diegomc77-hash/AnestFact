@@ -1419,6 +1419,18 @@ function descargarDoc(tipo){var docs=(S.cur&&S.cur.docs)||{};var d=docs[tipo];if
   var ua=document.getElementById('upload-area');
   if(ua){ua.addEventListener('dragover',function(e){e.preventDefault();ua.style.borderColor='var(--green)';});ua.addEventListener('dragleave',function(){ua.style.borderColor='var(--border)';});ua.addEventListener('drop',function(e){e.preventDefault();ua.style.borderColor='var(--border)';onFiles(e.dataTransfer.files);});}
   var dateEl=document.getElementById('f-fecha');if(dateEl&&!dateEl.value)dateEl.value=new Date().toISOString().slice(0,10);
+  // Restore saved API key into the input field and status
+  if(S.key){
+    var keyEl=document.getElementById('cfg-key');
+    if(keyEl)keyEl.value=S.key;
+  }
+  actualizarKeyStatus();
+  // Restore saved sync URL
+  var syncUrl=localStorage.getItem('af_sync_url')||'';
+  if(syncUrl){
+    var syncEl=document.getElementById('cfg-sync-url');
+    if(syncEl)syncEl.value=syncUrl;
+  }
   renderHome();
 })();
 </script>
