@@ -100,7 +100,7 @@ select.fi option{background:var(--bg2)}
   <button id="back-btn" onclick="goBack()">&#8249;</button>
   <div style="flex:1"><div class="logo" id="t-title">AnesFact <span>v6</span></div>
   <div style="font-size:11px;color:var(--text3)">Dra. Huerta &middot; M.P.32393 &middot; ADAARC</div></div>
-  <button onclick="irScan()" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px">&#128247;</button>
+  <button onclick="irScan()" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px" title="Configuraci&oacute;n / IA">&#9881;</button>
 </div>
 
 <div id="view-home" class="view active">
@@ -230,38 +230,10 @@ select.fi option{background:var(--bg2)}
     <div id="pracs-list"><p style="font-size:12px;color:var(--text3)">Sin pr&aacute;cticas</p></div>
     <button class="btn btn-s" style="margin-top:10px" onclick="go('nom')">&#128269; Buscar pr&aacute;ctica ADAARC</button>
   </div>
-  <div class="card">
+  <div class="card" id="docs-card">
     <div class="ct">&#128206; Documentaci&oacute;n para evweb</div>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:12px">Guard&aacute; las fojas y autorizaci&oacute;n de este paciente para tenerlas listas al cargar en evweb.</p>
-    <div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <div style="font-size:13px;font-weight:500">&#128203; Foja Anest&eacute;sica</div>
-        <span id="doc-anest-badge" style="display:none;font-size:11px" class="badge bg">&#10003; Guardada</span>
-      </div>
-      <label style="display:block;border:1.5px dashed var(--border);border-radius:8px;padding:10px;text-align:center;cursor:pointer;font-size:13px;color:var(--text2)" id="doc-anest-label">
-        &#128247; Foto / PDF<input type="file" accept="image/*,application/pdf" style="display:none" onchange="adjuntarDoc(this,'anest')">
-      </label>
-      <div id="doc-anest-prev"></div>
-    </div>
-    <div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <div style="font-size:13px;font-weight:500">&#128196; Foja Quir&uacute;rgica</div>
-        <span id="doc-qx-badge" style="display:none;font-size:11px" class="badge bg">&#10003; Guardada</span>
-      </div>
-      <label style="display:block;border:1.5px dashed var(--border);border-radius:8px;padding:10px;text-align:center;cursor:pointer;font-size:13px;color:var(--text2)" id="doc-qx-label">
-        &#128247; Foto / PDF<input type="file" accept="image/*,application/pdf" style="display:none" onchange="adjuntarDoc(this,'qx')">
-      </label>
-      <div id="doc-qx-prev"></div>
-    </div>
-    <div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <div style="font-size:13px;font-weight:500">&#9989; Autorizaci&oacute;n Obra Social</div>
-        <span id="doc-auth-badge" style="display:none;font-size:11px" class="badge bg">&#10003; Guardada</span>
-      </div>
-      <label style="display:block;border:1.5px dashed var(--border);border-radius:8px;padding:10px;text-align:center;cursor:pointer;font-size:13px;color:var(--text2)" id="doc-auth-label">
-        &#128247; Foto / PDF<input type="file" accept="image/*,application/pdf" style="display:none" onchange="adjuntarDoc(this,'auth')">
-      </label>
-      <div id="doc-auth-prev"></div>
+    <div id="docs-card-body">
+      <!-- Rendered by renderDocsCard() based on sanatorio -->
     </div>
   </div>
   <div class="brow" style="margin-bottom:8px">
@@ -282,8 +254,28 @@ select.fi option{background:var(--bg2)}
     <div id="key-status" style="font-size:12px;margin-top:8px;color:var(--text3)"></div>
   </div>
   <div class="card">
+    <div class="ct">&#9729; Sincronizaci&oacute;n entre dispositivos</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">
+      URL de tu Google Apps Script para sincronizar entre compu y celu.
+    </p>
+    <div class="field">
+      <label>URL del Apps Script</label>
+      <div class="fr">
+        <input class="fi" type="text" id="cfg-sync-url" placeholder="https://script.google.com/macros/s/..." style="flex:1;font-size:11px">
+        <button class="btn btn-g" style="width:auto;padding:10px 14px;flex-shrink:0" onclick="saveSyncUrl()">OK</button>
+      </div>
+    </div>
+    <div style="margin-top:8px">
+      <button class="btn btn-s" style="font-size:12px" onclick="mostrarCodigoScript()">&#128196; Ver c&oacute;digo Apps Script</button>
+    </div>
+    <div id="script-code-panel" style="display:none;margin-top:10px">
+      <textarea id="script-code-text" class="fi" rows="6" style="font-size:10px;font-family:monospace" readonly></textarea>
+      <button class="btn btn-g" style="margin-top:6px;font-size:12px" onclick="copiarCodigoScript()">&#128203; Copiar c&oacute;digo</button>
+    </div>
+  </div>
+  <div class="card">
     <div class="ct">Subir documentos</div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Foja anest. + Quirúrgica + Autorización. JPG, PNG o PDF.</p>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Foja anest. + Quir&uacute;rgica + Autorizaci&oacute;n. JPG, PNG o PDF.</p>
     <div class="upload" id="upload-area" onclick="document.getElementById('file-in').click()">
       <div style="font-size:36px;margin-bottom:8px">&#128206;</div>
       <div style="font-size:14px;font-weight:600">Tocá para seleccionar</div>
@@ -1435,7 +1427,42 @@ function descargarDoc(tipo){var docs=(S.cur&&S.cur.docs)||{};var d=docs[tipo];if
 })();
 </script>
 <script>
-if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch
+function renderDocsCard(){
+  var body=document.getElementById('docs-card-body');
+  if(!body)return;
+  var san=S.cur?(S.cur.san||''):'';
+  var esMayo=san.indexOf('Mayo')>=0;
+  var html='<p style="font-size:12px;color:var(--text2);margin-bottom:12px">';
+  html+=esMayo?'En Sanatorio Mayo la foja se completa en GECLISA. Adjunt\u00e1 la foja de GECLISA m\u00e1s la quir\u00fargica y autorizaci\u00f3n.':'Aeron\u00e1utico: imprim\u00ed la foja desde la app y adjunt\u00e1 la foto. Tambi\u00e9n la quir\u00fargica y autorizaci\u00f3n.';
+  html+='</p>';
+  if(!esMayo){html+='<div style="margin-bottom:12px"><button class="btn btn-s" style="font-size:13px" onclick="go(\'foja\')">\u2399 Completar e imprimir Foja Anest\u00e9sica</button></div>';}
+  var slots=[
+    {tipo:'anest',label:esMayo?'Foja GECLISA (anest\u00e9sica)':'Foja Anest\u00e9sica (foto/PDF)'},
+    {tipo:'qx',  label:'Foja Quir\u00fargica'},
+    {tipo:'auth',label:'Autorizaci\u00f3n Obra Social'}
+  ];
+  slots.forEach(function(slot){
+    var docs=(S.cur&&S.cur.docs)||{};
+    var saved=docs[slot.tipo];
+    html+='<div style="margin-bottom:10px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+    html+='<div style="font-size:13px;font-weight:500">'+slot.label+'</div>';
+    html+='<span id="doc-'+slot.tipo+'-badge" style="display:'+(saved?'inline-block':'none')+';font-size:11px" class="badge bg">\u2713 Guardada</span>';
+    html+='</div>';
+    html+='<label style="display:block;border:1.5px dashed var(--'+(saved?'green':'border')+');border-radius:8px;padding:10px;text-align:center;cursor:pointer;font-size:13px;color:var(--text2)" id="doc-'+slot.tipo+'-label">';
+    html+='Foto / PDF<input type="file" accept="image/*,application/pdf" style="display:none" onchange="adjuntarDoc(this,\''+slot.tipo+'\')">';
+    html+='</label>';
+    html+='<div id="doc-'+slot.tipo+'-prev">';
+    if(saved){var d=saved;var isImg=d.tipo&&d.tipo.startsWith('image/');html+='<div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--green);border-radius:8px;padding:8px 10px;margin-top:4px">'+(isImg?'<img src="'+d.data+'" style="height:44px;border-radius:4px;object-fit:cover">':'<span style="font-size:24px">doc</span>')+'<div style="flex:1;overflow:hidden"><div style="font-size:12px;font-weight:500">'+d.nombre+'</div><div style="font-size:11px;color:var(--text3)">'+new Date(d.fecha).toLocaleString()+'</div></div><button onclick="verDoc(\''+slot.tipo+'\')" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:13px">Ver</button><button onclick="borrarDoc(\''+slot.tipo+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px">\u00d7</button></div>';}
+    html+='</div></div>';
+  });
+  body.innerHTML=html;
+}
+function cargarDocBadges(){setTimeout(renderDocsCard,100);}
+function renderDocBadges(){renderDocsCard();}
+
+(function(){});});}
 </script>
 </body>
 </html>
