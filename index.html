@@ -1395,8 +1395,62 @@ function saveSyncUrl(){var url=(document.getElementById('cfg-sync-url')||{value:
 var APPS_SCRIPT_CODE=['function doGet(e){','  var action=e.parameter.action||"load";','  var props=PropertiesService.getUserProperties();','  if(action==="save"){','    var data=e.parameter.data||"{}";','    props.setProperty("anesfact_backup",Utilities.newBlob(Utilities.base64Decode(data)).getDataAsString());','    return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);','  }','  var saved=props.getProperty("anesfact_backup")||"{}";','  return ContentService.createTextOutput(saved).setMimeType(ContentService.MimeType.JSON);','}'].join('\n');
 function mostrarCodigoScript(){var p=document.getElementById('script-code-panel');var ta=document.getElementById('script-code-text');if(p&&ta){p.style.display='block';ta.value=APPS_SCRIPT_CODE;}}
 function copiarCodigoScript(){var ta=document.getElementById('script-code-text');if(ta){ta.select();document.execCommand('copy');toast('C\u00f3digo copiado \u2713');}}
-function syncGuardar(){var url=getSyncUrl();if(!url){toast('Configur\u00e1 la URL primero');return;}syncStatus('Guardando...','info');var data={intervs:S.intervs,cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),key:S.key||'',guardado:new Date().toISOString(),version:'AnesFact v6'};try{var b64=btoa(unescape(encodeURIComponent(JSON.stringify(data))));fetch(url+'?action=save&data='+encodeURIComponent(b64)).then(function(r){return r.json();}).then(function(res){if(res.ok){syncStatus('\u2713 Guardado ('+new Date().toLocaleTimeString()+')','ok');toast('Guardado en la nube \u2713');}else{syncStatus('Error','err');}}).catch(function(e){syncStatus('Error: '+e.message,'err');});}catch(e){syncStatus('Error: '+e.message,'err');}}
-function syncCargar(){var url=getSyncUrl();if(!url){toast('Configur\u00e1 la URL primero');return;}syncStatus('Cargando...','info');fetch(url+'?t='+Date.now()).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}).then(function(txt){var data;try{data=JSON.parse(txt);}catch(e){throw new Error('Respuesta inv\u00e1lida');}if(!data||!data.intervs){syncStatus('No hay backup a\u00fan','err');return;}var nueva=data.intervs||[];var existentes=S.intervs||[];var ids=existentes.map(function(i){return i.id;});var agregados=0;nueva.forEach(function(i){if(ids.indexOf(i.id)<0){existentes.push(i);agregados++;}});S.intervs=existentes;localStorage.setItem('af_i',JSON.stringify(S.intervs));if(data.cirujanos&&data.cirujanos.length){var local=[];try{local=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e2){}data.cirujanos.forEach(function(c){if(local.indexOf(c)<0)local.push(c);});localStorage.setItem('af_ciru',JSON.stringify(local));}if(data.key&&!S.key){S.key=data.key;localStorage.setItem('af_k',S.key);}renderHome();syncStatus('\u2713 '+agregados+' registros cargados','ok');}).catch(function(e){syncStatus('Error: '+e.message,'err');});}
+function syncGuardar(){
+  var url=getSyncUrl();
+  if(!url){toast('Configur\u00e1 la URL del script primero (\u2699 Configuraci\u00f3n)');return;}
+  syncStatus('Guardando...','info');
+  var data={intervs:S.intervs,cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),key:S.key||'',guardado:new Date().toISOString(),version:'AnesFact v6'};
+  try{
+    var b64=btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    fetch(url+'?action=save&data='+encodeURIComponent(b64))
+    .then(function(r){return r.text();})
+    .then(function(txt){
+      if(txt.indexOf('<!DOCTYPE')>=0||txt.indexOf('<html')>=0){
+        syncStatus('Error: URL incorrecta o script no implementado. Verific\u00e1 la URL en \u2699 Configuraci\u00f3n.','err');
+        return;
+      }
+      try{
+        var res=JSON.parse(txt);
+        if(res.ok){syncStatus('\u2713 Guardado ('+new Date().toLocaleTimeString()+')','ok');toast('Guardado en la nube \u2713');}
+        else{syncStatus('Error del script: '+(res.error||'desconocido'),'err');}
+      }catch(e2){syncStatus('Respuesta inesperada del script','err');}
+    })
+    .catch(function(e){syncStatus('Error de red: '+e.message,'err');});
+  }catch(e){syncStatus('Error: '+e.message,'err');}
+}
+function syncCargar(){
+  var url=getSyncUrl();
+  if(!url){toast('Configur\u00e1 la URL del script primero (\u2699 Configuraci\u00f3n)');return;}
+  syncStatus('Cargando...','info');
+  fetch(url+'?t='+Date.now())
+  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+  .then(function(txt){
+    if(txt.indexOf('<!DOCTYPE')>=0||txt.indexOf('<html')>=0){
+      syncStatus('Error: URL incorrecta. Verific\u00e1 la URL en \u2699 Configuraci\u00f3n.','err');
+      return;
+    }
+    var data;
+    try{data=JSON.parse(txt);}catch(e){syncStatus('Respuesta inv\u00e1lida del script','err');return;}
+    if(!data||!data.intervs){syncStatus('No hay backup guardado a\u00fan','err');return;}
+    var nueva=data.intervs||[];
+    var existentes=S.intervs||[];
+    var ids=existentes.map(function(i){return i.id;});
+    var agregados=0;
+    nueva.forEach(function(i){if(ids.indexOf(i.id)<0){existentes.push(i);agregados++;}});
+    S.intervs=existentes;
+    localStorage.setItem('af_i',JSON.stringify(S.intervs));
+    if(data.cirujanos&&data.cirujanos.length){
+      var local=[];try{local=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e2){}
+      data.cirujanos.forEach(function(c){if(local.indexOf(c)<0)local.push(c);});
+      localStorage.setItem('af_ciru',JSON.stringify(local));
+    }
+    if(data.key&&!S.key){S.key=data.key;localStorage.setItem('af_k',S.key);}
+    renderHome();
+    syncStatus('\u2713 '+agregados+' registros cargados','ok');
+    toast(agregados+' registros nuevos \u2713');
+  })
+  .catch(function(e){syncStatus('Error: '+e.message,'err');});
+}
 // === DOCUMENTOS ===
 function adjuntarDoc(input,tipo){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){var data=e.target.result;if(!S.cur)return;if(!S.cur.docs)S.cur.docs={};S.cur.docs[tipo]={nombre:file.name,tipo:file.type,data:data,fecha:new Date().toISOString()};var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});if(idx>=0)S.intervs[idx]=S.cur;localStorage.setItem('af_i',JSON.stringify(S.intervs));renderDocBadges();toast(getNombreDoc(tipo)+' guardada \u2713');};reader.readAsDataURL(file);}
 function getNombreDoc(tipo){return tipo==='anest'?'Foja Anest\u00e9sica':tipo==='qx'?'Foja Quir\u00fargica':'Autorizaci\u00f3n';}
