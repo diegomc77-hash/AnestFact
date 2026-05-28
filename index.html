@@ -417,9 +417,99 @@ select.fi option{background:var(--bg2)}
     </div>
   </div>
 
+  <!-- Mayo GECLISA helper - shown only for Mayo -->
+  <div id="mayo-foja-helper" style="display:none">
+    <div class="card" style="border-color:rgba(56,139,253,.4);background:rgba(56,139,253,.06)">
+      <div class="ct" style="color:var(--blue)">&#127973; Sanatorio Mayo — Datos para GECLISA</div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px">Completá estos campos acá para tenerlos listos al cargar en GECLISA. La foja la hace GECLISA, no se imprime desde la app.</p>
+
+      <div class="field"><label>Posición quirúrgica</label>
+        <select class="fi" id="fj-posicion">
+          <option value="">—</option>
+          <option>Decúbito dorsal</option><option>Decúbito lateral derecho</option>
+          <option>Decúbito lateral izquierdo</option><option>Decúbito ventral</option>
+          <option>Trendelenburg</option><option>Litotomía</option>
+          <option>Ginecológica</option><option>Semisentada</option>
+        </select>
+      </div>
+      <div class="field"><label>Nivel Regional (si aplica)</label>
+        <div class="fr"><input class="fi" type="text" id="fj-nivel-regional" placeholder="L3-L4 raquídea...">
+        <button class="mic" id="m-nivel" onclick="mic('fj-nivel-regional','m-nivel')">&#127897;</button></div>
+      </div>
+      <div class="field"><label>Observaciones generales del paciente</label>
+        <div class="fr" style="align-items:flex-start">
+          <textarea class="fi" id="fj-obs-geclisa" placeholder="Obesidad, hipertenso, fumador, resto ver HC..." rows="2"></textarea>
+          <button class="mic" id="m-obs-geclisa" onclick="mic('fj-obs-geclisa','m-obs-geclisa')">&#127897;</button>
+        </div>
+      </div>
+      <div class="field"><label>Materiales descartables</label>
+        <div class="fr"><input class="fi" type="text" id="fj-materiales" placeholder="TET 7.5, Jeringa 20cc, Abbocath 18...">
+        <button class="mic" id="m-mat" onclick="mic('fj-materiales','m-mat')">&#127897;</button></div>
+      </div>
+
+      <div style="margin-top:10px">
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Monitoreo intraoperatorio (tildar los usados):</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px" id="monitor-chips">
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
+            <input type="checkbox" id="mon-etco2" checked> EtCO2</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
+            <input type="checkbox" id="mon-pam" checked> PAM</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
+            <input type="checkbox" id="mon-ecg" checked> ECG</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
+            <input type="checkbox" id="mon-sato2" checked> SAT O2</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
+            <input type="checkbox" id="mon-pani" checked> PANI</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
+            <input type="checkbox" id="mon-decub"> PROT.DECUB.</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
+            <input type="checkbox" id="mon-emerg"> EMERGENCIA</label>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:12px"><label>Tabla de signos vitales (GECLISA cada 5-15 min)</label>
+        <p style="font-size:11px;color:var(--text3);margin-bottom:8px">Registrá los valores acá para copiarlos a GECLISA. SIST / DIAST / SAT O2 / E-CO2 / FC / PAM</p>
+        <div style="overflow-x:auto">
+          <table style="border-collapse:collapse;font-size:11px;min-width:500px" id="mayo-vitals-table">
+            <thead>
+              <tr style="background:var(--bg3)">
+                <th style="border:1px solid var(--border);padding:4px 6px;font-size:10px">MIN</th>
+                <th style="border:1px solid var(--border);padding:4px 6px">SIST</th>
+                <th style="border:1px solid var(--border);padding:4px 6px">DIAST</th>
+                <th style="border:1px solid var(--border);padding:4px 6px">SAT O2</th>
+                <th style="border:1px solid var(--border);padding:4px 6px">E-CO2</th>
+                <th style="border:1px solid var(--border);padding:4px 6px">FC</th>
+                <th style="border:1px solid var(--border);padding:4px 6px">PAM</th>
+              </tr>
+            </thead>
+            <tbody id="mayo-vitals-body"></tbody>
+          </table>
+        </div>
+        <div class="brow" style="margin-top:8px;gap:8px">
+          <button class="btn btn-s" style="font-size:12px" onclick="generarFilasMayo()">&#9200; Generar filas</button>
+          <button class="btn btn-s" style="font-size:12px" onclick="agregarFilaMayo()">+ Fila</button>
+        </div>
+      </div>
+
+      <div class="g2" style="margin-top:10px">
+        <div class="field"><label>Balance — Fluido 1</label>
+          <input class="fi" type="text" id="fj-fluido1" placeholder="ClNa 1000ml"></div>
+        <div class="field"><label>Balance — Fluido 2</label>
+          <input class="fi" type="text" id="fj-fluido2" placeholder="ClNa 500ml"></div>
+      </div>
+      <div class="g2">
+        <div class="field"><label>Orina (diuresis)</label>
+          <input class="fi" type="text" id="fj-orina" placeholder="200ml"></div>
+        <div class="field"><label>Sangrado</label>
+          <input class="fi" type="text" id="fj-sangrado" placeholder="50ml"></div>
+      </div>
+      <button class="btn btn-b" style="margin-top:8px" onclick="go('geclisa')">&#127973; Ver Guía GECLISA</button>
+    </div>
+  </div>
+
   <div class="brow" style="margin-bottom:24px">
-    <button class="btn btn-s" onclick="imprimirFoja()">🖨 Imprimir foja</button>
-    <button class="btn btn-g" onclick="guardarFoja()">💾 Guardar foja</button>
+    <button class="btn btn-s" id="btn-imprimir-foja" onclick="imprimirFoja()">&#128424; Imprimir foja</button>
+    <button class="btn btn-g" onclick="guardarFoja()">&#128190; Guardar foja</button>
   </div>
 </div>
 
@@ -450,6 +540,10 @@ select.fi option{background:var(--bg2)}
 <div id="toast"></div>
 
 <script>
+
+
+
+
 
 
 
@@ -884,7 +978,7 @@ function go(id,addH){
   document.getElementById('t-title').textContent=TITLES[id]||'AnesFact v5';
   if(id==='home')renderHome();
   if(id==='resumen')renderResumen();
-  if(id==='foja'){cargarFojaUI();setTimeout(initSign,80);renderPesoChips();renderRecupChips();}
+  if(id==='foja'){cargarFojaUI();setTimeout(initSign,80);renderPesoChips();renderRecupChips();renderFojaPorSanatorio();}
   if(id==='geclisa')renderGeclisa();
   if(id==='nom'){document.getElementById('nom-q').value='';document.getElementById('nom-res').innerHTML='<p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Escribí para buscar</p>';}
   if(id==='scan'){document.getElementById('cfg-key').value=S.key;actualizarKeyStatus();}
@@ -1035,6 +1129,20 @@ function guardarFoja(){guardarFojaVG();
     suero:gv('fj-suero'),sangre:gv('fj-sangre'),plasma:gv('fj-plasma'),otro:gv('fj-otro'),
     drogas:S.cur.foja.drogas||[],vitals:S.vitals||[],sign:S.signData||null
   };
+  // Save Mayo-specific fields
+  if(S.cur&&(S.cur.san||'').indexOf('Mayo')>=0){
+    function _gv(id){var e=document.getElementById(id);return(e&&e.value)?e.value:'';}
+    S.cur.foja.posicion=_gv('fj-posicion');
+    S.cur.foja.nivel_regional=_gv('fj-nivel-regional');
+    S.cur.foja.obs_geclisa=_gv('fj-obs-geclisa');
+    S.cur.foja.materiales=_gv('fj-materiales');
+    S.cur.foja.fluido1=_gv('fj-fluido1');
+    S.cur.foja.fluido2=_gv('fj-fluido2');
+    S.cur.foja.orina=_gv('fj-orina');
+    S.cur.foja.sangrado=_gv('fj-sangrado');
+    S.cur.foja.mayo_vitals=getMayoVitals();
+    S.cur.foja.monitoreo=getMayoMonitoreo();
+  }
   guardar();toast('Foja guardada ✓');go('nueva');
 }
 
@@ -1094,7 +1202,11 @@ function renderGeclisa(){
     +cpRow('Matrícula','32393')
     +cpRow('Hora Inicio',i.hora||'')+cpRow('Hora Fin',f.fin||'')
     +cpRow('Cirujano',i.ciru||'')+cpRow('Especialidad',i.serv||'')
-    +cpRow('Observaciones',f.obs||'')
+    +cpRow('Observaciones generales',f.obs_geclisa||f.obs||'')
+    +cpRow('Nivel Regional',f.nivel_regional||'')
+    +cpRow('Materiales descartables',f.materiales||'')
+    +cpRow('Monitoreo',f.monitoreo||'EtCO2, PAM, ECG, SAT O2, PANI')
+    +cpRow('Posición quirúrgica',f.posicion||'')
     +cpRow('Código Quirúrgico',codigoQx)
     +cpRow('Prácticas',pracsStr)
     +secT('3 — Medicación')
@@ -1109,6 +1221,12 @@ function renderGeclisa(){
     +cpRow('Inducción',f.ind||'')
     +cpRow('Mantenimiento / Técnica',f.tec||'')
     +cpRow('Vía Aérea',f.via||'')
+    +secT('6 — Signos Vitales (resumen)')
+    +(f.mayo_vitals&&f.mayo_vitals.length?
+      f.mayo_vitals.filter(function(r){return r.sist||r.fc;}).slice(0,5).map(function(r){
+        return cpRow(r.min+' min','SIST:'+r.sist+' DIAST:'+r.diast+' SAT:'+r.sato2+'% FC:'+r.fc+' PAM:'+r.pam);
+      }).join('')
+      :'<div style="font-size:12px;color:var(--text3);padding:6px 0">Registrá los valores en la tabla de la Foja Mayo</div>')
     +secT('7 — Balance')
     +cpRow('Fluidos / Suero',f.suero||'')+cpRow('Sangre',f.sangre||'')
     +cpRow('Plasma',f.plasma||'')+cpRow('Otro',f.otro||'')
@@ -1447,8 +1565,90 @@ function cargarDocBadges(){setTimeout(renderDocBadges,100);}
 function verDocRes(tipo){verDoc(tipo);}
 function descargarDoc(tipo){var docs=(S.cur&&S.cur.docs)||{};var d=docs[tipo];if(!d)return;var a=document.createElement('a');a.href=d.data;a.download=d.nombre;document.body.appendChild(a);a.click();document.body.removeChild(a);toast('Descargando '+d.nombre);}
 
-if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}
+function renderFojaPorSanatorio(){
+  var san=(S.cur&&S.cur.san)||'';
+  var esMayo=san.indexOf('Mayo')>=0;
+  // VG grid card - hide for Mayo
+  var vc=document.getElementById('vitals-card');
+  if(vc)vc.style.display=esMayo?'none':'block';
+  // Mayo helper - show for Mayo
+  var mh=document.getElementById('mayo-foja-helper');
+  if(mh)mh.style.display=esMayo?'block':'none';
+  // Imprimir button - hide for Mayo (they use GECLISA)
+  var bi=document.getElementById('btn-imprimir-foja');
+  if(bi)bi.style.display=esMayo?'none':'block';
+  // Generate Mayo vitals rows if Mayo and no rows yet
+  if(esMayo){
+    var tbody=document.getElementById('mayo-vitals-body');
+    if(tbody&&!tbody.children.length)generarFilasMayo();
+  }
+  // Restore Mayo-specific saved fields
+  if(esMayo&&S.cur&&S.cur.foja){
+    var f=S.cur.foja;
+    function sv2(id,val){var e=document.getElementById(id);if(e&&val)e.value=val;}
+    sv2('fj-posicion',f.posicion);
+    sv2('fj-nivel-regional',f.nivel_regional);
+    sv2('fj-obs-geclisa',f.obs_geclisa);
+    sv2('fj-materiales',f.materiales);
+    sv2('fj-fluido1',f.fluido1);
+    sv2('fj-fluido2',f.fluido2);
+    sv2('fj-orina',f.orina);
+    sv2('fj-sangrado',f.sangrado);
+  }
+}
 
+var MAYO_MINS=[5,15,30,45,60,75,90,105,120,135,150,165,180,195,210,225,240];
+
+function generarFilasMayo(){
+  var tbody=document.getElementById('mayo-vitals-body');
+  if(!tbody)return;
+  tbody.innerHTML='';
+  MAYO_MINS.forEach(function(min){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td style="border:1px solid var(--border);padding:2px 4px;font-size:11px;color:var(--text3);text-align:center;background:var(--bg3);font-weight:bold">'+min+'</td>'
+      +['sist','diast','sato2','eco2','fc','pam'].map(function(p){
+        return '<td style="border:1px solid var(--border);padding:1px"><input type="text" data-min="'+min+'" data-param="'+p+'" style="width:38px;background:transparent;border:none;color:var(--text);font-size:12px;text-align:center;outline:none;padding:3px 0" placeholder=""></td>';
+      }).join('');
+    tbody.appendChild(tr);
+  });
+}
+
+function agregarFilaMayo(){
+  var tbody=document.getElementById('mayo-vitals-body');
+  if(!tbody)return;
+  var tr=document.createElement('tr');
+  tr.innerHTML='<td style="border:1px solid var(--border);padding:2px"><input type="text" style="width:34px;background:transparent;border:none;color:var(--text);font-size:11px;text-align:center;outline:none" placeholder="min"></td>'
+    +['sist','diast','sato2','eco2','fc','pam'].map(function(p){
+      return '<td style="border:1px solid var(--border);padding:1px"><input type="text" style="width:38px;background:transparent;border:none;color:var(--text);font-size:12px;text-align:center;outline:none;padding:3px 0" placeholder=""></td>';
+    }).join('');
+  tbody.appendChild(tr);
+}
+
+function getMayoVitals(){
+  var tbody=document.getElementById('mayo-vitals-body');
+  if(!tbody)return[];
+  var rows=[];
+  Array.from(tbody.rows).forEach(function(tr){
+    var cells=tr.querySelectorAll('input');
+    if(cells.length>=7){
+      rows.push({min:cells[0].value||tr.cells[0].textContent.trim(),sist:cells[1]?cells[1].value:'',diast:cells[2]?cells[2].value:'',sato2:cells[3]?cells[3].value:'',eco2:cells[4]?cells[4].value:'',fc:cells[5]?cells[5].value:'',pam:cells[6]?cells[6].value:''});
+    } else if(cells.length===6){
+      var min=tr.cells[0].textContent.trim();
+      rows.push({min:min,sist:cells[0].value,diast:cells[1].value,sato2:cells[2].value,eco2:cells[3].value,fc:cells[4].value,pam:cells[5].value});
+    }
+  });
+  return rows.filter(function(r){return r.sist||r.fc||r.sato2;});
+}
+
+function getMayoMonitoreo(){
+  var items=[];
+  [['mon-etco2','EtCO2'],['mon-pam','PAM'],['mon-ecg','ECG'],['mon-sato2','SAT O2'],['mon-pani','PANI'],['mon-decub','PROT.DECUB.'],['mon-emerg','EMERGENCIA']].forEach(function(p){
+    var el=document.getElementById(p[0]);
+    if(el&&el.checked)items.push(p[1]);
+  });
+  return items.join(', ');
+}
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}
 
 </script>
 </body>
