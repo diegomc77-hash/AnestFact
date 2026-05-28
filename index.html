@@ -39,7 +39,10 @@ select.fi option{background:var(--bg2)}
 .tog input:checked+.ts{background:var(--green);border-color:var(--green)}
 .tog input:checked+.ts::before{transform:translateX(20px);background:#fff}
 .btn{width:100%;padding:13px;border-radius:var(--r);border:none;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s}
-.btn:active{opacity:.75}.btn-g{background:var(--green);color:#fff}.btn-s{background:var(--bg3);color:var(--text);border:1px solid var(--border)}.btn-b{background:var(--blue);color:#fff}
+.btn:active{opacity:.75}
+.btn-g{background:var(--green);color:#fff}
+.btn-s{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-b{background:var(--blue);color:#fff}
 .brow{display:flex;gap:8px}.brow .btn{flex:1}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .hr{border:none;border-top:1px solid var(--border);margin:10px 0}
@@ -67,13 +70,16 @@ select.fi option{background:var(--bg2)}
 .ac-item:hover,.ac-item.sel{background:var(--bg3);color:var(--green)}
 .ac-item small{color:var(--text3);font-size:11px;margin-left:6px}
 .droga-row{display:flex;gap:5px;margin-bottom:8px;align-items:flex-start}
+.droga-row .ac-wrap{flex:2;min-width:0}
+.droga-row .d-dose{flex:1;min-width:0;position:relative}
+.droga-row .d-via{flex:0 0 54px}
 .droga-row input,.droga-row select{background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px 7px;font-size:13px;font-family:inherit;outline:none;width:100%}
 .droga-row input:focus,.droga-row select:focus{border-color:var(--green)}
 .vitals-chart{overflow-x:auto;margin-top:8px}
 .vitals-table{border-collapse:collapse;font-size:11px;min-width:420px}
 .vitals-table th{background:var(--bg3);color:var(--text3);padding:4px 6px;border:1px solid var(--border);white-space:nowrap;font-weight:500;font-size:10px}
 .vitals-table td{border:1px solid var(--border);padding:2px;text-align:center}
-.vitals-table input{background:transparent;border:none;color:var(--text);font-size:12px;text-align:center;outline:none;width:100%;padding:2px 0;min-width:30px}
+.vitals-table input{background:transparent;border:none;color:var(--text);font-size:12px;text-align:center;outline:none;width:100%;padding:2px 0;min-width:32px}
 .vitals-table input:focus{background:rgba(29,185,84,.08)}
 .ta-wrap{display:flex;gap:2px;align-items:center}
 .ta-sep{color:var(--text3);font-size:13px;font-weight:600}
@@ -86,6 +92,7 @@ select.fi option{background:var(--bg2)}
 .chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-size:12px;cursor:pointer;color:var(--text2);white-space:nowrap}
 .chip:hover{border-color:var(--green);color:var(--green)}
 #sign-canvas{background:#fff;border:1px solid var(--border);border-radius:8px;cursor:crosshair;touch-action:none;width:100%;height:110px;display:block}
+.dose-hint{font-size:10px;color:var(--green);margin-top:2px;display:none}
 </style>
 </head>
 <body>
@@ -95,6 +102,7 @@ select.fi option{background:var(--bg2)}
   <div style="font-size:11px;color:var(--text3)">Dra. Huerta &middot; M.P.32393 &middot; ADAARC</div></div>
   <button onclick="irScan()" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px">&#128247;</button>
 </div>
+
 <div id="view-home" class="view active">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
     <div><div style="font-size:18px;font-weight:600">Intervenciones</div><div style="font-size:12px;color:var(--text3)" id="home-count"></div></div>
@@ -102,17 +110,16 @@ select.fi option{background:var(--bg2)}
   </div>
   <div style="display:flex;gap:8px;margin-bottom:8px">
     <button class="btn btn-s" style="flex:1;font-size:13px" onclick="exportarDatos()">&#128228; Exportar</button>
-    <label class="btn btn-s" style="flex:1;font-size:13px;text-align:center;cursor:pointer;margin:0">
-      &#128229; Importar<input type="file" accept=".json" onchange="importarDatos(this)" style="display:none">
-    </label>
+    <label class="btn btn-s" style="flex:1;font-size:13px;text-align:center;cursor:pointer;margin:0">&#128229; Importar<input type="file" accept=".json" onchange="importarDatos(this)" style="display:none"></label>
   </div>
-  <div style="display:flex;gap:8px;margin-bottom:8px">
+  <div style="display:flex;gap:8px;margin-bottom:16px">
     <button class="btn btn-s" style="flex:1;font-size:13px;background:rgba(66,133,244,.15);border-color:rgba(66,133,244,.4);color:#4285f4" onclick="syncGuardar()">&#9729; Sync: Guardar</button>
     <button class="btn btn-s" style="flex:1;font-size:13px;background:rgba(66,133,244,.15);border-color:rgba(66,133,244,.4);color:#4285f4" onclick="syncCargar()">&#9729; Sync: Cargar</button>
   </div>
-  <div id="sync-status" style="display:none;font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:8px;text-align:center"></div>
+  <div id="sync-status" style="display:none;font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:12px;text-align:center"></div>
   <div id="inter-list"></div>
 </div>
+
 <div id="view-nueva" class="view">
   <div id="ia-badge" style="display:none;margin-bottom:10px"></div>
   <div class="card">
@@ -125,18 +132,18 @@ select.fi option{background:var(--bg2)}
       <div class="fr"><input class="fi" type="text" id="f-pac" placeholder="GARCIA, Juan"><button class="mic" id="m-pac" onclick="mic('f-pac','m-pac')">&#127897;</button></div>
     </div>
     <div class="g2">
-      <div class="field"><label>Edad *</label><input class="fi" type="number" id="f-edad" min="0" max="120" placeholder="45" oninput="onPesoChange()"></div>
+      <div class="field"><label>Edad *</label><input class="fi" type="number" id="f-edad" min="0" max="120" placeholder="45" oninput="onPesoEdadChange()"></div>
       <div class="field"><label>Sexo</label><select class="fi" id="f-sexo"><option value="">—</option><option>F</option><option>M</option></select></div>
     </div>
     <div class="g2">
       <div class="field"><label>DNI</label>
         <div class="fr"><input class="fi" type="text" id="f-dni" placeholder="20123456" inputmode="numeric"><button class="mic" id="m-dni" onclick="mic('f-dni','m-dni')">&#127897;</button></div>
       </div>
-      <div class="field"><label>Peso (kg)</label><input class="fi" type="number" id="f-peso" placeholder="70" oninput="onPesoChange()"></div>
+      <div class="field"><label>Peso (kg)</label><input class="fi" type="number" id="f-peso" placeholder="70" oninput="onPesoEdadChange()"></div>
     </div>
     <div class="field"><label>Cirujano</label>
       <div class="ac-wrap">
-        <div class="fr"><input class="fi" type="text" id="f-ciru" placeholder="LOPEZ, Carlos" autocomplete="off" oninput="acCirujano()" onfocus="acCirujano()" onkeydown="acKey(event,'ac-ciru')"><button class="mic" id="m-ciru" onclick="mic('f-ciru','m-ciru')">&#127897;</button></div>
+        <div class="fr"><input class="fi" type="text" id="f-ciru" placeholder="LOPEZ, Carlos" autocomplete="off" oninput="acGeneric('f-ciru','ac-ciru',getCirujanos)" onkeydown="acKey(event,'ac-ciru')"><button class="mic" id="m-ciru" onclick="mic('f-ciru','m-ciru')">&#127897;</button></div>
         <div class="ac-list" id="ac-ciru"></div>
       </div>
     </div>
@@ -147,17 +154,16 @@ select.fi option{background:var(--bg2)}
         <option>Cirugía de Cabeza y Cuello</option><option>Cirugía Torácica</option>
         <option>Cirugía Vascular</option><option>Cirugía Plástica y Reparadora</option>
         <option>Ginecología y Obstetricia</option><option>Traumatología y Ortopedia</option>
-        <option>Neurocirugía</option><option>Urología</option>
-        <option>ORL (Otorrinolaringología)</option><option>Oftalmología</option>
-        <option>Proctología</option><option>Mastología</option>
-        <option>Cirugía Pediátrica</option><option>Cardiocirugía</option>
+        <option>Neurocirugía</option><option>Urología</option><option>ORL (Otorrinolaringología)</option>
+        <option>Oftalmología</option><option>Proctología</option><option>Mastología</option>
+        <option>Cirugía Pediátrica</option><option>Cardiocirugía</option><option>Cirugía Cardiovascular</option>
         <option>Endoscopía Digestiva</option><option>Hemodinamia</option>
-        <option>Radiología Intervencionista</option>
+        <option>Radiología Intervencionista</option><option>Odontología</option>
       </select>
     </div>
     <div class="field"><label>Diagn&oacute;stico / Cirug&iacute;a *</label>
       <div class="ac-wrap">
-        <div class="fr"><input class="fi" type="text" id="f-diag" placeholder="Colecistectom&iacute;a laparosc&oacute;pica" autocomplete="off" oninput="acCirugia()" onkeydown="acKey(event,'ac-diag')"><button class="mic" id="m-diag" onclick="mic('f-diag','m-diag')">&#127897;</button></div>
+        <div class="fr"><input class="fi" type="text" id="f-diag" placeholder="Colecistectom&iacute;a laparosc&oacute;pica" autocomplete="off" oninput="acCirugia('f-diag','ac-diag')" onkeydown="acKey(event,'ac-diag')"><button class="mic" id="m-diag" onclick="mic('f-diag','m-diag')">&#127897;</button></div>
         <div class="ac-list" id="ac-diag"></div>
       </div>
     </div>
@@ -169,20 +175,26 @@ select.fi option{background:var(--bg2)}
     </div>
     <div id="f-aero-wrap" style="display:none">
       <div class="g2">
-        <div class="field"><label>Quir&oacute;fano</label>
-          <select class="fi" id="f-sala"><option value="">—</option><option>Quirófano 1</option><option>Quirófano 2</option><option>Quirófano 3</option></select>
+        <div class="field"><label>Quir&oacute;fano / Sala</label>
+          <select class="fi" id="f-sala">
+            <option value="">—</option><option>Quirófano 1</option><option>Quirófano 2</option>
+            <option>Quirófano 3</option><option>Quirófano 4</option><option>Quirófano 5</option>
+            <option>Sala de Partos</option><option>Endoscopía</option><option>Hemodinamia</option><option>UCPA</option>
+          </select>
         </div>
         <div class="field"><label>Cama N&deg;</label>
           <select class="fi" id="f-cama"><option value="">—</option><option>Cama 1</option><option>Cama 2</option><option>Cama 3</option><option>Cama 4</option><option>Cama 5</option><option>Cama 6</option><option>Cama 7</option><option>Cama 8</option><option>Cama 9</option><option>Cama 10</option><option>Cama 11</option><option>Cama 12</option><option>Cama 13</option><option>Cama 14</option><option>Cama 15</option><option>Cama 16</option><option>Cama 17</option><option>Cama 18</option><option>Cama 19</option><option>Cama 20</option><option>Cama 21</option><option>Cama 22</option><option>Cama 23</option><option>Cama 24</option><option>Cama 25</option><option>UTI 1</option><option>UTI 2</option><option>UTI 3</option><option>UTI 4</option><option>UTI 5</option></select>
         </div>
       </div>
     </div>
+  </div>
     <div id="f-mayo-wrap" style="display:none">
       <div class="g2">
         <div class="field"><label>Sector</label>
           <select class="fi" id="f-mayo-sector" onchange="updateMayoCamas()">
-            <option value="">—</option><option>PISO</option><option>VIP</option>
-            <option>UCI</option><option>UTI</option><option>HOSPITAL DE DIA</option><option>GUARDIA</option>
+            <option value="">—</option>
+            <option>PISO</option><option>VIP</option><option>UCI</option>
+            <option>UTI</option><option>HOSPITAL DE DIA</option><option>GUARDIA</option>
           </select>
         </div>
         <div class="field"><label>Habitaci&oacute;n / Cama</label>
@@ -195,7 +207,7 @@ select.fi option{background:var(--bg2)}
     <div class="ct">Obra social</div>
     <div class="field"><label>Obra social *</label>
       <div class="ac-wrap">
-        <div class="fr"><input class="fi" type="text" id="f-obra" placeholder="IOSFA / PAMI / OSDE..." autocomplete="off" oninput="acObraSocial()" onkeydown="acKey(event,'ac-obra')"><button class="mic" id="m-obra" onclick="mic('f-obra','m-obra')">&#127897;</button></div>
+        <div class="fr"><input class="fi" type="text" id="f-obra" placeholder="IOSFA / PAMI / OSDE..." autocomplete="off" oninput="acObraSocial('f-obra','ac-obra')" onkeydown="acKey(event,'ac-obra')"><button class="mic" id="m-obra" onclick="mic('f-obra','m-obra')">&#127897;</button></div>
         <div class="ac-list" id="ac-obra"></div>
       </div>
     </div>
@@ -218,6 +230,40 @@ select.fi option{background:var(--bg2)}
     <div id="pracs-list"><p style="font-size:12px;color:var(--text3)">Sin pr&aacute;cticas</p></div>
     <button class="btn btn-s" style="margin-top:10px" onclick="go('nom')">&#128269; Buscar pr&aacute;ctica ADAARC</button>
   </div>
+  <div class="card">
+    <div class="ct">&#128206; Documentaci&oacute;n para evweb</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px">Guard&aacute; las fojas y autorizaci&oacute;n de este paciente para tenerlas listas al cargar en evweb.</p>
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:500">&#128203; Foja Anest&eacute;sica</div>
+        <span id="doc-anest-badge" style="display:none;font-size:11px" class="badge bg">&#10003; Guardada</span>
+      </div>
+      <label style="display:block;border:1.5px dashed var(--border);border-radius:8px;padding:10px;text-align:center;cursor:pointer;font-size:13px;color:var(--text2)" id="doc-anest-label">
+        &#128247; Foto / PDF<input type="file" accept="image/*,application/pdf" style="display:none" onchange="adjuntarDoc(this,'anest')">
+      </label>
+      <div id="doc-anest-prev"></div>
+    </div>
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:500">&#128196; Foja Quir&uacute;rgica</div>
+        <span id="doc-qx-badge" style="display:none;font-size:11px" class="badge bg">&#10003; Guardada</span>
+      </div>
+      <label style="display:block;border:1.5px dashed var(--border);border-radius:8px;padding:10px;text-align:center;cursor:pointer;font-size:13px;color:var(--text2)" id="doc-qx-label">
+        &#128247; Foto / PDF<input type="file" accept="image/*,application/pdf" style="display:none" onchange="adjuntarDoc(this,'qx')">
+      </label>
+      <div id="doc-qx-prev"></div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:500">&#9989; Autorizaci&oacute;n Obra Social</div>
+        <span id="doc-auth-badge" style="display:none;font-size:11px" class="badge bg">&#10003; Guardada</span>
+      </div>
+      <label style="display:block;border:1.5px dashed var(--border);border-radius:8px;padding:10px;text-align:center;cursor:pointer;font-size:13px;color:var(--text2)" id="doc-auth-label">
+        &#128247; Foto / PDF<input type="file" accept="image/*,application/pdf" style="display:none" onchange="adjuntarDoc(this,'auth')">
+      </label>
+      <div id="doc-auth-prev"></div>
+    </div>
+  </div>
   <div class="brow" style="margin-bottom:8px">
     <button class="btn btn-s" onclick="go('foja')">&#128203; Foja anest.</button>
     <button class="btn btn-s" onclick="guardar()">&#128190; Guardar</button>
@@ -227,200 +273,197 @@ select.fi option{background:var(--bg2)}
   </div>
   <button class="btn btn-g" style="margin-bottom:24px" onclick="marcarListo()">&#9989; Ver resumen evweb</button>
 </div>
-<div id="view-scan" class="view">
 
-  <div class="card">
-    <div class="ct">&#9729; Sincronización entre dispositivos</div>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">
-      Peg&#225; la URL de tu Google Apps Script para sincronizar entre compu y celu sin configuraciones complejas.
-    </p>
-    <div class="field">
-      <label>URL del Apps Script</label>
-      <div class="fr">
-        <input class="fi" type="text" id="cfg-sync-url" placeholder="https://script.google.com/macros/s/..." style="flex:1;font-size:11px">
-        <button class="btn btn-g" style="width:auto;padding:10px 14px;flex-shrink:0" onclick="saveSyncUrl()">OK</button>
-      </div>
-    </div>
-    <div id="sync-url-status" style="font-size:12px;margin-top:4px;color:var(--text3)"></div>
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;margin-top:10px;font-size:11px;color:var(--text2);line-height:1.6">
-      <b style="color:var(--text)">C&#243;mo configurar (una sola vez):</b><br>
-      1. Ir a <a href="https://script.google.com" target="_blank" style="color:var(--blue)">script.google.com</a> con la cuenta de Gmail<br>
-      2. <b>Nuevo proyecto</b> &rarr; borrar el c&#243;digo que trae<br>
-      3. Pegar el c&#243;digo que aparece abajo &rarr; <b>Guardar</b><br>
-      4. <b>Implementar &rarr; Nueva implementaci&#243;n &rarr; Aplicaci&#243;n web</b><br>
-      5. Ejecutar como: <b>Yo</b> &middot; Acceso: <b>Cualquier persona</b> &rarr; Implementar<br>
-      6. Copiar la URL y pegarla arriba
-    </div>
-    <div style="margin-top:10px">
-      <button class="btn btn-s" style="font-size:12px" onclick="mostrarCodigoScript()">&#128196; Ver c&#243;digo para copiar</button>
-    </div>
-    <div id="script-code-panel" style="display:none;margin-top:10px">
-      <textarea id="script-code-text" class="fi" rows="8" style="font-size:10px;font-family:monospace" readonly></textarea>
-      <button class="btn btn-g" style="margin-top:6px;font-size:12px" onclick="copiarCodigoScript()">&#128203; Copiar c&#243;digo</button>
-    </div>
-  </div>
+<div id="view-scan" class="view">
   <div class="card">
     <div class="ct">API Key Gemini (Gratis)</div>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Gratis en <b>aistudio.google.com</b> &rarr; Get API Key. 1500 req/d&iacute;a sin tarjeta.</p>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Gratis en <b>aistudio.google.com</b> → Get API Key. 1500 req/día sin tarjeta.</p>
     <div class="fr"><input class="fi" type="password" id="cfg-key" placeholder="AIza..." style="flex:1"><button class="btn btn-g" style="width:auto;padding:10px 14px" onclick="saveKey()">Guardar</button></div>
     <div id="key-status" style="font-size:12px;margin-top:8px;color:var(--text3)"></div>
   </div>
   <div class="card">
     <div class="ct">Subir documentos</div>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Foja + Autorizaci&oacute;n (el N&deg; afiliado se extrae autom&aacute;ticamente). JPG, PNG o PDF.</p>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Foja anest. + Quirúrgica + Autorización. JPG, PNG o PDF.</p>
     <div class="upload" id="upload-area" onclick="document.getElementById('file-in').click()">
       <div style="font-size:36px;margin-bottom:8px">&#128206;</div>
-      <div style="font-size:14px;font-weight:600">Toc&aacute; para seleccionar</div>
+      <div style="font-size:14px;font-weight:600">Tocá para seleccionar</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px">O arrastrá aquí</div>
     </div>
     <input type="file" id="file-in" multiple accept="image/*,application/pdf" style="display:none" onchange="onFiles(this.files)">
     <div id="file-prev" style="margin-top:10px"></div>
   </div>
   <div class="err-panel" id="err-panel">
-    <div class="err-title"><span>&#9888; Error</span><button onclick="document.getElementById('err-panel').classList.remove('on')" style="background:none;border:none;color:var(--red);font-size:22px;cursor:pointer">&times;</button></div>
+    <div class="err-title"><span>⚠ Error</span><button onclick="document.getElementById('err-panel').classList.remove('on')" style="background:none;border:none;color:var(--red);font-size:22px;cursor:pointer">×</button></div>
     <div class="err-msg" id="err-msg"></div>
   </div>
   <div class="spin-wrap" id="spin-wrap"><div class="spin"></div><div id="spin-msg" style="font-size:13px;color:var(--text2)">Analizando...</div></div>
-  <button id="btn-extraer" class="btn btn-g" style="display:none;margin-bottom:12px" onclick="extraer()">&#129302; Extraer con IA</button>
+  <button id="btn-extraer" class="btn btn-g" style="display:none;margin-bottom:12px" onclick="extraer()">🤖 Extraer datos con IA</button>
 </div>
+
 <div id="view-foja" class="view">
-  <div id="dose-bar" style="display:none;background:rgba(56,139,253,.12);border:1px solid rgba(56,139,253,.4);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--blue)"></div>
+  <div id="dose-info-bar" style="display:none;background:rgba(56,139,253,.1);border:1px solid rgba(56,139,253,.4);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:var(--blue)"></div>
   <div class="card">
     <div class="ct">T&eacute;cnica anest&eacute;sica</div>
     <div class="field"><label>T&eacute;cnica</label>
-      <select class="fi" id="fj-tec"><option value="">Seleccionar...</option><option>Anestesia General (AG)</option><option>Raqu&iacute;dea</option><option>Peridural</option><option>Combinada raquiperidural</option><option>Sedaci&oacute;n</option><option>Bloqueo Regional</option><option>TIVA</option></select>
+      <select class="fi" id="fj-tec"><option value="">Seleccionar...</option>
+        <option>Anestesia General (AG)</option><option>Raquídea</option>
+        <option>Peridural</option><option>Combinada raquiperidural</option>
+        <option>Sedación</option><option>Bloqueo Regional</option><option>TIVA</option>
+      </select>
     </div>
     <div class="g2">
-      <div class="field"><label>ASA</label><select class="fi" id="fj-asa"><option value="">—</option><option>I</option><option>II</option><option>III</option><option>IV</option><option>V</option></select></div>
-      <div class="field"><label>V&iacute;a a&eacute;rea</label><select class="fi" id="fj-via"><option value="">—</option><option>IOT</option><option>M&aacute;scara lar&iacute;ngea</option><option>Mascarilla facial</option><option>Sin dispositivo</option></select></div>
+      <div class="field"><label>ASA</label>
+        <select class="fi" id="fj-asa"><option value="">—</option><option>I</option><option>II</option><option>III</option><option>IV</option><option>V</option></select>
+      </div>
+      <div class="field"><label>Vía aérea</label>
+        <select class="fi" id="fj-via"><option value="">—</option><option>IOT</option><option>Máscara laríngea</option><option>Mascarilla facial</option><option>Sin dispositivo</option></select>
+      </div>
     </div>
     <div class="g2">
-      <div class="field"><label>Inducci&oacute;n</label><select class="fi" id="fj-ind"><option value="">—</option><option>Satisfactoria</option><option>Prolongada</option><option>Tormentosa</option></select></div>
+      <div class="field"><label>Inducción</label>
+        <select class="fi" id="fj-ind"><option value="">—</option><option>Satisfactoria</option><option>Prolongada</option><option>Tormentosa</option></select>
+      </div>
       <div class="field"><label>Hora fin</label><input class="fi" type="time" id="fj-fin"></div>
     </div>
     <div class="g2">
-      <div class="field"><label>Hora intubaci&oacute;n</label><input class="fi" type="time" id="fj-hint"></div>
-      <div class="field"><label>Hora extubaci&oacute;n</label><input class="fi" type="time" id="fj-hext"></div>
+      <div class="field"><label>Hora intubación</label><input class="fi" type="time" id="fj-hint"></div>
+      <div class="field"><label>Hora extubación</label><input class="fi" type="time" id="fj-hext"></div>
     </div>
-    <div class="field"><label>Premedicaci&oacute;n</label>
+    <div class="field"><label>Premedicación</label>
       <div class="ac-wrap">
-        <div class="fr"><input class="fi" type="text" id="fj-premed" placeholder="Midazolam 2mg EV" autocomplete="off" oninput="acDrugField('fj-premed','ac-premed')" onkeydown="acKey(event,'ac-premed')"><button class="mic" id="m-premed" onclick="mic('fj-premed','m-premed')">&#127897;</button></div>
+        <div class="fr">
+          <input class="fi" type="text" id="fj-premed" placeholder="Midazolam 2mg EV" autocomplete="off" oninput="acDrugField('fj-premed','ac-premed')" onkeydown="acKey(event,'ac-premed')">
+          <button class="mic" id="m-premed" onclick="mic('fj-premed','m-premed')">&#127897;</button>
+        </div>
         <div class="ac-list" id="ac-premed"></div>
       </div>
       <div class="chips" id="premed-chips"></div>
     </div>
   </div>
+
   <div class="card">
-    <div class="ct">Medicaci&oacute;n / Agentes anest&eacute;sicos</div>
-    <p style="font-size:11px;color:var(--text3);margin-bottom:10px">2 letras &rarr; sugerencias &middot; dosis por peso del paciente</p>
+    <div class="ct">Medicación / Agentes anestésicos</div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:10px">Primeras letras → sugerencias. Dosis calculadas por peso del paciente.</p>
     <div id="drogas-list"></div>
     <div class="brow" style="margin-top:8px;gap:6px">
-      <button class="btn btn-s" style="font-size:13px" onclick="addDroga()">+ F&aacute;rmaco</button>
+      <button class="btn btn-s" style="font-size:13px" onclick="addDroga()">+ Agregar fármaco</button>
       <button class="mic" style="flex-shrink:0;width:42px;height:42px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text2)" id="m-droga-new" onclick="micNewDrug()">&#127897;</button>
     </div>
   </div>
-  <div class="card" id="vitals-card">
-    <div class="ct">Gr&#225;fico intraoperatorio</div>
-    <p style="font-size:11px;color:var(--text3);margin-bottom:8px">Cada cuadrado = 25 unidades &middot; Eje Y: 0&ndash;200 &middot; Eje X: tiempo cada 5 min</p>
 
-    <!-- Hora inicio/fin para generar columnas -->
-    <div class="g2" style="margin-bottom:10px">
-      <div class="field"><label>Hora inicio</label><input class="fi" type="time" id="vg-inicio" style="font-size:14px"></div>
-      <div class="field"><label>Hora fin</label><input class="fi" type="time" id="vg-fin" style="font-size:14px"></div>
+  <div class="card">
+    <div class="ct">Signos vitales intraoperatorios</div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:8px">Cada 5 min — generá las filas automáticamente</p>
+    <div class="brow" style="margin-bottom:10px">
+      <button class="btn btn-s" style="font-size:13px" onclick="generarFilasVitales()">⏱ Generar filas (c/5 min)</button>
+      <button class="btn btn-s" style="font-size:13px" onclick="addVitalRow()">+ Fila manual</button>
     </div>
-    <button class="btn btn-s" style="margin-bottom:12px;font-size:13px" onclick="generarColumnas()">&#9200; Generar columnas de tiempo</button>
-
-    <!-- Selector de par&#225;metro activo -->
-    <div style="margin-bottom:10px">
-      <div style="font-size:12px;color:var(--text3);margin-bottom:6px;font-weight:500">Par&#225;metro activo (toc&#225; una celda para marcar):</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px" id="param-selector">
-        <button class="param-btn active" data-p="resp" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--green);color:var(--green);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer">Resp &#9675;</button>
-        <button class="param-btn" data-p="pulso" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer">Pulso &#9679;</button>
-        <button class="param-btn" data-p="ta" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer">T.A. )(</button>
-        <button class="param-btn" data-p="oximet" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer">OXIMET &mdash;</button>
-        <button class="param-btn" data-p="co2" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer">CO&#8322; &#9633;</button>
-        <button class="param-btn" data-p="operac" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer">Operac &#9632;</button>
-        <button class="param-btn" data-p="anest" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer">Anestes &#215;</button>
-      </div>
+    <div class="vitals-chart">
+      <table class="vitals-table">
+        <thead><tr>
+          <th style="min-width:52px">Hora</th>
+          <th style="min-width:64px">T.A.<br><span style="font-size:8px">sist / diast</span></th>
+          <th style="min-width:36px">FC</th>
+          <th style="min-width:36px">SpO₂%</th>
+          <th style="min-width:36px">EtCO₂</th>
+          <th style="min-width:36px">FR</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="vitals-body"></tbody>
+      </table>
     </div>
-
-    <!-- Gr&#225;fico principal -->
-    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-      <div id="vitals-grid-wrap" style="min-width:300px">
-        <p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Gener&#225; las columnas de tiempo para empezar</p>
-      </div>
-    </div>
-    <button class="btn btn-s" style="margin-top:8px;font-size:12px" onclick="limpiarGrafico()">&#128465; Limpiar gr&#225;fico</button>
   </div>
+
   <div class="card">
     <div class="ct">Fluidos</div>
     <div class="g2">
-      <div class="field"><label>Suero</label><select class="fi" id="fj-suero"><option value="">—</option><option>250 ml</option><option>500 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option></select></div>
-      <div class="field"><label>Sangre</label><select class="fi" id="fj-sangre"><option value="">—</option><option>0 ml</option><option>250 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option></select></div>
+      <div class="field"><label>Suero</label>
+        <select class="fi" id="fj-suero"><option value="">—</option><option>250 ml</option><option>500 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option></select>
+      </div>
+      <div class="field"><label>Sangre</label>
+        <select class="fi" id="fj-sangre"><option value="">—</option><option>0 ml</option><option>250 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option></select>
+      </div>
     </div>
     <div class="g2">
-      <div class="field"><label>Plasma</label><select class="fi" id="fj-plasma"><option value="">—</option><option>0 ml</option><option>200 ml</option><option>400 ml</option><option>600 ml</option><option>800 ml</option></select></div>
-      <div class="field"><label>Otro</label><select class="fi" id="fj-otro"><option value="">—</option><option>0 ml</option><option>100 ml</option><option>250 ml</option><option>500 ml</option><option>1000 ml</option></select></div>
+      <div class="field"><label>Plasma</label>
+        <select class="fi" id="fj-plasma"><option value="">—</option><option>0 ml</option><option>200 ml</option><option>400 ml</option><option>600 ml</option><option>800 ml</option></select>
+      </div>
+      <div class="field"><label>Otro</label>
+        <select class="fi" id="fj-otro"><option value="">—</option><option>0 ml</option><option>100 ml</option><option>250 ml</option><option>500 ml</option><option>1000 ml</option></select>
+      </div>
     </div>
   </div>
+
   <div class="card">
-    <div class="ct">M&eacute;todos anest&eacute;sicos</div>
-    <div class="fr" style="align-items:flex-start"><textarea class="fi" id="fj-metodos" placeholder="Raqu&iacute;dea estricta..."></textarea><button class="mic" id="m-metodos" onclick="mic('fj-metodos','m-metodos')">&#127897;</button></div>
+    <div class="ct">Métodos anestésicos</div>
+    <div class="fr" style="align-items:flex-start">
+      <textarea class="fi" id="fj-metodos" placeholder="Raquídea estricta..."></textarea>
+      <button class="mic" id="m-metodos" onclick="mic('fj-metodos','m-metodos')">&#127897;</button>
+    </div>
   </div>
+
   <div class="card">
-    <div class="ct">Recuperaci&oacute;n</div>
+    <div class="ct">Recuperación</div>
     <div class="ac-wrap" style="margin-bottom:8px">
-      <div class="fr" style="align-items:flex-start"><input class="fi" type="text" id="fj-recup" placeholder="Propofol estable PA 130/80..." autocomplete="off" oninput="acRecup(this.value)" onkeydown="acKey(event,'ac-recup')"><button class="mic" id="m-recup" onclick="mic('fj-recup','m-recup')">&#127897;</button></div>
+      <div class="fr" style="align-items:flex-start">
+        <input class="fi" type="text" id="fj-recup" placeholder="Propofol estable PA 130/80..." autocomplete="off" oninput="acRecup(this.value)" onkeydown="acKey(event,'ac-recup')">
+        <button class="mic" id="m-recup" onclick="mic('fj-recup','m-recup')">&#127897;</button>
+      </div>
       <div class="ac-list" id="ac-recup"></div>
     </div>
     <div class="chips" id="recup-chips"></div>
   </div>
+
   <div class="card">
-    <div class="ct">Observaciones / Hallazgos f&iacute;sicos anormales</div>
-    <div class="fr" style="align-items:flex-start"><textarea class="fi" id="fj-obs" placeholder="Inducci&oacute;n satisfactoria..."></textarea><button class="mic" id="m-obs" onclick="mic('fj-obs','m-obs')">&#127897;</button></div>
-  </div>
-  <div class="card">
-    <div class="ct">Firma digital (en negro sobre la foja)</div>
-    <p style="font-size:12px;color:var(--text3);margin-bottom:8px">Firm&aacute; con el dedo</p>
-    <canvas id="sign-canvas"></canvas>
-    <div class="brow" style="margin-top:8px">
-      <button class="btn btn-s" style="font-size:13px" onclick="clearSign()">&times; Borrar</button>
-      <button class="btn btn-g" style="font-size:13px" onclick="saveSign()">&#128190; Guardar firma</button>
+    <div class="ct">Observaciones</div>
+    <div class="fr" style="align-items:flex-start">
+      <textarea class="fi" id="fj-obs" placeholder="Inducción satisfactoria..."></textarea>
+      <button class="mic" id="m-obs" onclick="mic('fj-obs','m-obs')">&#127897;</button>
     </div>
   </div>
+
+  <div class="card">
+    <div class="ct">Firma digital (opcional)</div>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:8px">Firmá con el dedo — aparece en negro en la foja imprimible</p>
+    <canvas id="sign-canvas"></canvas>
+    <div class="brow" style="margin-top:8px">
+      <button class="btn btn-s" style="font-size:13px" onclick="clearSign()">✕ Borrar</button>
+      <button class="btn btn-g" style="font-size:13px" onclick="saveSign()">💾 Guardar firma</button>
+    </div>
+  </div>
+
   <div class="brow" style="margin-bottom:24px">
-    <button class="btn btn-s" onclick="imprimirFoja()">&#128424; Imprimir foja</button>
-    <button class="btn btn-g" onclick="guardarFoja()">&#128190; Guardar foja</button>
+    <button class="btn btn-s" onclick="imprimirFoja()">🖨 Imprimir foja</button>
+    <button class="btn btn-g" onclick="guardarFoja()">💾 Guardar foja</button>
   </div>
 </div>
+
 <div id="view-nom" class="view">
   <div class="card">
-    <div class="field"><label>Buscar pr&aacute;ctica ADAARC</label>
+    <div class="field"><label>Buscar práctica ADAARC</label>
       <div class="ac-wrap">
-        <div class="fr"><input class="fi" type="text" id="nom-q" placeholder="colecistectom&iacute;a / 10.01 / cabeza y cuello..." autocomplete="off" oninput="buscarNom(this.value)"><button class="mic" id="m-nom" onclick="mic('nom-q','m-nom')">&#127897;</button></div>
+        <div class="fr">
+          <input class="fi" type="text" id="nom-q" placeholder="colecistectomía / 01.02..." autocomplete="off" oninput="buscarNom(this.value)" onkeydown="acKey(event,'ac-nom')">
+          <button class="mic" id="m-nom" onclick="mic('nom-q','m-nom')">&#127897;</button>
+        </div>
       </div>
     </div>
   </div>
-  <div id="nom-res"><p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Escrib&iacute; para buscar</p></div>
+  <div id="nom-res"><p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Escribí para buscar</p></div>
 </div>
+
 <div id="view-geclisa" class="view">
-  <div class="card"><div style="font-size:16px;font-weight:600;margin-bottom:4px">&#127973; Gu&iacute;a GECLISA &mdash; Sanatorio Mayo</div><div style="font-size:12px;color:var(--text3)">Toc&aacute; &#128203; para copiar cada campo</div></div>
+  <div class="card"><div style="font-size:16px;font-weight:600;margin-bottom:4px">🏥 Guía GECLISA</div><div style="font-size:12px;color:var(--text3)">Sanatorio Mayo — tocá 📋 para copiar</div></div>
   <div class="card"><div class="ct">Campos copiables</div><div id="geclisa-campos"></div></div>
   <div class="card"><div class="ct">Pasos</div><div id="geclisa-steps"></div></div>
-  <div class="card"><a href="http://sanatoriomayo.myvnc.com:84" target="_blank" style="display:block"><button class="btn btn-b">&#127758; Abrir GECLISA</button></a><p style="font-size:11px;color:var(--text3);margin-top:6px;text-align:center">Usuario: Mhuerta</p></div>
+  <div class="card"><a href="http://sanatoriomayo.myvnc.com:84" target="_blank" style="display:block"><button class="btn btn-b">🌐 Abrir GECLISA</button></a><p style="font-size:11px;color:var(--text3);margin-top:6px;text-align:center">Usuario: Mhuerta</p></div>
+  <div class="card"><div class="ct">Foja Quirúrgica — campos</div><div id="geclisa-fojaqx"></div></div>
 </div>
+
 <div id="view-resumen" class="view"><div id="resumen-cont"></div></div>
+
 <div id="toast"></div>
 
-<!-- QR Sync Modal -->
-<div id="qr-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;overflow-y:auto;padding:20px">
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);max-width:460px;margin:0 auto;padding:20px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-size:16px;font-weight:600" id="qr-title">Enviar datos por QR</div>
-      <button onclick="cerrarQR()" style="background:none;border:none;color:var(--text2);font-size:26px;cursor:pointer">&times;</button>
-    </div>
-    <div id="qr-body"></div>
-  </div>
-</div>
 <script>
 // ═══════════════════════════════════════════════════
 // STATE
@@ -428,14 +471,12 @@ select.fi option{background:var(--bg2)}
 var S={intervs:[],cur:null,hist:['home'],recog:null,recField:null,pendFiles:[],key:'',signData:null,vitals:[]};
 try{S.intervs=JSON.parse(localStorage.getItem('af_i')||'[]');}catch(e){}
 S.key=localStorage.getItem('af_k')||'';
-  // Load saved sync URL
-  var _syncUrl=localStorage.getItem('af_sync_url')||'';
-  if(_syncUrl){var _su=document.getElementById('cfg-sync-url');if(_su)_su.value=_syncUrl;}
+  var _su=localStorage.getItem('af_sync_url')||'';if(_su){var _sel=document.getElementById('cfg-sync-url');if(_sel)_sel.value=_su;}
 // Cirujanos aprendidos
 var cirujanos=[];
 try{cirujanos=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e){}
 
-var TITLES={home:'AnesFact v6',nueva:'Nueva intervención',scan:'Escanear / Config',foja:'Foja anestésica',nom:'Prácticas ADAARC',resumen:'Resumen evweb',geclisa:'Guía GECLISA'};
+var TITLES={home:'AnesFact v5',nueva:'Nueva intervención',scan:'Escanear / Config',foja:'Foja anestésica',nom:'Prácticas ADAARC',resumen:'Resumen evweb',geclisa:'Guía GECLISA'};
 
 // ═══════════════════════════════════════════════════
 // OBRAS SOCIALES ARGENTINA
@@ -453,209 +494,45 @@ var OBRAS_SOCIALES=[
 // CIRUGÍAS NOMENCLADOR ARGENTINA
 // ═══════════════════════════════════════════════════
 var CIRUGIAS=[
-  'Absceso / Flemón / Drenaje de pared abdominal',
-  'Herida de pared hasta aponeurosis < 20 cm',
-  'Cuerpo extraño de pared abdominal',
-  'Herida de pared abdominal > 20 cm',
-  'Hernia umbilical / inguinal / crural / epigástrica',
-  'Fístula umbilical / Onfalitis',
-  'Corrección de diastasis de los rectos',
-  'Tumor de pared (hematoma supra-infra aponeurótico)',
-  'Hernia recidivada',
-  'Hernia estrangulada',
-  'Hernia atascada',
-  'Hernia inguinal bilateral',
-  'Eventración / Evisceración',
-  'Reparación de hernia con malla (Marlex o similar)',
-  'Hernia estrangulada con resección intestinal',
-  'Hernia inguinal laparoscópica',
-  'Tratamiento quirúrgico del onfalocele',
-  'Dermolipectomía post-cirugía bariátrica',
-  'Tratamiento quirúrgico de la gastroquisis',
-  'Peritoneocentesis',
-  'Laparotomía exploradora (única intervención)',
-  'Laparotomía contenida / lavado de cavidad',
-  'Biopsia de peritoneo / epiplón',
-  'Resección de epiplón / Drenaje de absceso subfrénico',
-  'Simpatectomía abdominal o lumbar',
-  'Hernia de hiato a cielo abierto',
-  'Videolaparoscopía exploradora de abdomen',
-  'Peritonitis generalizada',
-  'Drenaje absceso subfrénico por laparoscopía',
-  'Videolaparoscopía terapéutica de abdomen',
-  'Vaciamiento inguino-abdominal o inguino-escrotal',
-  'Laparotomía exploradora en paciente crítico',
-  'Hernia hiatal por vía laparoscópica',
-  'Hernia diafragmática por vía abdominal o torácica',
-  'Laparotomía terapéutica en paciente crítico',
-  'Hernia diafragmática por vía toraco-abdominal',
-  'Hernia diafragmática congénita',
-  'HIPEC - Operación de Sugarbaker abdominal',
-  'Quiste o tumor de mesenterio / Hematoma retroperitoneal',
-  'Linfadenectomía retroperitoneal lumboaórtica',
-  'Linfadenectomía retroperitoneal por video',
-  'Tumor retroperitoneal a cielo abierto',
-  'Tumor retroperitoneal por video',
-  'Biopsia hepática a cielo abierto o laparoscópica',
-  'Colecistectomía simple a cielo abierto',
-  'Colecistectomía por videolaparoscopía',
-  'Hepatectomía derecha/izquierda o Segmentectomía',
-  'Trasplante hepático',
-  'Esplenectomía electiva / Quiste de páncreas',
-  'Esplenectomía por rotura de bazo',
-  'Duodenopancreatectomía (Whipple)',
-  'Pancreatectomía por videolaparoscopía',
-  'Trasplante de páncreas',
-  'Trasplante reno-pancreático',
-  'Gastrostomía (percutánea / endoscópica / botón)',
-  'Gastroenteroanastomosis / Úlcera perforada',
-  'Gastrectomía subtotal',
-  'By-pass gástrico / Manga gástrica por video',
-  'Extracción cuerpo extraño esofágico / Dilatación',
-  'Megaesófago / Perforaciones / Acalasia',
-  'Esofaguectomía laparoscópica',
-  'Atresia de esófago por video-toracoscopía',
-  'Apendicectomía convencional a cielo abierto',
-  'Apendicectomía por videolaparoscopía',
-  'Colectomía total / Hemicolectomía a cielo abierto',
-  'Colectomía total / Hemicolectomía por videolaparoscopía',
-  'Video-esofago-gastro-duodenoscopía (VEDA)',
-  'Colonovideoscopía con polipectomía',
-  'Papilotomía endoscópica / ERCP',
-  'Shunt porto-sistémico transyugular (TIPS)',
-  'Absceso perianal / Dilatación anal',
-  'Fístula anal / Fistulectomía / Fisura anal',
-  'Hemorroidectomía / Quiste sacrococcígeo',
-  'Operación de Dixon (resección anterior de recto)',
-  'Operación de Dixon laparoscópica',
-  'Amputación abdomino-perineal (Miles)',
-  'Amputación abdomino-perineal por videolaparoscopía',
-  'Toracoplastia / Resección costal',
-  'Pectus excavatum / carinatum',
-  'Pectus excavatum por video-toracoscopía',
-  'Decorticación pleuropulmonar a cielo abierto',
-  'Decorticación pleuropulmonar por video-toracoscopía',
-  'Neumonectomía / Lobectomía a cielo abierto',
-  'Neumonectomía / Lobectomía por video-toracoscopía (VATS)',
-  'Trasplante pulmonar',
-  'Mediastinoscopía',
-  'Bocio endotorácico / Timectomía',
-  'Tumores mediastinales por toracoscopía',
-  'Cirugía reducción volúmenes pulmonares por video',
-  'Operación de Sugarbaker (HIPEC) torácica',
-  'Broncoscopía con broncoscopio rígido',
-  'Colocación de stent traqueal o bronquial',
-  'Hemitiroidectomía',
-  'Tiroidectomía total',
-  'Tiroidectomía total con vaciamiento cervical',
-  'Tiroidectomía total con vaciamiento por video',
-  'Paratiroidectomía',
-  'Adrenalectomía unilateral',
-  'Feocromocitoma por video-laparoscopía',
-  'Tumorectomía / Nodulectomía / Biopsia de mama',
-  'Mastectomía radical con vaciamiento ganglionar',
-  'Mastectomía bilateral y colocación de prótesis',
-  'Legrado uterino / Conización',
-  'Histerectomía con o sin anexectomía',
-  'Histerectomía por video-laparoscopía',
-  'Operación de Wertheim-Meigs',
-  'Operación de Wertheim-Meigs por video-laparoscopía',
-  'Cirugía de adecuación de sexo',
-  'Quiste de ovario / Embarazo ectópico',
-  'Microcirugía tubaria unilateral',
-  'Microcirugía tubaria por video-laparoscopía',
-  'Formación de vagina artificial',
-  'Vulvectomía con vaciamiento ganglionar',
-  'Analgesia de trabajo de parto (< 90 min)',
-  'Cesárea',
-  'Conducción de trabajo de parto (> 90 min)',
-  'Trabajo de parto que termina en cesárea',
-  'Cesárea por placenta ácreta con histerectomía',
-  'Cirugías intra-uterinas',
-  'Varicocele / Hidrocele / Circuncisión',
-  'Emasculación total con vaciamiento',
-  'Microcirugía de la vía espermal',
-  'Plástica de uretra / Uretroplastia',
-  'Nefrostomía percutánea / Pieloplastia',
-  'Nefrectomía total',
-  'Nefrectomía total o parcial por videolaparoscopía',
-  'Trasplante renal',
-  'Trasplante corazón-riñón',
-  'Resección endoscópica de vejiga (TUR-V)',
-  'Cistectomía total',
-  'Cirugía de Mitrofanoff / Neo-vejiga',
-  'Cirugía de Bricker',
-  'Resección transuretral de próstata (TUR-P)',
-  'Prostatectomía radical por videolaparoscopía',
-  'Yeso pelvi-pédico / Minerva / Corsé',
-  'Reducción incruenta de fracturas o luxaciones',
-  'Osteosíntesis de hombro / rodilla / cadera',
-  'Polidactilia / Sindactilia',
-  'Reimplante total de miembro con microcirugía',
-  'Video-artroscopía simple de rodilla',
-  'Artroplastia de cadera / rodilla (prótesis)',
-  'Hernia de disco cervical / dorsal / lumbar',
-  'Artrodesis cervical / dorsal / lumbar',
-  'Cirugía compleja de columna (abordaje doble)',
-  'Osteosíntesis de malar o maxilar (> 2 placas)',
-  'Mastoidectomía simple o radical',
-  'Timpanoplastia',
-  'Implante coclear',
-  'Septumplastia / Sinusotomía maxilar',
-  'Parotidectomía total / Glosectomía subtotal',
-  'Microcirugía de laringe',
-  'Laringectomía radical con vaciamiento',
-  'Amigdalectomía y/o adenoidectomía',
-  'Operación comando de faringe con vaciamiento',
-  'Orbitotomía con escisión de lesión',
-  'Estrabismo bilateral',
-  'Vitrectomía',
-  'Ptosis palpebral',
-  'Injerto de córnea',
-  'Cirugía de cataratas con implante (Faco)',
-  'Dacrio-cistorrinostomía',
-  'Neurotomía trigeminal / vestibular',
-  'Laminectomía descompresiva',
-  'Mielomeningocele / Espina bífida',
-  'Embolización de tumor cerebral',
-  'Tratamiento de aneurisma cerebral con coils',
-  'Evacuación de hematoma extradural / subdural',
-  'Tumor cerebral (< 8 horas)',
-  'Tumor cerebral (> 8 horas)',
-  'Cirugía de aneurisma cerebral (< 8 horas)',
-  'Cirugía de aneurisma cerebral (> 8 horas)',
-  'Tumor de fosa posterior (< 8 horas)',
-  'Tumor de fosa posterior (> 8 horas)',
-  'Tratamiento Mal de Parkinson',
-  'By-pass temporo-silviano',
-  'Arteriografía / Flebografía',
-  'Angioplastia de un vaso periférico',
-  'Colocación de endoprótesis de aorta',
-  'Fístula arterio-venosa para hemodiálisis',
-  'By-pass de vasos periféricos',
-  'Aneurisma de aorta abdominal no complicado',
-  'Aneurisma del cayado de la aorta',
-  'By-pass aorto-coronario sin CEC',
-  'Reemplazo valvular',
-  'Trasplante de corazón',
-  'Trasplante de corazón-riñón',
-  'Trasplante de corazón-pulmón',
-  'Consulta / Visita pre-anestésica',
-  'Catéter peridural para analgesia postoperatoria',
-  'Bloqueo nervioso periférico ecoguiado',
-  'Cirugía suspendida (paciente anestesiado)',
-  'Hemicolectomía',
-  'Hemicolectomía por videolaparoscopía',
-  'Sigmoidectomía',
-  'Sigmoidectomía por videolaparoscopía',
-  'Colectomía total',
-  'Colectomía total por videolaparoscopía',
-  'Colectomía transversa segmentaria (operación de Hartmann)',
-  'Cierre de Hartmann',
-  'Cierre de Hartmann por videolaparoscopía',
-  'Operación de Miles',
+  // Abdomen
+  'Apendicectomía','Apendicectomía laparoscópica','Colecistectomía laparoscópica','Colecistectomía abierta',
+  'Hernioplastia inguinal','Hernioplastia inguinal laparoscópica','Hernioplastia umbilical',
+  'Hernioplastia incisional','Laparotomía exploradora','Esplenectomía','Colectomía derecha',
+  'Colectomía izquierda','Sigmoidectomía','Hemicolectomía','Gastrectomía total','Gastrectomía parcial',
+  'Fundoplicatura de Nissen','Bariatría — Sleeve gástrico','Bariatría — By-pass gástrico',
+  'Hepatectomía parcial','Resección intestinal','Anastomosis intestinal','Ostomía',
+  // Gineco-Obstetricia
+  'Cesárea','Histerectomía abdominal total','Histerectomía laparoscópica','Histerectomía vaginal',
+  'Miomectomía','Ooforectomía','Salpingectomía','Ligadura de trompas','Laparoscopía ginecológica',
+  'Legrado uterino evacuador','Legrado uterino diagnóstico','Resección endometriosis',
+  'Parto vaginal asistido','Cerclaje cervical','Prolapso genital — colpoperineorrafia',
+  // Ortopedia
+  'Prótesis total de cadera','Prótesis total de rodilla','Prótesis parcial de cadera',
+  'Artroscopía de rodilla','Artroscopía de hombro','Artroscopía de tobillo',
+  'RAFI — fractura de cadera','RAFI — fractura de fémur','RAFI — fractura de tibia',
+  'RAFI — fractura de radio','Osteotomía','Amputación','Artrodesis de columna',
+  'Laminectomía','Discectomía lumbar','Fusión vertebral',
+  // Urología
+  'Prostatectomía transuretral (RTU-P)','Resección transuretral vesical (RTU-V)',
+  'Cistoscopía','Nefrectomía laparoscópica','Nefrectomía abierta','Pieloplastia',
+  'Ureteroscopía','Litotripsia endoscópica (LEOC)','Orquiectomía','Vasectomía',
+  // ORL
+  'Amigdalectomía','Adenoidectomía','Amigdalectomía + adenoidectomía','Septoplastia',
+  'Turbinoplastia','Rinoseptoplastia','Panendoscopía','Traqueotomía',
+  'Timpanoplastia','Mastoidectomía',
+  // Tórax / Cardio
+  'Toracoscopía VATS','Lobectomía pulmonar','Pleurodesis','Drenaje pleural',
+  'By-pass coronario (CRM)','Valvuloplastia aórtica','Valvuloplastia mitral',
+  // Neurocirugía
+  'Craneotomía','Derivación ventriculoperitoneal (DVP)','Laminectomía descompresiva',
+  // Plástica
+  'Mamoplastia de aumento','Mamoplastia reductora','Recambio de prótesis mamaria',
+  'Mastopexia','Abdominoplastia','Liposucción','Blefaroplastia','Rinoplastia',
+  // Endoscopía / Misceláneas
+  'Endoscopía digestiva alta','Colonoscopía','Recto-sigmoidoscopía',
+  'CPRE','Gastrostomía percutánea','Catéter peridural analgesia postop.',
+  'Consulta pre-anestésica','Bloqueo nervioso periférico ecoguiado'
 ];
-
 
 // ═══════════════════════════════════════════════════
 // DRUG DATABASE
@@ -720,236 +597,43 @@ var RECUP_DRUGS=['Propofol estable','Extubado/a SpO₂ 99%','Despierto/a conform
 // NOMENCLADOR ADAARC (expandido)
 // ═══════════════════════════════════════════════════
 var NOM=[
-// 5.1 ABDOMEN - Pared
-{cod:'AB.P01',desc:'Absceso / Flemón / Drenaje de pared abdominal',comp:1,sec:'Abdomen'},
-{cod:'AB.P02',desc:'Herida de pared hasta aponeurosis < 20 cm',comp:1,sec:'Abdomen'},
-{cod:'AB.P03',desc:'Cuerpo extraño de pared abdominal',comp:1,sec:'Abdomen'},
-{cod:'AB.P04',desc:'Herida de pared abdominal > 20 cm',comp:2,sec:'Abdomen'},
-{cod:'AB.P05',desc:'Hernia umbilical / inguinal / crural / epigástrica',comp:3,sec:'Abdomen'},
-{cod:'AB.P06',desc:'Fístula umbilical / Onfalitis',comp:3,sec:'Abdomen'},
-{cod:'AB.P07',desc:'Corrección de diastasis de los rectos',comp:3,sec:'Abdomen'},
-{cod:'AB.P08',desc:'Tumor de pared (hematoma supra-infra aponeurótico)',comp:3,sec:'Abdomen'},
-{cod:'AB.P09',desc:'Hernia recidivada',comp:3,sec:'Abdomen'},
-{cod:'AB.P10',desc:'Hernia estrangulada',comp:3,sec:'Abdomen'},
-{cod:'AB.P11',desc:'Hernia atascada',comp:4,sec:'Abdomen'},
-{cod:'AB.P12',desc:'Hernia inguinal bilateral',comp:4,sec:'Abdomen'},
-{cod:'AB.P13',desc:'Eventración / Evisceración',comp:4,sec:'Abdomen'},
-{cod:'AB.P14',desc:'Reparación de hernia con malla (Marlex o similar)',comp:4,sec:'Abdomen'},
-{cod:'AB.P15',desc:'Hernia estrangulada con resección intestinal',comp:5,sec:'Abdomen'},
-{cod:'AB.P16',desc:'Hernia inguinal laparoscópica',comp:5,sec:'Abdomen'},
-{cod:'AB.P17',desc:'Tratamiento quirúrgico del onfalocele',comp:6,sec:'Abdomen'},
-{cod:'AB.P18',desc:'Dermolipectomía post-cirugía bariátrica',comp:6,sec:'Abdomen'},
-{cod:'AB.P19',desc:'Tratamiento quirúrgico de la gastroquisis',comp:7,sec:'Abdomen'},
-// 5.1 ABDOMEN - Cavidad
-{cod:'AB.C01',desc:'Peritoneocentesis',comp:2,sec:'Abdomen'},
-{cod:'AB.C02',desc:'Laparotomía exploradora (única intervención)',comp:3,sec:'Abdomen'},
-{cod:'AB.C03',desc:'Laparotomía contenida / lavado de cavidad',comp:3,sec:'Abdomen'},
-{cod:'AB.C04',desc:'Biopsia de peritoneo / epiplón',comp:3,sec:'Abdomen'},
-{cod:'AB.C05',desc:'Resección de epiplón / Drenaje de absceso subfrénico',comp:3,sec:'Abdomen'},
-{cod:'AB.C06',desc:'Simpatectomía abdominal o lumbar',comp:3,sec:'Abdomen'},
-{cod:'AB.C07',desc:'Hernia de hiato a cielo abierto',comp:4,sec:'Abdomen'},
-{cod:'AB.C08',desc:'Videolaparoscopía exploradora de abdomen',comp:4,sec:'Abdomen'},
-{cod:'AB.C09',desc:'Peritonitis generalizada',comp:5,sec:'Abdomen'},
-{cod:'AB.C10',desc:'Drenaje absceso subfrénico por laparoscopía',comp:5,sec:'Abdomen'},
-{cod:'AB.C11',desc:'Videolaparoscopía terapéutica de abdomen',comp:5,sec:'Abdomen'},
-{cod:'AB.C12',desc:'Vaciamiento inguino-abdominal o inguino-escrotal',comp:5,sec:'Abdomen'},
-{cod:'AB.C13',desc:'Laparotomía exploradora en paciente crítico',comp:6,sec:'Abdomen'},
-{cod:'AB.C14',desc:'Hernia hiatal por vía laparoscópica',comp:6,sec:'Abdomen'},
-{cod:'AB.C15',desc:'Hernia diafragmática por vía abdominal o torácica',comp:6,sec:'Abdomen'},
-{cod:'AB.C16',desc:'Laparotomía terapéutica en paciente crítico',comp:7,sec:'Abdomen'},
-{cod:'AB.C17',desc:'Hernia diafragmática por vía toraco-abdominal',comp:7,sec:'Abdomen'},
-{cod:'AB.C18',desc:'Hernia diafragmática congénita',comp:12,sec:'Abdomen'},
-{cod:'AB.C19',desc:'HIPEC - Operación de Sugarbaker abdominal',comp:12,sec:'Abdomen'},
-// 5.1 ABDOMEN - Retroperitoneo
-{cod:'AB.R01',desc:'Quiste o tumor de mesenterio / Hematoma retroperitoneal',comp:4,sec:'Abdomen'},
-{cod:'AB.R02',desc:'Linfadenectomía retroperitoneal lumboaórtica',comp:5,sec:'Abdomen'},
-{cod:'AB.R03',desc:'Linfadenectomía retroperitoneal por video',comp:6,sec:'Abdomen'},
-{cod:'AB.R04',desc:'Tumor retroperitoneal a cielo abierto',comp:6,sec:'Abdomen'},
-{cod:'AB.R05',desc:'Tumor retroperitoneal por video',comp:7,sec:'Abdomen'},
-// 5.1 ABDOMEN - Hígado / Vesícula
-{cod:'AB.H01',desc:'Biopsia hepática a cielo abierto o laparoscópica',comp:3,sec:'Abdomen'},
-{cod:'AB.H02',desc:'Colecistectomía simple a cielo abierto',comp:4,sec:'Abdomen'},
-{cod:'AB.H03',desc:'Colecistectomía por videolaparoscopía',comp:5,sec:'Abdomen'},
-{cod:'AB.H04',desc:'Hepatectomía derecha/izquierda o Segmentectomía',comp:7,sec:'Abdomen'},
-{cod:'AB.H05',desc:'Trasplante hepático',comp:12,sec:'Abdomen'},
-// 5.1 ABDOMEN - Bazo / Páncreas
-{cod:'AB.B01',desc:'Esplenectomía electiva / Quiste de páncreas',comp:4,sec:'Abdomen'},
-{cod:'AB.B02',desc:'Esplenectomía por rotura de bazo',comp:5,sec:'Abdomen'},
-{cod:'AB.B03',desc:'Duodenopancreatectomía (Whipple)',comp:7,sec:'Abdomen'},
-{cod:'AB.B04',desc:'Pancreatectomía por videolaparoscopía',comp:7,sec:'Abdomen'},
-{cod:'AB.B05',desc:'Trasplante de páncreas',comp:11,sec:'Abdomen'},
-{cod:'AB.B06',desc:'Trasplante reno-pancreático',comp:12,sec:'Abdomen'},
-// 5.1 ABDOMEN - Estómago
-{cod:'AB.E01',desc:'Gastrostomía (percutánea / endoscópica / botón)',comp:3,sec:'Abdomen'},
-{cod:'AB.E02',desc:'Gastroenteroanastomosis / Úlcera perforada',comp:5,sec:'Abdomen'},
-{cod:'AB.E03',desc:'Gastrectomía subtotal',comp:6,sec:'Abdomen'},
-{cod:'AB.E04',desc:'By-pass gástrico / Manga gástrica por video',comp:8,sec:'Abdomen'},
-// 5.1 ABDOMEN - Esófago
-{cod:'AB.ES01',desc:'Extracción cuerpo extraño esofágico / Dilatación',comp:3,sec:'Abdomen'},
-{cod:'AB.ES02',desc:'Megaesófago / Perforaciones / Acalasia',comp:5,sec:'Abdomen'},
-{cod:'AB.ES03',desc:'Esofaguectomía laparoscópica',comp:7,sec:'Abdomen'},
-{cod:'AB.ES04',desc:'Atresia de esófago por video-toracoscopía',comp:8,sec:'Abdomen'},
-// 5.1 ABDOMEN - Intestino
-{cod:'AB.I01',desc:'Apendicectomía convencional a cielo abierto',comp:4,sec:'Abdomen'},
-{cod:'AB.I02',desc:'Apendicectomía por videolaparoscopía',comp:5,sec:'Abdomen'},
-{cod:'AB.I03',desc:'Derivación intestinal interna',comp:5,sec:'Abdomen'},
-{cod:'AB.I04',desc:'Oclusión con resección de intestino',comp:5,sec:'Abdomen'},
-{cod:'AB.I05',desc:'Devolvulación / desinvaginación intestinal con resección intestinal',comp:5,sec:'Abdomen'},
-{cod:'AB.I06',desc:'Cierre de Hartmann',comp:5,sec:'Abdomen'},
-{cod:'AB.I07',desc:'Tratamiento quirúrgico del megacolon',comp:5,sec:'Abdomen'},
-{cod:'AB.I08',desc:'Plicatura intestinal (operación de Noble)',comp:5,sec:'Abdomen'},
-{cod:'AB.I09',desc:'Hemicolectomía',comp:6,sec:'Abdomen'},
-{cod:'AB.I10',desc:'Sigmoidectomía',comp:6,sec:'Abdomen'},
-{cod:'AB.I11',desc:'Cierre de Hartmann por videolaparoscopía',comp:6,sec:'Abdomen'},
-{cod:'AB.I12',desc:'Colectomía transversa segmentaria (operación de Hartmann)',comp:6,sec:'Abdomen'},
-{cod:'AB.I13',desc:'Colectomía transversa segmentaria por videolaparoscopía (Hartmann laparoscópica)',comp:7,sec:'Abdomen'},
-{cod:'AB.I14',desc:'Sigmoidectomía por videolaparoscopía',comp:7,sec:'Abdomen'},
-{cod:'AB.I15',desc:'Hemicolectomía por videolaparoscopía',comp:7,sec:'Abdomen'},
-{cod:'AB.I16',desc:'Colectomía total',comp:7,sec:'Abdomen'},
-{cod:'AB.I17',desc:'Colectomía o hemicolectomía abdomino-pélvica (operación de Miles)',comp:7,sec:'Abdomen'},
-{cod:'AB.I18',desc:'Atresia ano-rectal en pediatría / malformaciones congénitas anorectales',comp:7,sec:'Abdomen'},
-{cod:'AB.I19',desc:'Colectomía o hemicolectomía abdomino-pélvica (operación de Miles) por videolaparoscopía',comp:8,sec:'Abdomen'},
-{cod:'AB.I20',desc:'Colectomía total por videolaparoscopía',comp:9,sec:'Abdomen'},
-// 5.1 ABDOMEN - Endoscopía
-{cod:'AB.EN01',desc:'Video-esofago-gastro-duodenoscopía (VEDA)',comp:2,sec:'Abdomen'},
-{cod:'AB.EN02',desc:'Colonovideoscopía con polipectomía',comp:3,sec:'Abdomen'},
-{cod:'AB.EN03',desc:'Papilotomía endoscópica / ERCP',comp:4,sec:'Abdomen'},
-{cod:'AB.EN04',desc:'Shunt porto-sistémico transyugular (TIPS)',comp:7,sec:'Abdomen'},
-// 5.2 PROCTOLOGÍA
-{cod:'PR.01',desc:'Absceso perianal / Dilatación anal',comp:1,sec:'Proctología'},
-{cod:'PR.02',desc:'Fístula anal / Fistulectomía / Fisura anal',comp:2,sec:'Proctología'},
-{cod:'PR.03',desc:'Hemorroidectomía / Quiste sacrococcígeo',comp:3,sec:'Proctología'},
-{cod:'PR.04',desc:'Operación de Dixon (resección anterior de recto)',comp:5,sec:'Proctología'},
-{cod:'PR.05',desc:'Operación de Dixon laparoscópica',comp:6,sec:'Proctología'},
-{cod:'PR.06',desc:'Amputación abdomino-perineal (Miles)',comp:7,sec:'Proctología'},
-{cod:'PR.07',desc:'Amputación abdomino-perineal por videolaparoscopía',comp:8,sec:'Proctología'},
-// 5.3 TÓRAX
-{cod:'TX.P01',desc:'Toracoplastia / Resección costal',comp:4,sec:'Tórax'},
-{cod:'TX.P02',desc:'Pectus excavatum / carinatum',comp:6,sec:'Tórax'},
-{cod:'TX.P03',desc:'Pectus excavatum por video-toracoscopía',comp:7,sec:'Tórax'},
-{cod:'TX.PL01',desc:'Decorticación pleuropulmonar a cielo abierto',comp:7,sec:'Tórax'},
-{cod:'TX.PL02',desc:'Decorticación pleuropulmonar por video-toracoscopía',comp:7,sec:'Tórax'},
-{cod:'TX.PU01',desc:'Neumonectomía / Lobectomía a cielo abierto',comp:6,sec:'Tórax'},
-{cod:'TX.PU02',desc:'Neumonectomía / Lobectomía por video-toracoscopía (VATS)',comp:7,sec:'Tórax'},
-{cod:'TX.PU03',desc:'Trasplante pulmonar',comp:11,sec:'Tórax'},
-{cod:'TX.M01',desc:'Mediastinoscopía',comp:4,sec:'Tórax'},
-{cod:'TX.M02',desc:'Bocio endotorácico / Timectomía',comp:6,sec:'Tórax'},
-{cod:'TX.M03',desc:'Tumores mediastinales por toracoscopía',comp:7,sec:'Tórax'},
-{cod:'TX.M04',desc:'Cirugía reducción volúmenes pulmonares por video',comp:10,sec:'Tórax'},
-{cod:'TX.M05',desc:'Operación de Sugarbaker (HIPEC) torácica',comp:12,sec:'Tórax'},
-{cod:'TX.E01',desc:'Broncoscopía con broncoscopio rígido',comp:3,sec:'Tórax'},
-{cod:'TX.E02',desc:'Colocación de stent traqueal o bronquial',comp:5,sec:'Tórax'},
-// 5.4 ENDÓCRINAS / MAMA
-{cod:'EN.T01',desc:'Hemitiroidectomía',comp:4,sec:'Endócrinas'},
-{cod:'EN.T02',desc:'Tiroidectomía total',comp:5,sec:'Endócrinas'},
-{cod:'EN.T03',desc:'Tiroidectomía total con vaciamiento cervical',comp:6,sec:'Endócrinas'},
-{cod:'EN.T04',desc:'Tiroidectomía total con vaciamiento por video',comp:7,sec:'Endócrinas'},
-{cod:'EN.P01',desc:'Paratiroidectomía',comp:5,sec:'Endócrinas'},
-{cod:'EN.S01',desc:'Adrenalectomía unilateral',comp:6,sec:'Endócrinas'},
-{cod:'EN.S02',desc:'Feocromocitoma por video-laparoscopía',comp:8,sec:'Endócrinas'},
-{cod:'EN.M01',desc:'Tumorectomía / Nodulectomía / Biopsia de mama',comp:3,sec:'Mama'},
-{cod:'EN.M02',desc:'Mastectomía radical con vaciamiento ganglionar',comp:7,sec:'Mama'},
-{cod:'EN.M03',desc:'Mastectomía bilateral y colocación de prótesis',comp:8,sec:'Mama'},
-// 5.5 GINECOLOGÍA
-{cod:'GI.U01',desc:'Legrado uterino / Conización',comp:2,sec:'Ginecología'},
-{cod:'GI.U02',desc:'Histerectomía con o sin anexectomía',comp:5,sec:'Ginecología'},
-{cod:'GI.U03',desc:'Histerectomía por video-laparoscopía',comp:6,sec:'Ginecología'},
-{cod:'GI.U04',desc:'Operación de Wertheim-Meigs',comp:7,sec:'Ginecología'},
-{cod:'GI.U05',desc:'Operación de Wertheim-Meigs por video-laparoscopía',comp:8,sec:'Ginecología'},
-{cod:'GI.U06',desc:'Cirugía de adecuación de sexo',comp:11,sec:'Ginecología'},
-{cod:'GI.A01',desc:'Quiste de ovario / Embarazo ectópico',comp:3,sec:'Ginecología'},
-{cod:'GI.A02',desc:'Microcirugía tubaria unilateral',comp:5,sec:'Ginecología'},
-{cod:'GI.A03',desc:'Microcirugía tubaria por video-laparoscopía',comp:7,sec:'Ginecología'},
-{cod:'GI.V01',desc:'Formación de vagina artificial',comp:7,sec:'Ginecología'},
-{cod:'GI.PV01',desc:'Vulvectomía con vaciamiento ganglionar',comp:6,sec:'Ginecología'},
-// 5.6 OBSTETRICIA
-{cod:'OB.01',desc:'Analgesia de trabajo de parto (< 90 min)',comp:4,sec:'Obstetricia'},
-{cod:'OB.02',desc:'Cesárea',comp:5,sec:'Obstetricia'},
-{cod:'OB.03',desc:'Conducción de trabajo de parto (> 90 min)',comp:5,sec:'Obstetricia'},
-{cod:'OB.04',desc:'Trabajo de parto que termina en cesárea',comp:6,sec:'Obstetricia'},
-{cod:'OB.05',desc:'Cesárea por placenta ácreta con histerectomía',comp:8,sec:'Obstetricia'},
-{cod:'OB.06',desc:'Cirugías intra-uterinas',comp:9,sec:'Obstetricia'},
-// 5.7 UROLOGÍA
-{cod:'UR.PT01',desc:'Varicocele / Hidrocele / Circuncisión',comp:3,sec:'Urología'},
-{cod:'UR.PT02',desc:'Emasculación total con vaciamiento',comp:6,sec:'Urología'},
-{cod:'UR.PT03',desc:'Microcirugía de la vía espermal',comp:8,sec:'Urología'},
-{cod:'UR.U01',desc:'Plástica de uretra / Uretroplastia',comp:4,sec:'Urología'},
-{cod:'UR.R01',desc:'Nefrostomía percutánea / Pieloplastia',comp:4,sec:'Urología'},
-{cod:'UR.R02',desc:'Nefrectomía total',comp:6,sec:'Urología'},
-{cod:'UR.R03',desc:'Nefrectomía total o parcial por videolaparoscopía',comp:7,sec:'Urología'},
-{cod:'UR.R04',desc:'Trasplante renal',comp:9,sec:'Urología'},
-{cod:'UR.R05',desc:'Trasplante corazón-riñón',comp:12,sec:'Urología'},
-{cod:'UR.V01',desc:'Resección endoscópica de vejiga (TUR-V)',comp:4,sec:'Urología'},
-{cod:'UR.V02',desc:'Cistectomía total',comp:6,sec:'Urología'},
-{cod:'UR.V03',desc:'Cirugía de Mitrofanoff / Neo-vejiga',comp:7,sec:'Urología'},
-{cod:'UR.V04',desc:'Cirugía de Bricker',comp:9,sec:'Urología'},
-{cod:'UR.PR01',desc:'Resección transuretral de próstata (TUR-P)',comp:5,sec:'Urología'},
-{cod:'UR.PR02',desc:'Prostatectomía radical por videolaparoscopía',comp:7,sec:'Urología'},
-// 5.8 ORTOPEDIA
-{cod:'OR.Y01',desc:'Yeso pelvi-pédico / Minerva / Corsé',comp:2,sec:'Ortopedia'},
-{cod:'OR.H01',desc:'Reducción incruenta de fracturas o luxaciones',comp:2,sec:'Ortopedia'},
-{cod:'OR.H02',desc:'Osteosíntesis de hombro / rodilla / cadera',comp:5,sec:'Ortopedia'},
-{cod:'OR.M01',desc:'Polidactilia / Sindactilia',comp:3,sec:'Ortopedia'},
-{cod:'OR.M02',desc:'Reimplante total de miembro con microcirugía',comp:8,sec:'Ortopedia'},
-{cod:'OR.AR01',desc:'Video-artroscopía simple de rodilla',comp:5,sec:'Ortopedia'},
-{cod:'OR.AR02',desc:'Artroplastia de cadera / rodilla (prótesis)',comp:6,sec:'Ortopedia'},
-{cod:'OR.CO01',desc:'Hernia de disco cervical / dorsal / lumbar',comp:5,sec:'Ortopedia'},
-{cod:'OR.CO02',desc:'Artrodesis cervical / dorsal / lumbar',comp:7,sec:'Ortopedia'},
-{cod:'OR.CO03',desc:'Cirugía compleja de columna (abordaje doble)',comp:8,sec:'Ortopedia'},
-{cod:'OR.CA01',desc:'Osteosíntesis de malar o maxilar (> 2 placas)',comp:6,sec:'Ortopedia'},
-// 5.9 ORL
-{cod:'OL.O01',desc:'Mastoidectomía simple o radical',comp:4,sec:'ORL'},
-{cod:'OL.O02',desc:'Timpanoplastia',comp:5,sec:'ORL'},
-{cod:'OL.O03',desc:'Implante coclear',comp:7,sec:'ORL'},
-{cod:'OL.N01',desc:'Septumplastia / Sinusotomía maxilar',comp:4,sec:'ORL'},
-{cod:'OL.B01',desc:'Parotidectomía total / Glosectomía subtotal',comp:5,sec:'ORL'},
-{cod:'OL.L01',desc:'Microcirugía de laringe',comp:4,sec:'ORL'},
-{cod:'OL.L02',desc:'Laringectomía radical con vaciamiento',comp:7,sec:'ORL'},
-{cod:'OL.F01',desc:'Amigdalectomía y/o adenoidectomía',comp:4,sec:'ORL'},
-{cod:'OL.F02',desc:'Operación comando de faringe con vaciamiento',comp:7,sec:'ORL'},
-// 5.10 OFTALMOLOGÍA
-{cod:'OF.OR01',desc:'Orbitotomía con escisión de lesión',comp:3,sec:'Oftalmología'},
-{cod:'OF.MU01',desc:'Estrabismo bilateral',comp:6,sec:'Oftalmología'},
-{cod:'OF.GO01',desc:'Vitrectomía',comp:6,sec:'Oftalmología'},
-{cod:'OF.PA01',desc:'Ptosis palpebral',comp:3,sec:'Oftalmología'},
-{cod:'OF.CO01',desc:'Injerto de córnea',comp:6,sec:'Oftalmología'},
-{cod:'OF.CR01',desc:'Cirugía de cataratas con implante (Faco)',comp:5,sec:'Oftalmología'},
-{cod:'OF.VL01',desc:'Dacrio-cistorrinostomía',comp:5,sec:'Oftalmología'},
-// 5.11 NEUROCIRUGÍA
-{cod:'NC.NE01',desc:'Neurotomía trigeminal / vestibular',comp:7,sec:'Neurocirugía'},
-{cod:'NC.RA01',desc:'Laminectomía descompresiva',comp:5,sec:'Neurocirugía'},
-{cod:'NC.RA02',desc:'Mielomeningocele / Espina bífida',comp:6,sec:'Neurocirugía'},
-{cod:'NC.HD01',desc:'Embolización de tumor cerebral',comp:6,sec:'Neurocirugía'},
-{cod:'NC.HD02',desc:'Tratamiento de aneurisma cerebral con coils',comp:7,sec:'Neurocirugía'},
-{cod:'NC.QX01',desc:'Evacuación de hematoma extradural / subdural',comp:6,sec:'Neurocirugía'},
-{cod:'NC.QX02',desc:'Tumor cerebral (< 8 horas)',comp:8,sec:'Neurocirugía'},
-{cod:'NC.QX03',desc:'Tumor cerebral (> 8 horas)',comp:8,sec:'Neurocirugía'},
-{cod:'NC.QX04',desc:'Cirugía de aneurisma cerebral (< 8 horas)',comp:8,sec:'Neurocirugía'},
-{cod:'NC.QX05',desc:'Cirugía de aneurisma cerebral (> 8 horas)',comp:8,sec:'Neurocirugía'},
-{cod:'NC.QX06',desc:'Tumor de fosa posterior (< 8 horas)',comp:8,sec:'Neurocirugía'},
-{cod:'NC.QX07',desc:'Tumor de fosa posterior (> 8 horas)',comp:8,sec:'Neurocirugía'},
-{cod:'NC.QX08',desc:'Tratamiento Mal de Parkinson',comp:8,sec:'Neurocirugía'},
-{cod:'NC.QX09',desc:'By-pass temporo-silviano',comp:9,sec:'Neurocirugía'},
-// 5.12 CARDIOVASCULAR
-{cod:'CV.HD01',desc:'Arteriografía / Flebografía',comp:2,sec:'Cardiovascular'},
-{cod:'CV.HD02',desc:'Angioplastia de un vaso periférico',comp:4,sec:'Cardiovascular'},
-{cod:'CV.HD03',desc:'Colocación de endoprótesis de aorta',comp:7,sec:'Cardiovascular'},
-{cod:'CV.VP01',desc:'Fístula arterio-venosa para hemodiálisis',comp:4,sec:'Cardiovascular'},
-{cod:'CV.VP02',desc:'By-pass de vasos periféricos',comp:6,sec:'Cardiovascular'},
-{cod:'CV.GV01',desc:'Aneurisma de aorta abdominal no complicado',comp:7,sec:'Cardiovascular'},
-{cod:'CV.GV02',desc:'Aneurisma del cayado de la aorta',comp:8,sec:'Cardiovascular'},
-{cod:'CV.CO01',desc:'By-pass aorto-coronario sin CEC',comp:8,sec:'Cardiovascular'},
-{cod:'CV.CO02',desc:'Reemplazo valvular',comp:8,sec:'Cardiovascular'},
-{cod:'CV.CO03',desc:'Trasplante de corazón',comp:11,sec:'Cardiovascular'},
-{cod:'CV.CO04',desc:'Trasplante de corazón-riñón',comp:12,sec:'Cardiovascular'},
-{cod:'CV.CO05',desc:'Trasplante de corazón-pulmón',comp:13,sec:'Cardiovascular'},
-// ANESTESIA ESPECÍFICA
-{cod:'AN.01',desc:'Consulta / Visita pre-anestésica',comp:1,sec:'Anestesia'},
-{cod:'AN.02',desc:'Catéter peridural para analgesia postoperatoria',comp:3,sec:'Anestesia'},
-{cod:'AN.03',desc:'Bloqueo nervioso periférico ecoguiado',comp:4,sec:'Anestesia'},
-{cod:'AN.04',desc:'Cirugía suspendida (paciente anestesiado)',comp:1,sec:'Anestesia'}
+  {cod:'01.01.01',desc:'Apendicectomía',comp:4,sec:'Abdomen'},{cod:'01.01.02',desc:'Apendicectomía laparoscópica',comp:5,sec:'Abdomen'},
+  {cod:'01.02.01',desc:'Colecistectomía abierta',comp:5,sec:'Abdomen'},{cod:'01.02.02',desc:'Colecistectomía laparoscópica',comp:5,sec:'Abdomen'},
+  {cod:'01.03.01',desc:'Hernioplastia inguinal',comp:4,sec:'Abdomen'},{cod:'01.03.02',desc:'Hernioplastia inguinal laparoscópica',comp:5,sec:'Abdomen'},
+  {cod:'01.03.03',desc:'Hernioplastia umbilical',comp:3,sec:'Abdomen'},{cod:'01.03.04',desc:'Hernioplastia incisional',comp:5,sec:'Abdomen'},
+  {cod:'01.04.01',desc:'Laparotomía exploradora',comp:6,sec:'Abdomen'},{cod:'01.05.01',desc:'Esplenectomía',comp:6,sec:'Abdomen'},
+  {cod:'01.06.01',desc:'Colectomía / Hemicolectomía',comp:7,sec:'Abdomen'},{cod:'01.07.01',desc:'Cirugía bariátrica (sleeve/bypass)',comp:7,sec:'Abdomen'},
+  {cod:'01.08.01',desc:'Gastrectomía',comp:7,sec:'Abdomen'},{cod:'01.09.01',desc:'Fundoplicatura (Nissen)',comp:5,sec:'Abdomen'},
+  {cod:'05.01.01',desc:'Histerectomía abdominal total',comp:6,sec:'Ginecología'},{cod:'05.01.02',desc:'Histerectomía vaginal',comp:5,sec:'Ginecología'},
+  {cod:'05.01.03',desc:'Histerectomía laparoscópica',comp:6,sec:'Ginecología'},{cod:'05.02.01',desc:'Miomectomía',comp:5,sec:'Ginecología'},
+  {cod:'05.02.02',desc:'Ooforectomía / Salpingectomía',comp:4,sec:'Ginecología'},{cod:'05.03.01',desc:'Legrado uterino diagnóstico',comp:2,sec:'Ginecología'},
+  {cod:'05.03.02',desc:'Legrado uterino evacuador',comp:2,sec:'Ginecología'},{cod:'05.04.01',desc:'Ligadura de trompas',comp:3,sec:'Ginecología'},
+  {cod:'05.05.01',desc:'Prolapso genital — colpoperineorrafia',comp:5,sec:'Ginecología'},{cod:'05.06.01',desc:'Laparoscopía ginecológica',comp:4,sec:'Ginecología'},
+  {cod:'06.01.01',desc:'Cesárea',comp:5,sec:'Obstetricia'},{cod:'06.01.02',desc:'Parto vaginal (asistencia anestésica)',comp:4,sec:'Obstetricia'},
+  {cod:'06.02.01',desc:'Analgesia peridural trabajo de parto',comp:3,sec:'Obstetricia'},{cod:'06.03.01',desc:'Cerclaje cervical',comp:3,sec:'Obstetricia'},
+  {cod:'08.01.01',desc:'Prótesis total de cadera',comp:7,sec:'Ortopedia'},{cod:'08.01.02',desc:'Prótesis total de rodilla',comp:7,sec:'Ortopedia'},
+  {cod:'08.01.03',desc:'Prótesis parcial de cadera',comp:6,sec:'Ortopedia'},{cod:'08.02.01',desc:'Artroscopía de rodilla diagnóstica',comp:4,sec:'Ortopedia'},
+  {cod:'08.02.02',desc:'Artroscopía de rodilla con reparación',comp:5,sec:'Ortopedia'},{cod:'08.02.03',desc:'Artroscopía de hombro',comp:5,sec:'Ortopedia'},
+  {cod:'08.03.01',desc:'RAFI — fractura de cadera/fémur',comp:6,sec:'Ortopedia'},{cod:'08.03.02',desc:'RAFI — fractura de tibia/radio',comp:5,sec:'Ortopedia'},
+  {cod:'08.04.01',desc:'Artrodesis de columna',comp:7,sec:'Ortopedia'},{cod:'08.04.02',desc:'Amputación de miembro',comp:6,sec:'Ortopedia'},
+  {cod:'07.01.01',desc:'Nefrectomía laparoscópica',comp:7,sec:'Urología'},{cod:'07.02.01',desc:'Prostatectomía transuretral (RTU-P)',comp:5,sec:'Urología'},
+  {cod:'07.02.02',desc:'Resección transuretral vesical (RTU-V)',comp:5,sec:'Urología'},{cod:'07.03.01',desc:'Cistoscopía',comp:2,sec:'Urología'},
+  {cod:'07.04.01',desc:'Ureteroscopía / litotripsia',comp:4,sec:'Urología'},{cod:'07.05.01',desc:'Orquiectomía',comp:4,sec:'Urología'},
+  {cod:'09.01.01',desc:'Amigdalectomía / adenoidectomía',comp:3,sec:'ORL'},{cod:'09.02.01',desc:'Septoplastia',comp:3,sec:'ORL'},
+  {cod:'09.02.02',desc:'Rinoseptoplastia',comp:4,sec:'ORL'},{cod:'09.03.01',desc:'Timpanoplastia / mastoidectomía',comp:5,sec:'ORL'},
+  {cod:'09.04.01',desc:'Traqueotomía',comp:5,sec:'ORL'},{cod:'03.01.01',desc:'Lobectomía pulmonar VATS',comp:8,sec:'Tórax'},
+  {cod:'03.02.01',desc:'Pleurodesis / drenaje pleural',comp:4,sec:'Tórax'},
+  {cod:'11.01.01',desc:'Craneotomía',comp:9,sec:'Neurocirugía'},{cod:'11.02.01',desc:'Laminectomía / discectomía',comp:6,sec:'Neurocirugía'},
+  {cod:'11.03.01',desc:'Derivación ventriculoperitoneal (DVP)',comp:7,sec:'Neurocirugía'},
+  {cod:'12.01.01',desc:'Mamoplastia de aumento',comp:4,sec:'Cirugía Plástica'},{cod:'12.01.02',desc:'Mamoplastia reductora',comp:5,sec:'Cirugía Plástica'},
+  {cod:'12.01.03',desc:'Recambio de prótesis mamaria',comp:4,sec:'Cirugía Plástica'},{cod:'12.02.01',desc:'Abdominoplastia',comp:5,sec:'Cirugía Plástica'},
+  {cod:'12.03.01',desc:'Liposucción',comp:4,sec:'Cirugía Plástica'},{cod:'12.04.01',desc:'Rinoplastia',comp:4,sec:'Cirugía Plástica'},
+  {cod:'15.01.01',desc:'Endoscopía digestiva alta',comp:2,sec:'Misceláneas'},{cod:'15.01.02',desc:'Colonoscopía',comp:2,sec:'Misceláneas'},
+  {cod:'15.01.03',desc:'CPRE',comp:4,sec:'Misceláneas'},
+  {cod:'00.01.01',desc:'Consulta pre-anestésica',comp:1,sec:'Anestesia'},
+  {cod:'00.02.01',desc:'Catéter peridural analgesia postop.',comp:3,sec:'Anestesia'},
+  {cod:'00.03.01',desc:'Bloqueo nervioso periférico ecoguiado',comp:4,sec:'Anestesia'},
 ];
-
 
 // ═══════════════════════════════════════════════════
 // AUTOCOMPLETE ENGINE
@@ -959,103 +643,38 @@ function acSearch(list,q,keyFn){
   var ql=q.toLowerCase();
   return list.filter(function(x){return keyFn(x).toLowerCase().indexOf(ql)>=0;}).slice(0,10);
 }
-function closeAllAC(){
-  document.querySelectorAll('.ac-list').forEach(function(el){el.style.display='none';});
-}
-document.addEventListener('click',function(e){
-  if(!e.target.closest('.ac-wrap'))closeAllAC();
-});
 function renderAC(listId,items,labelFn,subFn,onSelect){
   var el=document.getElementById(listId);if(!el)return;
   if(!items.length){el.style.display='none';return;}
-  var cap=items.slice(); // capture snapshot - FIX for re-filtering bug
+  var cap=items.slice();
   el.innerHTML=cap.map(function(item,i){
     return '<div class="ac-item" data-i="'+i+'" onmousedown="event.preventDefault()">'
       +labelFn(item)+(subFn?'<small>'+subFn(item)+'</small>':'')+'</div>';
   }).join('');
   el.onclick=function(e){
     var t=e.target.closest?e.target.closest('.ac-item'):e.target;
-    if(!t||!t.classList.contains('ac-item')){var n=e.target;while(n&&n!==el){if(n.className&&n.className.indexOf('ac-item')>=0){t=n;break;}n=n.parentNode;}}
+    if(!t||t.className.indexOf('ac-item')<0){var n=e.target;while(n&&n!==el){if(n.className&&n.className.indexOf('ac-item')>=0){t=n;break;}n=n.parentNode;}}
     if(!t||!t.className||t.className.indexOf('ac-item')<0)return;
     var i2=parseInt(t.getAttribute('data-i'));
     if(!isNaN(i2))onSelect(i2,cap);
   };
   el.style.display='block';
-  el._items=cap;
 }
 function acObraSocial(fieldId,listId){fieldId=fieldId||'f-obra';listId=listId||'ac-obra';
   var q=document.getElementById(fieldId).value;
   var items=OBRAS_SOCIALES.filter(function(x){return x.toLowerCase().indexOf(q.toLowerCase())>=0;}).slice(0,10);
-  renderAC(listId,items,function(x){return x;},null,function(i,cap){
-    document.getElementById(fieldId).value=cap[i]||'';closeAllAC();
-  });
-}
-
-// ═══════════════════════════════════════════════════
-// CIRUJANOS POR ESPECIALIDAD (Sanatorio Mayo)
-// ═══════════════════════════════════════════════════
-var CIRUJANOS_ESP = {
-  'Cirugía Cardiovascular':   ['BOCHINFUSO MATIAS','GUEVARA JORGE ALEJANDRO'],
-  'Cardiocirugía':             ['BOCHINFUSO MATIAS','GUEVARA JORGE ALEJANDRO'],
-  'Cirugía de Cabeza y Cuello':['CORBALL ALBERTO GUSTAVO','FLORES GABRIEL ALEJANDRO','MENSO NICOLAS'],
-  'Cirugía Torácica':         ['REPETTI JOSE LUIS'],
-  'Cirugía General':          ['COOKE JOSE ALBERTO','COPPARI BRIAN','MATUS GUSTAVO NICOLAS','ZURITA GONZALO'],
-  'Cirugía Laparoscópica':    ['COOKE JOSE ALBERTO','COPPARI BRIAN','MATUS GUSTAVO NICOLAS','ZURITA GONZALO'],
-  'Cirugía Hepática':         ['ALVAREZ FERNANDO ANDRES'],
-  'Cirugía Plástica y Reparadora':['PAOLETTI JAVIER ALBERTO','ROMERO ARENA FEDERICO'],
-  'Cirugía Vascular':         ['FONTAINE CRISTIAN','PELAEZ RODRIGO'],
-  'Endoscopía Digestiva':     ['BONAPARTE FERNANDO AGUSTIN','IRIARTE HORACIO FERNANDO','STRUMIA SILVINA DEL VALLE'],
-  'Gastroenterología':        ['BONAPARTE FERNANDO AGUSTIN','IRIARTE HORACIO FERNANDO','STRUMIA SILVINA DEL VALLE'],
-  'Ginecología y Obstetricia':['GIL ANA MARIA IRENE','ARRECHEA MARIANA','CANAVESIO CAROLA ALEJANDRA','CAPOVILLA CLAUDIA PATRICIA','PIOVANO MARIA PATRICIA'],
-  'Hemodinamia':              ['LEONARDI CARLOS RAUL','CHIARINI FERNANDO','FONTAINE CRISTIAN','MIARA JONATHAN','PESSAH GUSTAVO'],
-  'Neurocirugía':             ['BERRA MATIAS SEBASTIAN','SANCHEZ JAVIER ANTONIO'],
-  'Oftalmología':             ['GONZALEZ CASTELLANOS JERONIMO','ALVAREZ MARIA ALEJANDRA','GONZALEZ CASTELLANOS MARIA S','LAURIA LUIS FRANCISCO'],
-  'ORL (Otorrinolaringología)':['FREIRE BUTELER IGNACIO'],
-  'Traumatología y Ortopedia':['BENINGAZZA GABRIEL','AROCENA MARIANO','CEREZO RIZZI EMANUEL','FERREYRA PABLO','GORGAS ALBERTO','GUZMAN NICOLAS','JAIS JAIS JOSE FARID','VILLAFAÑE GONZALO DARIO'],
-  'Obesología / Bariátrica':  ['CLARIA JORGE','PIVA EUGENIO','ZURITA GONZALO'],
-  'Urología':                 ['PINTO GABRIEL FERNANDO','SONZINI CRISTIAN','MEINCKE SOFIA MARIA','PASTRANA RODRIGO EMANUEL']
-};
-
-function getCirujanosByEsp(){
-  var esp = (document.getElementById('f-serv')||{value:''}).value;
-  var fromEsp = (esp && CIRUJANOS_ESP[esp]) ? CIRUJANOS_ESP[esp] : [];
-  // Merge with learned surgeons, specialty-filtered first
-  var learned = (typeof cirujanos !== 'undefined') ? cirujanos : [];
-  var all = fromEsp.slice();
-  learned.forEach(function(c){ if(all.indexOf(c)<0) all.push(c); });
-  return all;
-}
-function acCirujano(){
-  var q=document.getElementById('f-ciru').value;
-  var src=getCirujanosByEsp();
-  if(!q||q.length<1){
-    // Show all from specialty if field is empty and specialty selected
-    var esp=(document.getElementById('f-serv')||{value:''}).value;
-    if(esp && CIRUJANOS_ESP[esp]){
-      renderAC('ac-ciru',CIRUJANOS_ESP[esp],function(x){return x;},null,function(i,cap){
-        document.getElementById('f-ciru').value=cap[i]||'';closeAllAC();
-      });
-    } else {
-      document.getElementById('ac-ciru').style.display='none';
-    }
-    return;
-  }
-  var hits=src.filter(function(x){return x.toLowerCase().indexOf(q.toLowerCase())>=0;}).slice(0,10);
-  if(!hits.length){document.getElementById('ac-ciru').style.display='none';return;}
-  renderAC('ac-ciru',hits,function(x){return x;},null,function(i,cap){
-    document.getElementById('f-ciru').value=cap[i]||'';closeAllAC();
-  });
+  renderAC(listId,items,function(x){return x;},null,function(i,cap){document.getElementById(fieldId).value=cap[i]||'';closeAllAC();});
 }
 function acCirugia(fieldId,listId){fieldId=fieldId||'f-diag';listId=listId||'ac-diag';
   var q=document.getElementById(fieldId).value;
   if(q.length<2){document.getElementById(listId).style.display='none';return;}
   var items=CIRUGIAS.filter(function(x){return x.toLowerCase().indexOf(q.toLowerCase())>=0;}).slice(0,10);
-  renderAC(listId,items,function(x){return x;},null,function(i,cap){
-    document.getElementById(fieldId).value=cap[i]||'';
-    var ciruName=(cap[i]||'').toLowerCase();
+  renderAC(listId,items,function(x){return x;},null,function(i,cap){document.getElementById(fieldId).value=cap[i]||'';
+    // Auto-suggest matching ADAARC practice
+    var ciruName=document.getElementById(fieldId).value.toLowerCase();
     var match=NOM.find(function(n){return n.desc.toLowerCase().indexOf(ciruName.slice(0,8))>=0;});
     if(match&&S.cur&&!S.cur.pracs.some(function(p){return p.cod===match.cod;})){
-      toast('Sugerida: '+match.cod+' '+match.desc);
+      toast('💡 Sugerida: '+match.cod+' '+match.desc);
     }
     closeAllAC();
   });
@@ -1070,7 +689,7 @@ function acDrugField(fieldId,listId){
     var d=cap[i];if(!d)return;
     var peso=parseFloat((S.cur&&S.cur.peso)||0);
     var doseStr=d.doses[0]||'';
-    if(d.mgKg&&peso>0)doseStr=(d.mgKg*peso).toFixed(0)+'mg';
+    if(d.mgKg&&peso>0){var calc=(d.mgKg*peso).toFixed(0);doseStr=calc+'mg';}
     document.getElementById(fieldId).value=d.n+' '+doseStr+' '+(d.via||'EV');
     closeAllAC();
   });
@@ -1081,7 +700,8 @@ function acDrugRow(i,q){
   if(!q||q.length<2){closeAllAC();return;}
   var hits=DRUGS.filter(function(d){return d.n.toLowerCase().indexOf(q.toLowerCase())>=0||d.cat.toLowerCase().indexOf(q.toLowerCase())>=0;}).slice(0,8);
   renderAC('ac-dr-'+i,hits,function(d){return d.n;},function(d){return d.cat;},function(idx,cap){
-    var drug=cap[idx];if(!drug)return;
+    var hits2=DRUGS.filter(function(d){return d.n.toLowerCase().indexOf((document.getElementById('din-'+i)||{value:''}).value.toLowerCase())>=0;}).slice(0,8);
+    var drug=hits2[idx];if(!drug)return;
     if(S.cur&&S.cur.foja&&S.cur.foja.drogas&&S.cur.foja.drogas[i]){
       S.cur.foja.drogas[i].n=drug.n;
       // Calculate dose by weight
@@ -1102,8 +722,10 @@ function acDoseRow(i,q){
   var drug=DRUGS.find(function(d){return d.n.toLowerCase()===drugName.toLowerCase();});
   if(!drug)return;
   var hits=drug.doses.filter(function(d){return d.toLowerCase().indexOf(q.toLowerCase())>=0;}).slice(0,6);
-  renderAC('ac-ds-'+i,hits,function(x){return x;},null,function(idx2,cap){
-    var chosen=cap[idx2]||'';
+  renderAC('ac-ds-'+i,hits,function(x){return x;},null,function(idx2){
+    var drug2=DRUGS.find(function(d){return d.n.toLowerCase()===((S.cur&&S.cur.foja&&S.cur.foja.drogas&&S.cur.foja.drogas[i]&&S.cur.foja.drogas[i].n)||'').toLowerCase();});
+    var _x=cap[idx]||''; var hits2=(drug2&&drug2.doses.filter(function(d){return d.toLowerCase().indexOf((document.getElementById('dds-'+i)||{value:''}).value.toLowerCase())>=0;}))||[];
+    var chosen=hits2[idx2]||'';
     if(S.cur.foja.drogas[i])S.cur.foja.drogas[i].d=chosen;
     var inp=document.getElementById('dds-'+i);if(inp)inp.value=chosen;
     closeAllAC();
@@ -1131,13 +753,7 @@ function acRecup(val){
   var hits=RECUP_DRUGS.filter(function(r){return r.toLowerCase().indexOf(q)>=0;});
   var dhits=DRUGS.filter(function(d){return d.n.toLowerCase().indexOf(q)>=0;}).map(function(d){return d.n+' EV';});
   hits=hits.concat(dhits).slice(0,8);
-  renderAC('ac-recup',hits,function(x){return x;},null,function(idx,cap){
-    var chosen=cap[idx]||'';
-    var cur=document.getElementById('fj-recup').value;
-    var parts=cur.split(/[,.]/);parts.pop();
-    document.getElementById('fj-recup').value=(parts.length?parts.join('. ')+'. ':'')+chosen;
-    closeAllAC();
-  });
+  renderAC('ac-recup',hits,function(x){return x;},null,function(idx,cap){var chosen=cap[idx]||'';var cur=document.getElementById('fj-recup').value;var parts=cur.split(/[,.]/);parts.pop();document.getElementById('fj-recup').value=(parts.length?parts.join('. ')+'. ':'')+chosen;closeAllAC();});
 }
 
 // ═══════════════════════════════════════════════════
@@ -1217,191 +833,22 @@ function addChipTo(fieldId,txt){
 // ═══════════════════════════════════════════════════
 // VITALS
 // ═══════════════════════════════════════════════════
-// ═══ VITALS GRID ══════════════════════════════════════
-// Grid: Y axis 0-200 (rows: 200,175,150,125,100,75,50,25 = 8 rows of 25)
-// X axis: time columns every 5 min
-// Each cell can hold one symbol per parameter
-
-var VG = {
-  cols: [],      // [{t:'08:00'}, ...]
-  cells: {},     // key: "colIdx_rowVal" -> {param, symbol}
-  obs: {},       // colIdx -> string (hora observacion)
-  fluidos: {},   // colIdx -> string (fluido)
-  activeParam: 'resp'
-};
-
-var PARAMS = {
-  resp:   {label:'Resp.',   sym:'○', color:'#4fc3f7'},
-  pulso:  {label:'Pulso',   sym:'●', color:'#ef5350'},
-  ta:     {label:'T.A.',    sym:')(', color:'#ab47bc'},
-  oximet: {label:'OXIMET',  sym:'—', color:'#66bb6a'},
-  co2:    {label:'El CO₂',  sym:'□', color:'#ffa726'},
-  operac: {label:'Operac.', sym:'■', color:'#78909c'},
-  anest:  {label:'Anestes.',sym:'×', color:'#26c6da'}
-};
-
-var Y_VALS = [200,187.5,175,162.5,150,137.5,125,112.5,100,87.5,75,62.5,50,37.5,25,12.5]; // 16 rows (2 per 25)
-
-function hm2min(s){var p=s.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
-function min2hm(m){var h=Math.floor(m/60)%24,mm=m%60;return(h<10?'0':'')+h+':'+(mm<10?'0':'')+mm;}
-
-function selParam(btn){
-  document.querySelectorAll('.param-btn').forEach(function(b){
-    b.style.borderColor='var(--border)';b.style.color='var(--text2)';
-    b.classList.remove('active');
-  });
-  btn.style.borderColor='var(--green)';btn.style.color='var(--green)';
-  btn.classList.add('active');
-  VG.activeParam=btn.getAttribute('data-p');
-}
-
-function generarColumnas(){
-  var hi=document.getElementById('vg-inicio').value||document.getElementById('fj-hint').value||document.getElementById('f-hora').value||'';
-  var hf=document.getElementById('vg-fin').value||document.getElementById('fj-fin').value||'';
-  if(!hi){toast('Completá la hora de inicio');return;}
-  var sm=hm2min(hi),em=hf?hm2min(hf):sm+90;
-  VG.cols=[];VG.cells={};VG.obs={};VG.fluidos={};
-  for(var t=sm;t<=em;t+=5)VG.cols.push({t:min2hm(t)});
-  renderVitalsGrid();
-  toast('Columnas generadas: '+VG.cols.length);
-}
-
-function cellKey(ci,val){return ci+'_'+val;}
-
-function toggleCell(ci,val){
-  var k=cellKey(ci,val);
-  var p=VG.activeParam;
-  if(VG.cells[k]&&VG.cells[k].param===p){
-    delete VG.cells[k]; // toggle off
-  } else {
-    VG.cells[k]={param:p,sym:PARAMS[p].sym,color:PARAMS[p].color};
+function generarFilasVitales(){
+  var horaI=(S.cur&&S.cur.hora)||document.getElementById('f-hora').value||'';
+  var horaF=document.getElementById('fj-fin').value||(S.cur&&S.cur.foja&&S.cur.foja.fin)||'';
+  if(!horaI){toast('Completá la hora de inicio primero');return;}
+  var startMin=parseInt(horaI.split(':')[0])*60+parseInt(horaI.split(':')[1]);
+  var endMin=horaF?(parseInt(horaF.split(':')[0])*60+parseInt(horaF.split(':')[1])):startMin+60;
+  S.vitals=[];
+  for(var t=startMin;t<=endMin;t+=5){
+    var hh=Math.floor(t/60)%24,mm=t%60;
+    S.vitals.push({t:(hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm,ta_s:'',ta_d:'',fc:'',spo2:'',etco2:'',fr:''});
   }
-  renderVitalsGrid();
+  renderVitals();toast('Filas generadas: '+S.vitals.length);
 }
-
-function renderVitalsGrid(){
-  var wrap=document.getElementById('vitals-grid-wrap');
-  if(!wrap)return;
-  if(!VG.cols.length){
-    wrap.innerHTML='<p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Generá las columnas de tiempo para empezar</p>';
-    return;
-  }
-  // Each small square = 12.5 units. 16 rows from 200 to 12.5 (200,187.5,...,12.5)
-  // Labels shown at: 200, 150, 100, 50 (every 4 rows)
-  var ROWS=16;
-  var ROW_H=18; // px height per small square (app view)
-  var CELL_W=28; // px width per column
-  var LABEL_W=50;
-  var cols=VG.cols.length;
-  // Y values from top to bottom: 200, 187.5, 175 ... 12.5
-  var yVals=[];
-  for(var r=0;r<ROWS;r++)yVals.push(200 - r*12.5);
-
-  var html='<div style="font-family:Arial,sans-serif;user-select:none">';
-
-  // Time header
-  html+='<div style="display:flex;margin-left:'+LABEL_W+'px;border-bottom:1px solid var(--border)">';
-  VG.cols.forEach(function(col,ci){
-    html+='<div style="width:'+CELL_W+'px;font-size:6.5px;text-align:center;color:var(--text3);padding:2px 0;overflow:hidden;flex-shrink:0">'+col.t+'</div>';
-  });
-  html+='</div>';
-
-  // Grid rows
-  yVals.forEach(function(yval,ri){
-    var showLabel=(yval===200||yval===150||yval===100||yval===50);
-    var isMajor=(yval%50===0); // thick line every 50 (every 4 rows)
-    html+='<div style="display:flex;align-items:stretch">';
-    // Y label
-    html+='<div style="width:'+LABEL_W+'px;font-size:8px;color:var(--text2);text-align:right;padding-right:4px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:flex-end;padding-bottom:1px;font-weight:'+(showLabel?'bold':'normal')+'">'+(showLabel?yval:'')+'</div>';
-    // Cells
-    VG.cols.forEach(function(col,ci){
-      var k=ci+'_'+yval;
-      var cell=VG.cells[k];
-      var borderT=isMajor?'1.5px solid rgba(100,100,100,.5)':'1px solid rgba(48,54,61,.5)';
-      var bg=cell?'rgba(29,185,84,.12)':'transparent';
-      var sym=cell?('<span style="font-size:13px;font-weight:bold;line-height:1;color:'+cell.color+'">'+cell.sym+'</span>'):'';
-      html+='<div onclick="toggleCell('+ci+','+yval+')" '
-       +'style="width:'+CELL_W+'px;height:'+ROW_H+'px;'
-       +'border-left:1px solid rgba(48,54,61,.4);'
-       +'border-top:'+borderT+';'
-       +'background:'+bg+';'
-       +'display:flex;align-items:center;justify-content:center;'
-       +'cursor:pointer;flex-shrink:0;box-sizing:border-box">'+sym+'</div>';
-    });
-    html+='</div>';
-  });
-
-  // Bottom border
-  html+='<div style="display:flex;margin-left:'+LABEL_W+'px;border-top:1.5px solid rgba(100,100,100,.5)">';
-  VG.cols.forEach(function(){html+='<div style="width:'+CELL_W+'px;flex-shrink:0"></div>';});
-  html+='</div>';
-
-  // Hora observac row (editable)
-  html+='<div style="display:flex;margin-top:2px;align-items:stretch">';
-  html+='<div style="width:'+LABEL_W+'px;font-size:7px;color:var(--text3);text-align:right;padding-right:4px;flex-shrink:0;line-height:1.2;display:flex;align-items:center;justify-content:flex-end">Hora<br>obs.</div>';
-  VG.cols.forEach(function(col,ci){
-    var val=VG.obs[ci]||'';
-    html+='<div style="width:'+CELL_W+'px;height:20px;border:1px solid rgba(48,54,61,.5);flex-shrink:0;overflow:hidden">'
-      +'<input oninput="VG.obs['+ci+']=this.value" value="'+val+'" '
-      +'style="width:100%;height:100%;background:transparent;border:none;font-size:6px;text-align:center;color:var(--text);padding:0;outline:none;font-family:Arial"></div>';
-  });
-  html+='</div>';
-
-  // FLUIDOS row (editable)
-  html+='<div style="display:flex;margin-top:1px;align-items:stretch">';
-  html+='<div style="width:'+LABEL_W+'px;font-size:8px;color:var(--text3);text-align:right;padding-right:4px;flex-shrink:0;font-weight:bold;display:flex;align-items:center;justify-content:flex-end">FLUIDOS</div>';
-  VG.cols.forEach(function(col,ci){
-    var val=VG.fluidos[ci]||'';
-    html+='<div style="width:'+CELL_W+'px;height:20px;border:1px solid rgba(48,54,61,.5);flex-shrink:0;overflow:hidden">'
-      +'<input oninput="VG.fluidos['+ci+']=this.value" value="'+val+'" '
-      +'placeholder="" '
-      +'style="width:100%;height:100%;background:transparent;border:none;font-size:6px;text-align:center;color:var(--text);padding:0;outline:none;font-family:Arial"></div>';
-  });
-  html+='</div>';
-
-  // Legend
-  html+='<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:12px">';
-  Object.keys(PARAMS).forEach(function(k){
-    var p=PARAMS[k];
-    html+='<span style="color:'+p.color+'"><b>'+p.sym+'</b> '+p.label+'</span>';
-  });
-  html+='</div>';
-  html+='</div>';
-  wrap.innerHTML=html;
-}
-
-function limpiarGrafico(){
-  VG.cells={};VG.obs={};VG.fluidos={};renderVitalsGrid();toast('Gráfico limpiado');
-}
-
-// Legacy compatibility (guardarFoja uses S.vitals)
-function getVGasVitals(){
-  // Convert grid to simple vitals array for storage and print
-  var result={};
-  Object.keys(VG.cells).forEach(function(k){
-    var parts=k.split('_');var ci=parseInt(parts[0]);var val=parseInt(parts[1]);
-    if(!VG.cols[ci])return;
-    var t=VG.cols[ci].t;
-    if(!result[t])result[t]={t:t,markers:[]};
-    result[t].markers.push({val:val,param:VG.cells[k].param,sym:VG.cells[k].sym,color:VG.cells[k].color});
-  });
-  return Object.values(result).sort(function(a,b){return a.t.localeCompare(b.t);});
-}
-
-// Keep these for compatibility
-function generarFilasVitales(){generarColumnas();}
-function addVitalRow(){}
-function renderVitals(){}
-function syncVitalsText(){}
-function parsearVitalsTexto(){toast('Toca las celdas del gráfico para marcar valores');}
-function micVitals(){toast('Usá el gráfico tocando las celdas');}
-function editV(){}
-function delV(){}
-
 function addVitalRow(){S.vitals.push({t:'',ta_s:'',ta_d:'',fc:'',spo2:'',etco2:'',fr:''});renderVitals();}
 function renderVitals(){
   var tb=document.getElementById('vitals-body');if(!tb)return;
-  var cnt=document.getElementById('vitals-count');if(cnt)cnt.textContent=(S.vitals?S.vitals.length:0)+' registros';
   if(!S.vitals||!S.vitals.length){tb.innerHTML='<tr><td colspan="7" style="padding:10px;color:var(--text3);font-size:12px">Sin registros</td></tr>';return;}
   tb.innerHTML=S.vitals.map(function(row,i){
     return '<tr>'
@@ -1475,7 +922,7 @@ function updateMayoCamas(){
   var sec=document.getElementById('f-mayo-sector');var cam=document.getElementById('f-mayo-cama');
   if(!sec||!cam)return;var sector=sec.value;
   var opts=['<option value="">—</option>'];
-  if(sector==='PISO'){for(var hab=1;hab<=15;hab++){var c1=200+hab*2-1;var c2=200+hab*2;opts.push('<option>Hab.'+hab+' — Cama '+c1+'</option>');opts.push('<option>Hab.'+hab+' — Cama '+c2+'</option>');}}
+  if(sector==='PISO'){for(var hab=1;hab<=15;hab++){var c1=200+hab*2-1;var c2=200+hab*2;opts.push('<option>Hab.'+hab+' — Cama '+c1+'</option><option>Hab.'+hab+' — Cama '+c2+'</option>');}}
   else if(sector==='VIP'){opts.push('<option>VIP 1</option><option>VIP 2</option>');}
   else if(sector==='UCI'){for(var j=1;j<=16;j++)opts.push('<option>UCI '+j+'</option>');}
   else if(sector==='UTI'){for(var j=1;j<=16;j++)opts.push('<option>UTI1-'+j+'</option>');for(var j=1;j<=16;j++)opts.push('<option>UTI2-'+j+'</option>');}
@@ -1507,7 +954,7 @@ function renderHome(){
 }
 function abrirInter(id){S.cur=S.intervs.find(function(i){return i.id===id;})||null;if(S.cur){S.vitals=S.cur.foja&&S.cur.foja.vitals||[];cargarForm(S.cur);document.getElementById('ia-badge').style.display='none';go('nueva');}}
 function nuevaInter(){
-  S.cur={id:Date.now()+'',estado:'borrador',fecha:new Date().toISOString().slice(0,10),hora:'',pac:'',edad:'',sexo:'',dni:'',peso:'',ciru:'',serv:'',diag:'',san:'Hospital Aeronáutico',sala:'',cama:'',mayo_sector:'',mayo_cama:'',obra:'',afil:'',ob:false,env:true,pracs:[],foja:{drogas:[],vitals:[]}};
+  S.cur={id:Date.now()+'',estado:'borrador',fecha:new Date().toISOString().slice(0,10),hora:'',pac:'',edad:'',sexo:'',dni:'',peso:'',ciru:'',serv:'',diag:'',san:'Hospital Aeronáutico',sala:'',cama:'',mayo_sector:'',mayo_cama:'',obra:'',afil:'',docs:{},ob:false,env:true,pracs:[],foja:{drogas:[],vitals:[]}};
   S.vitals=[];document.getElementById('ia-badge').style.display='none';
   cargarForm(S.cur);go('nueva');
 }
@@ -1517,10 +964,7 @@ function cargarForm(i){
   sv('f-fecha',i.fecha);sv('f-hora',i.hora);sv('f-pac',i.pac);
   sv('f-edad',i.edad);sv('f-sexo',i.sexo||'');sv('f-dni',i.dni);
   sv('f-peso',i.peso||'');sv('f-ciru',i.ciru);sv('f-serv',i.serv||'');sv('f-diag',i.diag||'');
-  sv('f-san',i.san);sv('f-mayo-sector',i.mayo_sector||'');if(i.mayo_sector)setTimeout(function(){updateMayoCamas();sv('f-mayo-cama',i.mayo_cama||'');},50);sv('f-sala',i.sala||'');sv('f-cama',i.cama||'');
- sv('f-mayo-sector',i.mayo_sector||'');
- if(i.mayo_sector)updateMayoCamas();
- sv('f-mayo-cama',i.mayo_cama||'');
+  sv('f-san',i.san);sv('f-mayo-sector',i.mayo_sector||'');cargarDocBadges();if(i.mayo_sector)setTimeout(function(){updateMayoCamas();sv('f-mayo-cama',i.mayo_cama||'');},50);sv('f-sala',i.sala||'');sv('f-cama',i.cama||'');
   sv('f-obra',i.obra);sv('f-afil',i.afil);
   var ob=document.getElementById('f-ob');if(ob)ob.checked=!!i.ob;
   var en=document.getElementById('f-env');if(en)en.checked=i.env!==false;
@@ -1532,7 +976,6 @@ function guardar(extra){
   S.cur.edad=gv('f-edad');S.cur.sexo=gv('f-sexo');S.cur.dni=gv('f-dni');
   S.cur.peso=gv('f-peso');S.cur.ciru=gv('f-ciru');S.cur.serv=gv('f-serv');S.cur.diag=gv('f-diag');
   S.cur.san=gv('f-san');S.cur.mayo_sector=gv('f-mayo-sector')||'';S.cur.mayo_cama=gv('f-mayo-cama')||'';S.cur.sala=gv('f-sala');S.cur.cama=gv('f-cama');
- S.cur.mayo_sector=gv('f-mayo-sector');S.cur.mayo_cama=gv('f-mayo-cama');
   S.cur.obra=gv('f-obra');S.cur.afil=gv('f-afil');
   var ob=document.getElementById('f-ob');S.cur.ob=ob?ob.checked:false;
   var en=document.getElementById('f-env');S.cur.env=en?en.checked:true;
@@ -1560,7 +1003,7 @@ function quitarPrac(i){S.cur.pracs.splice(i,1);renderPracs();}
 // ═══════════════════════════════════════════════════
 // FOJA
 // ═══════════════════════════════════════════════════
-function cargarFojaUI(){
+function cargarFojaUI(){cargarFojaVG();
   if(!S.cur||!S.cur.foja)return;
   var f=S.cur.foja;
   sv('fj-tec',f.tec);sv('fj-asa',f.asa);sv('fj-via',f.via);sv('fj-fin',f.fin);
@@ -1569,11 +1012,10 @@ function cargarFojaUI(){
   sv('fj-recup',f.recup||'');sv('fj-obs',f.obs||'');
   sv('fj-suero',f.suero||'');sv('fj-sangre',f.sangre||'');sv('fj-plasma',f.plasma||'');sv('fj-otro',f.otro||'');
   S.vitals=f.vitals||[];
-  if(f.vg_cols){VG.cols=f.vg_cols;VG.cells=f.vg_cells||{};VG.obs=f.vg_obs||{};VG.fluidos=f.vg_fluidos||{};setTimeout(renderVitalsGrid,50);}
   if(f.sign)S.signData=f.sign;
   renderDrogas();renderVitals();
 }
-function guardarFoja(){
+function guardarFoja(){guardarFojaVG();
   if(!S.cur)return;
   // Sync drug inputs from DOM
   if(S.cur.foja&&S.cur.foja.drogas){
@@ -1591,27 +1033,16 @@ function guardarFoja(){
     drogas:S.cur.foja.drogas||[],vitals:S.vitals||[],sign:S.signData||null
   };
   guardar();toast('Foja guardada ✓');go('nueva');
-  VG.cols=VG.cols||[];VG.cells=VG.cells||{};
-  if(S.cur.foja){S.cur.foja.vg_cols=VG.cols;S.cur.foja.vg_cells=VG.cells;S.cur.foja.vg_obs=VG.obs;S.cur.foja.vg_fluidos=VG.fluidos;}
 }
 
 // ═══════════════════════════════════════════════════
 // NOMENCLADOR
 // ═══════════════════════════════════════════════════
-var SINONIMOS={'hemicolectomia':'colectomia','hemicolectomía':'colectomía','laparo':'laparoscop','sleeve':'manga','bypass':'by-pass','rtup':'prostata','rtuv':'vejiga','tep':'endoscop','colecist':'colecist','apendicect':'apendic','colangiopancreat':'papilotomía','hernia inguinal':'hernia','hernia umbilical':'hernia','colostomia':'ostomía','ileostomia':'ostomía'};
 function buscarNom(q){
   var r=document.getElementById('nom-res');
   if(!q||q.length<2){r.innerHTML='<p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Escribí para buscar</p>';return;}
-  var ql=q.toLowerCase().trim();
-  // Apply synonym expansion
-  var qlExp=SINONIMOS[ql]||ql;
-  var hits=NOM.filter(function(n){
-    var d=n.desc.toLowerCase();var cod=n.cod.toLowerCase();var sec=n.sec.toLowerCase();
-    return cod.indexOf(ql)>=0||d.indexOf(ql)>=0||sec.indexOf(ql)>=0||d.indexOf(qlExp)>=0;
-  }).slice(0,20);
-  // Deduplicate by cod+desc
-  var seen={};
-  hits=hits.filter(function(n){var k=n.cod+n.desc;if(seen[k])return false;seen[k]=true;return true;});
+  var ql=q.toLowerCase();
+  var hits=NOM.filter(function(n){return n.cod.indexOf(ql)>=0||n.desc.toLowerCase().indexOf(ql)>=0||n.sec.toLowerCase().indexOf(ql)>=0;}).slice(0,15);
   if(!hits.length){r.innerHTML='<p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Sin resultados</p>';return;}
   r.innerHTML=hits.map(function(n){
     return '<div class="nom-r" onclick="agregarPrac(\''+n.cod+'\',\''+n.desc.replace(/'/g,"\\'")+'\','+n.comp+')">'
@@ -1685,7 +1116,7 @@ function renderResumen(){
     +pracsHtml+modsHtml
     +'<div class="brow" style="margin-bottom:8px"><button class="btn btn-s" onclick="go(\'foja\')">📋 Foja</button>'+(i.san&&i.san.includes('Mayo')?'<button class="btn btn-b" onclick="go(\'geclisa\')">🏥 GECLISA</button>':'')+'</div>'
     +'<button class="btn btn-g" style="margin-bottom:8px" onclick="copiarTodo()">📋 Copiar resumen</button>'
-    +'<a href="https://adaarc.evweb.com.ar/" target="_blank" style="display:block;margin-bottom:8px"><button class="btn btn-b" style="width:100%">🌐 Abrir evweb ADAARC</button></a>'+'<p style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:10px">Subí: foja anest. + foja quirúrgica + autorización. Tildá cada ítem al completarlo.</p>'+'<button class="btn btn-s" style="margin-bottom:24px" onclick="marcarEnviado()">✅ Marcar como enviado</button>';
+    +'<button class="btn btn-s" style="margin-bottom:24px" onclick="marcarEnviado()">✅ Marcar enviado</button>';
 }
 function toggleChk(id){var b=document.getElementById(id);if(!b)return;var d=b.classList.contains('checked');b.classList.toggle('checked',!d);b.textContent=d?'':'✓';}
 function calcMods(i){
@@ -1715,117 +1146,109 @@ function marcarEnviado(){
 // IMPRIMIR FOJA AERONÁUTICO — fiel al original
 // ═══════════════════════════════════════════════════
 function imprimirFoja(){
- var i=S.cur;if(!i){toast('Completá los datos primero');return;}
- var f=i.foja||{};var vitals=f.vitals||S.vitals||[];
- var signSrc=f.sign||S.signData||'';
- var drogaLines=(f.drogas||[]).map(function(d){return(d.n||'')+' '+(d.d||'')+' '+(d.v||'');}).filter(function(x){return x.trim();}).join(' · ');
- // Build chart
- var chartHtml='';
- var vgCols=(f.vg_cols&&f.vg_cols.length)?f.vg_cols:[];
- var vgCells=(f.vg_cells)||{};
- var vgObs=(f.vg_obs)||{};
- var vgFluidos=(f.vg_fluidos)||{};
- if(vgCols.length){
-  // Render VG grid for print
-  var CELL_W=Math.max(8,Math.min(16,Math.floor(150/vgCols.length)));
-  var YVALS=[200,187.5,175,162.5,150,137.5,125,112.5,100,87.5,75,62.5,50,37.5,25,12.5];
-  var PSYMS={resp:'○',pulso:'●',ta:')(',oximet:'—',co2:'□',operac:'■',anest:'×'};
-  var PCOLS={resp:'#000',pulso:'#000',ta:'#000',oximet:'#000',co2:'#000',operac:'#000',anest:'#000'};
-  chartHtml='<table style="border-collapse:collapse;width:100%"><tbody>';
-  // Time header
-  chartHtml+='<tr><td style="width:50px"></td>';
-  vgCols.forEach(function(col){chartHtml+='<td style="width:'+CELL_W+'px;font-size:5px;text-align:center;border:1px solid #ccc;padding:0">'+col.t.slice(0,5)+'</td>';});
-  chartHtml+='</tr>';
-  // Value rows
-  YVALS.forEach(function(yval){
-   chartHtml+='<tr><td style="font-size:7px;text-align:right;padding-right:3px;font-weight:bold;vertical-align:middle">'+yval+'</td>';
-   vgCols.forEach(function(col,ci){
-    var k=ci+'_'+yval;var cell=vgCells[k];
-    var sym=cell?('<b style="font-size:8px">'+cell.sym+'</b>'):'';
-    chartHtml+='<td style="width:'+CELL_W+'px;height:14px;border:1px solid #ddd;text-align:center;vertical-align:middle">'+sym+'</td>';
-   });
-   chartHtml+='</tr>';
-  });
-  // Hora obs row
-  chartHtml+='<tr><td style="font-size:6px;text-align:right;padding-right:3px;line-height:1.1">Hora<br>obs.</td>';
-  vgCols.forEach(function(col,ci){var ov=vgObs[ci]||'';chartHtml+='<td style="height:14px;border:1px solid #ddd;font-size:6px;text-align:center;vertical-align:middle">'+ov+'</td>';});
-  chartHtml+='</tr>';
-  // Fluidos row
-  chartHtml+='<tr><td style="font-size:7px;font-weight:bold;text-align:right;padding-right:3px">FLUIDOS</td>';
-  vgCols.forEach(function(col,ci){var fv=vgFluidos[ci]||'';chartHtml+='<td style="height:14px;border:1px solid #ddd;font-size:6px;text-align:center;vertical-align:middle">'+fv+'</td>';});
-  chartHtml+='</tr>';
-  chartHtml+='</tbody></table>';
- } else if(vitals.length){
-  chartHtml='<table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f0f0f0">'
-   +'<td style="border:1px solid #aaa;padding:1px 3px;font-size:6.5px;font-weight:bold;width:52px"></td>'
-   +vitals.map(function(v){return'<td style="border:1px solid #ccc;text-align:center;font-size:6px;min-width:14px">'+(v.t||'')+'</td>';}).join('')
-   +'</tr></thead><tbody>'
-   +'<tr><td style="border:1px solid #aaa;padding:1px 2px;background:#f0f0f0;font-size:6.5px;font-weight:bold">T.A.</td>'+vitals.map(function(v){return'<td style="border:1px solid #ddd;text-align:center;font-size:6px;height:14px">'+(v.ta_s?v.ta_s+'/'+(v.ta_d||''):' ')+'</td>';}).join('')+'</tr>'
-   +'<tr><td style="border:1px solid #aaa;padding:1px 2px;background:#f0f0f0;font-size:6.5px;font-weight:bold">FC</td>'+vitals.map(function(v){return'<td style="border:1px solid #ddd;text-align:center;font-size:6px;height:14px">'+(v.fc||' ')+'</td>';}).join('')+'</tr>'
-   +'<tr><td style="border:1px solid #aaa;padding:1px 2px;background:#f0f0f0;font-size:6.5px;font-weight:bold">SpO&#8322;</td>'+vitals.map(function(v){return'<td style="border:1px solid #ddd;text-align:center;font-size:6px;height:14px">'+(v.spo2||' ')+'</td>';}).join('')+'</tr>'
-   +'<tr><td style="border:1px solid #aaa;padding:1px 2px;background:#f0f0f0;font-size:6.5px;font-weight:bold">EtCO&#8322;</td>'+vitals.map(function(v){return'<td style="border:1px solid #ddd;text-align:center;font-size:6px;height:14px">'+(v.etco2||' ')+'</td>';}).join('')+'</tr>'
-   +'<tr><td style="border:1px solid #aaa;padding:1px 2px;background:#f0f0f0;font-size:6.5px;font-weight:bold">FR</td>'+vitals.map(function(v){return'<td style="border:1px solid #ddd;text-align:center;font-size:6px;height:14px">'+(v.fr||' ')+'</td>';}).join('')+'</tr>'
-   +'</tbody></table>';
- } else if(!vgCols.length){
-  var COLS=24;
-  chartHtml='<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup><col style="width:52px">'+Array(COLS).fill('<col>').join('')+'</colgroup>';
-  [{lb:'200',h:18},{lb:'150',h:18},{lb:'100',h:18},{lb:'50',h:18},{lb:'Hora obs.',h:12},{lb:'FLUIDOS',h:12}].forEach(function(rd){
-   chartHtml+='<tr><td style="border:1px solid #999;font-size:6.5px;padding:1px 2px;background:#f0f0f0;text-align:right">'+rd.lb+'</td>';
-   for(var c=0;c<COLS;c++)chartHtml+='<td style="border:1px solid #ddd;height:'+rd.h+'px"></td>';
-   chartHtml+='</tr>';
-  });
-  chartHtml+='</table>';
- }
- var signImg=signSrc?'<img src="'+signSrc+'" style="max-height:46px;max-width:130px;display:block;margin:0 auto 3px;filter:grayscale(1) brightness(0) contrast(2)">':'<div style="height:46px"></div>';
- var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Foja de Anestesia</title>'
-  +'<style>*{box-sizing:border-box;margin:0;padding:0}html{width:210mm}body{font-family:Arial,Helvetica,sans-serif;font-size:10.5px;color:#000;line-height:1.35;padding:6mm 8mm}@page{size:A4;margin:0}'
-  +'h1{font-size:14px;text-align:center;font-weight:bold;border-bottom:2px solid #000;padding-bottom:5px;margin-bottom:7px;letter-spacing:.07em}'
-  +'.r{display:flex;gap:5px;margin-bottom:5px;align-items:flex-end}'
-  +'.f{border-bottom:1.5px solid #000;padding:0 2px 1px;min-height:17px;flex:1;font-size:10.5px}'
-  +'.l{font-size:8px;color:#333;font-weight:bold;text-transform:uppercase;display:block;margin-bottom:1px}'
-  +'.s{font-size:9px;font-weight:bold;text-transform:uppercase;border-bottom:1px solid #555;margin:5px 0 3px;padding-bottom:1px}'
-  +'.chk{display:inline-block;width:9px;height:9px;border:1px solid #000;margin-right:2px;text-align:center;line-height:8px;font-size:8px;vertical-align:middle}'
-  +'</style></head><body>'
-  +'<h1>FOJA DE ANESTESIA</h1>'
-  +'<div class="r"><div style="flex:3"><span class="l">Apellido y nombres</span><div class="f">'+(i.pac||'')+'</div></div><div style="flex:0 0 118px"><span class="l">D.N.I. N&#176;</span><div class="f">'+(i.dni||'')+'</div></div></div>'
-  +'<div class="r"><div style="flex:2"><span class="l">Servicio</span><div class="f">'+(i.serv||i.diag||'')+'</div></div><div style="flex:0 0 72px"><span class="l">Sala</span><div class="f">'+(i.sala||i.mayo_sector||'')+'</div></div><div style="flex:0 0 60px"><span class="l">Cama N&#176;</span><div class="f">'+(i.cama||i.mayo_cama||'')+'</div></div></div>'
-  +'<div class="r"><div style="flex:0 0 64px"><span class="l">Fecha</span><div class="f">'+fmt(i.fecha)+'</div></div><div style="flex:0 0 36px"><span class="l">Edad</span><div class="f">'+(i.edad||'')+'</div></div><div style="flex:0 0 26px"><span class="l">Sexo</span><div class="f">'+(i.sexo||'')+'</div></div><div style="flex:0 0 42px"><span class="l">Peso</span><div class="f">'+(i.peso?i.peso+' kg':'')+'</div></div><div style="flex:1"><span class="l">Premedicaci&#243;n</span><div class="f">'+(f.premed||'')+'</div></div><div style="flex:0 0 44px"><span class="l">Hora</span><div class="f">'+(i.hora||'')+'</div></div></div>'
-  +'<div class="r"><div style="flex:1"><span class="l">Hallazgos f&#237;sicos anormales</span><div class="f" style="min-height:14px">&nbsp;</div></div></div>'
-  +'<div style="margin:3px 0;font-size:9.5px"><b>Inducci&#243;n:</b>&nbsp;<span class="chk">'+(f.ind==='Satisfactoria'?'&#10003;':'')+'</span>Satisfactoria&nbsp;&nbsp;<span class="chk">'+(f.ind==='Prolongada'?'&#10003;':'')+'</span>Prolongada&nbsp;&nbsp;<span class="chk">'+(f.ind==='Tormentosa'?'&#10003;':'')+'</span>Tormentosa</div>'
-  +'<div class="r"><div style="flex:1"><span class="l">Hora intubaci&#243;n</span><div class="f">'+(f.hint||'')+'</div></div><div style="flex:2"></div><div style="flex:1"><span class="l">Hora extubaci&#243;n</span><div class="f">'+(f.hext||'')+'</div></div></div>'
-  +'<div style="border:1.5px solid #000;margin:4px 0;display:flex;min-height:150px">'
-  +'<div style="flex:0 0 56px;border-right:1px solid #000;padding:2px 3px;font-size:7px">'
-  +'<div style="font-weight:bold;line-height:1.2;margin-bottom:4px">Plano de 3er.<br>Estudio</div>'
-  +'<div style="text-align:right">200</div><div style="height:20px"></div>'
-  +'<div style="text-align:right">150</div><div style="height:20px"></div>'
-  +'<div style="text-align:right">100</div><div style="height:20px"></div>'
-  +'<div style="text-align:right">50</div>'
-  +'<div style="margin-top:6px;font-size:6.5px;line-height:1.7">Resp.: &#9675;<br>Pulso: &#9679;<br>T.A: )(<br>OXIMET:<br>El CO&#8322;: &#9633;<br>Operac.: &#9632;<br>Anestes.: &#215;</div>'
-  +'<div style="margin-top:5px;font-size:6.5px;font-weight:bold">Hora de las<br>Observac.</div>'
-  +'<div style="margin-top:3px;font-size:6.5px;font-weight:bold">FLUIDOS</div>'
-  +'</div><div style="flex:1">'+chartHtml+'</div></div>'
-  +'<div class="s">Agentes Anest&#233;sicos:</div><div style="border-bottom:1px solid #ccc;padding:2px 3px;min-height:17px;font-size:9.5px">'+(drogaLines||'')+'</div>'
-  +'<div class="s">M&#233;todos Anest&#233;sicos:</div><div style="border-bottom:1px solid #ccc;padding:2px 3px;min-height:17px;font-size:9.5px">'+(f.metodos||'')+'</div>'
-  +'<div class="s">Recuperaci&#243;n:</div><div style="border-bottom:1px solid #ccc;padding:2px 3px;min-height:17px;font-size:9.5px">'+(f.recup||'')+'</div>'
-  +'<div style="display:flex;gap:8px;margin-top:5px">'
-  +'<div style="flex:2"><div class="s">Observaciones:</div><div style="border:1px solid #ccc;padding:3px;min-height:52px;font-size:9.5px">'+(f.obs||'')+'</div>'
-  +'<div style="border:1px solid #ccc;border-top:none;padding:2px 3px;text-align:center;font-size:7.5px;font-weight:bold">FIRMA Y SELLO DEL ANESTESISTA</div></div>'
-  +'<div style="flex:0 0 138px;display:flex;flex-direction:column;justify-content:flex-end;text-align:center">'+signImg
-  +'<div style="border-top:1.5px solid #000;padding-top:3px;font-size:8px"><b>MARIA SOLEDAD HUERTA</b><br>M.P. 32393 &nbsp; M.E. 15518<br>Anest&#243;loga &middot; ADAARC</div></div></div>'
-  +'<div style="display:flex;gap:8px;margin-top:5px;border-top:2px solid #000;padding-top:4px">'
-  +'<div style="flex:1"><div class="s">Hemoterapia:</div><div style="font-size:9.5px;line-height:2.1">'
-  +'Sangre: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.sangre||'')+'</span> cm&#179;<br>'
-  +'Plasma: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.plasma||'')+'</span> cm&#179;<br>'
-  +'Suero: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.suero||'')+'</span> cm&#179;<br>'
-  +'Otro: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.otro||'')+'</span> cm&#179;</div></div>'
-  +'<div style="flex:2"><div class="s">Observaciones</div><div style="border:1px solid #ccc;min-height:70px;padding:3px;font-size:10px"></div></div>'
-  +'</div></body></html>';
- var w=window.open('','_blank');
- if(!w){toast('Permitir ventanas emergentes en Chrome');return;}
- w.document.write(html);w.document.close();
- setTimeout(function(){w.print();},signSrc?700:400);
+  var i=S.cur;if(!i){toast('Completá los datos primero');return;}
+  var f=i.foja||{};
+  var vitals=f.vitals||S.vitals||[];
+
+  // Build sign image — convert to black (canvas trick)
+  var signSrc='';
+  if(f.sign||S.signData){
+    // Re-render the sign in black on white via offscreen canvas
+    var tmpC=document.createElement('canvas');tmpC.width=200;tmpC.height=60;
+    var tmpCtx=tmpC.getContext('2d');
+    tmpCtx.fillStyle='#ffffff';tmpCtx.fillRect(0,0,200,60);
+    var img2=new Image();
+    // Draw synchronously only if already loaded
+    img2.src=f.sign||S.signData;
+    // Use composite to convert to black
+    tmpCtx.globalCompositeOperation='multiply';
+    try{tmpCtx.drawImage(img2,0,0,200,60);}catch(e){}
+    tmpCtx.globalCompositeOperation='source-over';
+    // Actually: just use the PNG directly — sign is drawn in black now
+    signSrc=f.sign||S.signData||'';
+  }
+
+  // Drug lines
+  var drogaLines=(f.drogas||[]).map(function(d){return(d.n||'')+' '+(d.d||'')+' '+(d.v||'');}).join('   |   ');
+
+  // Vitals as grid table
+  var chartHtml='';
+  if(vitals.length){
+    chartHtml='<table style="width:100%;border-collapse:collapse;font-size:7px">'
+      +'<thead><tr><th style="border:1px solid #999;padding:1px 2px;background:#eee">Hora</th>'
+      +vitals.map(function(v){return'<th style="border:1px solid #ccc;padding:0 1px;min-width:18px;font-size:7px;background:#f9f9f9">'+(v.t||'')+'</th>';}).join('')+'</tr></thead><tbody>'
+      +'<tr><td style="border:1px solid #999;padding:1px 2px;background:#eee">T.A.</td>'+vitals.map(function(v){return'<td style="border:1px solid #ddd;padding:1px;text-align:center;font-size:7px">'+(v.ta_s?v.ta_s+'/'+(v.ta_d||''):' ')+'</td>';}).join('')+'</tr>'
+      +'<tr><td style="border:1px solid #999;padding:1px 2px;background:#eee">FC</td>'+vitals.map(function(v){return'<td style="border:1px solid #ddd;padding:1px;text-align:center;font-size:7px">'+(v.fc||' ')+'</td>';}).join('')+'</tr>'
+      +'<tr><td style="border:1px solid #999;padding:1px 2px;background:#eee">SpO₂</td>'+vitals.map(function(v){return'<td style="border:1px solid #ddd;padding:1px;text-align:center;font-size:7px">'+(v.spo2||' ')+'</td>';}).join('')+'</tr>'
+      +'<tr><td style="border:1px solid #999;padding:1px 2px;background:#eee">EtCO₂</td>'+vitals.map(function(v){return'<td style="border:1px solid #ddd;padding:1px;text-align:center;font-size:7px">'+(v.etco2||' ')+'</td>';}).join('')+'</tr>'
+      +'<tr><td style="border:1px solid #999;padding:1px 2px;background:#eee">FR</td>'+vitals.map(function(v){return'<td style="border:1px solid #ddd;padding:1px;text-align:center;font-size:7px">'+(v.fr||' ')+'</td>';}).join('')+'</tr>'
+      +'</tbody></table>';
+  } else {
+    // Empty grid — 24 cols × 6 rows with row labels, exactly like original
+    var labels=['200','150','100','50','Hora obs.','FLUIDOS'];
+    chartHtml='<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup><col style="width:36px">'+Array(24).fill('<col>').join('')+'</colgroup>'
+      +labels.map(function(lb){return'<tr><td style="border:1px solid #999;font-size:7px;padding:1px 2px;background:#f0f0f0">'+lb+'</td>'+Array(24).fill('<td style="border:1px solid #ddd;height:13px"></td>').join('')+'</tr>';}).join('')+'</table>';
+  }
+
+  var signBlock='';
+  if(signSrc){
+    signBlock='<img src="'+signSrc+'" style="max-height:40px;max-width:140px;display:block;margin:0 auto 2px;filter:grayscale(1) brightness(0)">';
+  }
+
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Foja de Anestesia</title>'
+    +'<style>'
+    +'*{box-sizing:border-box}'
+    +'body{font-family:Arial,Helvetica,sans-serif;font-size:9.5px;margin:0;padding:5mm;color:#000;line-height:1.3}'
+    +'h1{font-size:11px;text-align:center;font-weight:bold;border-bottom:2px solid #000;padding-bottom:4px;margin:0 0 5px;letter-spacing:.08em}'
+    +'.row{display:flex;gap:6px;margin-bottom:4px;align-items:flex-end}'
+    +'.f{border-bottom:1.5px solid #000;padding:0 2px 1px;min-height:13px;flex:1}'
+    +'.l{font-size:7px;color:#333;font-weight:bold;text-transform:uppercase;display:block}'
+    +'.sect{font-size:8px;font-weight:bold;text-transform:uppercase;border-bottom:1px solid #555;margin:4px 0 2px}'
+    +'.chk{display:inline-block;width:8px;height:8px;border:1px solid #000;margin-right:2px;text-align:center;line-height:7px;font-size:7px;vertical-align:middle}'
+    +'</style></head><body>'
+    +'<h1>FOJA DE ANESTESIA</h1>'
+    +'<div class="row"><div style="flex:2"><span class="l">Apellido y nombres</span><div class="f">'+(i.pac||'')+'</div></div><div style="flex:0 0 110px"><span class="l">D.N.I. N°</span><div class="f">'+(i.dni||'')+'</div></div></div>'
+    +'<div class="row"><div style="flex:1"><span class="l">Servicio</span><div class="f">'+(i.serv||i.diag||'')+'</div></div><div style="flex:0 0 70px"><span class="l">Sala</span><div class="f">'+(i.sala||'')+'</div></div><div style="flex:0 0 55px"><span class="l">Cama N°</span><div class="f">'+(i.cama||'')+'</div></div></div>'
+    +'<div class="row"><div style="flex:0 0 58px"><span class="l">Fecha</span><div class="f">'+fmt(i.fecha)+'</div></div><div style="flex:0 0 32px"><span class="l">Edad</span><div class="f">'+(i.edad||'')+'</div></div><div style="flex:0 0 26px"><span class="l">Sexo</span><div class="f">'+(i.sexo||'')+'</div></div><div style="flex:0 0 40px"><span class="l">Peso</span><div class="f">'+(i.peso?i.peso+' kg':'')+'</div></div><div style="flex:1"><span class="l">Premedicación</span><div class="f">'+(f.premed||'')+'</div></div><div style="flex:0 0 44px"><span class="l">Hora</span><div class="f">'+(i.hora||'')+'</div></div></div>'
+    +'<div class="row"><div style="flex:1"><span class="l">Hallazgos físicos anormales</span><div class="f" style="min-height:11px">&nbsp;</div></div></div>'
+    +'<div style="margin:2px 0;font-size:8.5px"><b>Inducción:</b> <span class="chk">'+(f.ind==='Satisfactoria'?'✓':'')+'</span>Satisfactoria &nbsp;<span class="chk">'+(f.ind==='Prolongada'?'✓':'')+'</span>Prolongada &nbsp;<span class="chk">'+(f.ind==='Tormentosa'?'✓':'')+'</span>Tormentosa</div>'
+    +'<div class="row"><div style="flex:1"><span class="l">Hora intubación</span><div class="f">'+(f.hint||'')+'</div></div><div style="flex:1"><span class="l">Hora extubación</span><div class="f">'+(f.hext||'')+'</div></div></div>'
+    +'<div style="border:1.5px solid #000;margin:3px 0;padding:2px">'
+      +'<div style="font-size:7px;margin-bottom:2px">Plano de 3er. Estudio &nbsp;|&nbsp; Resp.: ○ &nbsp; Pulso: ● &nbsp; T.A: )( &nbsp; OXIMET: △ &nbsp; El CO₂: □ &nbsp; Operac.: ■ &nbsp; Anestes.: ×</div>'
+      +chartHtml
+    +'</div>'
+    +'<div class="sect">Agentes Anestésicos:</div><div style="border-bottom:1px solid #ccc;padding:1px 2px;min-height:13px">'+(drogaLines||'')+'</div>'
+    +'<div class="sect">Métodos Anestésicos:</div><div style="border-bottom:1px solid #ccc;padding:1px 2px;min-height:14px">'+(f.metodos||'')+'</div>'
+    +'<div class="sect">Recuperación:</div><div style="border-bottom:1px solid #ccc;padding:1px 2px;min-height:13px">'+(f.recup||'')+'</div>'
+    +'<div style="display:flex;gap:8px;margin-top:4px">'
+      +'<div style="flex:2"><div class="sect">Observaciones:</div><div style="border:1px solid #ccc;padding:2px;min-height:38px">'+(f.obs||'')+'</div></div>'
+      +'<div style="flex:1;text-align:center;padding-top:10px"><div style="font-size:7px;font-weight:bold;margin-bottom:14px">FIRMA Y SELLO DEL ANESTESISTA</div>'
+        +signBlock
+        +'<div style="border-top:1px solid #000;padding-top:2px;font-size:7px"><b>MARIA SOLEDAD HUERTA</b><br>M.P. 32393 &nbsp; M.E. 15518<br>Anestesióloga · ADAARC</div>'
+      +'</div>'
+    +'</div>'
+    +'<div style="display:flex;gap:8px;margin-top:4px;border-top:1.5px solid #000;padding-top:3px">'
+      +'<div style="flex:1"><div class="sect">Hemoterapia</div><div style="font-size:8.5px;line-height:2">Sangre: <span style="border-bottom:1px solid #000;display:inline-block;min-width:36px;padding:0 2px">'+(f.sangre||'')+'</span> cm³<br>Plasma: <span style="border-bottom:1px solid #000;display:inline-block;min-width:36px;padding:0 2px">'+(f.plasma||'')+'</span> cm³<br>Suero: <span style="border-bottom:1px solid #000;display:inline-block;min-width:36px;padding:0 2px">'+(f.suero||'')+'</span> cm³<br>Otro: <span style="border-bottom:1px solid #000;display:inline-block;min-width:36px;padding:0 2px">'+(f.otro||'')+'</span> cm³</div></div>'
+      +'<div style="flex:2"><div class="sect">Observaciones</div><div style="border:1px solid #ccc;min-height:48px;padding:2px;font-size:8.5px"></div></div>'
+      +'<div style="flex:1;text-align:center;padding-top:4px"><div style="font-size:7px;font-weight:bold;margin-bottom:14px">FIRMA Y SELLO<br>DEL ANESTESISTA</div>'
+        +signBlock
+        +'<div style="border-top:1px solid #000;padding-top:2px;font-size:7px"><b>MARIA SOLEDAD HUERTA</b><br>M.P. 32393</div>'
+      +'</div>'
+    +'</div>'
+    +'</body></html>';
+
+  var w=window.open('','_blank');
+  if(!w){toast('Permitir ventanas emergentes en Chrome');return;}
+  // Write and wait for images
+  w.document.write(html);w.document.close();
+  // Wait for sign image to load before printing
+  if(signSrc){setTimeout(function(){w.print();},800);}
+  else{setTimeout(function(){w.print();},400);}
 }
 
+// ═══════════════════════════════════════════════════
+// IA EXTRACCIÓN
+// ═══════════════════════════════════════════════════
 var PROMPT='Analizá todas las imágenes adjuntas (foja anestésica, quirúrgica y/o autorización de obra social). De la AUTORIZACIÓN extraé: número de afiliado/socio, obra social, diagnóstico y cirugía autorizada. SOLO JSON sin markdown:\n{"fecha":"DD/MM/AAAA","hora_inicio":"HH:MM","paciente":"APELLIDO Nombre","edad":null,"sexo":null,"dni":null,"peso":null,"obra_social":null,"afiliado":null,"cirujano":null,"sanatorio":null,"diagnostico":null,"tecnica":null,"asa":null,"obesidad":false,"premedicacion":null,"induccion":null,"hora_intubacion":null,"hora_extubacion":null,"hora_fin":null,"drogas":[{"n":"","d":"","v":""}],"metodos":null,"recuperacion":null,"practicas":["desc"],"observaciones":null,"suero":null,"sangre":null,"plasma":null,"confianza":"alta|media|baja","dudosos":[]}';
 function onFiles(files){
   S.pendFiles=[];for(var k=0;k<files.length;k++){if(files[k].type.startsWith('image/')||files[k].type==='application/pdf')S.pendFiles.push(files[k]);}
@@ -1844,7 +1267,7 @@ function extraer(){
   .catch(function(e){document.getElementById('err-msg').textContent=e.message;document.getElementById('err-panel').classList.add('on');setSpin(false);document.getElementById('btn-extraer').style.display='block';});
 }
 function aplicarIA(j){
-  var base={id:Date.now()+'',estado:'borrador',fecha:new Date().toISOString().slice(0,10),hora:'',pac:'',edad:'',sexo:'',dni:'',peso:'',ciru:'',serv:'',diag:'',san:'Hospital Aeronáutico',sala:'',cama:'',mayo_sector:'',mayo_cama:'',obra:'',afil:'',ob:false,env:true,pracs:[],foja:{drogas:[],vitals:[]}};
+  var base={id:Date.now()+'',estado:'borrador',fecha:new Date().toISOString().slice(0,10),hora:'',pac:'',edad:'',sexo:'',dni:'',peso:'',ciru:'',serv:'',diag:'',san:'Hospital Aeronáutico',sala:'',cama:'',mayo_sector:'',mayo_cama:'',obra:'',afil:'',docs:{},ob:false,env:true,pracs:[],foja:{drogas:[],vitals:[]}};
   if(!S.cur)S.cur=base;
   var m={paciente:'pac',hora_inicio:'hora',obra_social:'obra',afiliado:'afil',cirujano:'ciru',sanatorio:'san',dni:'dni',diagnostico:'diag',sexo:'sexo'};
   Object.keys(m).forEach(function(k){if(j[k])S.cur[m[k]]=j[k];});
@@ -1912,400 +1335,95 @@ function argToISO(s){if(!s)return'';var p=s.split('/');return p.length===3?p[2]+
 
 // DRAG & DROP + INIT
 
+
+// === VITALS GRID ===
+var VG={cols:[],cells:{},obs:{},fluidos:{},activeParam:'resp'};
+var PARAMS={resp:{label:'Resp.',sym:'\u25cb',color:'#4fc3f7'},pulso:{label:'Pulso',sym:'\u25cf',color:'#ef5350'},ta:{label:'T.A.',sym:')(',color:'#ab47bc'},oximet:{label:'OXIMET',sym:'\u2014',color:'#66bb6a'},co2:{label:'El CO\u2082',sym:'\u25a1',color:'#ffa726'},operac:{label:'Operac.',sym:'\u25a0',color:'#78909c'},anest:{label:'Anestes.',sym:'\u00d7',color:'#26c6da'}};
+var Y_VALS=[200,187.5,175,162.5,150,137.5,125,112.5,100,87.5,75,62.5,50,37.5,25,12.5];
+function hm2min(s){var p=s.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
+function min2hm(m){var h=Math.floor(m/60)%24,mm=m%60;return(h<10?'0':'')+h+':'+(mm<10?'0':'')+mm;}
+function selParam(btn){document.querySelectorAll('.param-btn').forEach(function(b){b.style.borderColor='var(--border)';b.style.color='var(--text2)';b.classList.remove('active');});btn.style.borderColor='var(--green)';btn.style.color='var(--green)';btn.classList.add('active');VG.activeParam=btn.getAttribute('data-p');}
+function generarColumnas(){var hi=document.getElementById('vg-inicio').value||document.getElementById('f-hora').value||'';var hf=document.getElementById('vg-fin').value||'';if(!hi){toast('Complet\u00e1 la hora de inicio');return;}var sm=hm2min(hi),em=hf?hm2min(hf):sm+90;VG.cols=[];VG.cells={};VG.obs={};VG.fluidos={};for(var t=sm;t<=em;t+=5)VG.cols.push({t:min2hm(t)});renderVitalsGrid();toast('Columnas generadas: '+VG.cols.length);}
+function cellKey(ci,val){return ci+'_'+val;}
+function toggleCell(ci,val){var k=cellKey(ci,val);var p=VG.activeParam;if(VG.cells[k]&&VG.cells[k].param===p){delete VG.cells[k];}else{VG.cells[k]={param:p,sym:PARAMS[p].sym,color:PARAMS[p].color};}renderVitalsGrid();}
+function renderVitalsGrid(){
+  var wrap=document.getElementById('vitals-grid-wrap');if(!wrap)return;
+  if(!VG.cols.length){wrap.innerHTML='<p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Gener\u00e1 las columnas de tiempo para empezar</p>';return;}
+  var CELL=28,LABEL_W=50;
+  var html='<div style="font-family:Arial,sans-serif;user-select:none"><div style="display:flex;margin-left:'+LABEL_W+'px;border-bottom:1px solid var(--border)">';
+  VG.cols.forEach(function(col){html+='<div style="width:'+CELL+'px;font-size:6.5px;text-align:center;color:var(--text3);padding:2px 0;overflow:hidden;flex-shrink:0">'+col.t+'</div>';});
+  html+='</div>';
+  Y_VALS.forEach(function(yval){
+    var showLabel=(yval===200||yval===150||yval===100||yval===50);
+    var isMajor=(yval%50===0);
+    html+='<div style="display:flex;align-items:stretch"><div style="width:'+LABEL_W+'px;font-size:8px;color:var(--text2);text-align:right;padding-right:4px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:flex-end;padding-bottom:1px;font-weight:'+(showLabel?'bold':'normal')+'">'+(showLabel?yval:'')+'</div>';
+    VG.cols.forEach(function(col,ci){var k=cellKey(ci,yval);var cell=VG.cells[k];var bt=isMajor?'1.5px solid rgba(100,100,100,.5)':'1px solid rgba(48,54,61,.5)';var bg=cell?'rgba(29,185,84,.12)':'transparent';var sym=cell?('<span style="font-size:13px;font-weight:bold;line-height:1;color:'+cell.color+'">'+cell.sym+'</span>'):'';html+='<div onclick="toggleCell('+ci+','+yval+')" style="width:'+CELL+'px;height:18px;border-left:1px solid rgba(48,54,61,.4);border-top:'+bt+';background:'+bg+';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">'+sym+'</div>';});
+    html+='</div>';
+  });
+  html+='<div style="display:flex;margin-top:2px;align-items:stretch"><div style="width:'+LABEL_W+'px;font-size:7px;color:var(--text3);text-align:right;padding-right:4px;flex-shrink:0;line-height:1.2">Hora<br>obs.</div>';
+  VG.cols.forEach(function(col,ci){var val=VG.obs[ci]||'';html+='<div style="width:'+CELL+'px;height:20px;border:1px solid rgba(48,54,61,.5);flex-shrink:0;overflow:hidden"><input oninput="VG.obs['+ci+']=this.value" value="'+val+'" style="width:100%;height:100%;background:transparent;border:none;font-size:6px;text-align:center;color:var(--text);padding:0;outline:none"></div>';});
+  html+='</div><div style="display:flex;margin-top:1px;align-items:stretch"><div style="width:'+LABEL_W+'px;font-size:8px;color:var(--text3);text-align:right;padding-right:4px;flex-shrink:0;font-weight:bold">FLUIDOS</div>';
+  VG.cols.forEach(function(col,ci){var val=VG.fluidos[ci]||'';html+='<div style="width:'+CELL+'px;height:20px;border:1px solid rgba(48,54,61,.5);flex-shrink:0;overflow:hidden"><input oninput="VG.fluidos['+ci+']=this.value" value="'+val+'" style="width:100%;height:100%;background:transparent;border:none;font-size:6px;text-align:center;color:var(--text);padding:0;outline:none"></div>';});
+  html+='</div><div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:11px">';
+  Object.keys(PARAMS).forEach(function(k){var p=PARAMS[k];html+='<span style="color:'+p.color+'"><b>'+p.sym+'</b> '+p.label+'</span>';});
+  html+='</div></div>';
+  wrap.innerHTML=html;
+}
+function limpiarGrafico(){VG.cells={};VG.obs={};VG.fluidos={};renderVitalsGrid();toast('Gr\u00e1fico limpiado');}
+function generarFilasVitales(){generarColumnas();}
+function addVitalRow(){}
+function renderVitals(){}
+function editV(){}
+function delV(){}
+function guardarFojaVG(){if(S.cur&&S.cur.foja){S.cur.foja.vg_cols=VG.cols;S.cur.foja.vg_cells=VG.cells;S.cur.foja.vg_obs=VG.obs;S.cur.foja.vg_fluidos=VG.fluidos;}}
+function cargarFojaVG(){var f=(S.cur&&S.cur.foja)||{};if(f.vg_cols){VG.cols=f.vg_cols;VG.cells=f.vg_cells||{};VG.obs=f.vg_obs||{};VG.fluidos=f.vg_fluidos||{};setTimeout(renderVitalsGrid,80);}}
+// === ACKEY + closeAllAC ===
 function acKey(e,lid){
-  var list=document.getElementById(lid);
-  if(!list||list.style.display==='none')return;
-  var items=list.querySelectorAll('.ac-item');
-  var sel=list.querySelector('.ac-item.sel');
-  var idx=-1;
+  var list=document.getElementById(lid);if(!list||list.style.display==='none')return;
+  var items=list.querySelectorAll('.ac-item');var sel=list.querySelector('.ac-item.sel');var idx=-1;
   items.forEach(function(it,i){if(it===sel)idx=i;});
-  if(e.key==='ArrowDown'){
-    e.preventDefault();
-    var n=Math.min(idx+1,items.length-1);
-    items.forEach(function(it){it.classList.remove('sel');});
-    if(items[n])items[n].classList.add('sel');
-  } else if(e.key==='ArrowUp'){
-    e.preventDefault();
-    var n2=Math.max(idx-1,0);
-    items.forEach(function(it){it.classList.remove('sel');});
-    if(items[n2])items[n2].classList.add('sel');
-  } else if(e.key==='Enter'||e.key==='Tab'){
-    var s=list.querySelector('.ac-item.sel');
-    if(s){e.preventDefault();s.click();}
-  } else if(e.key==='Escape'){
-    closeAllAC();
-  }
+  if(e.key==='ArrowDown'){e.preventDefault();var n=Math.min(idx+1,items.length-1);items.forEach(function(it){it.classList.remove('sel');});if(items[n])items[n].classList.add('sel');}
+  else if(e.key==='ArrowUp'){e.preventDefault();var n2=Math.max(idx-1,0);items.forEach(function(it){it.classList.remove('sel');});if(items[n2])items[n2].classList.add('sel');}
+  else if(e.key==='Enter'||e.key==='Tab'){var s=list.querySelector('.ac-item.sel');if(s){e.preventDefault();s.click();}}
+  else if(e.key==='Escape'){closeAllAC();}
 }
+function closeAllAC(){document.querySelectorAll('.ac-list').forEach(function(el){el.style.display='none';});}
+document.addEventListener('click',function(e){if(!e.target.closest||!e.target.closest('.ac-wrap'))closeAllAC();});
+// === CIRUJANOS POR ESPECIALIDAD ===
+var CIRUJANOS_ESP={'Cirug\u00eda Cardiovascular':['BOCHINFUSO MATIAS','GUEVARA JORGE ALEJANDRO'],'Cardiocirug\u00eda':['BOCHINFUSO MATIAS','GUEVARA JORGE ALEJANDRO'],'Cirug\u00eda de Cabeza y Cuello':['CORBALL ALBERTO GUSTAVO','FLORES GABRIEL ALEJANDRO','MENSO NICOLAS'],'Cirug\u00eda Tor\u00e1cica':['REPETTI JOSE LUIS'],'Cirug\u00eda General':['COOKE JOSE ALBERTO','COPPARI BRIAN','MATUS GUSTAVO NICOLAS','ZURITA GONZALO'],'Cirug\u00eda Laparosc\u00f3pica':['COOKE JOSE ALBERTO','COPPARI BRIAN','MATUS GUSTAVO NICOLAS','ZURITA GONZALO'],'Cirug\u00eda Hep\u00e1tica':['ALVAREZ FERNANDO ANDRES'],'Cirug\u00eda Pl\u00e1stica y Reparadora':['PAOLETTI JAVIER ALBERTO','ROMERO ARENA FEDERICO'],'Cirug\u00eda Vascular':['FONTAINE CRISTIAN','PELAEZ RODRIGO'],'Endoscop\u00eda Digestiva':['BONAPARTE FERNANDO AGUSTIN','IRIARTE HORACIO FERNANDO','STRUMIA SILVINA DEL VALLE'],'Gastroenterolog\u00eda':['BONAPARTE FERNANDO AGUSTIN','IRIARTE HORACIO FERNANDO','STRUMIA SILVINA DEL VALLE'],'Ginecolog\u00eda y Obstetricia':['GIL ANA MARIA IRENE','ARRECHEA MARIANA','CANAVESIO CAROLA ALEJANDRA','CAPOVILLA CLAUDIA PATRICIA','PIOVANO MARIA PATRICIA'],'Hemodinamia':['LEONARDI CARLOS RAUL','CHIARINI FERNANDO','FONTAINE CRISTIAN','MIARA JONATHAN','PESSAH GUSTAVO'],'Neurocirug\u00eda':['BERRA MATIAS SEBASTIAN','SANCHEZ JAVIER ANTONIO'],'Oftalmolog\u00eda':['GONZALEZ CASTELLANOS JERONIMO','ALVAREZ MARIA ALEJANDRA','GONZALEZ CASTELLANOS MARIA S','LAURIA LUIS FRANCISCO'],'ORL (Otorrinolaringolog\u00eda)':['FREIRE BUTELER IGNACIO'],'Traumatolog\u00eda y Ortopedia':['BENINGAZZA GABRIEL','AROCENA MARIANO','CEREZO RIZZI EMANUEL','FERREYRA PABLO','GORGAS ALBERTO','GUZMAN NICOLAS','JAIS JAIS JOSE FARID','VILLAFA\u00d1E GONZALO DARIO'],'Obesolog\u00eda / Bari\u00e1trica':['CLARIA JORGE','PIVA EUGENIO','ZURITA GONZALO'],'Urolog\u00eda':['PINTO GABRIEL FERNANDO','SONZINI CRISTIAN','MEINCKE SOFIA MARIA','PASTRANA RODRIGO EMANUEL']};
+function getCirujanosByEsp(){var esp=(document.getElementById('f-serv')||{value:''}).value;var fromEsp=(esp&&CIRUJANOS_ESP[esp])?CIRUJANOS_ESP[esp]:[];var learned=(typeof cirujanos!=='undefined')?cirujanos:[];var all=fromEsp.slice();learned.forEach(function(c){if(all.indexOf(c)<0)all.push(c);});return all;}
+function acCirujano(){var q=document.getElementById('f-ciru').value;var src=getCirujanosByEsp();if(!q||q.length<1){var esp=(document.getElementById('f-serv')||{value:''}).value;if(esp&&CIRUJANOS_ESP[esp]){renderAC('ac-ciru',CIRUJANOS_ESP[esp],function(x){return x;},null,function(i,cap){document.getElementById('f-ciru').value=cap[i]||'';closeAllAC();});}else{document.getElementById('ac-ciru').style.display='none';}return;}var hits=src.filter(function(x){return x.toLowerCase().indexOf(q.toLowerCase())>=0;}).slice(0,10);if(!hits.length){document.getElementById('ac-ciru').style.display='none';return;}renderAC('ac-ciru',hits,function(x){return x;},null,function(i,cap){document.getElementById('f-ciru').value=cap[i]||'';closeAllAC();});}
+// === EXPORT/IMPORT ===
+function exportarDatos(){var data={intervs:S.intervs,cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),key:S.key||'',exportado:new Date().toISOString(),version:'AnesFact v6'};var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='AnesFact_backup_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);toast('Datos exportados \u2713');}
+function importarDatos(input){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);var nueva=data.intervs||[];var existentes=S.intervs||[];var ids=existentes.map(function(i){return i.id;});var agregados=0;nueva.forEach(function(i){if(ids.indexOf(i.id)<0){existentes.push(i);agregados++;}});S.intervs=existentes;localStorage.setItem('af_i',JSON.stringify(S.intervs));if(data.cirujanos&&data.cirujanos.length){var local=[];try{local=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e2){}data.cirujanos.forEach(function(c){if(local.indexOf(c)<0)local.push(c);});localStorage.setItem('af_ciru',JSON.stringify(local));}if(data.key&&!S.key){S.key=data.key;localStorage.setItem('af_k',S.key);}renderHome();toast('Importados '+agregados+' registros \u2713');}catch(err){toast('Error: '+err.message);}};reader.readAsText(file);input.value='';}
+// === SYNC ===
+function syncStatus(msg,color){var el=document.getElementById('sync-status');if(!el)return;el.style.display='block';el.style.background=color==='ok'?'rgba(29,185,84,.1)':color==='err'?'rgba(248,81,73,.1)':'rgba(56,139,253,.1)';el.style.color=color==='ok'?'var(--green)':color==='err'?'var(--red)':'var(--blue)';el.style.border='1px solid '+(color==='ok'?'rgba(29,185,84,.3)':color==='err'?'rgba(248,81,73,.3)':'rgba(56,139,253,.3)');el.textContent=msg;}
+function getSyncUrl(){return localStorage.getItem('af_sync_url')||'';}
+function saveSyncUrl(){var url=(document.getElementById('cfg-sync-url')||{value:''}).value.trim();if(!url){toast('Peg\u00e1 la URL del script');return;}localStorage.setItem('af_sync_url',url);toast('URL guardada \u2713');}
+var APPS_SCRIPT_CODE=['function doGet(e){','  var action=e.parameter.action||"load";','  var props=PropertiesService.getUserProperties();','  if(action==="save"){','    var data=e.parameter.data||"{}";','    props.setProperty("anesfact_backup",Utilities.newBlob(Utilities.base64Decode(data)).getDataAsString());','    return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);','  }','  var saved=props.getProperty("anesfact_backup")||"{}";','  return ContentService.createTextOutput(saved).setMimeType(ContentService.MimeType.JSON);','}'].join('\n');
+function mostrarCodigoScript(){var p=document.getElementById('script-code-panel');var ta=document.getElementById('script-code-text');if(p&&ta){p.style.display='block';ta.value=APPS_SCRIPT_CODE;}}
+function copiarCodigoScript(){var ta=document.getElementById('script-code-text');if(ta){ta.select();document.execCommand('copy');toast('C\u00f3digo copiado \u2713');}}
+function syncGuardar(){var url=getSyncUrl();if(!url){toast('Configur\u00e1 la URL primero');return;}syncStatus('Guardando...','info');var data={intervs:S.intervs,cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),key:S.key||'',guardado:new Date().toISOString(),version:'AnesFact v6'};try{var b64=btoa(unescape(encodeURIComponent(JSON.stringify(data))));fetch(url+'?action=save&data='+encodeURIComponent(b64)).then(function(r){return r.json();}).then(function(res){if(res.ok){syncStatus('\u2713 Guardado ('+new Date().toLocaleTimeString()+')','ok');toast('Guardado en la nube \u2713');}else{syncStatus('Error','err');}}).catch(function(e){syncStatus('Error: '+e.message,'err');});}catch(e){syncStatus('Error: '+e.message,'err');}}
+function syncCargar(){var url=getSyncUrl();if(!url){toast('Configur\u00e1 la URL primero');return;}syncStatus('Cargando...','info');fetch(url+'?t='+Date.now()).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}).then(function(txt){var data;try{data=JSON.parse(txt);}catch(e){throw new Error('Respuesta inv\u00e1lida');}if(!data||!data.intervs){syncStatus('No hay backup a\u00fan','err');return;}var nueva=data.intervs||[];var existentes=S.intervs||[];var ids=existentes.map(function(i){return i.id;});var agregados=0;nueva.forEach(function(i){if(ids.indexOf(i.id)<0){existentes.push(i);agregados++;}});S.intervs=existentes;localStorage.setItem('af_i',JSON.stringify(S.intervs));if(data.cirujanos&&data.cirujanos.length){var local=[];try{local=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e2){}data.cirujanos.forEach(function(c){if(local.indexOf(c)<0)local.push(c);});localStorage.setItem('af_ciru',JSON.stringify(local));}if(data.key&&!S.key){S.key=data.key;localStorage.setItem('af_k',S.key);}renderHome();syncStatus('\u2713 '+agregados+' registros cargados','ok');}).catch(function(e){syncStatus('Error: '+e.message,'err');});}
+// === DOCUMENTOS ===
+function adjuntarDoc(input,tipo){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){var data=e.target.result;if(!S.cur)return;if(!S.cur.docs)S.cur.docs={};S.cur.docs[tipo]={nombre:file.name,tipo:file.type,data:data,fecha:new Date().toISOString()};var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});if(idx>=0)S.intervs[idx]=S.cur;localStorage.setItem('af_i',JSON.stringify(S.intervs));renderDocBadges();toast(getNombreDoc(tipo)+' guardada \u2713');};reader.readAsDataURL(file);}
+function getNombreDoc(tipo){return tipo==='anest'?'Foja Anest\u00e9sica':tipo==='qx'?'Foja Quir\u00fargica':'Autorizaci\u00f3n';}
+function renderDocBadges(){var docs=(S.cur&&S.cur.docs)||{};['anest','qx','auth'].forEach(function(tipo){var badge=document.getElementById('doc-'+tipo+'-badge');var prev=document.getElementById('doc-'+tipo+'-prev');var label=document.getElementById('doc-'+tipo+'-label');if(!badge)return;if(docs[tipo]){badge.style.display='inline-block';var d=docs[tipo];var isImg=d.tipo&&d.tipo.startsWith('image/');if(prev)prev.innerHTML='<div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--green);border-radius:8px;padding:8px 10px;margin-top:4px">'+(isImg?'<img src="'+d.data+'" style="height:44px;border-radius:4px;object-fit:cover">':'<span style="font-size:24px">doc</span>')+'<div style="flex:1;overflow:hidden"><div style="font-size:12px;font-weight:500">'+d.nombre+'</div><div style="font-size:11px;color:var(--text3)">'+new Date(d.fecha).toLocaleString()+'</div></div><button onclick="verDoc(\''+tipo+'\')" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:13px">ver</button><button onclick="borrarDoc(\''+tipo+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px">\u00d7</button></div>';if(label)label.style.borderColor='var(--green)';}else{badge.style.display='none';if(prev)prev.innerHTML='';if(label)label.style.borderColor='var(--border)';}});}
+function verDoc(tipo){var docs=(S.cur&&S.cur.docs)||{};var d=docs[tipo];if(!d)return;var w=window.open('','_blank');if(d.tipo&&d.tipo.startsWith('image/')){w.document.write('<img src="'+d.data+'" style="max-width:100%">');}else{w.document.write('<embed src="'+d.data+'" width="100%" height="100%" type="application/pdf">');}w.document.close();}
+function borrarDoc(tipo){if(!S.cur||!S.cur.docs)return;delete S.cur.docs[tipo];var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});if(idx>=0)S.intervs[idx]=S.cur;localStorage.setItem('af_i',JSON.stringify(S.intervs));renderDocBadges();toast(getNombreDoc(tipo)+' eliminada');}
+function cargarDocBadges(){setTimeout(renderDocBadges,100);}
+function verDocRes(tipo){verDoc(tipo);}
+function descargarDoc(tipo){var docs=(S.cur&&S.cur.docs)||{};var d=docs[tipo];if(!d)return;var a=document.createElement('a');a.href=d.data;a.download=d.nombre;document.body.appendChild(a);a.click();document.body.removeChild(a);toast('Descargando '+d.nombre);}
 
-function exportarDatos(){
-  var data={
-    intervs:S.intervs,
-    cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),
-    key:S.key||'',
-    exportado:new Date().toISOString(),
-    version:'AnesFact v6'
-  };
-  var json=JSON.stringify(data,null,2);
-  var blob=new Blob([json],{type:'application/json'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');
-  var fecha=new Date().toISOString().slice(0,10);
-  a.href=url;
-  a.download='AnesFact_backup_'+fecha+'.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast('Datos exportados ✓ Guardá el archivo en Drive o WhatsApp');
-}
-
-function importarDatos(input){
-  var file=input.files[0];
-  if(!file){return;}
-  var reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      var data=JSON.parse(e.target.result);
-      if(!data.intervs&&!data.version){
-        toast('Archivo no válido');return;
-      }
-      var nueva=data.intervs||[];
-      var existentes=S.intervs||[];
-      // Merge: add new ones that don't exist (by id)
-      var ids=existentes.map(function(i){return i.id;});
-      var agregados=0;
-      nueva.forEach(function(i){
-        if(ids.indexOf(i.id)<0){existentes.push(i);agregados++;}
-      });
-      S.intervs=existentes;
-      localStorage.setItem('af_i',JSON.stringify(S.intervs));
-      // Restore cirujanos
-      if(data.cirujanos&&data.cirujanos.length){
-        var ciru=data.cirujanos;
-        try{
-          var local=JSON.parse(localStorage.getItem('af_ciru')||'[]');
-          ciru.forEach(function(c){if(local.indexOf(c)<0)local.push(c);});
-          localStorage.setItem('af_ciru',JSON.stringify(local));
-        }catch(e2){}
-      }
-      // Restore API key if not set
-      if(data.key&&!S.key){
-        S.key=data.key;
-        localStorage.setItem('af_k',S.key);
-      }
-      renderHome();
-      toast('Importados '+agregados+' nuevos registros ✓');
-    }catch(err){
-      toast('Error al leer el archivo: '+err.message);
-    }
-  };
-  reader.readAsText(file);
-  input.value='';
-}
-
-
-// ═══════════════════════════════════════════════════
-var DRIVE_CLIENT_ID='';  // Set by user in config
-var DRIVE_FILE_NAME='AnesFact_backup.json';
-var DRIVE_TOKEN=null;
-var DRIVE_FILE_ID=null;
-
-function driveStatus(msg,color){
-  var el=document.getElementById('drive-status');
-  if(!el)return;
-  el.style.display='block';
-  el.style.background=color==='ok'?'rgba(29,185,84,.1)':color==='err'?'rgba(248,81,73,.1)':'rgba(56,139,253,.1)';
-  el.style.color=color==='ok'?'var(--green)':color==='err'?'var(--red)':'var(--blue)';
-  el.style.border='1px solid '+(color==='ok'?'rgba(29,185,84,.3)':color==='err'?'rgba(248,81,73,.3)':'rgba(56,139,253,.3)');
-  el.textContent=msg;
-}
-
-function getDriveClientId(){
-  var id=localStorage.getItem('af_drive_id')||'';
-  if(!id){
-    id=prompt('Ingresá tu Google Client ID (Google Cloud Console):','');
-    if(id)localStorage.setItem('af_drive_id',id.trim());
-  }
-  return id?id.trim():'';
-}
-
-function driveAuth(callback){
-  var clientId=getDriveClientId();
-  if(!clientId){driveStatus('Falta configurar el Client ID de Google','err');return;}
-  // Load Google Identity Services if not loaded
-  if(!window.google||!window.google.accounts){
-    var script=document.createElement('script');
-    script.src='https://accounts.google.com/gsi/client';
-    script.onload=function(){driveAuthInner(clientId,callback);};
-    script.onerror=function(){driveStatus('Error al cargar Google Sign-In','err');};
-    document.head.appendChild(script);
-  } else {
-    driveAuthInner(clientId,callback);
-  }
-}
-
-function driveAuthInner(clientId,callback){
-  try {
-    var client=google.accounts.oauth2.initTokenClient({
-      client_id:clientId,
-      scope:'https://www.googleapis.com/auth/drive.file',
-      callback:function(resp){
-        if(resp.error){driveStatus('Error de autenticación: '+resp.error,'err');return;}
-        DRIVE_TOKEN=resp.access_token;
-        callback();
-      }
-    });
-    client.requestAccessToken();
-  } catch(e) {
-    driveStatus('Error Google Auth: '+e.message,'err');
-  }
-}
-
-function driveGuardar(){
-  driveStatus('Conectando con Google...','info');
-  driveAuth(function(){
-    var data={
-      intervs:S.intervs,
-      cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),
-      key:S.key||'',
-      guardado:new Date().toISOString(),
-      version:'AnesFact v6'
-    };
-    var json=JSON.stringify(data,null,2);
-    // Search for existing file first
-    fetch('https://www.googleapis.com/drive/v3/files?q=name%3D%22'+DRIVE_FILE_NAME+'%22+and+trashed%3Dfalse&fields=files(id,name)',{
-      headers:{Authorization:'Bearer '+DRIVE_TOKEN}
-    })
-    .then(function(r){return r.json();})
-    .then(function(res){
-      var fileId=res.files&&res.files.length?res.files[0].id:null;
-      driveUpload(json,fileId);
-    })
-    .catch(function(e){driveStatus('Error buscando archivo: '+e.message,'err');});
-  });
-}
-
-function driveUpload(json,fileId){
-  driveStatus('Subiendo datos...','info');
-  var boundary='anesfact_boundary';
-  var metadata={name:DRIVE_FILE_NAME,mimeType:'application/json'};
-  var body='--'+boundary+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'
-    +JSON.stringify(metadata)+'\r\n--'+boundary+'\r\nContent-Type: application/json\r\n\r\n'
-    +json+'\r\n--'+boundary+'--';
-  var method=fileId?'PATCH':'POST';
-  var url=fileId
-    ?'https://www.googleapis.com/upload/drive/v3/files/'+fileId+'?uploadType=multipart'
-    :'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
-  fetch(url,{
-    method:method,
-    headers:{Authorization:'Bearer '+DRIVE_TOKEN,'Content-Type':'multipart/related; boundary='+boundary},
-    body:body
-  })
-  .then(function(r){return r.json();})
-  .then(function(res){
-    if(res.id){
-      DRIVE_FILE_ID=res.id;
-      driveStatus('✓ Guardado en Drive correctamente ('+new Date().toLocaleTimeString()+')','ok');
-    } else {
-      driveStatus('Error al guardar: '+(res.error&&res.error.message||'desconocido'),'err');
-    }
-  })
-  .catch(function(e){driveStatus('Error subiendo: '+e.message,'err');});
-}
-
-function driveCargar(){
-  driveStatus('Conectando con Google...','info');
-  driveAuth(function(){
-    fetch('https://www.googleapis.com/drive/v3/files?q=name%3D%22'+DRIVE_FILE_NAME+'%22+and+trashed%3Dfalse&fields=files(id,name,modifiedTime)',{
-      headers:{Authorization:'Bearer '+DRIVE_TOKEN}
-    })
-    .then(function(r){return r.json();})
-    .then(function(res){
-      if(!res.files||!res.files.length){
-        driveStatus('No se encontró backup en Drive. Guardá primero desde la compu.','err');
-        return;
-      }
-      var file=res.files[0];
-      driveStatus('Descargando backup ('+new Date(file.modifiedTime).toLocaleString()+')...','info');
-      return fetch('https://www.googleapis.com/drive/v3/files/'+file.id+'?alt=media',{
-        headers:{Authorization:'Bearer '+DRIVE_TOKEN}
-      });
-    })
-    .then(function(r){if(r&&r.ok)return r.text();})
-    .then(function(txt){
-      if(!txt)return;
-      try{
-        var data=JSON.parse(txt);
-        var nueva=data.intervs||[];
-        var existentes=S.intervs||[];
-        var ids=existentes.map(function(i){return i.id;});
-        var agregados=0;
-        nueva.forEach(function(i){if(ids.indexOf(i.id)<0){existentes.push(i);agregados++;}});
-        S.intervs=existentes;
-        localStorage.setItem('af_i',JSON.stringify(S.intervs));
-        if(data.cirujanos&&data.cirujanos.length){
-          try{
-            var local=JSON.parse(localStorage.getItem('af_ciru')||'[]');
-            data.cirujanos.forEach(function(c){if(local.indexOf(c)<0)local.push(c);});
-            localStorage.setItem('af_ciru',JSON.stringify(local));
-          }catch(e2){}
-        }
-        if(data.key&&!S.key){S.key=data.key;localStorage.setItem('af_k',S.key);}
-        renderHome();
-        driveStatus('✓ '+agregados+' nuevos registros importados desde Drive','ok');
-      }catch(e){driveStatus('Error al leer backup: '+e.message,'err');}
-    })
-    .catch(function(e){driveStatus('Error descargando: '+e.message,'err');});
-  });
-}
-
-// ═══════════════════════════════════════════════════
-// SYNC VIA GOOGLE APPS SCRIPT
-// ═══════════════════════════════════════════════════
-var APPS_SCRIPT_CODE = [
-  'function doGet(e){',
-  '  var action = e.parameter.action || "load";',
-  '  var props = PropertiesService.getUserProperties();',
-  '  if(action === "save"){',
-  '    var data = e.parameter.data || "{}";',
-  '    props.setProperty("anesfact_backup", Utilities.newBlob(Utilities.base64Decode(data)).getDataAsString());',
-  '    return ContentService.createTextOutput(JSON.stringify({ok:true}))',
-  '      .setMimeType(ContentService.MimeType.JSON);',
-  '  }',
-  '  var saved = props.getProperty("anesfact_backup") || "{}";',
-  '  return ContentService.createTextOutput(saved)',
-  '    .setMimeType(ContentService.MimeType.JSON);',
-  '}'
-].join('\n');
-
-function syncStatus(msg, color){
-  var el=document.getElementById('sync-status');
-  if(!el)return;
-  el.style.display='block';
-  el.style.background=color==='ok'?'rgba(29,185,84,.1)':color==='err'?'rgba(248,81,73,.1)':'rgba(56,139,253,.1)';
-  el.style.color=color==='ok'?'var(--green)':color==='err'?'var(--red)':'var(--blue)';
-  el.style.border='1px solid '+(color==='ok'?'rgba(29,185,84,.3)':color==='err'?'rgba(248,81,73,.3)':'rgba(56,139,253,.3)');
-  el.textContent=msg;
-}
-
-function getSyncUrl(){
-  return localStorage.getItem('af_sync_url')||'';
-}
-
-function saveSyncUrl(){
-  var url=(document.getElementById('cfg-sync-url').value||'').trim();
-  if(!url){toast('Pegá la URL del script');return;}
-  localStorage.setItem('af_sync_url',url);
-  document.getElementById('sync-url-status').textContent='URL guardada ✓';
-  toast('URL de sincronización guardada');
-}
-
-function mostrarCodigoScript(){
-  var panel=document.getElementById('script-code-panel');
-  var ta=document.getElementById('script-code-text');
-  if(panel&&ta){
-    panel.style.display='block';
-    ta.value=APPS_SCRIPT_CODE;
-  }
-}
-
-function copiarCodigoScript(){
-  var ta=document.getElementById('script-code-text');
-  if(ta){ta.select();document.execCommand('copy');toast('Código copiado ✓');}
-}
-
-function syncGuardar(){
-  var url=getSyncUrl();
-  if(!url){toast('Configurá la URL del script primero');return;}
-  syncStatus('Guardando...','info');
-  var data={
-    intervs:S.intervs,
-    cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),
-    key:S.key||'',
-    guardado:new Date().toISOString(),
-    version:'AnesFact v6'
-  };
-  try{
-    var json=JSON.stringify(data);
-    var b64=btoa(unescape(encodeURIComponent(json)));
-    var saveUrl=url+'?action=save&data='+encodeURIComponent(b64);
-    fetch(saveUrl)
-    .then(function(r){return r.json();})
-    .then(function(res){
-      if(res.ok){
-        syncStatus('✓ Guardado ('+new Date().toLocaleTimeString()+')','ok');
-        toast('Datos guardados en la nube ✓');
-      } else {
-        syncStatus('Error al guardar','err');
-      }
-    })
-    .catch(function(e){syncStatus('Error: '+e.message,'err');});
-  }catch(e){syncStatus('Error al preparar datos: '+e.message,'err');}
-}
-
-function syncCargar(){
-  var url=getSyncUrl();
-  if(!url){toast('Configurá la URL del script primero (icón de cámara → Sincronización)');return;}
-  syncStatus('Cargando datos...','info');
-  // GET works normally with CORS on Apps Script
-  fetch(url+'?t='+Date.now())
-  .then(function(r){
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    return r.text();
-  })
-  .then(function(txt){
-    var data;
-    try{data=JSON.parse(txt);}catch(e){throw new Error('Respuesta inválida del script');}
-    if(!data||!data.intervs){syncStatus('No hay backup guardado aún. Guardá primero desde la compu.','err');return;}
-    var nueva=data.intervs||[];
-    var existentes=S.intervs||[];
-    var ids=existentes.map(function(i){return i.id;});
-    var agregados=0;
-    nueva.forEach(function(i){if(ids.indexOf(i.id)<0){existentes.push(i);agregados++;}});
-    S.intervs=existentes;
-    localStorage.setItem('af_i',JSON.stringify(S.intervs));
-    if(data.cirujanos&&data.cirujanos.length){
-      var local=[];try{local=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e2){}
-      data.cirujanos.forEach(function(c){if(local.indexOf(c)<0)local.push(c);});
-      localStorage.setItem('af_ciru',JSON.stringify(local));
-    }
-    if(data.key&&!S.key){S.key=data.key;localStorage.setItem('af_k',S.key);}
-    renderHome();
-    syncStatus('✓ '+agregados+' nuevos registros importados','ok');
-    toast(agregados+' registros nuevos cargados ✓');
-  })
-  .catch(function(e){syncStatus('Error: '+e.message+'. Verificá la URL del script.','err');});
-}
-
-function saveDriveId(){saveSyncUrl();}
 (function(){
   var ua=document.getElementById('upload-area');
   if(ua){ua.addEventListener('dragover',function(e){e.preventDefault();ua.style.borderColor='var(--green)';});ua.addEventListener('dragleave',function(){ua.style.borderColor='var(--border)';});ua.addEventListener('drop',function(e){e.preventDefault();ua.style.borderColor='var(--border)';onFiles(e.dataTransfer.files);});}
   var dateEl=document.getElementById('f-fecha');if(dateEl&&!dateEl.value)dateEl.value=new Date().toISOString().slice(0,10);
   renderHome();
 })();
-
 </script>
 <script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js')
-      .then(function(reg){ console.log('SW registered'); })
-      .catch(function(e){ console.log('SW error:', e); });
-  });
-  // Handle share target - check URL params on load
-  window.addEventListener('load', function(){
-    var params = new URLSearchParams(window.location.search);
-    var sharedUrl = params.get('url') || params.get('text');
-    if(sharedUrl){
-      // Store for IA extraction
-      setTimeout(function(){
-        go('scan');
-        toast('Contenido compartido recibido - subí la imagen para extraer');
-      }, 500);
-    }
-  });
-}
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}
 </script>
 </body>
 </html>
