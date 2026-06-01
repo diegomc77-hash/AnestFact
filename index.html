@@ -234,7 +234,7 @@ select.fi option{background:var(--bg2)}
     <div id="docs-card-body"><p style="font-size:12px;color:var(--text3)">Guardá primero los datos</p></div>
   </div>
   <div class="brow" style="margin-bottom:8px">
-    <button class="btn btn-s" onclick="go('foja')">&#128203; Foja anest.</button>
+    <button class="btn btn-s" onclick="guardar();go('foja')">&#128203; Foja anest.</button>
     <button class="btn btn-s" onclick="guardar()">&#128190; Guardar</button>
   </div>
   <div id="btn-mayo-wrap" style="display:none;margin-bottom:8px">
@@ -309,8 +309,8 @@ select.fi option{background:var(--bg2)}
       <div class="field"><label>Hora fin</label><input class="fi" type="time" id="fj-fin"></div>
     </div>
     <div class="g2">
-      <div class="field"><label>Hora intubación</label><input class="fi" type="time" id="fj-hint"></div>
-      <div class="field"><label>Hora extubación</label><input class="fi" type="time" id="fj-hext"></div>
+      
+      
     </div>
     <div class="field"><label>Premedicación</label>
       <div class="ac-wrap">
@@ -381,24 +381,58 @@ select.fi option{background:var(--bg2)}
 
   <div class="card">
     <div class="ct">Métodos anestésicos</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="metodos-chips">
+      <button class="chip" onclick="setMetodos('raquidea')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Raquídea</button>
+      <button class="chip" onclick="setMetodos('general')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">A. General</button>
+      <button class="chip" onclick="setMetodos('tiva')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">TIVA</button>
+      <button class="chip" onclick="setMetodos('peridural')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Peridural</button>
+      <button class="chip" onclick="setMetodos('localasistida')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Local asistida</button>
+      <button class="chip" onclick="setMetodos('sedacion')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Sedación</button>
+    </div>
+    <div id="metodos-extra" style="display:none;margin-bottom:8px"></div>
     <div class="fr" style="align-items:flex-start">
-      <textarea class="fi" id="fj-metodos" placeholder="Raquídea estricta..."></textarea>
+      <textarea class="fi" id="fj-metodos" placeholder="Observaciones adicionales..."></textarea>
       <button class="mic" id="m-metodos" onclick="mic('fj-metodos','m-metodos')">&#127897;</button>
     </div>
   </div>
 
   <div class="card">
     <div class="ct">Recuperación</div>
-    <div class="ac-wrap" style="margin-bottom:8px">
-      <div class="fr" style="align-items:flex-start">
-        <input class="fi" type="text" id="fj-recup" placeholder="Propofol estable PA 130/80..." autocomplete="off" oninput="acRecup(this.value)" onkeydown="acKey(event,'ac-recup')">
-        <button class="mic" id="m-recup" onclick="mic('fj-recup','m-recup')">&#127897;</button>
+    <div class="field" style="margin-bottom:10px">
+      <label>Escala de Aldrete</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px" id="aldrete-chips">
+        <button class="chip" onclick="setAldrete('1')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">1/10</button><button class="chip" onclick="setAldrete('2')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">2/10</button><button class="chip" onclick="setAldrete('3')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">3/10</button><button class="chip" onclick="setAldrete('4')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">4/10</button><button class="chip" onclick="setAldrete('5')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">5/10</button><button class="chip" onclick="setAldrete('6')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">6/10</button><button class="chip" onclick="setAldrete('7')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">7/10</button><button class="chip" onclick="setAldrete('8')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">8/10</button><button class="chip" onclick="setAldrete('9')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">9/10</button><button class="chip" onclick="setAldrete('10')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">10/10</button>
       </div>
-      <div class="ac-list" id="ac-recup"></div>
+      <input class="fi" type="text" id="fj-aldrete" placeholder="Aldrete .../10" style="margin-top:8px" readonly>
     </div>
-    <div class="chips" id="recup-chips"></div>
+    <div class="field" style="margin-bottom:10px">
+      <label>Destino post-operatorio</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button class="chip" onclick="setDestino('URPA')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">URPA</button>
+        <button class="chip" onclick="setDestino('UTI')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">UTI</button>
+        <button class="chip" onclick="setDestino('UCI')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">UCI</button>
+      </div>
+    </div>
+    <div id="destino-extra" style="display:none;margin-bottom:10px">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">
+        <button class="chip" onclick="setDestinoExtra('extubado')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Extubado/a</button>
+        <button class="chip" onclick="setDestinoExtra('intubado')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Intubado/a</button>
+      </div>
+      <div id="intubado-extra" style="display:none;margin-bottom:6px">
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="chip" onclick="setARM('ARM')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">En ARM</button>
+          <button class="chip" onclick="setARM('sinARM')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Sin ARM</button>
+          <button class="chip" onclick="setInotrop('con')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Con inotrópicos</button>
+          <button class="chip" onclick="setInotrop('sin')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Sin inotrópicos</button>
+        </div>
+      </div>
+    </div>
+    <div class="chips" id="recup-chips" style="margin-bottom:8px"></div>
+    <div class="fr" style="align-items:flex-start">
+      <textarea class="fi" id="fj-recup" placeholder="Observaciones adicionales de recuperación..."></textarea>
+      <button class="mic" id="m-recup" onclick="mic('fj-recup','m-recup')">&#127897;</button>
+    </div>
   </div>
-
   <div class="card">
     <div class="ct">Observaciones</div>
     <div class="fr" style="align-items:flex-start">
@@ -421,93 +455,100 @@ select.fi option{background:var(--bg2)}
   <div id="mayo-foja-helper" style="display:none">
     <div class="card" style="border-color:rgba(56,139,253,.4);background:rgba(56,139,253,.06)">
       <div class="ct" style="color:var(--blue)">&#127973; Sanatorio Mayo — Datos para GECLISA</div>
-      <p style="font-size:12px;color:var(--text2);margin-bottom:12px">Completá estos campos acá para tenerlos listos al cargar en GECLISA. La foja la hace GECLISA, no se imprime desde la app.</p>
 
-      <div class="field"><label>Posición quirúrgica</label>
-        <select class="fi" id="fj-posicion">
-          <option value="">—</option>
-          <option>Decúbito dorsal</option><option>Decúbito lateral derecho</option>
-          <option>Decúbito lateral izquierdo</option><option>Decúbito ventral</option>
-          <option>Trendelenburg</option><option>Litotomía</option>
-          <option>Ginecológica</option><option>Semisentada</option>
-        </select>
-      </div>
-      <div class="field"><label>Nivel Regional (si aplica)</label>
-        <div class="fr"><input class="fi" type="text" id="fj-nivel-regional" placeholder="L3-L4 raquídea...">
-        <button class="mic" id="m-nivel" onclick="mic('fj-nivel-regional','m-nivel')">&#127897;</button></div>
-      </div>
-      <div class="field"><label>Observaciones generales del paciente</label>
+      <div class="field">
+        <label>Antecedentes del paciente</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px" id="antec-chips">
+          <button class="chip" onclick="toggleAntec(this,'HTA')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">HTA</button>
+          <button class="chip" onclick="toggleAntec(this,'DBT')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">DBT</button>
+          <button class="chip" onclick="toggleAntec(this,'IRC s/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC s/diálisis</button>
+          <button class="chip" onclick="toggleAntec(this,'IRC c/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC c/diálisis</button>
+          <button class="chip" onclick="toggleAntec(this,'IC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IC</button>
+          <button class="chip" onclick="toggleAntec(this,'Obesidad')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Obesidad</button>
+          <button class="chip" onclick="toggleAntec(this,'EPOC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">EPOC</button>
+          <button class="chip" onclick="toggleAntec(this,'Asma')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Asma</button>
+          <button class="chip" onclick="toggleAntec(this,'Coronario')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Coronario</button>
+          <button class="chip" onclick="toggleAntec(this,'ACV previo')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">ACV previo</button>
+          <button class="chip" onclick="toggleAntec(this,'Fumador')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Fumador</button>
+          <button class="chip" onclick="toggleAntec(this,'Anticoagulado')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Anticoagulado</button>
+        </div>
         <div class="fr" style="align-items:flex-start">
-          <textarea class="fi" id="fj-obs-geclisa" placeholder="Obesidad, hipertenso, fumador, resto ver HC..." rows="2"></textarea>
+          <textarea class="fi" id="fj-obs-geclisa" placeholder="Otros antecedentes..." rows="2"></textarea>
           <button class="mic" id="m-obs-geclisa" onclick="mic('fj-obs-geclisa','m-obs-geclisa')">&#127897;</button>
         </div>
       </div>
-      <div class="field"><label>Materiales descartables</label>
-        <div class="fr"><input class="fi" type="text" id="fj-materiales" placeholder="TET 7.5, Jeringa 20cc, Abbocath 18...">
-        <button class="mic" id="m-mat" onclick="mic('fj-materiales','m-mat')">&#127897;</button></div>
-      </div>
 
-      <div style="margin-top:10px">
-        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Monitoreo intraoperatorio (tildar los usados):</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px" id="monitor-chips">
-          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
-            <input type="checkbox" id="mon-etco2" checked> EtCO2</label>
-          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
-            <input type="checkbox" id="mon-pam" checked> PAM</label>
-          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
-            <input type="checkbox" id="mon-ecg" checked> ECG</label>
-          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
-            <input type="checkbox" id="mon-sato2" checked> SAT O2</label>
-          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
-            <input type="checkbox" id="mon-pani" checked> PANI</label>
-          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
-            <input type="checkbox" id="mon-decub"> PROT.DECUB.</label>
-          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px">
-            <input type="checkbox" id="mon-emerg"> EMERGENCIA</label>
+      <div style="margin-top:12px">
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px">Monitoreo intraoperatorio:</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-etco2" checked> EtCO2</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-pam" checked> PAM</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-ecg" checked> ECG</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-sato2" checked> SAT O2</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-pani" checked> PANI</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-decub"> PROT.DECUB.</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-emerg"> EMERGENCIA</label>
         </div>
       </div>
 
-      <div class="field" style="margin-top:12px"><label>Tabla de signos vitales (GECLISA cada 5-15 min)</label>
-        <p style="font-size:11px;color:var(--text3);margin-bottom:8px">Registrá los valores acá para copiarlos a GECLISA. SIST / DIAST / SAT O2 / E-CO2 / FC / PAM</p>
-        <div style="overflow-x:auto">
-          <table style="border-collapse:collapse;font-size:11px;min-width:500px" id="mayo-vitals-table">
-            <thead>
-              <tr style="background:var(--bg3)">
-                <th style="border:1px solid var(--border);padding:4px 6px;font-size:10px">MIN</th>
-                <th style="border:1px solid var(--border);padding:4px 6px">SIST</th>
-                <th style="border:1px solid var(--border);padding:4px 6px">DIAST</th>
-                <th style="border:1px solid var(--border);padding:4px 6px">SAT O2</th>
-                <th style="border:1px solid var(--border);padding:4px 6px">E-CO2</th>
-                <th style="border:1px solid var(--border);padding:4px 6px">FC</th>
-                <th style="border:1px solid var(--border);padding:4px 6px">PAM</th>
-              </tr>
-            </thead>
-            <tbody id="mayo-vitals-body"></tbody>
-          </table>
+      <div class="field" style="margin-top:14px">
+        <label>Signos vitales intraoperatorios — Generación por curva</label>
+        <p style="font-size:11px;color:var(--text3);margin-bottom:10px">Ingresá los valores base y la evolución. El sistema genera la tabla completa según la duración de la cirugía.</p>
+        <div class="g2" style="margin-bottom:8px">
+          <div class="field"><label>TA Sist. base</label><input class="fi" type="number" id="sv-sist" placeholder="120" min="60" max="250"></div>
+          <div class="field"><label>TA Diast. base</label><input class="fi" type="number" id="sv-diast" placeholder="75" min="40" max="150"></div>
         </div>
-        <div class="brow" style="margin-top:8px;gap:8px">
-          <button class="btn btn-s" style="font-size:12px" onclick="generarFilasMayo()">&#9200; Generar filas</button>
-          <button class="btn btn-s" style="font-size:12px" onclick="agregarFilaMayo()">+ Fila</button>
+        <div class="g2" style="margin-bottom:8px">
+          <div class="field"><label>FC base</label><input class="fi" type="number" id="sv-fc" placeholder="75" min="40" max="180"></div>
+          <div class="field"><label>SAT O2 base (%)</label><input class="fi" type="number" id="sv-sat" placeholder="98" min="85" max="100"></div>
+        </div>
+        <div class="g2" style="margin-bottom:10px">
+          <div class="field"><label>EtCO2 base</label><input class="fi" type="number" id="sv-eco2" placeholder="35" min="20" max="60"></div>
+          <div class="field"><label>PAM base</label><input class="fi" type="number" id="sv-pam" placeholder="90" min="40" max="160"></div>
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <label>Evolución durante la cirugía</label>
+          <select class="fi" id="sv-evol">
+            <option value="estable">Estable (variación mínima ±5%)</option>
+            <option value="leve_descenso">Leve descenso inicial y recuperación</option>
+            <option value="descenso_mod">Descenso moderado sostenido (~15%)</option>
+            <option value="leve_aumento">Leve aumento (cirugía dolorosa/stress)</option>
+            <option value="variable">Variable (oscilante)</option>
+          </select>
+        </div>
+        <button class="btn btn-g" onclick="generarCurvaVitales()" style="margin-bottom:10px">&#9685; Generar curva de signos vitales</button>
+        <div id="mayo-vitals-preview" style="display:none">
+          <div style="font-size:11px;color:var(--green);margin-bottom:6px" id="mayo-vitals-info"></div>
+          <div style="overflow-x:auto">
+            <table style="border-collapse:collapse;font-size:11px;min-width:400px" id="mayo-vitals-table">
+              <thead>
+                <tr style="background:var(--bg3)">
+                  <th style="border:1px solid var(--border);padding:4px 6px">MIN</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">SIST</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">DIAST</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">SAT</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">CO2</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">FC</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">PAM</th>
+                </tr>
+              </thead>
+              <tbody id="mayo-vitals-body"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       <div class="g2" style="margin-top:10px">
-        <div class="field"><label>Balance — Fluido 1</label>
-          <input class="fi" type="text" id="fj-fluido1" placeholder="ClNa 1000ml"></div>
-        <div class="field"><label>Balance — Fluido 2</label>
-          <input class="fi" type="text" id="fj-fluido2" placeholder="ClNa 500ml"></div>
+        <div class="field"><label>Balance — Fluido 1</label><input class="fi" type="text" id="fj-fluido1" placeholder="ClNa 1000ml"></div>
+        <div class="field"><label>Balance — Fluido 2</label><input class="fi" type="text" id="fj-fluido2" placeholder="ClNa 500ml"></div>
       </div>
       <div class="g2">
-        <div class="field"><label>Orina (diuresis)</label>
-          <input class="fi" type="text" id="fj-orina" placeholder="200ml"></div>
-        <div class="field"><label>Sangrado</label>
-          <input class="fi" type="text" id="fj-sangrado" placeholder="50ml"></div>
+        <div class="field"><label>Orina (diuresis)</label><input class="fi" type="text" id="fj-orina" placeholder="200ml"></div>
+        <div class="field"><label>Sangrado</label><input class="fi" type="text" id="fj-sangrado" placeholder="50ml"></div>
       </div>
-      <button class="btn btn-b" style="margin-top:8px" onclick="go('geclisa')">&#127973; Ver Guía GECLISA</button>
+      <button class="btn btn-b" style="margin-top:10px;width:100%" onclick="go('geclisa')">&#127973; Ver Guía GECLISA completa</button>
     </div>
-  </div>
-
-  <div class="brow" style="margin-bottom:24px">
+  </div>  <div class="brow" style="margin-bottom:24px">
     <button class="btn btn-s" id="btn-imprimir-foja" onclick="imprimirFoja()">&#128424; Imprimir foja</button>
     <button class="btn btn-g" onclick="guardarFoja()">&#128190; Guardar foja</button>
   </div>
@@ -531,7 +572,7 @@ select.fi option{background:var(--bg2)}
   <div class="card"><div style="font-size:16px;font-weight:600;margin-bottom:4px">🏥 Guía GECLISA</div><div style="font-size:12px;color:var(--text3)">Sanatorio Mayo — tocá 📋 para copiar</div></div>
   <div class="card"><div class="ct">Campos copiables</div><div id="geclisa-campos"></div></div>
   <div class="card"><div class="ct">Pasos</div><div id="geclisa-steps"></div></div>
-  <div class="card"><a href="http://sanatoriomayo.myvnc.com:84" target="_blank" style="display:block"><button class="btn btn-b">🌐 Abrir GECLISA</button></a><p style="font-size:11px;color:var(--text3);margin-top:6px;text-align:center">Usuario: Mhuerta</p></div>
+  <div class="card"><button class="btn btn-b" onclick="abrirGeclisa()" style="width:100%">&#127758; Abrir GECLISA (auto-rellena)</button><p style="font-size:11px;color:var(--text3);margin-top:6px;text-align:center">Usuario: Mhuerta</p></div>
   <div class="card"><div class="ct">Foja Quirúrgica — campos</div><div id="geclisa-fojaqx"></div></div>
 </div>
 
@@ -540,6 +581,7 @@ select.fi option{background:var(--bg2)}
 <div id="toast"></div>
 
 <script>
+
 
 
 
@@ -626,7 +668,7 @@ var DRUGS=[
   {n:'Ketamina',cat:'Disociativo',mgKg:1.5,rangoMgKg:[1,2],doses:['50mg','100mg','150mg'],via:'EV'},
   {n:'Etomidato',cat:'Hipnótico',mgKg:0.3,rangoMgKg:[0.2,0.4],doses:['10mg','20mg'],via:'EV'},
   {n:'Dexmedetomidina',cat:'α2 agonista',mgKg:null,doses:['0.5mcg/kg/h','1mcg/kg/h'],via:'EV'},
-  {n:'Fentanilo',cat:'Opioide',mgKg:0.002,rangoMgKg:[0.001,0.005],doses:['50mcg','100mcg','150mcg','200mcg'],via:'EV'},
+  {n:'Fentanilo',cat:'Opioide',mgKg:0.002,rangoMgKg:[0.001,0.005],doses:['50γ EV','100γ EV','150γ EV','200γ EV']},
   {n:'Remifentanilo',cat:'Opioide',mgKg:null,doses:['0.1mcg/kg/min','0.25mcg/kg/min'],via:'EV'},
   {n:'Morfina',cat:'Opioide',mgKg:0.1,rangoMgKg:[0.05,0.15],doses:['2mg','4mg','5mg','8mg','10mg'],via:'EV'},
   {n:'Tramadol',cat:'Opioide',mgKg:1.5,rangoMgKg:[1,2],doses:['50mg','100mg'],via:'EV'},
@@ -673,8 +715,9 @@ var DRUGS=[
 ];
 var VIAS=['EV','IM','IT','Peridural','INH','SC','SL','Tópica'];
 
-var PREMED_CHIPS=['Midazolam 2mg EV','Midazolam 1mg EV','Midazolam 5mg IM','Atropina 0.5mg EV','Dexametasona 8mg EV','Ranitidina 50mg EV','Omeprazol 40mg EV','Metoclopramida 10mg EV'];
-var RECUP_DRUGS=['Propofol estable','Extubado/a SpO₂ 99%','Despierto/a conforme','PA estable sin vasopresores','Ketorolac 30mg EV','Ondansetrón 4mg EV','Paracetamol 1g EV','Dexametasona 8mg EV','Morfina 2mg EV','Tramadol 100mg EV','Atropina 0.5mg EV','Efedrina 10mg EV','UCPA sin incidencias','Traslado a sala en buenas condiciones'];
+var PREMED_CHIPS=['Midazolam 2mg EV','Midazolam 1mg EV','Atropina 0.5mg EV','Cefalotina 2g EV','Ketorolac 30mg EV','Diclofenac 75mg EV','Ondansetrón 8mg EV','Dexametasona 8mg EV','Metoclopramida 10mg EV','Ranitidina 50mg EV'];
+var RECUP_CHIPS_BASE=['Extubado/a SpO₂ 99%','Despierto/a conforme','Hemodinámicamente estable','Ketorolac 30mg EV','Ondansetrón 8mg EV','Paracetamol 1g EV','Morfina 2mg EV','Tramadol 100mg EV','Atropina 0.5mg EV'];
+var RECUP_DRUGS=RECUP_CHIPS_BASE;
 
 // ═══════════════════════════════════════════════════
 // NOMENCLADOR ADAARC (expandido)
@@ -979,7 +1022,7 @@ function go(id,addH){
   if(id==='home')renderHome();
   if(id==='resumen')renderResumen();
   if(id==='foja'){cargarFojaUI();setTimeout(initSign,80);renderPesoChips();renderRecupChips();renderFojaPorSanatorio();}
-  if(id==='geclisa')renderGeclisa();
+  if(id==='geclisa'){window._geclisaTexto='';renderGeclisa();}
   if(id==='nom'){document.getElementById('nom-q').value='';document.getElementById('nom-res').innerHTML='<p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Escribí para buscar</p>';}
   if(id==='scan'){document.getElementById('cfg-key').value=S.key;actualizarKeyStatus();}
 }
@@ -996,6 +1039,8 @@ function saveKey(){S.key=document.getElementById('cfg-key').value.trim();localSt
 function actualizarKeyStatus(){var el=document.getElementById('key-status');if(!el)return;el.textContent=S.key?'Key: '+S.key.slice(0,8)+'...':'Sin key';el.style.color=S.key?'var(--green)':'var(--yellow)';}
 function onSanChange(){
   var s=document.getElementById('f-san').value;
+  // Also update foja view if visible
+  setTimeout(renderFojaPorSanatorio,50);
   document.getElementById('f-aero-wrap').style.display=s==='Hospital Aeronáutico'?'block':'none';
   var mw=document.getElementById('f-mayo-wrap');if(mw)mw.style.display=s==='Sanatorio Mayo'?'block':'none';
   var mb=document.getElementById('btn-mayo-wrap');if(mb)mb.style.display=s==='Sanatorio Mayo'?'block':'none';
@@ -1244,6 +1289,37 @@ function renderGeclisa(){
     +'<div>• <b>Riesgo quirúrgico</b>: ASA '+(f.asa||'?')+'</div>'
     +'<div>• <b>Código Qx</b>: '+(i.pracs&&i.pracs.length?i.pracs[0].cod:'—')+'</div>'
     +'<div>• <b>Hora inicio / fin</b>: '+(i.hora||'—')+' / '+(f.fin||'—')+'</div>'+'</div>';
+
+  // Build text + copy button
+  var lineas=[
+    '=== GECLISA - '+(i.pac||'').toUpperCase()+' - '+fmt(i.fecha)+' ===',
+    'Quirofano: '+(i.sala||sectorCama||'')+'  Hora: '+(i.hora||'')+' - '+(f.fin||''),
+    'Diagnostico: '+(i.diag||''),
+    '','MEDICACION:','Premed: '+(f.premed||''),'Anestesicos: '+drogasStr,
+    '','PREANESTESICA:',
+    'Peso: '+(i.peso||'')+'kg  Edad: '+(i.edad||'')+'  ASA: '+(f.asa?'ASA '+f.asa:''),
+    'Monitoreo: '+(f.monitoreo||'EtCO2, PAM, ECG, SAT O2, PANI'),
+    '','TECNICA:',
+    'Induccion: '+(f.ind||'')+'  Via: '+(f.via||''),
+    'Mantenimiento: '+(f.tec||''),
+    'Metodos: '+(f.metodos||''),
+  ];
+  if(f.mayo_vitals&&f.mayo_vitals.length){
+    lineas.push('','SIGNOS VITALES:','MIN  SIST  DIAST  SAT  CO2  FC  PAM');
+    f.mayo_vitals.forEach(function(r){
+      lineas.push(String(r.min).padEnd(5)+String(r.sist).padEnd(6)+String(r.diast).padEnd(7)+String(r.sato2).padEnd(5)+String(r.eco2).padEnd(5)+String(r.fc).padEnd(4)+String(r.pam));
+    });
+  }
+  lineas=lineas.concat(['','BALANCE:',
+    'Fluido 1: '+(f.fluido1||f.suero||''),
+    'Fluido 2: '+(f.fluido2||''),
+    'Orina: '+(f.orina||''),
+    'Sangrado: '+(f.sangrado||f.sangre||''),
+    '','POSTOP:','Recuperacion: '+(f.recup||'S/p')
+  ]);
+  window._geclisaTexto=lineas.join('\n');
+  var btnCopy='<button class="btn btn-g" style="width:100%;margin-bottom:14px;font-size:14px;padding:14px" onclick="copiarTodoGeclisa()">📋 Copiar todos los datos para GECLISA</button>';
+  campos.innerHTML=btnCopy+campos.innerHTML;
 }
 
 // ═══════════════════════════════════════════════════
@@ -1566,7 +1642,9 @@ function verDocRes(tipo){verDoc(tipo);}
 function descargarDoc(tipo){var docs=(S.cur&&S.cur.docs)||{};var d=docs[tipo];if(!d)return;var a=document.createElement('a');a.href=d.data;a.download=d.nombre;document.body.appendChild(a);a.click();document.body.removeChild(a);toast('Descargando '+d.nombre);}
 
 function renderFojaPorSanatorio(){
-  var san=(S.cur&&S.cur.san)||'';
+  // Read from live form OR saved data
+  var sanEl=document.getElementById('f-san');
+  var san=(sanEl&&sanEl.value)||((S.cur&&S.cur.san)||'');
   var esMayo=san.indexOf('Mayo')>=0;
   // VG grid card - hide for Mayo
   var vc=document.getElementById('vitals-card');
@@ -1648,7 +1726,152 @@ function getMayoMonitoreo(){
   });
   return items.join(', ');
 }
+
+function abrirGeclisa(){
+  var i=S.cur;
+  var f=(i&&i.foja)||{};
+  if(!i){toast('Carg\u00e1 un paciente primero');return;}
+  // Auto-save current form and foja data first
+  if(document.getElementById('f-pac'))guardar();
+  i=S.cur;f=(i&&i.foja)||{};
+  var parts=(i.pac||'').split(',');
+  var payload={
+    apellido:(parts[0]||'').trim().toUpperCase(),
+    nombre:(parts[1]||'').trim().toUpperCase(),
+    dni:i.dni||'', edad:i.edad||'',
+    obraSocial:i.obra||'', nroAfiliado:i.afil||'',
+    fechaCirugia:i.fecha||'', horaInicio:i.hora||'',
+    quirofano:i.sala||(i.mayo_sector?(i.mayo_sector+' - '+i.mayo_cama):''),
+    tipoCirugia:'PROGRAMADA',
+    diagnostico:i.diag||'',
+    anestesista:'HUERTA MARIA SOLEDAD', matricula:'32393',
+    horaFin:f.fin||'',
+    cirujano:i.ciru||'', especialidad:i.serv||'',
+    observaciones:f.obs_geclisa||f.obs||'',
+    premedicacion:f.premed||'',
+    medicamentos:(f.drogas||[]).map(function(d){return(d.n||'')+' '+(d.d||'')+' '+(d.v||'');}).filter(function(x){return x.trim();}).join(', '),
+    peso:i.peso||'', asa:f.asa||'',
+    monEtco2:true,monPam:true,monEcg:true,monSato2:true,monPani:true,monDecub:false,monEmerg:false,
+    induccion:f.ind||'', mantenimiento:f.tec||'', viaAerea:f.via||'',
+    metodos:f.metodos||'',
+    vitals:f.mayo_vitals||[],
+    fluido1:f.fluido1||f.suero||'', fluido2:f.fluido2||'',
+    orina:f.orina||'', sangrado:f.sangrado||f.sangre||'',
+    recuperacion:f.recup||'S/p',
+    timestamp:new Date().toISOString()
+  };
+
+  // Encode as base64 and open GECLISA with data in URL hash
+  // The bookmarklet reads window.location.hash on GECLISA
+  try{
+    var json=JSON.stringify(payload);
+    var b64=btoa(unescape(encodeURIComponent(json)));
+    // Also try to write to all possible storage mechanisms
+    try{localStorage.setItem('datosAnestFact',json);}catch(e){}
+    try{sessionStorage.setItem('datosAnestFact',json);}catch(e){}
+    // Open GECLISA with data in hash fragment
+    var url='http://sanatoriomayo.myvnc.com:84#AF='+encodeURIComponent(b64);
+    toast('Datos listos. En GECLISA us\u00e1 el bookmarklet ✓');
+    setTimeout(function(){window.open(url,'_blank');},200);
+  }catch(e){
+    toast('Error preparando datos: '+e.message);
+  }
+}
+
+// === MÉTODOS ANESTÉSICOS SMART ===
+var METODOS_TEXTOS={
+  raquidea:function(){var a=document.getElementById('metodos-aguja');return 'Raqu\u00eddea. T\u00e9cnica as\u00e9ptica estricta con materiales provistos por la instituci\u00f3n. Punci\u00f3n \u00fanica atraumatica con aguja '+(a?a.value:'AR 25 PL')+' (aguja raqu\u00eddea punta l\u00e1piz).';},
+  general:function(){var t=document.getElementById('metodos-tubo');return 'Anestesia general balanceada. Intubaci\u00f3n orotraqueal con tubo endotraqueal N\u00ba '+(t?t.value:'7')+' con manguito de baja presi\u00f3n.';},
+  tiva:function(){return 'TIVA (Anestesia Total Intravenosa). Infusi\u00f3n continua de agentes anest\u00e9sicos EV.';},
+  peridural:function(){return 'Anestesia peridural. T\u00e9cnica as\u00e9ptica estricta. Cat\u00e9ter peridural.';},
+  localasistida:function(){return 'Anestesia local asistida / MAC (Monitoreo Anestesiologico Controlado).';},
+  sedacion:function(){return 'Sedaci\u00f3n consciente. Monitoreo continuo.';}
+};
+function setMetodos(tipo){
+  var extra=document.getElementById('metodos-extra');
+  if(!extra)return;
+  if(tipo==='raquidea'){extra.style.display='block';extra.innerHTML='<div class="field" style="margin-bottom:8px"><label>Aguja raqu\u00eddea</label><select class="fi" id="metodos-aguja" onchange="actualizarMetodos()"><option>AR 25 PL</option><option>AR 26 PL</option><option>AR 27 PL</option></select></div>';}
+  else if(tipo==='general'){extra.style.display='block';extra.innerHTML='<div class="field" style="margin-bottom:8px"><label>Tubo endotraqueal N\u00ba</label><select class="fi" id="metodos-tubo" onchange="actualizarMetodos()"><option>5</option><option>6</option><option>7</option><option>7 1/2</option><option>8</option></select></div>';}
+  else{extra.style.display='none';}
+  extra.setAttribute('data-tipo',tipo);
+  var fn=METODOS_TEXTOS[tipo];var ta=document.getElementById('fj-metodos');
+  if(ta&&fn)ta.value=fn();
+  document.querySelectorAll('#metodos-chips .chip').forEach(function(b){b.style.background='var(--bg3)';b.style.borderColor='var(--border)';b.style.color='var(--text)';});
+  if(event&&event.target){event.target.style.background='rgba(29,185,84,.15)';event.target.style.borderColor='var(--green)';event.target.style.color='var(--green)';}
+}
+function actualizarMetodos(){var extra=document.getElementById('metodos-extra');var tipo=extra?extra.getAttribute('data-tipo'):'';var fn=METODOS_TEXTOS[tipo];var ta=document.getElementById('fj-metodos');if(ta&&fn)ta.value=fn();}
+
+// === RECUPERACIÓN ALDRETE + DESTINO ===
+var _aldrete='',_destino='',_destinoExtra='',_arm='',_inotrop='';
+function setAldrete(val){_aldrete=val;var inp=document.getElementById('fj-aldrete');if(inp)inp.value='Aldrete '+val+'/10';document.querySelectorAll('#aldrete-chips .chip').forEach(function(b){b.style.background='var(--bg3)';b.style.borderColor='var(--border)';b.style.color='var(--text)';});if(event&&event.target){event.target.style.background='rgba(29,185,84,.15)';event.target.style.borderColor='var(--green)';event.target.style.color='var(--green)';}actualizarRecup();}
+function setDestino(val){_destino=val;_destinoExtra='';_arm='';_inotrop='';var extra=document.getElementById('destino-extra');var intoExtra=document.getElementById('intubado-extra');if(extra)extra.style.display=(val==='UTI'||val==='UCI')?'block':'none';if(intoExtra)intoExtra.style.display='none';actualizarRecup();}
+function setDestinoExtra(val){_destinoExtra=val;_arm='';_inotrop='';var intoExtra=document.getElementById('intubado-extra');if(intoExtra)intoExtra.style.display=(val==='intubado')?'block':'none';actualizarRecup();}
+function setARM(val){_arm=val;actualizarRecup();}
+function setInotrop(val){_inotrop=val;actualizarRecup();}
+function actualizarRecup(){var ta=document.getElementById('fj-recup');if(!ta)return;var txt='';if(_aldrete)txt+='Aldrete '+_aldrete+'/10. ';if(_destino){txt+='Pasa a '+_destino;if(_destinoExtra){txt+=' '+(_destinoExtra==='intubado'?'intubado/a':'extubado/a');if(_destinoExtra==='intubado'&&_arm){txt+=', '+(_arm==='ARM'?'en ARM':'sin ARM');if(_inotrop)txt+=', '+(_inotrop==='con'?'con inotr\u00f3picos':'sin inotr\u00f3picos');}}txt+='. ';}ta.value=txt.trim();}
+
+// === ANTECEDENTES MAYO ===
+var _antecedentes=[];
+function toggleAntec(btn,val){var idx=_antecedentes.indexOf(val);if(idx>=0){_antecedentes.splice(idx,1);btn.style.background='var(--bg3)';btn.style.borderColor='var(--border)';btn.style.color='var(--text)';}else{_antecedentes.push(val);btn.style.background='rgba(29,185,84,.15)';btn.style.borderColor='var(--green)';btn.style.color='var(--green)';}var ta=document.getElementById('fj-obs-geclisa');if(ta){var extra=ta.value.replace(/^Antecedentes:[^.]*\.\s*/,'');ta.value=(_antecedentes.length?'Antecedentes: '+_antecedentes.join(', ')+'. ':'')+extra;}}
+
+// === GENERADOR DE CURVA DE SIGNOS VITALES ===
+function generarCurvaVitales(){
+  // Get hora from multiple sources
+  var hi=(S.cur&&S.cur.hora)||'';
+  var hf='';
+  var elFin=document.getElementById('fj-fin')||document.getElementById('vg-fin');
+  if(elFin&&elFin.value)hf=elFin.value;
+  if(!hf&&S.cur&&S.cur.foja)hf=S.cur.foja.fin||'';
+  // Also try vg-inicio for aeronautico context
+  var elI=document.getElementById('vg-inicio');
+  if(elI&&elI.value)hi=elI.value;
+  if(!hi&&S.cur)hi=S.cur.hora||'';
+  if(!hi){toast('Ingres\u00e1 hora inicio en la foja');return;}
+  if(!hf){toast('Ingres\u00e1 hora fin en la foja');return;}
+  function hm(s){var p=s.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
+  var minI=hm(hi),minF=hm(hf);
+  if(minF<=minI){toast('Hora fin debe ser mayor a hora inicio');return;}
+  var dur=minF-minI;
+  var sist=parseInt((document.getElementById('sv-sist')||{value:'120'}).value)||120;
+  var diast=parseInt((document.getElementById('sv-diast')||{value:'75'}).value)||75;
+  var fc=parseInt((document.getElementById('sv-fc')||{value:'75'}).value)||75;
+  var sat=parseInt((document.getElementById('sv-sat')||{value:'98'}).value)||98;
+  var eco2=parseInt((document.getElementById('sv-eco2')||{value:'35'}).value)||35;
+  var pam=parseInt((document.getElementById('sv-pam')||{value:'0'}).value)||Math.round((sist+2*diast)/3);
+  var evol=(document.getElementById('sv-evol')||{value:'estable'}).value;
+  var MINS=[5,15,30,45,60,75,90,105,120,135,150,165,180,195,210,225,240];
+  var puntos=MINS.filter(function(m){return m<=dur;});
+  if(!puntos.length||puntos[puntos.length-1]<dur-5)puntos.push(dur);
+  function c(base,t){
+    var p=t/dur;var f=1;
+    if(evol==='estable')f=1+(Math.random()-0.5)*0.08;
+    else if(evol==='leve_descenso')f=(p<0.33?1-(p/0.33)*0.12:0.88+(p-0.33)*0.18)+(Math.random()-0.5)*0.06;
+    else if(evol==='descenso_mod')f=1-(p*0.15)+(Math.random()-0.5)*0.06;
+    else if(evol==='leve_aumento')f=1+(p*0.12)+(Math.random()-0.5)*0.06;
+    else f=1+Math.sin(p*Math.PI*3)*0.15+(Math.random()-0.5)*0.08;
+    return Math.round(base*f);
+  }
+  var rows=puntos.map(function(t){var s=c(sist,t);var d=c(diast,t);var f2=c(fc,t);var sa=Math.min(100,Math.max(90,Math.round(sat+(Math.random()-0.5)*2)));var e=Math.round(eco2+(Math.random()-0.5)*3);return {min:t,sist:s,diast:d,sato2:sa,eco2:e,fc:f2,pam:Math.round((s+2*d)/3)};});
+  var tbody=document.getElementById('mayo-vitals-body');
+  if(tbody)tbody.innerHTML=rows.map(function(r){return '<tr><td style="border:1px solid var(--border);padding:3px 6px;text-align:center;font-size:11px;color:var(--text3);font-weight:bold">'+r.min+'</td>'+[r.sist,r.diast,r.sato2,r.eco2,r.fc,r.pam].map(function(v){return '<td style="border:1px solid var(--border);padding:3px 6px;text-align:center;font-size:12px">'+v+'</td>';}).join('')+'</tr>';}).join('');
+  var preview=document.getElementById('mayo-vitals-preview');if(preview)preview.style.display='block';
+  var info=document.getElementById('mayo-vitals-info');if(info)info.textContent='\u2713 '+rows.length+' filas generadas para '+dur+' min ('+hi+' \u2192 '+hf+')';
+  if(S.cur){if(!S.cur.foja)S.cur.foja={drogas:[],vitals:[]};S.cur.foja.mayo_vitals=rows;var ix=S.intervs.findIndex(function(i){return i.id===S.cur.id;});if(ix>=0)S.intervs[ix]=S.cur;localStorage.setItem('af_i',JSON.stringify(S.intervs));}
+  toast('Curva generada \u2713 '+rows.length+' filas');
+}
+
+// === COPIAR TODO GECLISA ===
+function copiarTodoGeclisa(){
+  // If not yet rendered, render now
+  if(!window._geclisaTexto)renderGeclisa();
+  var txt=window._geclisaTexto||'';
+  if(!txt){toast('No hay datos cargados en el paciente');return;}
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){toast('Copiado \u2713 Peg\u00e1 en GECLISA');});}
+  else{var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Copiado \u2713');}
+}
+
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}
+
 
 </script>
 </body>
