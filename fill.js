@@ -3,6 +3,8 @@
 // - termina con void(0) para no navegar
 // - no retorna valores al bookmarklet
 (function(){
+// Prevent SPA router interference
+try{if(window.event){window.event.stopPropagation&&window.event.stopPropagation();window.event.preventDefault&&window.event.preventDefault();}}catch(e){}
 
 // ── 1. Leer datos ─────────────────────────────────────────────────────
 var d=null;
@@ -249,6 +251,5 @@ msg+='\u2713 '+ok+' campos rellenados ('+docs.length+' frame'+(docs.length!==1?'
 if(ok===0)msg+='\u26a0 No se encontraron campos.\nAsegurate de estar en la FOJA ANEST\u00c9SICA (no en b\u00fasqueda de paciente).';
 else msg+='Revis\u00e1 y hac\u00e9 clic en GRABAR.';
 alert(msg);
-
-return void(0); // evita que Chrome navegue la ventana
 })();
+void(0);
