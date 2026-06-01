@@ -1769,10 +1769,10 @@ function abrirGeclisa(){
     // Also try to write to all possible storage mechanisms
     try{localStorage.setItem('datosAnestFact',json);}catch(e){}
     try{sessionStorage.setItem('datosAnestFact',json);}catch(e){}
-    // Open GECLISA with data in hash fragment
-    var url='http://sanatoriomayo.myvnc.com:84#AF='+encodeURIComponent(b64);
-    toast('Datos listos. En GECLISA us\u00e1 el bookmarklet ✓');
-    setTimeout(function(){window.open(url,'_blank');},200);
+    // Open relay page (same domain) with data in hash
+    var relayUrl='https://diegomc77-hash.github.io/AnestFact/geclisa_relay.html#AF='+encodeURIComponent(b64);
+    toast('Abriendo GECLISA...');
+    setTimeout(function(){window.open(relayUrl,'_blank');},200);
   }catch(e){
     toast('Error preparando datos: '+e.message);
   }
