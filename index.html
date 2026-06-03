@@ -1731,51 +1731,58 @@ function abrirGeclisa(){
   var i=S.cur;
   var f=(i&&i.foja)||{};
   if(!i){toast('Carg\u00e1 un paciente primero');return;}
-  // Auto-save current form and foja data first
   if(document.getElementById('f-pac'))guardar();
   i=S.cur;f=(i&&i.foja)||{};
   var parts=(i.pac||'').split(',');
+  var clave=(i.dni||i.pac||'paciente').trim().replace(/\s+/g,'_');
   var payload={
     apellido:(parts[0]||'').trim().toUpperCase(),
     nombre:(parts[1]||'').trim().toUpperCase(),
-    dni:i.dni||'', edad:i.edad||'',
-    obraSocial:i.obra||'', nroAfiliado:i.afil||'',
-    fechaCirugia:i.fecha||'', horaInicio:i.hora||'',
+    dni:i.dni||'',edad:i.edad||'',
+    obraSocial:i.obra||'',nroAfiliado:i.afil||'',
+    fechaCirugia:i.fecha||'',horaInicio:i.hora||'',
     quirofano:i.sala||(i.mayo_sector?(i.mayo_sector+' - '+i.mayo_cama):''),
-    tipoCirugia:'PROGRAMADA',
-    diagnostico:i.diag||'',
-    anestesista:'HUERTA MARIA SOLEDAD', matricula:'32393',
-    horaFin:f.fin||'',
-    cirujano:i.ciru||'', especialidad:i.serv||'',
+    tipoCirugia:'PROGRAMADA',diagnostico:i.diag||'',
+    anestesista:'HUERTA MARIA SOLEDAD',matricula:'32393',
+    horaFin:f.fin||'',cirujano:i.ciru||'',especialidad:i.serv||'',
     observaciones:f.obs_geclisa||f.obs||'',
     premedicacion:f.premed||'',
     medicamentos:(f.drogas||[]).map(function(d){return(d.n||'')+' '+(d.d||'')+' '+(d.v||'');}).filter(function(x){return x.trim();}).join(', '),
-    peso:i.peso||'', asa:f.asa||'',
+    peso:i.peso||'',asa:f.asa||'',
     monEtco2:true,monPam:true,monEcg:true,monSato2:true,monPani:true,monDecub:false,monEmerg:false,
-    induccion:f.ind||'', mantenimiento:f.tec||'', viaAerea:f.via||'',
-    metodos:f.metodos||'',
+    induccion:f.ind||'',mantenimiento:f.tec||'',viaAerea:f.via||'',metodos:f.metodos||'',
     vitals:f.mayo_vitals||[],
-    fluido1:f.fluido1||f.suero||'', fluido2:f.fluido2||'',
-    orina:f.orina||'', sangrado:f.sangrado||f.sangre||'',
+    fluido1:f.fluido1||f.suero||'',fluido2:f.fluido2||'',
+    orina:f.orina||'',sangrado:f.sangrado||f.sangre||'',
     recuperacion:f.recup||'S/p',
     timestamp:new Date().toISOString()
   };
 
-  // Encode as base64 and open GECLISA with data in URL hash
-  // The bookmarklet reads window.location.hash on GECLISA
-  try{
-    var json=JSON.stringify(payload);
-    var b64=btoa(unescape(encodeURIComponent(json)));
-    // Also try to write to all possible storage mechanisms
-    try{localStorage.setItem('datosAnestFact',json);}catch(e){}
-    try{sessionStorage.setItem('datosAnestFact',json);}catch(e){}
-    // Open relay page (same domain) with data in hash
-    var relayUrl='https://diegomc77-hash.github.io/AnestFact/geclisa_relay.html#AF='+encodeURIComponent(b64);
-    toast('Abriendo GECLISA...');
-    setTimeout(function(){window.open(relayUrl,'_blank');},200);
-  }catch(e){
-    toast('Error preparando datos: '+e.message);
-  }
+  var SURL='https://xntvibfsuubedplptvzs.supabase.co';
+  var SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhudHZpYmZzdXViZWRwbHB0dnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNDk2MjgsImV4cCI6MjA5NTkyNTYyOH0.9SaZdO7knkzSREyaUfoOX8nanid9AQwlNbY5VudWcws';
+
+  // Upsert en Supabase
+  fetch(SURL+'/rest/v1/anesfact_datos',{
+    method:'POST',
+    headers:{
+      'apikey':SKEY,
+      'Authorization':'Bearer '+SKEY,
+      'Content-Type':'application/json',
+      'Prefer':'resolution=merge-duplicates,return=minimal'
+    },
+    body:JSON.stringify({clave:clave,datos:JSON.stringify(payload)})
+  })
+  .then(function(r){
+    if(r.ok||r.status===201||r.status===200||r.status===204){
+      toast('Datos guardados \u2713 Abr\u00ed GECLISA y us\u00e1 el marcador');
+      setTimeout(function(){window.open('http://sanatoriomayo.myvnc.com:84','_blank');},500);
+    } else {
+      r.text().then(function(t){toast('Error guardando: '+t.slice(0,60));});
+    }
+  })
+  .catch(function(e){
+    toast('Error de red: '+e.message);
+  });
 }
 
 // === MÉTODOS ANESTÉSICOS SMART ===
