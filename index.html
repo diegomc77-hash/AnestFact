@@ -287,32 +287,60 @@ select.fi option{background:var(--bg2)}
   <div id="dose-info-bar" style="display:none;background:rgba(56,139,253,.1);border:1px solid rgba(56,139,253,.4);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:var(--blue)"></div>
   <div class="card">
     <div class="ct">T&eacute;cnica anest&eacute;sica</div>
-    <div class="field"><label>T&eacute;cnica</label>
-      <select class="fi" id="fj-tec"><option value="">Seleccionar...</option>
-        <option>Anestesia General (AG)</option><option>Raquídea</option>
-        <option>Peridural</option><option>Combinada raquiperidural</option>
-        <option>Sedación</option><option>Bloqueo Regional</option><option>TIVA</option>
+
+    <!-- Nivel 1: Tipo principal -->
+    <div class="field">
+      <label>Tipo de anestesia</label>
+      <select class="fi" id="fj-tec-tipo" onchange="tecNivel1()">
+        <option value="">Seleccionar...</option>
+        <option value="general">Anestesia General</option>
+        <option value="neuroaxial">Anestesia Regional Neuroaxial</option>
+        <option value="bloqueo">Bloqueo de Nervio Perif&eacute;rico</option>
+        <option value="local">Anestesia Local</option>
+        <option value="sedacion">Sedaci&oacute;n / CAM</option>
       </select>
     </div>
-    <div class="g2">
+
+    <!-- Nivel 2: Subtipo -->
+    <div class="field" id="tec-nivel2-wrap" style="display:none">
+      <label id="tec-nivel2-label">Subtipo</label>
+      <select class="fi" id="fj-tec-subtipo" onchange="tecNivel2()">
+        <option value="">Seleccionar...</option>
+      </select>
+    </div>
+
+    <!-- Nivel 3: Bloqueo específico (solo para bloqueos) -->
+    <div class="field" id="tec-nivel3-wrap" style="display:none">
+      <label id="tec-nivel3-label">Bloqueo espec&iacute;fico</label>
+      <select class="fi" id="fj-tec-bloqueo" onchange="tecNivel3()">
+        <option value="">Seleccionar...</option>
+      </select>
+    </div>
+
+    <!-- Campo oculto que guarda el valor final -->
+    <input type="hidden" id="fj-tec" value="">
+
+    <!-- Resumen de lo seleccionado -->
+    <div id="tec-resumen" style="display:none;background:var(--bg3);border:1px solid var(--green);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);margin-top:6px">
+      <span id="tec-resumen-txt"></span>
+      <button onclick="tecLimpiar()" style="background:none;border:none;color:var(--text3);cursor:pointer;float:right;font-size:16px">&times;</button>
+    </div>
+
+    <div class="g2" style="margin-top:10px">
       <div class="field"><label>ASA</label>
-        <select class="fi" id="fj-asa"><option value="">—</option><option>I</option><option>II</option><option>III</option><option>IV</option><option>V</option></select>
+        <select class="fi" id="fj-asa"><option value="">&mdash;</option><option>I</option><option>II</option><option>III</option><option>IV</option><option>V</option></select>
       </div>
-      <div class="field"><label>Vía aérea</label>
-        <select class="fi" id="fj-via"><option value="">—</option><option>IOT</option><option>Máscara laríngea</option><option>Mascarilla facial</option><option>Sin dispositivo</option></select>
+      <div class="field"><label>V&iacute;a a&eacute;rea</label>
+        <select class="fi" id="fj-via"><option value="">&mdash;</option><option>IOT</option><option>M&aacute;scara lar&iacute;ngea</option><option>Mascarilla facial</option><option>Sin dispositivo</option></select>
       </div>
     </div>
     <div class="g2">
-      <div class="field"><label>Inducción</label>
-        <select class="fi" id="fj-ind"><option value="">—</option><option>Satisfactoria</option><option>Prolongada</option><option>Tormentosa</option></select>
+      <div class="field"><label>Inducci&oacute;n</label>
+        <select class="fi" id="fj-ind"><option value="">&mdash;</option><option>Satisfactoria</option><option>Prolongada</option><option>Tormentosa</option></select>
       </div>
       <div class="field"><label>Hora fin</label><input class="fi" type="time" id="fj-fin"></div>
     </div>
-    <div class="g2">
-      
-      
-    </div>
-    <div class="field"><label>Premedicación</label>
+    <div class="field"><label>Premedicaci&oacute;n</label>
       <div class="ac-wrap">
         <div class="fr">
           <input class="fi" type="text" id="fj-premed" placeholder="Midazolam 2mg EV" autocomplete="off" oninput="acDrugField('fj-premed','ac-premed')" onkeydown="acKey(event,'ac-premed')">
@@ -1399,7 +1427,7 @@ function quitarPrac(i){S.cur.pracs.splice(i,1);renderPracs();}
 // ═══════════════════════════════════════════════════
 // FOJA
 // ═══════════════════════════════════════════════════
-function cargarFojaUI(){cargarFojaVG();
+function cargarFojaUI(){cargarFojaVG();setTimeout(function(){tecRestaurar((S.cur&&S.cur.foja&&S.cur.foja.tec)||'');},50);
   if(!S.cur||!S.cur.foja)return;
   var f=S.cur.foja;
   sv('fj-tec',f.tec);sv('fj-asa',f.asa);sv('fj-via',f.via);sv('fj-fin',f.fin);
@@ -2129,6 +2157,176 @@ function copiarTodoGeclisa(){
   if(!txt){toast('No hay datos cargados en el paciente');return;}
   if(navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){toast('Copiado \u2713 Peg\u00e1 en GECLISA');});}
   else{var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Copiado \u2713');}
+}
+
+
+// ═══ SELECTOR EN CASCADA DE TÉCNICA ANESTÉSICA ═══════════════════════
+var TEC_OPCIONES = {
+  general: {
+    label: 'Tipo de anestesia general',
+    opciones: [
+      {val:'Anestesia General Balanceada', txt:'Anestesia General Balanceada (inducci\u00f3n EV + mantenimiento inhalatorio)'},
+      {val:'Anestesia General TIVA', txt:'Anestesia General TIVA (Total Intravenosa)'},
+      {val:'Anestesia General Inhalatoria', txt:'Anestesia General Inhalatoria'}
+    ],
+    nivel3: false
+  },
+  neuroaxial: {
+    label: 'Tipo de anestesia neuroaxial',
+    opciones: [
+      {val:'Anestesia Raqu\u00eddea', txt:'Anestesia Raqu\u00eddea (Subaracnoidea / Intratecal)'},
+      {val:'Anestesia Epidural con cat\u00e9ter', txt:'Anestesia Epidural (Peridural) con cat\u00e9ter'},
+      {val:'Anestesia Combinada Raqui-Epidural', txt:'Anestesia Combinada Raqui-Epidural (CSE)'}
+    ],
+    nivel3: false
+  },
+  bloqueo: {
+    label: 'Regi\u00f3n a bloquear',
+    opciones: [
+      {val:'miembro_sup', txt:'Miembro Superior'},
+      {val:'miembro_inf', txt:'Miembro Inferior'},
+      {val:'tronco', txt:'Tronco / Abdomen / T\u00f3rax'}
+    ],
+    nivel3: {
+      miembro_sup: {
+        label: 'Bloqueo de miembro superior',
+        opciones: [
+          'Bloqueo Interescal\u00e9nico (plexo braquial C5-C7) - hombro y clav\u00edcula',
+          'Bloqueo Supraclavicular (plexo braquial - troncos) - brazo, codo, antebrazo y mano',
+          'Bloqueo Infraclavicular (plexo braquial - cordones) - codo hasta mano',
+          'Bloqueo Axilar (plexo braquial - ramas terminales) - antebrazo y mano',
+          'Bloqueos distales de mu\u00f1eca (Mediano / Cubital / Radial)'
+        ]
+      },
+      miembro_inf: {
+        label: 'Bloqueo de miembro inferior',
+        opciones: [
+          'Bloqueo Plexo Lumbar - Compartimento del Psoas (cadera y muslo anterior)',
+          'Bloqueo Nervio Femoral (f\u00e9mur, r\u00f3tula, muslo anterior)',
+          'Bloqueo Canal Aductor - Nervio Safeno (analgesia rodilla sin bloqueo motor)',
+          'Bloqueo Nervio Ci\u00e1tico Abordaje Subgl\u00fateo (pierna entera o pie)',
+          'Bloqueo Nervio Ci\u00e1tico Fosa Popl\u00edtea (tobillo y pie)',
+          'Bloqueo de Tobillo - Ankle Block (5 nervios terminales)'
+        ]
+      },
+      tronco: {
+        label: 'Bloqueo de tronco / abdomen / t\u00f3rax',
+        opciones: [
+          'Bloqueo TAP (Plano Transverso del Abdomen) - pared abdominal infraumbilical',
+          'Bloqueo Erector de la Espina - ESP Block (cirug\u00eda tor\u00e1cica, mamaria o espinal)',
+          'Bloqueo PECS I y II (cirug\u00eda mamaria y axilar)',
+          'Bloqueo Serrato-Intercostal - BRILMA / Serratus Plane (t\u00f3rax anterolateral)',
+          'Bloqueo Cuadrado Lumbar - QL Block (analgesia abdominal profunda y cadera)'
+        ]
+      }
+    }
+  },
+  local: {
+    label: 'Tipo de anestesia local',
+    opciones: [
+      {val:'Anestesia Local T\u00f3pica', txt:'Anestesia Local T\u00f3pica (cremas, geles o aerosoles)'},
+      {val:'Anestesia Local por Infiltraci\u00f3n', txt:'Anestesia Local por Infiltraci\u00f3n directa en tejidos'}
+    ],
+    nivel3: false
+  },
+  sedacion: {
+    label: 'Nivel de sedaci\u00f3n',
+    opciones: [
+      {val:'Sedaci\u00f3n M\u00ednima (Ansiolisis)', txt:'Sedaci\u00f3n M\u00ednima / Ansiolisis - paciente responde normalmente'},
+      {val:'Sedaci\u00f3n Moderada (Consciente)', txt:'Sedaci\u00f3n Moderada / Consciente - responde a \u00f3rdenes verbales o t\u00e1ctiles'},
+      {val:'Sedaci\u00f3n Profunda', txt:'Sedaci\u00f3n Profunda - responde solo a est\u00edmulos dolorosos repetidos'},
+      {val:'Cuidado Anest\u00e9sico Monitorizado (CAM)', txt:'Cuidado Anest\u00e9sico Monitorizado (CAM)'}
+    ],
+    nivel3: false
+  }
+};
+
+function tecNivel1(){
+  var tipo = document.getElementById('fj-tec-tipo').value;
+  var n2wrap = document.getElementById('tec-nivel2-wrap');
+  var n3wrap = document.getElementById('tec-nivel3-wrap');
+  var resumen = document.getElementById('tec-resumen');
+  document.getElementById('fj-tec').value = '';
+  document.getElementById('tec-resumen-txt').textContent = '';
+  resumen.style.display = 'none';
+  n3wrap.style.display = 'none';
+
+  if(!tipo){ n2wrap.style.display='none'; return; }
+
+  var cfg = TEC_OPCIONES[tipo];
+  if(!cfg){ n2wrap.style.display='none'; return; }
+
+  document.getElementById('tec-nivel2-label').textContent = cfg.label;
+  var sel2 = document.getElementById('fj-tec-subtipo');
+  sel2.innerHTML = '<option value="">Seleccionar...</option>';
+  cfg.opciones.forEach(function(op){
+    var o = document.createElement('option');
+    o.value = op.val || op;
+    o.textContent = op.txt || op;
+    sel2.appendChild(o);
+  });
+  n2wrap.style.display = 'block';
+}
+
+function tecNivel2(){
+  var tipo = document.getElementById('fj-tec-tipo').value;
+  var subtipo = document.getElementById('fj-tec-subtipo').value;
+  var n3wrap = document.getElementById('tec-nivel3-wrap');
+  var resumen = document.getElementById('tec-resumen');
+  document.getElementById('fj-tec').value = '';
+  resumen.style.display = 'none';
+
+  if(!subtipo){ n3wrap.style.display='none'; return; }
+
+  var cfg = TEC_OPCIONES[tipo];
+  // Check if this subtipo needs a nivel3
+  if(cfg && cfg.nivel3 && cfg.nivel3[subtipo]){
+    var n3cfg = cfg.nivel3[subtipo];
+    document.getElementById('tec-nivel3-label').textContent = n3cfg.label;
+    var sel3 = document.getElementById('fj-tec-bloqueo');
+    sel3.innerHTML = '<option value="">Seleccionar...</option>';
+    n3cfg.opciones.forEach(function(op){
+      var o = document.createElement('option');
+      o.value = op; o.textContent = op;
+      sel3.appendChild(o);
+    });
+    n3wrap.style.display = 'block';
+  } else {
+    // No nivel3 needed - set the value directly
+    n3wrap.style.display = 'none';
+    tecSetFinal(subtipo);
+  }
+}
+
+function tecNivel3(){
+  var val = document.getElementById('fj-tec-bloqueo').value;
+  if(val) tecSetFinal(val);
+}
+
+function tecSetFinal(val){
+  document.getElementById('fj-tec').value = val;
+  var res = document.getElementById('tec-resumen');
+  document.getElementById('tec-resumen-txt').textContent = '✓ ' + val;
+  res.style.display = 'block';
+  // Auto-fill metodos if empty
+  var metodos = document.getElementById('fj-metodos');
+  if(metodos && !metodos.value) metodos.value = val;
+}
+
+function tecLimpiar(){
+  document.getElementById('fj-tec-tipo').value = '';
+  document.getElementById('tec-nivel2-wrap').style.display = 'none';
+  document.getElementById('tec-nivel3-wrap').style.display = 'none';
+  document.getElementById('tec-resumen').style.display = 'none';
+  document.getElementById('fj-tec').value = '';
+}
+
+// Restore cascade on cargarFojaUI
+function tecRestaurar(val){
+  if(!val) return;
+  document.getElementById('fj-tec').value = val;
+  var res = document.getElementById('tec-resumen');
+  if(res){ document.getElementById('tec-resumen-txt').textContent = '✓ ' + val; res.style.display='block'; }
 }
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}
