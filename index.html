@@ -494,7 +494,11 @@ select.fi option{background:var(--bg2)}
   <!-- Mayo GECLISA helper - shown only for Mayo -->
   <div id="mayo-foja-helper" style="display:none">
     <div class="card" style="border-color:rgba(56,139,253,.4);background:rgba(56,139,253,.06)">
-      <div class="ct" style="color:var(--blue)">&#127973; Sanatorio Mayo — Datos para GECLISA</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleMayoHelper()">
+        <div class="ct" style="color:var(--blue);margin:0">&#127973; Sanatorio Mayo — Datos para GECLISA</div>
+        <span id="mayo-helper-arrow" style="font-size:18px;color:var(--blue);transition:transform .2s">&#8964;</span>
+      </div>
+      <div id="mayo-helper-body" style="display:none;margin-top:12px">
 
       <div class="field">
         <label>Antecedentes del paciente</label>
@@ -587,8 +591,12 @@ select.fi option{background:var(--bg2)}
         <div class="field"><label>Sangrado</label><input class="fi" type="text" id="fj-sangrado" placeholder="50ml"></div>
       </div>
       <button class="btn btn-b" style="margin-top:10px;width:100%" onclick="go('geclisa')">&#127973; Ver Guía GECLISA completa</button>
+      </div><!-- /mayo-helper-body -->
+      <!-- Botón Enviar a GECLISA siempre visible -->
+      <button class="btn btn-b" style="width:100%;margin-top:10px;font-size:14px;padding:12px" onclick="guardarFoja();abrirGeclisa()">&#127973; Enviar a GECLISA</button>
     </div>
-  </div>  <div class="brow" style="margin-bottom:24px">
+  </div>
+  <div class="brow" style="margin-bottom:24px">
     <button class="btn btn-s" id="btn-imprimir-foja" onclick="imprimirFoja()">&#128424; Imprimir foja</button>
     <button class="btn btn-g" onclick="guardarFoja()">&#128190; Guardar foja</button>
   </div>
@@ -3879,6 +3887,15 @@ function cargarDocBadges(){setTimeout(renderDocBadges,100);}
 function verDocRes(tipo){verDoc(tipo);}
 function descargarDoc(tipo){var docs=(S.cur&&S.cur.docs)||{};var d=docs[tipo];if(!d)return;var a=document.createElement('a');a.href=d.data;a.download=d.nombre;document.body.appendChild(a);a.click();document.body.removeChild(a);toast('Descargando '+d.nombre);}
 
+function toggleMayoHelper(){
+  var body=document.getElementById('mayo-helper-body');
+  var arrow=document.getElementById('mayo-helper-arrow');
+  if(!body)return;
+  var open=body.style.display!=='none';
+  body.style.display=open?'none':'block';
+  if(arrow)arrow.style.transform=open?'':'rotate(180deg)';
+}
+
 function renderFojaPorSanatorio(){
   // Read from live form OR saved data
   var sanEl=document.getElementById('f-san');
@@ -3985,7 +4002,7 @@ function abrirGeclisa(){
     horaFin:f.fin||'',cirujano:i.ciru||'',especialidad:i.serv||'',
     observaciones:f.obs_geclisa||f.obs||'',
     premedicacion:f.premed||'',
-    antibioticoprofilaxis:(_gv('fj-atb')||''),
+    antibioticoprofilaxis:(document.getElementById('fj-atb')?document.getElementById('fj-atb').value:''),
     medicamentos:(f.drogas||[]).map(function(d){return(d.n||'')+' '+(d.d||'')+' '+(d.v||'');}).filter(function(x){return x.trim();}).join(', '),
     peso:i.peso||'',asa:f.asa||'',
     monEtco2:true,monPam:true,monEcg:true,monSato2:true,monPani:true,monDecub:false,monEmerg:false,
