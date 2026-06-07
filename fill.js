@@ -1,6 +1,5 @@
-// AnesFact -> GECLISA filler v10
+// AnesFact -> GECLISA filler v11
 // IDs mapeados desde DevTools reales de GECLISA Sanatorio Mayo
-// Acceso: document.querySelectorAll('iframe')[0].contentDocument
 (function(){
 
 var SURL='https://xntvibfsuubedplptvzs.supabase.co';
@@ -8,7 +7,7 @@ var SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6I
 
 try{window.onbeforeunload=null;}catch(e){}
 
-// ── Obtener documento del iframe correcto ─────────────────────────────
+// ── Obtener documento del iframe con la foja ──────────────────────────
 var D=null;
 try{
   var frs=document.querySelectorAll('iframe');
@@ -20,13 +19,7 @@ try{
   }
 }catch(e){}
 
-if(!D){
-  alert('No se encontró la foja anestésica.\nAsegurate de estar en la Foja Anestésica del paciente.');
-  return void(0);
-}
-
-// Verificar que es la foja correcta buscando campo diagnóstico
-if(!D.getElementById('8054')){
+if(!D||!D.getElementById('8054')){
   alert('No estás en la Foja Anestésica.\nNavegá hasta la foja del paciente y ejecutá el marcador.');
   return void(0);
 }
@@ -38,12 +31,12 @@ toast.textContent='⏳ Cargando datos de AnesFact...';
 document.body.appendChild(toast);
 function rmToast(){try{document.body.removeChild(toast);}catch(e){}}
 
-// Detectar DNI del paciente desde la foja
+// DNI desde la foja — sacar ceros iniciales
 function getClave(){
   try{
-    var dniEl=D.getElementById('8031');// txt_dni
-    if(dniEl&&dniEl.value){
-      var v=dniEl.value.trim().replace(/^0+/,'');// sacar ceros iniciales
+    var el=D.getElementById('8031');
+    if(el&&el.value){
+      var v=el.value.trim().replace(/^0+/,'');
       if(/^\d{7,9}$/.test(v))return v;
     }
   }catch(e){}
@@ -52,32 +45,34 @@ function getClave(){
 
 var clave=getClave();
 
-// XHR — funciona en HTTP sin bloqueo Mixed Content
+// XHR compatible con HTTP
 function xhrGet(url,ok,fail){
   var x=new XMLHttpRequest();
   x.open('GET',url,true);
   x.setRequestHeader('apikey',SKEY);
   x.setRequestHeader('Authorization','Bearer '+SKEY);
   x.setRequestHeader('Content-Type','application/json');
-  x.setRequestHeader('Prefer','return=representation');
   x.onload=function(){
     if(x.status===200||x.status===206){
       try{ok(JSON.parse(x.responseText));}
-      catch(e){fail('Respuesta invalida: '+e.message);}
-    } else {
-      fail('Error HTTP '+x.status+': '+x.responseText.slice(0,100));
+      catch(e){fail('Respuesta inválida: '+e.message);}
+    }else{
+      fail('Error HTTP '+x.status+': '+x.responseText.slice(0,120));
     }
   };
-  x.onerror=function(){fail('Sin conexion a Supabase. Verificar red.');};
+  x.onerror=function(){fail('Sin conexión a Supabase.');};
   x.send();
 }
 
 function cargarDatos(k){
   var url=SURL+'/rest/v1/anesfact_datos?clave=eq.'+encodeURIComponent(k)+'&select=datos&limit=1';
-  console.log('AnesFact fetch URL:',url);
   xhrGet(url,function(rows){
     if(!rows||!rows.length){
-      if(k!=='ultimo'){toast.textContent='⏳ Buscando último paciente...';cargarDatos('ultimo');return;}
+      if(k!=='ultimo'){
+        toast.textContent='⏳ Buscando último registro...';
+        cargarDatos('ultimo');
+        return;
+      }
       rmToast();
       alert('Sin datos en AnesFact.\nAbrí AnesFact, cargá el paciente y tocá "Enviar a GECLISA" primero.');
       return;
@@ -106,15 +101,17 @@ function setVal(el,val){
   return true;
 }
 
-function byId(id){return D.getElementById(id);}
-
+function byId(id){return D.getElementById(String(id));}
 function setId(id,val){return setVal(byId(id),val);}
 
 function setSelect(id,texto){
-  var sel=byId(id);if(!sel)return false;
-  var t=(texto||'').toLowerCase();
+  var sel=byId(id);if(!sel||!texto)return false;
+  var t=String(texto).toLowerCase().replace(/dr\.|dra\./gi,'').trim();
   var opt=Array.from(sel.options).find(function(o){
-    return o.text.toLowerCase().indexOf(t)>=0||o.value.toLowerCase()===t;
+    var ot=o.text.toLowerCase().replace(/dr\.|dra\./gi,'').trim();
+    return ot.indexOf(t)>=0||t.indexOf(ot)>=0||
+           // coincidencia por primer apellido
+           (t.split(' ')[0].length>3&&ot.indexOf(t.split(' ')[0])>=0);
   });
   if(!opt)return false;
   sel.value=opt.value;
@@ -122,105 +119,121 @@ function setSelect(id,texto){
   return true;
 }
 
-// Clickear radio SI o NO de un grupo (name = el name compartido)
-function setRadio(nameSI,nameNO,valor){
-  // nameSI = id del botón SI, nameNO = id del botón NO
-  var btn=byId(valor?nameSI:nameNO);
+function setRadio(idSI,idNO,valor){
+  var btn=byId(valor?idSI:idNO);
   if(btn){try{btn.click();}catch(e){}return true;}
   return false;
+}
+
+// Convertir fecha ISO a DD/MM/AAAA
+function fmtFecha(iso){
+  if(!iso)return '';
+  if(/^\d{2}\/\d{2}\/\d{4}$/.test(iso))return iso; // ya está en formato correcto
+  var p=iso.split('-');
+  if(p.length===3)return p[2]+'/'+p[1]+'/'+p[0];
+  return iso;
+}
+
+// Detectar si hay tubo (anestesia general) por vía aérea o técnica
+function esGeneral(d){
+  var va=(d.viaAerea||'').toLowerCase();
+  var tec=(d.tecnica||d.mantenimiento||'').toLowerCase();
+  return /iot|intub|tubo|general|balanceada|tiva/.test(va+' '+tec);
+}
+
+// Texto de monitoreo según técnica
+function textoMonitoreo(d){
+  if(esGeneral(d)){
+    return 'Paciente bajo monitoreo cardiovascular con oximetría de pulso, control de tensión arterial cada 5 minutos y medición de capnografía.';
+  }
+  return 'Paciente bajo monitoreo cardiovascular con oximetría de pulso y control de tensión arterial cada 5 minutos.';
 }
 
 // ── Rellenar ──────────────────────────────────────────────────────────
 function rellenar(d){
   var ok=0;
 
-  // 1. Datos del paciente (ya vienen de GECLISA, pero por si acaso)
-  // 8027=apellido 8028=nombre 8031=dni 8033=edad 8085=peso
-
-  // 2. Diagnóstico / cx realizada
+  // 1. Diagnóstico
   if(setId('8054',d.diagnostico))ok++;
 
-  // 3. Quirófano
-  if(d.quirofano&&setSelect('8049',d.quirofano))ok++;
+  // 2. Quirófano (select — mapeo directo desde AnesFact)
+  if(d.quirofano){
+    if(setSelect('8049',d.quirofano))ok++;
+  }
 
-  // 4. Anestesista — buscar HUERTA en el select
+  // 3. Anestesista — buscar HUERTA
   if(setSelect('8057','HUERTA'))ok++;
 
-  // 5. Fecha cirugía
-  if(d.fecha&&setId('8058',d.fecha))ok++;
+  // 4. Fecha cirugía DD/MM/AAAA
+  if(d.fechaCirugia&&setId('8058',fmtFecha(d.fechaCirugia)))ok++;
 
-  // 6. Hora inicio y fin
+  // 5. Horas
   if(d.horaInicio&&setId('8061',d.horaInicio))ok++;
   if(d.horaFin&&setId('8063',d.horaFin))ok++;
 
-  // 7. Cirujano
+  // 6. Cirujano — buscar por apellido
   if(d.cirujano&&setSelect('8065',d.cirujano))ok++;
 
-  // 8. Observaciones
-  if(setId('8070',d.observaciones))ok++;
+  // 7. Observaciones — fj-metodos (descripción técnica)
+  if(d.metodos&&setId('8070',d.metodos))ok++;
 
-  // 9. Premedicación (medicamentos generales)
-  var med=d.premedicacion||'';
-  if(d.antibioticoprofilaxis)med+=(med?' / ':'')+d.antibioticoprofilaxis;
-  if(setId('8075',med))ok++;
+  // 8. Medicamentos generales — texto de monitoreo según técnica
+  if(setId('8075',textoMonitoreo(d)))ok++;
 
-  // 10. Medicamentos anestésicos (drogas)
-  if(d.drogas&&setId('8077',d.drogas))ok++;
+  // 9. Medicamentos anestésicos — drogas
+  if(d.medicamentos&&setId('8077',d.medicamentos))ok++;
+
+  // 10. Materiales descartables — tubo o aguja según técnica
+  if(d.materiales&&setId('8079',d.materiales))ok++;
 
   // 11. Evaluación preanestésica
   if(d.edad&&setId('8083',d.edad))ok++;
   if(d.peso&&setId('8085',d.peso))ok++;
 
-  // 12. Examen físico / antecedentes
-  if(d.antecedentes&&setId('8088',d.antecedentes))ok++;
-
-  // 13. ASA
+  // 12. ASA
   if(d.asa&&setSelect('8090',String(d.asa)))ok++;
 
-  // 14. Monitoreo — radios SI/NO
-  // EtCO2: id 8095=SI, 8096=NO
-  setRadio('8095','8096',d.monEtco2!==false);if(d.monEtco2!==false)ok++;
-  // PAM: 8099=SI, 8100=NO
-  setRadio('8099','8100',d.monPam!==false);if(d.monPam!==false)ok++;
-  // ECG: 8103=SI, 8104=NO
-  setRadio('8103','8104',d.monEcg!==false);if(d.monEcg!==false)ok++;
-  // SAT O2: 8107=SI, 8108=NO
-  setRadio('8107','8108',d.monSato2!==false);if(d.monSato2!==false)ok++;
-  // PANI: 8111=SI, 8112=NO
-  setRadio('8111','8112',d.monPani!==false);if(d.monPani!==false)ok++;
-  // PROT.DECUB: 8115=SI, 8116=NO
-  setRadio('8115','8116',d.monDecub||false);
+  // 13. Monitoreo radios SI/NO
+  setRadio('8095','8096',d.monEtco2!==false);   // EtCO2
+  setRadio('8099','8100',d.monPam!==false);      // PAM
+  setRadio('8103','8104',d.monEcg!==false);      // ECG
+  setRadio('8107','8108',d.monSato2!==false);    // SAT O2
+  setRadio('8111','8112',d.monPani!==false);     // PANI
+  setRadio('8115','8116',d.monDecub||false);     // PROT.DECUB
+  ok+=6;
 
-  // 15. Recuperación
-  if(d.recuperacion&&setId('8458',d.recuperacion))ok++;
+  // 14. Premedicación (campo específico) + antibiótico
+  var premed=d.premedicacion||'';
+  if(d.antibioticoprofilaxis)premed+=(premed?' / ':'')+d.antibioticoprofilaxis;
+  if(premed&&setId('8119',premed))ok++;
 
-  // 16. Fluidos / Balance
+  // 15. Inducción
+  if(d.induccion&&setId('8121',d.induccion))ok++;
+
+  // 16. Mantenimiento
+  if(d.mantenimiento&&setId('8123',d.mantenimiento))ok++;
+
+  // 17. Fluidos
   if(d.fluido1&&setId('8448',d.fluido1))ok++;
 
-  // 17. Signos vitales — grilla temporal
-  // Columnas por fila: SIST, DIAST, SAT02, E-CO2, FC, PAM
-  // IDs mapeados: DIAST14=8217, DIAST16=8236...
-  // Usar selector por name para ser más robusto
+  // 18. Recuperación
+  if(d.recuperacion&&setId('8458',d.recuperacion))ok++;
+
+  // 19. Signos vitales — grilla
   try{
     if(d.vitals&&d.vitals.length){
-      // Buscar todas las filas de la grilla por el patrón de inputs seguidos
-      var allInputs=Array.from(D.querySelectorAll('input[type=text],input:not([type])'));
-      // Filtrar solo los de la grilla (id numérico > 8126)
-      var grilaInputs=allInputs.filter(function(el){
-        var n=parseInt(el.id);return n>8125&&n<9000;
-      });
-      // Agrupar en filas de 6
-      var filas=[];
-      for(var i=0;i<grilaInputs.length;i+=6){
-        filas.push(grilaInputs.slice(i,i+6));
-      }
+      // Nombres por columna (SIST): cols 1-13 usan txtd_, 14+ sin prefijo
+      var sistIds=['8134','8140','8147','8153','8159','8166','8172','8178','8185','8191','8197','8204','8210','8216','8222','8223','8224'];
+      // Cada fila tiene 6 valores: SIST, DIAST, SAT02, ECO2, FC, PAM
+      // Los IDs siguen un patrón: SIST+1=DIAST, +2=SAT02, +3=ECO2, +4=FC, +5=PAM (aprox)
       d.vitals.forEach(function(v,idx){
-        if(!filas[idx])return;
-        var cols=[v.sist,v.diast,v.sato2,v.eco2,v.fc,v.pam];
-        cols.forEach(function(val,ci){
-          if(filas[idx][ci]&&val!==undefined&&val!==''){
-            setVal(filas[idx][ci],String(val));
-          }
+        if(idx>=sistIds.length)return;
+        var base=parseInt(sistIds[idx]);
+        var vals=[v.sist,v.diast,v.sato2,v.eco2,v.fc,v.pam];
+        vals.forEach(function(val,ci){
+          if(val===undefined||val==='')return;
+          var el=D.getElementById(String(base+ci));
+          if(el)setVal(el,String(val));
         });
       });
       ok+=d.vitals.length;

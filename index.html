@@ -200,6 +200,7 @@ select.fi option{background:var(--bg2)}
           <select class="fi" id="f-mayo-cama"><option value="">—</option></select>
         </div>
       </div>
+
     </div>
   </div>
   <div class="card">
@@ -285,6 +286,24 @@ select.fi option{background:var(--bg2)}
 
 <div id="view-foja" class="view">
   <div id="dose-info-bar" style="display:none;background:rgba(56,139,253,.1);border:1px solid rgba(56,139,253,.4);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:var(--blue)"></div>
+  <!-- Quirófano Mayo — solo visible para Sanatorio Mayo -->
+  <div id="foja-mayo-quir-wrap" style="display:none">
+    <div class="card" style="padding:10px 14px">
+      <div class="g2">
+        <div class="field"><label>Quir&oacute;fano</label>
+          <select class="fi" id="f-mayo-quir">
+            <option value="">— Seleccionar —</option>
+            <option>QUIROFANO 1</option>
+            <option>QUIROFANO 2</option>
+            <option>QUIROFANO 3</option>
+            <option>QUIROFANO 4</option>
+            <option>SALA DE ENDOSCOP&#205;AS</option>
+            <option>SALA DE HEMODINAMIA</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="card">
     <div class="ct">T&eacute;cnica anest&eacute;sica</div>
 
@@ -3337,7 +3356,7 @@ function cargarForm(i){
   sv('f-fecha',i.fecha);sv('f-hora',i.hora);sv('f-pac',i.pac);
   sv('f-edad',i.edad);sv('f-sexo',i.sexo||'');sv('f-dni',i.dni);
   sv('f-peso',i.peso||'');sv('f-ciru',i.ciru);sv('f-serv',i.serv||'');sv('f-diag',i.diag||'');
-  sv('f-san',i.san);onSanChange();sv('f-mayo-sector',i.mayo_sector||'');if(i.mayo_sector)setTimeout(function(){updateMayoCamas();sv('f-mayo-cama',i.mayo_cama||'');},50);sv('f-sala',i.sala||'');sv('f-cama',i.cama||'');
+  sv('f-san',i.san);onSanChange();sv('f-mayo-sector',i.mayo_sector||'');sv('f-mayo-quir',i.mayo_quir||'');if(i.mayo_sector)setTimeout(function(){updateMayoCamas();sv('f-mayo-cama',i.mayo_cama||'');},50);sv('f-sala',i.sala||'');sv('f-cama',i.cama||'');
   sv('f-obra',i.obra);sv('f-afil',i.afil);
   var ob=document.getElementById('f-ob');if(ob)ob.checked=!!i.ob;
   var en=document.getElementById('f-env');if(en)en.checked=i.env!==false;
@@ -3348,7 +3367,7 @@ function guardar(extra){
   S.cur.fecha=gv('f-fecha');S.cur.hora=gv('f-hora');S.cur.pac=gv('f-pac');
   S.cur.edad=gv('f-edad');S.cur.sexo=gv('f-sexo');S.cur.dni=gv('f-dni');
   S.cur.peso=gv('f-peso');S.cur.ciru=gv('f-ciru');S.cur.serv=gv('f-serv');S.cur.diag=gv('f-diag');
-  S.cur.san=gv('f-san');S.cur.mayo_sector=gv('f-mayo-sector')||'';S.cur.mayo_cama=gv('f-mayo-cama')||'';S.cur.sala=gv('f-sala');S.cur.cama=gv('f-cama');
+  S.cur.san=gv('f-san');S.cur.mayo_sector=gv('f-mayo-sector')||'';S.cur.mayo_cama=gv('f-mayo-cama')||'';S.cur.mayo_quir=gv('f-mayo-quir')||'';S.cur.sala=gv('f-sala');S.cur.cama=gv('f-cama');
   S.cur.obra=gv('f-obra');S.cur.afil=gv('f-afil');
   var ob=document.getElementById('f-ob');S.cur.ob=ob?ob.checked:false;
   var en=document.getElementById('f-env');S.cur.env=en?en.checked:true;
@@ -3901,6 +3920,7 @@ function renderFojaPorSanatorio(){
   var sanEl=document.getElementById('f-san');
   var san=(sanEl&&sanEl.value)||((S.cur&&S.cur.san)||'');
   var esMayo=san.indexOf('Mayo')>=0;
+  var quirWrap=document.getElementById('foja-mayo-quir-wrap');if(quirWrap)quirWrap.style.display=esMayo?'block':'none';
   // VG grid card - hide for Mayo
   var vc=document.getElementById('vitals-card');
   if(vc)vc.style.display=esMayo?'none':'block';
@@ -3996,7 +4016,7 @@ function abrirGeclisa(){
     dni:i.dni||'',edad:i.edad||'',
     obraSocial:i.obra||'',nroAfiliado:i.afil||'',
     fechaCirugia:i.fecha||'',horaInicio:i.hora||'',
-    quirofano:i.sala||(i.mayo_sector?(i.mayo_sector+' - '+i.mayo_cama):''),
+    quirofano:i.mayo_quir||i.sala||'',
     tipoCirugia:'PROGRAMADA',diagnostico:i.diag||'',
     anestesista:'HUERTA MARIA SOLEDAD',matricula:'32393',
     horaFin:f.fin||'',cirujano:i.ciru||'',especialidad:i.serv||'',
