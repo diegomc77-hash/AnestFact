@@ -70,7 +70,7 @@ function xhrGet(url,ok,fail){
 }
 
 function cargarDatos(k){
-  var url=SURL+'/rest/v1/anesfact_datos?clave=eq.'+encodeURIComponent(k)+'&select=datos&order=id.desc&limit=1';
+  var url=SURL+'/rest/v1/anesfact_datos?clave=eq.'+encodeURIComponent(k)+'&select=datos&limit=1';
   console.log('AnesFact fetch URL:',url);
   xhrGet(url,function(rows){
     if(!rows||!rows.length){
