@@ -55,16 +55,23 @@ function xhrGet(url,ok,fail){
   x.open('GET',url,true);
   x.setRequestHeader('apikey',SKEY);
   x.setRequestHeader('Authorization','Bearer '+SKEY);
+  x.setRequestHeader('Content-Type','application/json');
+  x.setRequestHeader('Prefer','return=representation');
   x.onload=function(){
-    if(x.status===200){try{ok(JSON.parse(x.responseText));}catch(e){fail('Respuesta inválida: '+e.message);}}
-    else fail('Error HTTP '+x.status);
+    if(x.status===200||x.status===206){
+      try{ok(JSON.parse(x.responseText));}
+      catch(e){fail('Respuesta invalida: '+e.message);}
+    } else {
+      fail('Error HTTP '+x.status+': '+x.responseText.slice(0,100));
+    }
   };
-  x.onerror=function(){fail('Sin conexión a Supabase.');};
+  x.onerror=function(){fail('Sin conexion a Supabase. Verificar red.');};
   x.send();
 }
 
 function cargarDatos(k){
   var url=SURL+'/rest/v1/anesfact_datos?clave=eq.'+encodeURIComponent(k)+'&select=datos&order=id.desc&limit=1';
+  console.log('AnesFact fetch URL:',url);
   xhrGet(url,function(rows){
     if(!rows||!rows.length){
       if(k!=='ultimo'){toast.textContent='⏳ Buscando último paciente...';cargarDatos('ultimo');return;}
