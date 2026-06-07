@@ -42,7 +42,10 @@ function rmToast(){try{document.body.removeChild(toast);}catch(e){}}
 function getClave(){
   try{
     var dniEl=D.getElementById('8031');// txt_dni
-    if(dniEl&&dniEl.value&&/^\d{7,9}$/.test(dniEl.value.trim()))return dniEl.value.trim();
+    if(dniEl&&dniEl.value){
+      var v=dniEl.value.trim().replace(/^0+/,'');// sacar ceros iniciales
+      if(/^\d{7,9}$/.test(v))return v;
+    }
   }catch(e){}
   return 'ultimo';
 }

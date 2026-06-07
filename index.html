@@ -3989,7 +3989,7 @@ function abrirGeclisa(){
   if(document.getElementById('f-pac'))guardar();
   i=S.cur;f=(i&&i.foja)||{};
   var parts=(i.pac||'').split(',');
-  var clave=(i.dni||i.pac||'paciente').trim().replace(/\s+/g,'_');
+  var clave=(i.dni||'').trim().replace(/^0+/,'').replace(/\s+/g,'_')||'ultimo';
   var payload={
     apellido:(parts[0]||'').trim().toUpperCase(),
     nombre:(parts[1]||'').trim().toUpperCase(),
