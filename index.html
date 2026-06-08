@@ -162,7 +162,7 @@ select.fi option{background:var(--bg2)}
     </div>
     <div class="field"><label>Diagn&oacute;stico / Cirug&iacute;a *</label>
       <div class="ac-wrap">
-        <div class="fr"><input class="fi" type="text" id="f-diag" placeholder="Colecistectom&iacute;a laparosc&oacute;pica" autocomplete="off" oninput="acCirugia('f-diag','ac-diag')" onkeydown="acKey(event,'ac-diag')"><button class="mic" id="m-diag" onclick="mic('f-diag','m-diag')">&#127897;</button></div>
+        <div class="fr"><input class="fi" type="text" id="f-diag" placeholder="Colecistectom&iacute;a laparosc&oacute;pica" autocomplete="off" oninput="acCirugia('f-diag','ac-diag');sugerirPosicion()" onkeydown="acKey(event,'ac-diag')"><button class="mic" id="m-diag" onclick="mic('f-diag','m-diag')">&#127897;</button></div>
         <div class="ac-list" id="ac-diag"></div>
       </div>
     </div>
@@ -300,6 +300,28 @@ select.fi option{background:var(--bg2)}
             <option>SALA DE ENDOSCOP&#205;AS</option>
             <option>SALA DE HEMODINAMIA</option>
           </select>
+        </div>
+        <div class="field"><label>Tipo de cirug&iacute;a</label>
+          <select class="fi" id="f-mayo-tipociru">
+            <option value="">— Seleccionar —</option>
+            <option>PROGRAMADA</option>
+            <option>URGENCIA</option>
+          </select>
+        </div>
+      </div>
+      <div class="g2" style="margin-top:8px">
+        <div class="field">
+          <label>Posici&oacute;n quir&uacute;rgica</label>
+          <select class="fi" id="f-mayo-posicion">
+            <option value="">— Seleccionar —</option>
+            <option>DECUBITO DORSAL</option>
+            <option>DECUBITO VENTRAL</option>
+            <option>IZQUIERDO LATERAL</option>
+            <option>DERECHO LATERAL</option>
+            <option>GINECOLОГ&#205;A</option>
+            <option>DAKOTA DEL SUR</option>
+          </select>
+          <div id="posicion-sugerida" style="display:none;margin-top:4px;padding:5px 8px;background:rgba(29,185,84,.1);border:1px solid var(--green);border-radius:6px;font-size:11px;color:var(--green)"></div>
         </div>
       </div>
     </div>
@@ -3356,7 +3378,7 @@ function cargarForm(i){
   sv('f-fecha',i.fecha);sv('f-hora',i.hora);sv('f-pac',i.pac);
   sv('f-edad',i.edad);sv('f-sexo',i.sexo||'');sv('f-dni',i.dni);
   sv('f-peso',i.peso||'');sv('f-ciru',i.ciru);sv('f-serv',i.serv||'');sv('f-diag',i.diag||'');
-  sv('f-san',i.san);onSanChange();sv('f-mayo-sector',i.mayo_sector||'');sv('f-mayo-quir',i.mayo_quir||'');if(i.mayo_sector)setTimeout(function(){updateMayoCamas();sv('f-mayo-cama',i.mayo_cama||'');},50);sv('f-sala',i.sala||'');sv('f-cama',i.cama||'');
+  sv('f-san',i.san);onSanChange();sv('f-mayo-sector',i.mayo_sector||'');sv('f-mayo-quir',i.mayo_quir||'');sv('f-mayo-tipociru',i.mayo_tipociru||'');sv('f-mayo-posicion',i.mayo_posicion||'');if(i.mayo_sector)setTimeout(function(){updateMayoCamas();sv('f-mayo-cama',i.mayo_cama||'');},50);sv('f-sala',i.sala||'');sv('f-cama',i.cama||'');
   sv('f-obra',i.obra);sv('f-afil',i.afil);
   var ob=document.getElementById('f-ob');if(ob)ob.checked=!!i.ob;
   var en=document.getElementById('f-env');if(en)en.checked=i.env!==false;
@@ -3367,7 +3389,7 @@ function guardar(extra){
   S.cur.fecha=gv('f-fecha');S.cur.hora=gv('f-hora');S.cur.pac=gv('f-pac');
   S.cur.edad=gv('f-edad');S.cur.sexo=gv('f-sexo');S.cur.dni=gv('f-dni');
   S.cur.peso=gv('f-peso');S.cur.ciru=gv('f-ciru');S.cur.serv=gv('f-serv');S.cur.diag=gv('f-diag');
-  S.cur.san=gv('f-san');S.cur.mayo_sector=gv('f-mayo-sector')||'';S.cur.mayo_cama=gv('f-mayo-cama')||'';S.cur.mayo_quir=gv('f-mayo-quir')||'';S.cur.sala=gv('f-sala');S.cur.cama=gv('f-cama');
+  S.cur.san=gv('f-san');S.cur.mayo_sector=gv('f-mayo-sector')||'';S.cur.mayo_cama=gv('f-mayo-cama')||'';S.cur.mayo_quir=gv('f-mayo-quir')||'';S.cur.mayo_tipociru=gv('f-mayo-tipociru')||'';S.cur.mayo_posicion=gv('f-mayo-posicion')||'';S.cur.sala=gv('f-sala');S.cur.cama=gv('f-cama');
   S.cur.obra=gv('f-obra');S.cur.afil=gv('f-afil');
   var ob=document.getElementById('f-ob');S.cur.ob=ob?ob.checked:false;
   var en=document.getElementById('f-env');S.cur.env=en?en.checked:true;
@@ -3906,6 +3928,51 @@ function cargarDocBadges(){setTimeout(renderDocBadges,100);}
 function verDocRes(tipo){verDoc(tipo);}
 function descargarDoc(tipo){var docs=(S.cur&&S.cur.docs)||{};var d=docs[tipo];if(!d)return;var a=document.createElement('a');a.href=d.data;a.download=d.nombre;document.body.appendChild(a);a.click();document.body.removeChild(a);toast('Descargando '+d.nombre);}
 
+
+// ═══════════════════════════════════════════════════
+// SUGERENCIA DE POSICIÓN QUIRÚRGICA
+// ═══════════════════════════════════════════════════
+function sugerirPosicion(){
+  var diag=(document.getElementById('f-diag')?document.getElementById('f-diag').value:'').toLowerCase();
+  var ciru=(document.getElementById('f-ciru')?document.getElementById('f-ciru').value:'').toLowerCase();
+  var txt=diag+' '+ciru;
+  var pos='';
+  // Decúbito ventral — columna, posterior
+  if(/columna|laminect|fusion.*lumbar|hernia.*disco|quiste.*pilonidal|pilonidal|aquiles|poplite|dorsal|posterior|proct|fistula.*anal|hemorroid|fistulect|perianal|coccig|sacrococ/i.test(txt))
+    pos='DECUBITO VENTRAL';
+  // Litotomía / Ginecológica
+  else if(/histerect|legrado|conizac|colposcop|vaginal|vulvect|cistoscop|tur-p|prostat.*transuretral|hemorroid|fistula.*anal|perineorrafia|colpoperineorrafia/i.test(txt))
+    pos='GINECOLOGÍA';
+  // Lateral derecho — riñón izquierdo, suprarrenal izq, pulmón izquierdo
+  else if(/nefr.*izq|renal.*izq|suprarenal.*izq|lobectom.*izq|toracotom.*izq|pulmon.*izq/i.test(txt))
+    pos='DERECHO LATERAL';
+  // Lateral izquierdo — riñón derecho, pulmón derecho, cadera derecha
+  else if(/nefr.*der|renal.*der|suprarenal.*der|lobectom.*der|toracotom.*der|pulmon.*der|cadera.*der|artroplast.*der/i.test(txt))
+    pos='IZQUIERDO LATERAL';
+  // Lateral genérico — toracotomía, nefrectomía sin lado especificado
+  else if(/toracotom|lobectom|nefr|suprarenal|cadera.*reemplaz|artroplast.*cadera/i.test(txt))
+    pos='IZQUIERDO LATERAL';
+  // Dorsal — todo lo demás (default)
+  else if(txt.trim().length>3)
+    pos='DECUBITO DORSAL';
+
+  var sel=document.getElementById('f-mayo-posicion');
+  var sug=document.getElementById('posicion-sugerida');
+  if(!sel||!sug)return;
+  if(pos){
+    sug.style.display='block';
+    sug.innerHTML='💡 Sugerida: <strong>'+pos+'</strong> &nbsp;<button class="btn btn-s" style="padding:2px 8px;font-size:11px" onclick="confirmarPosicion(''+pos+'')">Confirmar</button>';
+  } else {
+    sug.style.display='none';
+  }
+}
+function confirmarPosicion(pos){
+  var sel=document.getElementById('f-mayo-posicion');
+  if(sel)sel.value=pos;
+  var sug=document.getElementById('posicion-sugerida');
+  if(sug)sug.style.display='none';
+}
+// ═══════════════════════════════════════════════════
 function toggleMayoHelper(){
   var body=document.getElementById('mayo-helper-body');
   var arrow=document.getElementById('mayo-helper-arrow');
@@ -4017,6 +4084,8 @@ function abrirGeclisa(){
     obraSocial:i.obra||'',nroAfiliado:i.afil||'',
     fechaCirugia:i.fecha||'',horaInicio:i.hora||'',
     quirofano:i.mayo_quir||i.sala||'',
+    tipoCirugia:i.mayo_tipociru||'PROGRAMADA',
+    posicion:i.mayo_posicion||'',
     tipoCirugia:'PROGRAMADA',diagnostico:i.diag||'',
     anestesista:'HUERTA MARIA SOLEDAD',matricula:'32393',
     horaFin:f.fin||'',cirujano:i.ciru||'',especialidad:i.serv||'',
@@ -4029,7 +4098,7 @@ function abrirGeclisa(){
     induccion:f.ind||'',mantenimiento:f.tec||'',viaAerea:f.via||'',metodos:f.metodos||'',
     vitals:f.mayo_vitals||[],
     fluido1:f.fluido1||f.suero||'',fluido2:f.fluido2||'',
-    orina:f.orina||'',sangrado:f.sangrado||f.sangre||'',
+    orina:(f.orina!==undefined&&f.orina!==''?f.orina:'0'),sangrado:(f.sangrado||f.sangre||'0'),
     recuperacion:f.recup||'S/p',
     timestamp:new Date().toISOString()
   };
