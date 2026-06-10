@@ -3961,7 +3961,7 @@ function sugerirPosicion(){
   if(!sel||!sug)return;
   if(pos){
     sug.style.display='block';
-    sug.innerHTML='💡 Sugerida: <strong>'+pos+'</strong> &nbsp;<button class="btn btn-s" style="padding:2px 8px;font-size:11px" onclick="confirmarPosicion(''+pos+'')">Confirmar</button>';
+    sug.innerHTML='💡 Sugerida: <strong>'+pos+'</strong> &nbsp;<button class="btn btn-s" style="padding:2px 8px;font-size:11px" onclick="confirmarPosicion(\'' +pos+ '\')">Confirmar</button>';
   } else {
     sug.style.display='none';
   }
