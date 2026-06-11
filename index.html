@@ -332,7 +332,7 @@ select.fi option{background:var(--bg2)}
     <!-- Nivel 1: Tipo principal -->
     <div class="field">
       <label>Tipo de anestesia</label>
-      <select class="fi" id="fj-tec-tipo" onchange="tecNivel1()">
+      <select class="fi" id="fj-tec-tipo" onchange="tecNivel1();_sugerirDrogasPorTec(this.value)">
         <option value="">Seleccionar...</option>
         <option value="general">Anestesia General</option>
         <option value="neuroaxial">Anestesia Regional Neuroaxial</option>
@@ -408,6 +408,7 @@ select.fi option{background:var(--bg2)}
   <div class="card">
     <div class="ct">Medicación / Agentes anestésicos</div>
     <p style="font-size:11px;color:var(--text3);margin-bottom:10px">Primeras letras → sugerencias. Dosis calculadas por peso del paciente.</p>
+    <div id="drogas-sugeridas" style="display:none;margin-bottom:12px"></div>
     <div id="drogas-list"></div>
     <div class="brow" style="margin-top:8px;gap:6px">
       <button class="btn btn-s" style="font-size:13px" onclick="addDroga()">+ Agregar fármaco</button>
@@ -415,6 +416,7 @@ select.fi option{background:var(--bg2)}
     </div>
   </div>
 
+  <div class="card">
     <div class="ct">Métodos anestésicos</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="metodos-chips">
       <button class="chip" onclick="setMetodos('raquidea')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Raquídea</button>
@@ -648,6 +650,7 @@ select.fi option{background:var(--bg2)}
     <button class="btn btn-s" id="btn-imprimir-foja" onclick="imprimirFoja()">&#128424; Imprimir foja</button>
     <button class="btn btn-g" onclick="guardarFoja()">&#128190; Guardar foja</button>
   </div>
+</div>
 </div>
 
 <div id="view-nom" class="view">
@@ -3271,7 +3274,7 @@ function saveSign(){if(_sEl){S.signData=_sEl.toDataURL('image/png');toast('Firma
 function go(id,addH){
   if(addH===undefined)addH=true;
   document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
-  document.getElementById('view-'+id).classList.add('active');
+  var vEl=document.getElementById('view-'+id);if(!vEl){alert('Vista no encontrada: '+id);return;}vEl.classList.add('active');
   if(addH)S.hist.push(id);
   document.getElementById('back-btn').style.display=S.hist.length>1?'block':'none';
   document.getElementById('t-title').textContent=TITLES[id]||'AnesFact v5';
@@ -4146,6 +4149,129 @@ var METODOS_TEXTOS={
   localasistida:function(){return 'Anestesia local asistida / MAC (Monitoreo Anestesiologico Controlado).';},
   sedacion:function(){return 'Sedaci\u00f3n consciente. Monitoreo continuo.';}
 };
+// ═══════════════════════════════════════════════════
+// DROGAS SUGERIDAS POR TÉCNICA
+// ═══════════════════════════════════════════════════
+function _sugerirDrogasPorTec(tec){
+  var t=(tec||'').toLowerCase();
+  if(t==='general')sugerirDrogas('general');
+  else if(t==='tiva')sugerirDrogas('tiva');
+  else if(t==='neuroaxial'||t==='raquidea'||t==='raquídea')sugerirDrogas('raquidea');
+  else if(t==='peridural')sugerirDrogas('peridural');
+  else if(t==='sedacion'||t==='sedación')sugerirDrogas('sedacion');
+  else sugerirDrogas('');
+}
+function sugerirDrogas(tipo){
+  var cont=document.getElementById('drogas-sugeridas');
+  if(!cont)return;
+  var peso=parseFloat((S.cur&&S.cur.peso)||(document.getElementById('f-peso')?document.getElementById('f-peso').value:0)||70);
+  function rnd(n){return parseFloat(n.toFixed(1));}
+  var grupos=[];
+  if(tipo==='general'||tipo==='tiva'){
+    grupos.push({t:'Inductores',items:[
+      {n:'Propofol',d:rnd(2*peso),u:'mg EV'},
+      {n:'Etomidato',d:rnd(0.25*peso),u:'mg EV'},
+      {n:'Ketamina',d:rnd(1.5*peso),u:'mg EV'},
+      {n:'Midazolam',d:rnd(0.03*peso),u:'mg EV'}
+    ]});
+    if(tipo==='general'){
+      grupos.push({t:'Relajantes',items:[
+        {n:'Rocuronio',d:rnd(0.9*peso),u:'mg EV'},
+        {n:'Succinilcolina',d:rnd(1.25*peso),u:'mg EV'},
+        {n:'Atracurio',d:rnd(0.45*peso),u:'mg EV'},
+        {n:'Vecuronio',d:rnd(0.1*peso),u:'mg EV'},
+        {n:'Pancuronio',d:rnd(0.1*peso),u:'mg EV'}
+      ]});
+    }
+    grupos.push({t:'Analgésicos',items:[
+      {n:'Fentanilo',d:rnd(3*peso),u:'mcg EV'},
+      {n:'Remifentanilo',d:rnd(1*peso),u:'mcg EV'}
+    ]});
+    if(tipo==='general'){
+      grupos.push({t:'Mantenimiento',items:[
+        {n:'Sevoflurano',d:'2',u:'% CAM'},
+        {n:'Remifentanilo',d:'0.1-0.5',u:'mcg/kg/min inf'}
+      ]});
+    } else {
+      grupos.push({t:'Mantenimiento TIVA',items:[
+        {n:'Propofol',d:'8',u:'mg/kg/h inf'},
+        {n:'Remifentanilo',d:'0.2',u:'mcg/kg/min inf'}
+      ]});
+    }
+  } else if(tipo==='raquidea'){
+    grupos.push({t:'Anestésico intratecal',items:[
+      {n:'Bupivacaína hiperbárica',d:'12.5',u:'mg intratecal'},
+      {n:'Fentanilo',d:'25',u:'mcg intratecal'}
+    ]});
+  } else if(tipo==='peridural'){
+    grupos.push({t:'Anestésico peridural',items:[
+      {n:'Bupivacaína 0.5%',d:'20',u:'ml peridural'},
+      {n:'Ropivacaína 0.75%',d:'15',u:'ml peridural'},
+      {n:'Fentanilo',d:'100',u:'mcg peridural'}
+    ]});
+  }
+  grupos.push({t:'Inotrópicos / Emergencia',items:[
+    {n:'Efedrina',d:rnd(0.1*peso),u:'mg EV'},
+    {n:'Noradrenalina',d:'4',u:'mcg/min inf'},
+    {n:'Adrenalina',d:'0.1',u:'mcg/kg/min inf'},
+    {n:'Atropina',d:rnd(0.015*peso),u:'mg EV'}
+  ]});
+  if(!grupos.length){cont.style.display='none';return;}
+  cont.style.display='block';
+  var html2='';
+  grupos.forEach(function(g){
+    html2+='<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:4px;text-transform:uppercase">'+g.t+'</div><div style="display:flex;flex-wrap:wrap;gap:4px">';
+    g.items.forEach(function(it){
+      var label=it.n+' '+it.d+' '+it.u;
+      var btn=document.createElement('button');
+      btn.className='chip';
+      btn.style.cssText='border-radius:20px;padding:4px 10px;font-size:11px;cursor:pointer;background:rgba(29,185,84,.1);border:1px solid var(--green);color:var(--green);margin:2px';
+      btn.textContent=label;
+      btn._dLabel=label;
+      btn.onclick=function(){addDrogaDirecta(this._dLabel);};
+      cont.appendChild(btn);
+      html2+='__BTN__';
+    });
+    html2+='</div></div>';
+  });
+  // Usar innerHTML para estructura, botones con onclick via JS
+  cont.innerHTML='';
+  grupos.forEach(function(g){
+    var sec=document.createElement('div');
+    sec.style.marginBottom='8px';
+    var title=document.createElement('div');
+    title.style.cssText='font-size:11px;font-weight:600;color:var(--text3);margin-bottom:4px;text-transform:uppercase';
+    title.textContent=g.t;
+    sec.appendChild(title);
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;flex-wrap:wrap;gap:4px';
+    g.items.forEach(function(it){
+      var label=it.n+' '+it.d+' '+it.u;
+      var btn=document.createElement('button');
+      btn.className='chip';
+      btn.style.cssText='border-radius:20px;padding:4px 10px;font-size:11px;cursor:pointer;background:rgba(29,185,84,.1);border:1px solid var(--green);color:var(--green);margin:2px';
+      btn.textContent=label;
+      (function(lbl){btn.onclick=function(){addDrogaDirecta(lbl);};})(label);
+      row.appendChild(btn);
+    });
+    sec.appendChild(row);
+    cont.appendChild(sec);
+  });
+}
+function addDrogaDirecta(label){
+  if(!S.cur)return;
+  if(!S.cur.foja)S.cur.foja={drogas:[],vitals:[]};
+  if(!S.cur.foja.drogas)S.cur.foja.drogas=[];
+  var parts=label.split(' ');
+  var n=parts[0]||'';
+  var d=parts[1]||'';
+  var v=parts.slice(2).join(' ')||'EV';
+  S.cur.foja.drogas.push({n:n,d:d,v:v});
+  renderDrogas();
+  toast(n+' agregado');
+}
+// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function setMetodos(tipo){
   var extra=document.getElementById('metodos-extra');
   if(!extra)return;
@@ -4157,6 +4283,8 @@ function setMetodos(tipo){
   if(ta&&fn)ta.value=fn();
   document.querySelectorAll('#metodos-chips .chip').forEach(function(b){b.style.background='var(--bg3)';b.style.borderColor='var(--border)';b.style.color='var(--text)';});
   if(event&&event.target){event.target.style.background='rgba(29,185,84,.15)';event.target.style.borderColor='var(--green)';event.target.style.color='var(--green)';}
+  sugerirDrogas(tipo);
+  actualizarMetodos();
 }
 function actualizarMetodos(){
   var extra=document.getElementById('metodos-extra');
