@@ -429,6 +429,13 @@ select.fi option{background:var(--bg2)}
       <textarea class="fi" id="fj-metodos" placeholder="Observaciones adicionales..."></textarea>
       <button class="mic" id="m-metodos" onclick="mic('fj-metodos','m-metodos')">&#127897;</button>
     </div>
+    <div class="field" style="margin-top:10px">
+      <label>Materiales descartables</label>
+      <div class="fr">
+        <input class="fi" type="text" id="fj-materiales" placeholder="Tubo endotraqueal N&ordm; 7 / Aguja raqu&iacute;dea AR 25 PL" autocomplete="off">
+        <button class="mic" id="m-materiales" onclick="mic('fj-materiales','m-materiales')">&#127897;</button>
+      </div>
+    </div>
   </div>
 
   <div class="card">
@@ -4151,7 +4158,28 @@ function setMetodos(tipo){
   document.querySelectorAll('#metodos-chips .chip').forEach(function(b){b.style.background='var(--bg3)';b.style.borderColor='var(--border)';b.style.color='var(--text)';});
   if(event&&event.target){event.target.style.background='rgba(29,185,84,.15)';event.target.style.borderColor='var(--green)';event.target.style.color='var(--green)';}
 }
-function actualizarMetodos(){var extra=document.getElementById('metodos-extra');var tipo=extra?extra.getAttribute('data-tipo'):'';var fn=METODOS_TEXTOS[tipo];var ta=document.getElementById('fj-metodos');if(ta&&fn)ta.value=fn();}
+function actualizarMetodos(){
+  var extra=document.getElementById('metodos-extra');
+  var tipo=extra?extra.getAttribute('data-tipo'):'';
+  var fn=METODOS_TEXTOS[tipo];
+  var ta=document.getElementById('fj-metodos');
+  if(ta&&fn)ta.value=fn();
+  // Autollenar materiales descartables
+  var mat=document.getElementById('fj-materiales');
+  if(mat){
+    if(tipo==='general'||tipo==='tiva'){
+      var t=document.getElementById('metodos-tubo');
+      mat.value='Tubo endotraqueal Nº '+(t?t.value:'7')+' con manguito de baja presion.';
+    } else if(tipo==='raquidea'){
+      var a=document.getElementById('metodos-aguja');
+      mat.value='Aguja raquidea punta lapiz '+(a?a.value:'AR 25 PL')+'.';
+    } else if(tipo==='peridural'){
+      mat.value='Aguja de Tuohy 18G. Cateter peridural.';
+    } else {
+      mat.value='';
+    }
+  }
+}
 
 // === RECUPERACIÓN ALDRETE + DESTINO ===
 var _aldrete='',_destino='',_destinoExtra='',_arm='',_inotrop='';
