@@ -4156,26 +4156,29 @@ function _sugerirDrogasPorTec(tec){
   var t=(tec||'').toLowerCase();
   if(t==='general')sugerirDrogas('general');
   else if(t==='tiva')sugerirDrogas('tiva');
-  else if(t==='neuroaxial'||t==='raquidea'||t==='raquídea')sugerirDrogas('raquidea');
+  else if(/raqui|neuroaxial/.test(t))sugerirDrogas('raquidea');
   else if(t==='peridural')sugerirDrogas('peridural');
-  else if(t==='sedacion'||t==='sedación')sugerirDrogas('sedacion');
+  else if(/sedac/.test(t))sugerirDrogas('sedacion');
   else sugerirDrogas('');
 }
+
 function sugerirDrogas(tipo){
   var cont=document.getElementById('drogas-sugeridas');
   if(!cont)return;
   var peso=parseFloat((S.cur&&S.cur.peso)||(document.getElementById('f-peso')?document.getElementById('f-peso').value:0)||70);
   function rnd(n){return parseFloat(n.toFixed(1));}
+
+  // Definir grupos segun tecnica
   var grupos=[];
   if(tipo==='general'||tipo==='tiva'){
-    grupos.push({t:'Inductores',items:[
+    grupos.push({id:'sg-ind',t:'Inductores',items:[
       {n:'Propofol',d:rnd(2*peso),u:'mg EV'},
       {n:'Etomidato',d:rnd(0.25*peso),u:'mg EV'},
       {n:'Ketamina',d:rnd(1.5*peso),u:'mg EV'},
-      {n:'Midazolam',d:rnd(0.03*peso),u:'mg EV'}
+      {n:'Midazolam',d:rnd(0.05*peso),u:'mg EV'}
     ]});
     if(tipo==='general'){
-      grupos.push({t:'Relajantes',items:[
+      grupos.push({id:'sg-rel',t:'Relajantes',items:[
         {n:'Rocuronio',d:rnd(0.9*peso),u:'mg EV'},
         {n:'Succinilcolina',d:rnd(1.25*peso),u:'mg EV'},
         {n:'Atracurio',d:rnd(0.45*peso),u:'mg EV'},
@@ -4183,79 +4186,114 @@ function sugerirDrogas(tipo){
         {n:'Pancuronio',d:rnd(0.1*peso),u:'mg EV'}
       ]});
     }
-    grupos.push({t:'Analgésicos',items:[
+    grupos.push({id:'sg-anal',t:'Analgésicos',items:[
       {n:'Fentanilo',d:rnd(3*peso),u:'mcg EV'},
       {n:'Remifentanilo',d:rnd(1*peso),u:'mcg EV'}
     ]});
     if(tipo==='general'){
-      grupos.push({t:'Mantenimiento',items:[
+      grupos.push({id:'sg-mant',t:'Mantenimiento',items:[
         {n:'Sevoflurano',d:'2',u:'% CAM'},
-        {n:'Remifentanilo',d:'0.1-0.5',u:'mcg/kg/min inf'}
+        {n:'Isoflurano',d:'1.5',u:'% CAM'},
+        {n:'Remifentanilo',d:'0.2',u:'mcg/kg/min inf'},
+        {n:'Fentanilo',d:rnd(1.5*peso),u:'mcg EV bolo'}
       ]});
     } else {
-      grupos.push({t:'Mantenimiento TIVA',items:[
+      grupos.push({id:'sg-mant',t:'Mantenimiento TIVA',items:[
         {n:'Propofol',d:'8',u:'mg/kg/h inf'},
-        {n:'Remifentanilo',d:'0.2',u:'mcg/kg/min inf'}
+        {n:'Remifentanilo',d:'0.2',u:'mcg/kg/min inf'},
+        {n:'Dexmedetomidina',d:'0.5',u:'mcg/kg/h inf'}
       ]});
     }
   } else if(tipo==='raquidea'){
-    grupos.push({t:'Anestésico intratecal',items:[
+    grupos.push({id:'sg-raq',t:'Anestésico intratecal',items:[
       {n:'Bupivacaína hiperbárica',d:'12.5',u:'mg intratecal'},
+      {n:'Levobupivacaína',d:'10',u:'mg intratecal'},
       {n:'Fentanilo',d:'25',u:'mcg intratecal'}
     ]});
   } else if(tipo==='peridural'){
-    grupos.push({t:'Anestésico peridural',items:[
+    grupos.push({id:'sg-peri',t:'Anestésico peridural',items:[
       {n:'Bupivacaína 0.5%',d:'20',u:'ml peridural'},
       {n:'Ropivacaína 0.75%',d:'15',u:'ml peridural'},
       {n:'Fentanilo',d:'100',u:'mcg peridural'}
     ]});
+  } else if(tipo==='sedacion'){
+    grupos.push({id:'sg-sed',t:'Sedación',items:[
+      {n:'Propofol',d:rnd(1*peso),u:'mg EV'},
+      {n:'Midazolam',d:rnd(0.02*peso),u:'mg EV'},
+      {n:'Fentanilo',d:rnd(1.5*peso),u:'mcg EV'},
+      {n:'Ketamina',d:rnd(0.5*peso),u:'mg EV'}
+    ]});
   }
-  grupos.push({t:'Inotrópicos / Emergencia',items:[
+
+  // Inotrópicos siempre
+  grupos.push({id:'sg-inot',t:'Inotrópicos / Emergencia',items:[
     {n:'Efedrina',d:rnd(0.1*peso),u:'mg EV'},
     {n:'Noradrenalina',d:'4',u:'mcg/min inf'},
     {n:'Adrenalina',d:'0.1',u:'mcg/kg/min inf'},
-    {n:'Atropina',d:rnd(0.015*peso),u:'mg EV'}
+    {n:'Atropina',d:rnd(0.015*peso),u:'mg EV'},
+    {n:'Dopamina',d:'5',u:'mcg/kg/min inf'}
   ]});
-  if(!grupos.length){cont.style.display='none';return;}
+
+  if(!tipo){cont.style.display='none';cont.innerHTML='';return;}
   cont.style.display='block';
-  var html2='';
-  grupos.forEach(function(g){
-    html2+='<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:4px;text-transform:uppercase">'+g.t+'</div><div style="display:flex;flex-wrap:wrap;gap:4px">';
-    g.items.forEach(function(it){
-      var label=it.n+' '+it.d+' '+it.u;
-      var btn=document.createElement('button');
-      btn.className='chip';
-      btn.style.cssText='border-radius:20px;padding:4px 10px;font-size:11px;cursor:pointer;background:rgba(29,185,84,.1);border:1px solid var(--green);color:var(--green);margin:2px';
-      btn.textContent=label;
-      btn._dLabel=label;
-      btn.onclick=function(){addDrogaDirecta(this._dLabel);};
-      cont.appendChild(btn);
-      html2+='__BTN__';
-    });
-    html2+='</div></div>';
-  });
-  // Usar innerHTML para estructura, botones con onclick via JS
   cont.innerHTML='';
+
   grupos.forEach(function(g){
-    var sec=document.createElement('div');
-    sec.style.marginBottom='8px';
-    var title=document.createElement('div');
-    title.style.cssText='font-size:11px;font-weight:600;color:var(--text3);margin-bottom:4px;text-transform:uppercase';
-    title.textContent=g.t;
-    sec.appendChild(title);
-    var row=document.createElement('div');
-    row.style.cssText='display:flex;flex-wrap:wrap;gap:4px';
+    var wrap=document.createElement('div');
+    wrap.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:6px';
+
+    // Select con las drogas del grupo
+    var sel=document.createElement('select');
+    sel.className='fi';
+    sel.style.cssText='flex:1;font-size:12px';
+    var opt0=document.createElement('option');
+    opt0.value='';
+    opt0.textContent=g.t+' — elegir...';
+    sel.appendChild(opt0);
     g.items.forEach(function(it){
-      var label=it.n+' '+it.d+' '+it.u;
-      var btn=document.createElement('button');
-      btn.className='chip';
-      btn.style.cssText='border-radius:20px;padding:4px 10px;font-size:11px;cursor:pointer;background:rgba(29,185,84,.1);border:1px solid var(--green);color:var(--green);margin:2px';
-      btn.textContent=label;
-      (function(lbl){btn.onclick=function(){addDrogaDirecta(lbl);};})(label);
-      row.appendChild(btn);
+      var op=document.createElement('option');
+      op.value=it.n+'|'+it.d+'|'+it.u;
+      op.textContent=it.n+' ('+it.d+' '+it.u+')';
+      sel.appendChild(op);
     });
-    sec.appendChild(row);
-    cont.appendChild(sec);
+
+    // Input de dosis (editable)
+    var inp=document.createElement('input');
+    inp.type='text';
+    inp.placeholder='dosis';
+    inp.style.cssText='width:120px;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text)';
+    inp.readOnly=true;
+
+    // Boton agregar
+    var btn=document.createElement('button');
+    btn.className='btn btn-s';
+    btn.style.cssText='font-size:12px;padding:6px 10px;flex-shrink:0';
+    btn.textContent='+ Agregar';
+    btn.disabled=true;
+
+    // Al cambiar select -> prellenar dosis
+    sel.onchange=function(){
+      if(!sel.value){inp.value='';inp.readOnly=true;btn.disabled=true;return;}
+      var parts=sel.value.split('|');
+      inp.value=parts[1]+' '+parts[2];
+      inp.readOnly=false;
+      btn.disabled=false;
+    };
+
+    // Al confirmar -> agregar a la lista
+    btn.onclick=function(){
+      if(!sel.value)return;
+      var parts=sel.value.split('|');
+      var nombre=parts[0];
+      var dosis=inp.value.trim()||parts[1]+' '+parts[2];
+      addDrogaDirecta(nombre+'|'+dosis);
+      sel.value='';inp.value='';inp.readOnly=true;btn.disabled=true;
+    };
+
+    wrap.appendChild(sel);
+    wrap.appendChild(inp);
+    wrap.appendChild(btn);
+    cont.appendChild(wrap);
   });
 }
 function addDrogaDirecta(label){

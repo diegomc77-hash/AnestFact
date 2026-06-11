@@ -161,8 +161,30 @@ function textoMonitoreo(d){
     : 'Paciente bajo monitoreo cardiovascular con oximetria de pulso y control de tension arterial cada 5 minutos.';
 }
 
+// ── Inyectar CSS correctivo en el iframe ─────────────────────────────
+function inyectarCSS(){
+  try{
+    var st=D.createElement('style');
+    st.innerHTML=[
+      'input[id="8134"],input[id="8140"],input[id="8147"],input[id="8153"],input[id="8159"],',
+      'input[id="8166"],input[id="8172"],input[id="8178"],input[id="8185"],input[id="8191"],',
+      'input[id="8197"],input[id="8204"],input[id="8210"],input[id="8216"],input[id="8222"],',
+      'input[id="8223"],input[id="8224"],',
+      'input[name^="txtd_"],input[name^="SIST"],input[name^="DIAST"],input[name^="SAT"],',
+      'input[name^="ECO"],input[name^="FC"],input[name^="PAM"]{',
+      'width:52px!important;min-width:52px!important;max-width:52px!important;',
+      'box-sizing:border-box!important;text-align:center!important;',
+      'padding:2px!important;font-size:11px!important;}',
+      'table{table-layout:fixed!important;}',
+      'td,th{overflow:hidden!important;}'
+    ].join('');
+    D.head.appendChild(st);
+  }catch(e){}
+}
+
 // ── Rellenar ──────────────────────────────────────────────────────────
 function rellenar(d){
+  inyectarCSS();
   var ok=0;
 
   // BLOQUE 1 — Quirófano y tiempos
