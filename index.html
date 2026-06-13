@@ -345,7 +345,7 @@ select.fi option{background:var(--bg2)}
     <!-- Nivel 2: Subtipo -->
     <div class="field" id="tec-nivel2-wrap" style="display:none">
       <label id="tec-nivel2-label">Subtipo</label>
-      <select class="fi" id="fj-tec-subtipo" onchange="tecNivel2()">
+      <select class="fi" id="fj-tec-subtipo" onchange="tecNivel2();_sugerirDrogasPorTec(this.value||document.getElementById('fj-tec-tipo').value)">
         <option value="">Seleccionar...</option>
       </select>
     </div>
@@ -4241,11 +4241,15 @@ var METODOS_TEXTOS={
 // ═══════════════════════════════════════════════════
 function _sugerirDrogasPorTec(tec){
   var t=(tec||'').toLowerCase();
-  if(t==='general')sugerirDrogas('general');
-  else if(t==='tiva')sugerirDrogas('tiva');
-  else if(/raqui|neuroaxial/.test(t))sugerirDrogas('raquidea');
-  else if(t==='peridural')sugerirDrogas('peridural');
-  else if(/sedac/.test(t))sugerirDrogas('sedacion');
+  // Leer subtipo si existe para mayor precision
+  var sub=(document.getElementById('fj-tec-subtipo')?document.getElementById('fj-tec-subtipo').value||'':'').toLowerCase();
+  var v=sub||t;
+  if(/tiva/.test(v))sugerirDrogas('tiva');
+  else if(/raqui/.test(v))sugerirDrogas('raquidea');
+  else if(/peridural|epidural/.test(v))sugerirDrogas('peridural');
+  else if(/general|neuroaxial/.test(v)&&!/raqui|peridural/.test(v))sugerirDrogas('general');
+  else if(/sedac|cam|local/.test(v))sugerirDrogas('sedacion');
+  else if(/bloqueo/.test(v))sugerirDrogas('bloqueo');
   else sugerirDrogas('');
 }
 
@@ -4292,16 +4296,49 @@ function sugerirDrogas(tipo){
       ]});
     }
   } else if(tipo==='raquidea'){
-    grupos.push({id:'sg-raq',t:'Anestésico intratecal',items:[
-      {n:'Bupivacaína hiperbárica',d:'12.5',u:'mg intratecal'},
-      {n:'Levobupivacaína',d:'10',u:'mg intratecal'},
-      {n:'Fentanilo',d:'25',u:'mcg intratecal'}
+    grupos.push({t:'Anestésico intratecal',items:[
+      {n:'Bupivacaína hiperbárica 0.5%',d:'12.5',u:'mg intratecal'},
+      {n:'Ropivacaína 0.75%',d:'15',u:'mg intratecal'},
+      {n:'Lidocaína 2%',d:rnd(4*peso),u:'mg intratecal'}
+    ]});
+    grupos.push({t:'Coadyuvantes intratecales',items:[
+      {n:'Fentanilo',d:'25',u:'mcg intratecal'},
+      {n:'Morfina s/conservantes',d:'200',u:'mcg intratecal'},
+      {n:'Dexmedetomidina',d:'10',u:'mcg intratecal'},
+      {n:'Clonidina',d:'15',u:'mcg intratecal'},
+      {n:'Adrenalina 1:200.000',d:'0.1',u:'ml intratecal'}
     ]});
   } else if(tipo==='peridural'){
-    grupos.push({id:'sg-peri',t:'Anestésico peridural',items:[
-      {n:'Bupivacaína 0.5%',d:'20',u:'ml peridural'},
+    grupos.push({t:'Anestésico peridural',items:[
+      {n:'Ropivacaína 0.5%',d:'20',u:'ml peridural'},
       {n:'Ropivacaína 0.75%',d:'15',u:'ml peridural'},
-      {n:'Fentanilo',d:'100',u:'mcg peridural'}
+      {n:'Bupivacaína 0.5%',d:'20',u:'ml peridural'},
+      {n:'Lidocaína 2%',d:'15',u:'ml peridural'},
+      {n:'Mepivacaína 2%',d:'15',u:'ml peridural'}
+    ]});
+    grupos.push({t:'Coadyuvantes peridurales',items:[
+      {n:'Fentanilo',d:'100',u:'mcg peridural'},
+      {n:'Morfina s/conservantes',d:'2',u:'mg peridural'},
+      {n:'Dexmedetomidina',d:'20',u:'mcg peridural'},
+      {n:'Clonidina',d:'30',u:'mcg peridural'},
+      {n:'Adrenalina 1:200.000',d:'5',u:'mcg/ml peridural'}
+    ]});
+  } else if(tipo==='bloqueo'){
+    grupos.push({t:'Anestésico local',items:[
+      {n:'Ropivacaína 0.5%',d:rnd(3*peso),u:'mg'},
+      {n:'Ropivacaína 0.75%',d:rnd(3*peso),u:'mg'},
+      {n:'Bupivacaína 0.25%',d:rnd(2*peso),u:'mg'},
+      {n:'Bupivacaína 0.5%',d:rnd(2*peso),u:'mg'},
+      {n:'Lidocaína 1%',d:rnd(4*peso),u:'mg'},
+      {n:'Lidocaína 2%',d:rnd(4*peso),u:'mg'},
+      {n:'Mepivacaína 1%',d:rnd(5*peso),u:'mg'},
+      {n:'Mepivacaína 2%',d:rnd(5*peso),u:'mg'}
+    ]});
+    grupos.push({t:'Coadyuvantes',items:[
+      {n:'Fentanilo',d:'25',u:'mcg'},
+      {n:'Dexmedetomidina',d:rnd(1*peso),u:'mcg'},
+      {n:'Clonidina',d:rnd(1*peso),u:'mcg'},
+      {n:'Adrenalina 1:200.000',d:'5',u:'mcg/ml'}
     ]});
   } else if(tipo==='sedacion'){
     grupos.push({id:'sg-sed',t:'Sedación',items:[
