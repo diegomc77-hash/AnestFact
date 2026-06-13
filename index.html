@@ -418,13 +418,16 @@ select.fi option{background:var(--bg2)}
 
   <div class="card">
     <div class="ct">Métodos anestésicos</div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="metodos-chips">
-      <button class="chip" onclick="setMetodos('raquidea')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Raquídea</button>
-      <button class="chip" onclick="setMetodos('general')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">A. General</button>
-      <button class="chip" onclick="setMetodos('tiva')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">TIVA</button>
-      <button class="chip" onclick="setMetodos('peridural')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Peridural</button>
-      <button class="chip" onclick="setMetodos('localasistida')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Local asistida</button>
-      <button class="chip" onclick="setMetodos('sedacion')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Sedación</button>
+    <div style="margin-bottom:10px" id="metodos-chips">
+      <select class="fi" id="metodos-tipo-sel" onchange="if(this.value)setMetodos(this.value)">
+        <option value="">— Seleccionar método anestésico —</option>
+        <option value="raquidea">Raquídea</option>
+        <option value="general">A. General</option>
+        <option value="tiva">TIVA</option>
+        <option value="peridural">Peridural</option>
+        <option value="localasistida">Local asistida</option>
+        <option value="sedacion">Sedación</option>
+      </select>
     </div>
     <div id="metodos-extra" style="display:none;margin-bottom:8px"></div>
     <div class="fr" style="align-items:flex-start">
