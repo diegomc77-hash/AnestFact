@@ -389,7 +389,7 @@ select.fi option{background:var(--bg2)}
         </div>
         <div class="ac-list" id="ac-premed"></div>
       </div>
-      <div class="chips" id="premed-chips"></div>
+      <div id="premed-selects"></div>
       <div style="margin-top:6px">
         <button class="btn btn-s" style="font-size:12px;background:rgba(29,185,84,.15);border:1px solid var(--green);color:var(--green)" onclick="calcPremed()">&#9889; Sugerir por peso / anestesia</button>
       </div>
@@ -890,8 +890,8 @@ function calcPremed(){
   var midazFull = rnd(0.03*peso,2);   // media 0.02–0.04 mg/kg
   var midazLow  = rnd(0.02*peso,2);   // dosis mínima para regional
   var atro      = rnd(0.015*peso,2);  // media 0.01–0.02 mg/kg
-  var rani      = Math.min(rnd(1*peso,0),50);    // techo 50mg
-  var ondan     = Math.min(rnd(0.1*peso,2),4);   // techo 4mg  (NO combinar con metoclopramida)
+  var rani      = Math.min(rnd(1*peso,0),300);   // techo 300mg (hasta 6 ampollas)
+  var ondan     = Math.min(rnd(0.1*peso,2),8);   // techo 8mg
   var dexameta  = 8;                             // fijo
 
   // 4. CONSTRUIR ESQUEMA PRINCIPAL (string directo al campo)
@@ -3200,10 +3200,86 @@ function parseDrugSpeech(txt){
   if(found)showDoseInfo(found,parseFloat((S.cur&&S.cur.peso)||0));
 }
 
-// Chips
+// Selects sectorizados de premedicación
 function renderPesoChips(){
-  var c=document.getElementById('premed-chips');if(!c)return;
-  c.innerHTML=PREMED_CHIPS.map(function(r){return'<span class="chip" onclick="addChipTo(\'fj-premed\',\''+r.replace(/'/g,"\\'")+'\')">'+(r.length>30?r.slice(0,28)+'…':r)+'</span>';}).join('');
+  var cont=document.getElementById('premed-selects');if(!cont)return;
+  var peso=parseFloat((S.cur&&S.cur.peso)||(document.getElementById('f-peso')?document.getElementById('f-peso').value:0)||70);
+  function rnd(n){return parseFloat(n.toFixed(1));}
+  var grupos=[
+    {t:'Benzodiacepinas',items:[
+      {n:'Midazolam',d:rnd(0.04*peso),u:'mg EV'},
+      {n:'Diazepam',d:'5',u:'mg EV'},
+      {n:'Lorazepam',d:'2',u:'mg EV'}
+    ]},
+    {t:'Anticolinérgicos',items:[
+      {n:'Atropina',d:rnd(0.015*peso),u:'mg EV'},
+      {n:'Escopolamina',d:'20',u:'mg EV'}
+    ]},
+    {t:'Protectores gástricos',items:[
+      {n:'Ranitidina',d:'50',u:'mg EV'},
+      {n:'Omeprazol',d:'40',u:'mg EV'},
+      {n:'Pantoprazol',d:'40',u:'mg EV'}
+    ]},
+    {t:'Antieméticos',items:[
+      {n:'Ondansetrón',d:rnd(0.1*peso),u:'mg EV'},
+      {n:'Metoclopramida',d:'10',u:'mg EV'}
+    ]},
+    {t:'Corticoides',items:[
+      {n:'Dexametasona',d:'8',u:'mg EV'}
+    ]},
+    {t:'AINEs / Analgésicos',items:[
+      {n:'Ketorolac',d:'30',u:'mg EV'},
+      {n:'Diclofenac',d:'75',u:'mg EV'},
+      {n:'Dexketoprofeno',d:'50',u:'mg EV'},
+      {n:'Meloxicam',d:'15',u:'mg EV'},
+      {n:'Dipirona',d:'1',u:'g EV'},
+      {n:'Paracetamol',d:'1',u:'g EV'}
+    ]},
+    {t:'Antibióticos',items:[
+      {n:'Cefazolina',d:'2',u:'g EV'},
+      {n:'Cefalotina',d:'2',u:'g EV'},
+      {n:'Cefoxitina',d:'2',u:'g EV'},
+      {n:'Clindamicina',d:'900',u:'mg EV'},
+      {n:'Vancomicina',d:'1',u:'g EV'},
+      {n:'Metronidazol',d:'500',u:'mg EV'}
+    ]}
+  ];
+  cont.innerHTML='';
+  grupos.forEach(function(g){
+    var wrap=document.createElement('div');
+    wrap.style.cssText='display:grid;grid-template-columns:1fr 70px 60px;gap:4px;margin-bottom:6px;align-items:center';
+    var sel=document.createElement('select');
+    sel.className='fi';
+    sel.style.cssText='width:100%;font-size:10px;padding:4px 2px;height:32px;box-sizing:border-box';
+    var opt0=document.createElement('option');opt0.value='';opt0.textContent=g.t+' — elegir...';sel.appendChild(opt0);
+    g.items.forEach(function(it){
+      var op=document.createElement('option');
+      op.value=it.n+'|'+it.d+'|'+it.u;
+      op.textContent=it.n+' ('+it.d+' '+it.u+')';
+      sel.appendChild(op);
+    });
+    var inp=document.createElement('input');
+    inp.type='text';inp.placeholder='dosis';inp.readOnly=true;
+    inp.style.cssText='width:100%;font-size:10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 2px;height:32px;color:var(--text);box-sizing:border-box;text-align:center';
+    var btn=document.createElement('button');
+    btn.className='btn btn-s';
+    btn.style.cssText='width:100%;font-size:10px;padding:4px 2px;height:32px;white-space:nowrap;box-sizing:border-box';
+    btn.textContent='+ Agregar';btn.disabled=true;
+    sel.onchange=function(){
+      if(!sel.value){inp.value='';inp.readOnly=true;btn.disabled=true;return;}
+      var p=sel.value.split('|');inp.value=p[1]+' '+p[2];inp.readOnly=false;btn.disabled=false;
+    };
+    btn.onclick=function(){
+      if(!sel.value)return;
+      var p=sel.value.split('|');
+      var txt=p[0]+' '+(inp.value.trim()||p[1]+' '+p[2]);
+      var fp=document.getElementById('fj-premed');
+      if(fp){fp.value=(fp.value?fp.value+'. ':'')+txt;}
+      sel.value='';inp.value='';inp.readOnly=true;btn.disabled=true;
+    };
+    wrap.appendChild(sel);wrap.appendChild(inp);wrap.appendChild(btn);
+    cont.appendChild(wrap);
+  });
 }
 function renderRecupChips(){
   var c=document.getElementById('recup-chips');if(!c)return;
