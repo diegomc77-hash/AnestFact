@@ -4240,12 +4240,12 @@ function sugerirDrogas(tipo){
 
   grupos.forEach(function(g){
     var wrap=document.createElement('div');
-    wrap.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:6px';
+    wrap.style.cssText='display:grid;grid-template-columns:1fr 70px 60px;gap:4px;margin-bottom:6px;align-items:center';
 
     // Select con las drogas del grupo
     var sel=document.createElement('select');
     sel.className='fi';
-    sel.style.cssText='flex:1;font-size:12px';
+    sel.style.cssText='width:100%;font-size:10px;padding:4px 2px;height:32px;box-sizing:border-box';
     var opt0=document.createElement('option');
     opt0.value='';
     opt0.textContent=g.t+' — elegir...';
@@ -4261,13 +4261,13 @@ function sugerirDrogas(tipo){
     var inp=document.createElement('input');
     inp.type='text';
     inp.placeholder='dosis';
-    inp.style.cssText='width:120px;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text)';
+    inp.style.cssText='width:100%;font-size:10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 2px;height:32px;color:var(--text);box-sizing:border-box;text-align:center';
     inp.readOnly=true;
 
     // Boton agregar
     var btn=document.createElement('button');
     btn.className='btn btn-s';
-    btn.style.cssText='font-size:12px;padding:6px 10px;flex-shrink:0';
+    btn.style.cssText='width:100%;font-size:10px;padding:4px 2px;height:32px;white-space:nowrap;box-sizing:border-box';
     btn.textContent='+ Agregar';
     btn.disabled=true;
 
