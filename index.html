@@ -2,6 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AnesFact v6</title>
 <meta name="mobile-web-app-capable" content="yes">
@@ -3363,7 +3366,12 @@ function go(id,addH){
   if(id==='nom'){document.getElementById('nom-q').value='';document.getElementById('nom-res').innerHTML='<p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Escribí para buscar</p>';}
   if(id==='scan'){document.getElementById('cfg-key').value=S.key;actualizarKeyStatus();}
 }
-function goBack(){if(S.hist.length<=1)return;S.hist.pop();go(S.hist[S.hist.length-1],false);}
+function goBack(){
+  if(S.hist.length<=1)return;
+  var cur=S.hist[S.hist.length-1];
+  if(cur==='foja'&&S.cur){try{guardarFoja();}catch(e){}}
+  S.hist.pop();go(S.hist[S.hist.length-1],false);
+}
 function irScan(){document.getElementById('err-panel').classList.remove('on');document.getElementById('btn-extraer').style.display='none';document.getElementById('file-prev').innerHTML='';S.pendFiles=[];go('scan');}
 var _tt;
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(function(){t.classList.remove('show');},2600);}
@@ -3458,7 +3466,21 @@ function abrirInter(id){S.cur=S.intervs.find(function(i){return i.id===id;})||nu
 function nuevaInter(){
   S.cur={id:Date.now()+'',estado:'borrador',fecha:new Date().toISOString().slice(0,10),hora:'',pac:'',edad:'',sexo:'',dni:'',peso:'',ciru:'',serv:'',diag:'',san:'Hospital Aeronáutico',sala:'',cama:'',mayo_sector:'',mayo_cama:'',mayo_quir:'',mayo_tipociru:'',mayo_posicion:'',obra:'',afil:'',docs:{},ob:false,env:true,pracs:[],foja:{drogas:[],vitals:[]}};
   S.vitals=[];document.getElementById('ia-badge').style.display='none';
-  cargarForm(S.cur);go('nueva');
+  cargarForm(S.cur);
+  // Limpiar campos de foja que no resetea cargarForm
+  ['fj-asa','fj-via','fj-ind','fj-fin','fj-tec-tipo','fj-tec-subtipo',
+   'fj-premed','fj-metodos','fj-recup','fj-obs','fj-materiales',
+   'fj-suero','fj-sangre','fj-plasma','fj-otro',
+   'fj-fluido1','fj-fluido2','fj-orina','fj-sangrado',
+   'fj-mayo-quir','fj-hint','fj-hext'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  var droList=document.getElementById('drogas-list');if(droList)droList.innerHTML='';
+  var droSug=document.getElementById('drogas-sugeridas');if(droSug){droSug.innerHTML='';droSug.style.display='none';}
+  var premedSel=document.getElementById('premed-selects');if(premedSel)premedSel.innerHTML='';
+  var metExtra=document.getElementById('metodos-extra');if(metExtra){metExtra.innerHTML='';metExtra.style.display='none';}
+  var metipoSel=document.getElementById('metodos-tipo-sel');if(metipoSel)metipoSel.value='';
+  go('nueva');
 }
 function sv(id,v){var e=document.getElementById(id);if(e)e.value=v||'';}
 function gv(id){var e=document.getElementById(id);return e?e.value:'';}
