@@ -535,13 +535,12 @@ select.fi option{background:var(--bg2)}
         </div>
       </div>
 
-      <div class="g2" style="margin-top:10px">
-        <div class="field"><label>Balance — Fluido 1</label><input class="fi" type="text" id="fj-fluido1" placeholder="ClNa 1000ml"></div>
-        <div class="field"><label>Balance — Fluido 2</label><input class="fi" type="text" id="fj-fluido2" placeholder="ClNa 500ml"></div>
-      </div>
-      <div class="g2">
-        <div class="field"><label>Orina (diuresis)</label><input class="fi" type="text" id="fj-orina" placeholder="200ml"></div>
-        <div class="field"><label>Sangrado</label><input class="fi" type="text" id="fj-sangrado" placeholder="50ml"></div>
+      <!-- Campos ocultos — datos guardados desde card Fluidos -->
+      <div style="display:none">
+        <input type="text" id="fj-fluido1">
+        <input type="text" id="fj-fluido2">
+        <input type="text" id="fj-orina">
+        <input type="text" id="fj-sangrado">
       </div>
       <button class="btn btn-b" style="margin-top:10px;width:100%" onclick="go('geclisa')">&#127973; Ver Guía GECLISA completa</button>
       </div><!-- /mayo-helper-body -->
@@ -3557,6 +3556,15 @@ function guardarFoja(){guardarFojaVG();
     S.cur.foja.nivel_regional=_gv('fj-nivel-regional');
     S.cur.foja.obs_geclisa=_gv('fj-obs-geclisa');
     S.cur.foja.materiales=_gv('fj-materiales');
+    // Combinar fluidos inteligentes en fluido1/fluido2
+    var _flu=[];
+    var _sue=gv('fj-suero'),_san=gv('fj-sangre'),_pla=gv('fj-plasma'),_otr=gv('fj-otro');
+    if(_sue)_flu.push('Suero '+_sue);
+    if(_san&&_san!=='0 ml')_flu.push('Sangre '+_san);
+    if(_pla&&_pla!=='0 ml')_flu.push('Plasma '+_pla);
+    if(_otr&&_otr!=='0 ml')_flu.push('Otro '+_otr);
+    var _f1=document.getElementById('fj-fluido1');if(_f1&&_flu.length)_f1.value=_flu[0]||'';
+    var _f2=document.getElementById('fj-fluido2');if(_f2&&_flu.length>1)_f2.value=_flu.slice(1).join('. ')||'';
     S.cur.foja.fluido1=_gv('fj-fluido1');
     S.cur.foja.fluido2=_gv('fj-fluido2');
     S.cur.foja.orina=_gv('fj-orina');
