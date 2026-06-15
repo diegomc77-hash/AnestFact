@@ -600,33 +600,19 @@ select.fi option{background:var(--bg2)}
     <div class="ct">Recuperación</div>
     <div class="field" style="margin-bottom:10px">
       <label>Escala de Aldrete</label>
-      <div style="display:flex;flex-wrap:wrap;gap:6px" id="aldrete-chips">
-        <button class="chip" onclick="setAldrete('1')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">1/10</button><button class="chip" onclick="setAldrete('2')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">2/10</button><button class="chip" onclick="setAldrete('3')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">3/10</button><button class="chip" onclick="setAldrete('4')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">4/10</button><button class="chip" onclick="setAldrete('5')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">5/10</button><button class="chip" onclick="setAldrete('6')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">6/10</button><button class="chip" onclick="setAldrete('7')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">7/10</button><button class="chip" onclick="setAldrete('8')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">8/10</button><button class="chip" onclick="setAldrete('9')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">9/10</button><button class="chip" onclick="setAldrete('10')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">10/10</button>
+      <div id="aldrete-chips">
+        <select class="fi" onchange="if(this.value)setAldrete(this.value)">
+          <option value="">— Puntaje Aldrete —</option>
+          <option value="1">1/10</option><option value="2">2/10</option>
+          <option value="3">3/10</option><option value="4">4/10</option>
+          <option value="5">5/10</option><option value="6">6/10</option>
+          <option value="7">7/10</option><option value="8">8/10</option>
+          <option value="9">9/10</option><option value="10">10/10</option>
+        </select>
       </div>
       <input class="fi" type="text" id="fj-aldrete" placeholder="Aldrete .../10" style="margin-top:8px" readonly>
     </div>
-    <div class="field" style="margin-bottom:10px">
-      <label>Destino post-operatorio</label>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">
-        <button class="chip" onclick="setDestino('URPA')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">URPA</button>
-        <button class="chip" onclick="setDestino('UTI')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">UTI</button>
-        <button class="chip" onclick="setDestino('UCI')" style="border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">UCI</button>
-      </div>
-    </div>
-    <div id="destino-extra" style="display:none;margin-bottom:10px">
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">
-        <button class="chip" onclick="setDestinoExtra('extubado')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Extubado/a</button>
-        <button class="chip" onclick="setDestinoExtra('intubado')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Intubado/a</button>
-      </div>
-      <div id="intubado-extra" style="display:none;margin-bottom:6px">
-        <div style="display:flex;flex-wrap:wrap;gap:6px">
-          <button class="chip" onclick="setARM('ARM')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">En ARM</button>
-          <button class="chip" onclick="setARM('sinARM')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Sin ARM</button>
-          <button class="chip" onclick="setInotrop('con')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Con inotrópicos</button>
-          <button class="chip" onclick="setInotrop('sin')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Sin inotrópicos</button>
-        </div>
-      </div>
-    </div>
+    <div id="recup-selects" style="margin-bottom:10px"></div>
     <div class="chips" id="recup-chips" style="margin-bottom:8px"></div>
     <div class="fr" style="align-items:flex-start">
       <textarea class="fi" id="fj-recup" placeholder="Observaciones adicionales de recuperación..."></textarea>
@@ -3297,6 +3283,43 @@ function renderPesoChips(){
     cont.appendChild(wrap);
   });
 }
+function renderRecupSelects(){
+  var cont=document.getElementById('recup-selects');
+  if(!cont)return;
+  cont.innerHTML='';
+  var grupos=[
+    {t:'Destino',campo:'_destino',items:['URPA','UTI','UCI','Sala general','Alta domiciliaria']},
+    {t:'Vía aérea al egreso',campo:'_viaEgreso',items:['Extubado/a','Intubado/a','Máscara laríngea retirada','Sin dispositivo']},
+    {t:'SpO₂ al egreso',campo:'_spo2',items:['SpO₂ 99%','SpO₂ 98%','SpO₂ 97%','SpO₂ 96%','SpO₂ 95%','SpO₂ <95% - requiere O₂ suplementario']},
+    {t:'Estado neurológico',campo:'_neuro',items:['Despierto/a y orientado/a','Somnoliento/a pero reactivo/a','Sin despertar']},
+    {t:'Hemodinamia',campo:'_hemo',items:['Hemodinámicamente estable','Requiere Efedrina EV','Requiere Noradrenalina EV','Requiere Dopamina EV','Hipertenso/a','Bradicárdico/a - requiere Atropina']},
+    {t:'Analgesia post-operatoria',campo:'_anal',items:['Ketorolac 30mg EV','Diclofenac 75mg EV','Paracetamol 1g EV','Morfina 2mg EV','Tramadol 100mg EV','Dipirona 1g EV','Sin analgesia adicional']},
+    {t:'Antieméticos',campo:'_ahem',items:['Ondansetrón 8mg EV','Metoclopramida 10mg EV','Sin antieméticos']}
+  ];
+  grupos.forEach(function(g){
+    var row=document.createElement('div');
+    row.style.marginBottom='6px';
+    var sel=document.createElement('select');
+    sel.className='fi';
+    sel.style.fontSize='12px';
+    var opt0=document.createElement('option');
+    opt0.value='';opt0.textContent=g.t+' — elegir...';
+    sel.appendChild(opt0);
+    g.items.forEach(function(it){
+      var op=document.createElement('option');
+      op.value=it;op.textContent=it;sel.appendChild(op);
+    });
+    (function(campo){
+      sel.onchange=function(){
+        if(!sel.value)return;
+        window[campo]=sel.value;
+        actualizarRecup();
+      };
+    })(g.campo);
+    row.appendChild(sel);
+    cont.appendChild(row);
+  });
+}
 function renderRecupChips(){
   var c=document.getElementById('recup-chips');if(!c)return;
   c.innerHTML=RECUP_DRUGS.slice(0,12).map(function(r){return'<span class="chip" onclick="addChipTo(\'fj-recup\',\''+r.replace(/'/g,"\\'")+'\')">'+(r.length>28?r.slice(0,26)+'…':r)+'</span>';}).join('');
@@ -3370,7 +3393,7 @@ function go(id,addH){
   if(addH)S.hist.push(id);
   document.getElementById('back-btn').style.display=S.hist.length>1?'block':'none';
   document.getElementById('t-title').textContent=TITLES[id]||'AnesFact v5';
-  if(id==='home')renderHome();
+  if(id==='home')renderHome();if(id==='foja')renderRecupSelects();
   if(id==='resumen')renderResumen();
   if(id==='foja'){cargarFojaUI();setTimeout(initSign,80);renderPesoChips();renderRecupChips();renderFojaPorSanatorio();}
   if(id==='geclisa'){window._geclisaTexto='';renderGeclisa();}
@@ -3379,9 +3402,10 @@ function go(id,addH){
 }
 function goBack(){
   if(S.hist.length<=1)return;
-  var cur=S.hist[S.hist.length-1];
-  if(cur==='foja'&&S.cur){try{guardarFoja();}catch(e){}}
-  S.hist.pop();go(S.hist[S.hist.length-1],false);
+  try{var cur=S.hist[S.hist.length-1];if(cur==='foja'&&S.cur)guardarFoja();}catch(e){}
+  S.hist.pop();
+  var dest=S.hist[S.hist.length-1]||'home';
+  go(dest,false);
 }
 function irScan(){document.getElementById('err-panel').classList.remove('on');document.getElementById('btn-extraer').style.display='none';document.getElementById('file-prev').innerHTML='';S.pendFiles=[];go('scan');}
 var _tt;
@@ -3476,7 +3500,7 @@ function renderHome(){
 function abrirInter(id){S.cur=S.intervs.find(function(i){return i.id===id;})||null;if(S.cur){S.vitals=S.cur.foja&&S.cur.foja.vitals||[];cargarForm(S.cur);document.getElementById('ia-badge').style.display='none';go('nueva');}}
 function nuevaInter(){
   S.cur={id:Date.now()+'',estado:'borrador',fecha:new Date().toISOString().slice(0,10),hora:'',pac:'',edad:'',sexo:'',dni:'',peso:'',ciru:'',serv:'',diag:'',san:'Hospital Aeronáutico',sala:'',cama:'',mayo_sector:'',mayo_cama:'',mayo_quir:'',mayo_tipociru:'',mayo_posicion:'',obra:'',afil:'',docs:{},ob:false,env:true,pracs:[],foja:{drogas:[],vitals:[]}};
-  S.vitals=[];document.getElementById('ia-badge').style.display='none';
+  S.vitals=[];_aldrete='';_destino='';_viaEgreso='';_spo2='';_neuro='';_hemo='';_anal='';_ahem='';document.getElementById('ia-badge').style.display='none';
   cargarForm(S.cur);
   // Limpiar campos de foja que no resetea cargarForm
   ['fj-asa','fj-via','fj-ind','fj-fin','fj-tec-tipo','fj-tec-subtipo',
@@ -4506,15 +4530,25 @@ function actualizarMetodos(){
 
 // === RECUPERACIÓN ALDRETE + DESTINO ===
 var _aldrete='',_destino='',_destinoExtra='',_arm='',_inotrop='';
+var _viaEgreso='',_spo2='',_neuro='',_hemo='',_anal='',_ahem='';
 function setAldrete(val){_aldrete=val;var inp=document.getElementById('fj-aldrete');if(inp)inp.value='Aldrete '+val+'/10';document.querySelectorAll('#aldrete-chips .chip').forEach(function(b){b.style.background='var(--bg3)';b.style.borderColor='var(--border)';b.style.color='var(--text)';});if(event&&event.target){event.target.style.background='rgba(29,185,84,.15)';event.target.style.borderColor='var(--green)';event.target.style.color='var(--green)';}actualizarRecup();}
 function setDestino(val){_destino=val;_destinoExtra='';_arm='';_inotrop='';var extra=document.getElementById('destino-extra');var intoExtra=document.getElementById('intubado-extra');if(extra)extra.style.display=(val==='UTI'||val==='UCI')?'block':'none';if(intoExtra)intoExtra.style.display='none';actualizarRecup();}
 function setDestinoExtra(val){_destinoExtra=val;_arm='';_inotrop='';var intoExtra=document.getElementById('intubado-extra');if(intoExtra)intoExtra.style.display=(val==='intubado')?'block':'none';actualizarRecup();}
 function setARM(val){_arm=val;actualizarRecup();}
 function setInotrop(val){_inotrop=val;actualizarRecup();}
-function actualizarRecup(){var ta=document.getElementById('fj-recup');if(!ta)return;var txt='';if(_aldrete)txt+='Aldrete '+_aldrete+'/10. ';if(_destino){txt+='Pasa a '+_destino;if(_destinoExtra){txt+=' '+(_destinoExtra==='intubado'?'intubado/a':'extubado/a');if(_destinoExtra==='intubado'&&_arm){txt+=', '+(_arm==='ARM'?'en ARM':'sin ARM');if(_inotrop)txt+=', '+(_inotrop==='con'?'con inotr\u00f3picos':'sin inotr\u00f3picos');}}txt+='. ';}ta.value=txt.trim();}
-
-// === ANTECEDENTES MAYO ===
-var _antecedentes=[];
+function actualizarRecup(){
+  var partes=[];
+  if(_aldrete)partes.push('Aldrete '+_aldrete+'/10');
+  if(_destino)partes.push('Pasa a '+_destino);
+  if(_viaEgreso)partes.push(_viaEgreso);
+  if(_spo2)partes.push(_spo2);
+  if(_neuro)partes.push(_neuro);
+  if(_hemo)partes.push(_hemo);
+  if(_anal)partes.push(_anal);
+  if(_ahem)partes.push(_ahem);
+  var recup=document.getElementById('fj-recup');
+  if(recup)recup.value=partes.join('. ')+(partes.length?'.':'');
+}
 function toggleAntec(btn,val){var idx=_antecedentes.indexOf(val);if(idx>=0){_antecedentes.splice(idx,1);btn.style.background='var(--bg3)';btn.style.borderColor='var(--border)';btn.style.color='var(--text)';}else{_antecedentes.push(val);btn.style.background='rgba(29,185,84,.15)';btn.style.borderColor='var(--green)';btn.style.color='var(--green)';}var ta=document.getElementById('fj-obs-geclisa');if(ta){var extra=ta.value.replace(/^Antecedentes:[^.]*\.\s*/,'');ta.value=(_antecedentes.length?'Antecedentes: '+_antecedentes.join(', ')+'. ':'')+extra;}}
 
 // === GENERADOR DE CURVA DE SIGNOS VITALES ===
