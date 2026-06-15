@@ -697,6 +697,17 @@ select.fi option{background:var(--bg2)}
 // STATE
 // ═══════════════════════════════════════════════════
 var S={intervs:[],cur:null,hist:['home'],recog:null,recField:null,pendFiles:[],key:'',signData:null,vitals:[]};
+
+// Ping silencioso a Supabase para evitar pausa por inactividad
+(function(){
+  try{
+    var _px=new XMLHttpRequest();
+    _px.open('GET','https://xntvibfsuubedplptvzs.supabase.co/rest/v1/anesfact_datos?select=clave&limit=1',true);
+    _px.setRequestHeader('apikey','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhudHZpYmZzdXViZWRwbHB0dnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNDk2MjgsImV4cCI6MjA5NTkyNTYyOH0.9SaZdO7knkzSREyaUfoOX8nanid9AQwlNbY5VudWcws');
+    _px.setRequestHeader('Authorization','Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhudHZpYmZzdXViZWRwbHB0dnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNDk2MjgsImV4cCI6MjA5NTkyNTYyOH0.9SaZdO7knkzSREyaUfoOX8nanid9AQwlNbY5VudWcws');
+    _px.send();
+  }catch(e){}
+})();
 try{S.intervs=JSON.parse(localStorage.getItem('af_i')||'[]');}catch(e){}
 S.key=localStorage.getItem('af_k')||'';
   if(S.key){var _ke=document.getElementById('cfg-key');if(_ke)_ke.value=S.key;}actualizarKeyStatus();
