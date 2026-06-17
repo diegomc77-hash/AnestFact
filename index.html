@@ -368,8 +368,6 @@ select.fi option{background:var(--bg2)}
         <label>Espacio intervertebral</label>
         <select class="fi" id="fj-tec-espacio" onchange="tecNivel4Check()">
           <option value="">Seleccionar...</option>
-          <option>L2-L3</option><option>L3-L4</option><option>L4-L5</option>
-          <option>T11-T12</option><option>T12-L1</option>
         </select>
       </div>
       <!-- Lateralidad (solo bloqueos periféricos) -->
@@ -4709,7 +4707,8 @@ var TEC_OPCIONES = {
           'Bloqueo Erector de la Espina - ESP Block (cirug\u00eda tor\u00e1cica, mamaria o espinal)',
           'Bloqueo PECS I y II (cirug\u00eda mamaria y axilar)',
           'Bloqueo Serrato-Intercostal - BRILMA / Serratus Plane (t\u00f3rax anterolateral)',
-          'Bloqueo Cuadrado Lumbar - QL Block (analgesia abdominal profunda y cadera)'
+          'Bloqueo Cuadrado Lumbar - QL Block (analgesia abdominal profunda y cadera)',
+          'Bloqueo de la Vaina del Recto (analgesia línea media abdominal)'
         ]
       }
     }
@@ -4817,8 +4816,24 @@ function tecNivel4Activar(tipo){
   var wrap=document.getElementById('tec-nivel4-wrap');
   wrap.style.display='block';
   var esNeuroaxial=(tipo==='neuroaxial');
-  // Espacio intervertebral — solo neuroaxial
+  // Espacio intervertebral — solo neuroaxial, opciones según subtipo
   document.getElementById('tec-espacio-wrap').style.display=esNeuroaxial?'block':'none';
+  if(esNeuroaxial){
+    var subtipo2=document.getElementById('fj-tec-subtipo').value||'';
+    var selEsp=document.getElementById('fj-tec-espacio');
+    selEsp.innerHTML='<option value="">Seleccionar...</option>';
+    var espacios=[];
+    if(subtipo2.indexOf('pidural')>=0||subtipo2.indexOf('at\u00e9ter')>=0||subtipo2.indexOf('CSE')>=0||subtipo2.indexOf('ombinada')>=0){
+      // Peridural o Combinada: T3-T4 hasta L4-L5
+      espacios=['T3-T4','T4-T5','T5-T6','T6-T7','T7-T8','T8-T9','T9-T10','T10-T11','T11-T12','T12-L1','L1-L2','L2-L3','L3-L4','L4-L5'];
+    } else {
+      // Raquídea subaracnoidea: T11-T12 hasta L4-L5
+      espacios=['T11-T12','T12-L1','L1-L2','L2-L3','L3-L4','L4-L5'];
+    }
+    espacios.forEach(function(e){
+      var op=document.createElement('option');op.value=e;op.textContent=e;selEsp.appendChild(op);
+    });
+  }
   // Lateralidad — solo bloqueos periféricos
   document.getElementById('tec-lateral-wrap').style.display=esNeuroaxial?'none':'block';
   // Guía — siempre
