@@ -41,7 +41,36 @@ function getClave(){
       if(/^\d{7,9}$/.test(v))return v;
     }
   }catch(e){}
+  // Intentar con apellido+nombre visible en la foja
+  try{
+    var ap=D.getElementById('8027');
+    var nm=D.getElementById('8028');
+    var fe=D.getElementById('8058');
+    if(ap&&ap.value){
+      var nom=(ap.value+'_'+(nm?nm.value:'')).trim().replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'').slice(0,20);
+      var fec=(fe&&fe.value?fe.value.replace(/\//g,''):'');
+      if(nom)return nom+(fec?'_'+fec:'');
+    }
+  }catch(e){}
   return 'ultimo';
+}
+
+function verificarPaciente(d){
+  // Verificar que los datos son del paciente correcto antes de pegar
+  try{
+    var apEl=D.getElementById('8027');
+    var apGeclisa=(apEl?apEl.value:'').toLowerCase().trim();
+    var apAnesfact=(d.apellido||'').toLowerCase().trim();
+    if(apGeclisa&&apAnesfact&&apGeclisa.length>2&&apAnesfact.length>2){
+      // Comparar primer apellido
+      var ap1=apGeclisa.split(/\s+/)[0];
+      var ap2=apAnesfact.split(/[\s,]+/)[0];
+      if(ap1&&ap2&&ap1!==ap2&&ap2.indexOf(ap1)<0&&ap1.indexOf(ap2)<0){
+        return confirm('⚠️ ATENCIÓN\nDatos guardados: '+d.apellido+'\nPaciente en GECLISA: '+(apEl?apEl.value:'')+'\n\n¿Los datos son correctos? Presioná Cancelar para NO rellenar.');
+      }
+    }
+  }catch(e){}
+  return true;
 }
 
 // XHR compatible con HTTP (sin bloqueo Mixed Content)
@@ -78,6 +107,7 @@ function cargarDatos(k){
     }
     try{
       var d=JSON.parse(rows[0].datos);
+      if(!verificarPaciente(d)){rmToast();return;}
       toast.textContent='\u2705 Rellenando foja...';
       setTimeout(rmToast,2500);
       rellenar(d);

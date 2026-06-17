@@ -361,6 +361,45 @@ select.fi option{background:var(--bg2)}
       </select>
     </div>
 
+    <!-- Campos adicionales para bloqueos regionales -->
+    <div id="tec-nivel4-wrap" style="display:none">
+      <!-- Espacio de abordaje (solo neuroaxial) -->
+      <div class="field" id="tec-espacio-wrap" style="display:none">
+        <label>Espacio intervertebral</label>
+        <select class="fi" id="fj-tec-espacio" onchange="tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+          <option>L2-L3</option><option>L3-L4</option><option>L4-L5</option>
+          <option>T11-T12</option><option>T12-L1</option>
+        </select>
+      </div>
+      <!-- Lateralidad (solo bloqueos periféricos) -->
+      <div class="field" id="tec-lateral-wrap" style="display:none">
+        <label>Lateralidad</label>
+        <select class="fi" id="fj-tec-lateral" onchange="tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+          <option>Derecho</option><option>Izquierdo</option><option>Bilateral</option>
+        </select>
+      </div>
+      <!-- Guía de localización (siempre) -->
+      <div class="field" id="tec-guia-wrap" style="display:none">
+        <label>Guía de localización</label>
+        <select class="fi" id="fj-tec-guia" onchange="tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+          <option>Ultrasonografía (Ecoguiado)</option>
+          <option>Neuroestimulación</option>
+          <option>Referencias anatómicas (A ciegas)</option>
+          <option>Combinada (Ultrasonografía + Neuroestimulación)</option>
+        </select>
+      </div>
+      <!-- Resultado clínico (varía) -->
+      <div class="field" id="tec-resultado-wrap" style="display:none">
+        <label>Resultado clínico</label>
+        <select class="fi" id="fj-tec-resultado" onchange="tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
+    </div>
+
     <!-- Campo oculto que guarda el valor final -->
     <input type="hidden" id="fj-tec" value="">
 
@@ -4230,7 +4269,11 @@ function abrirGeclisa(){
   if(document.getElementById('f-pac'))guardar();
   i=S.cur;f=(i&&i.foja)||{};
   var parts=(i.pac||'').split(',');
-  var clave=(i.dni||'').trim().replace(/^0+/,'').replace(/\s+/g,'_')||'ultimo';
+  // Clave: DNI sin ceros, sino nombre+fecha, nunca 'ultimo'
+  var _dni=(i.dni||'').trim().replace(/^0+/,'').replace(/\s+/g,'');
+  var _nom=(i.pac||'').trim().replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'').slice(0,20);
+  var _fec=(i.fecha||new Date().toISOString().slice(0,10)).replace(/-/g,'');
+  var clave=_dni||(_nom?_nom+'_'+_fec:'sin_id_'+_fec);
   var payload={
     apellido:(parts[0]||'').trim().toUpperCase(),
     nombre:(parts[1]||'').trim().toUpperCase(),
@@ -4758,15 +4801,81 @@ function tecSetFinal(val){
   var res = document.getElementById('tec-resumen');
   document.getElementById('tec-resumen-txt').textContent = '✓ ' + val;
   res.style.display = 'block';
-  // Auto-fill metodos if empty
-  var metodos = document.getElementById('fj-metodos');
-  if(metodos && !metodos.value) metodos.value = val;
+  // Activar nivel4 si es bloqueo regional
+  var tipo = document.getElementById('fj-tec-tipo').value;
+  if(tipo==='neuroaxial'||tipo==='bloqueo'){
+    tecNivel4Activar(tipo);
+  } else {
+    document.getElementById('tec-nivel4-wrap').style.display='none';
+    // Auto-fill metodos si no es regional
+    var metodos = document.getElementById('fj-metodos');
+    if(metodos && !metodos.value) metodos.value = val;
+  }
+}
+
+function tecNivel4Activar(tipo){
+  var wrap=document.getElementById('tec-nivel4-wrap');
+  wrap.style.display='block';
+  var esNeuroaxial=(tipo==='neuroaxial');
+  // Espacio intervertebral — solo neuroaxial
+  document.getElementById('tec-espacio-wrap').style.display=esNeuroaxial?'block':'none';
+  // Lateralidad — solo bloqueos periféricos
+  document.getElementById('tec-lateral-wrap').style.display=esNeuroaxial?'none':'block';
+  // Guía — siempre
+  document.getElementById('tec-guia-wrap').style.display='block';
+  // Resultado clínico — opciones según tipo
+  var selRes=document.getElementById('fj-tec-resultado');
+  selRes.innerHTML='<option value="">Seleccionar...</option>';
+  var opts=esNeuroaxial
+    ?['T4','T6','T8','T10','T12','L1']
+    :['Bloqueo sensitivo completo','Bloqueo sensitivo parcial','Bloqueo no satisfactorio'];
+  opts.forEach(function(o){
+    var op=document.createElement('option');op.value=o;op.textContent=o;selRes.appendChild(op);
+  });
+  document.getElementById('tec-resultado-wrap').style.display='block';
+  // Limpiar selects
+  ['fj-tec-espacio','fj-tec-lateral','fj-tec-guia','fj-tec-resultado'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+}
+
+function tecNivel4Check(){
+  // Verificar si todos los campos requeridos están completos
+  var tipo=document.getElementById('fj-tec-tipo').value;
+  var esNeuroaxial=(tipo==='neuroaxial');
+  var espacio=document.getElementById('fj-tec-espacio').value;
+  var lateral=document.getElementById('fj-tec-lateral').value;
+  var guia=document.getElementById('fj-tec-guia').value;
+  var resultado=document.getElementById('fj-tec-resultado').value;
+  if(!guia||!resultado)return;
+  if(esNeuroaxial&&!espacio)return;
+  if(!esNeuroaxial&&!lateral)return;
+  // Generar texto narrativo
+  var subtipo=document.getElementById('fj-tec-subtipo').value||document.getElementById('fj-tec').value||'';
+  var bloqueo=document.getElementById('fj-tec-bloqueo')?document.getElementById('fj-tec-bloqueo').value:'';
+  var txt='';
+  if(esNeuroaxial){
+    txt='Se realiza procedimiento bajo anestesia regional de tipo '+subtipo+'. '
+      +'Mediante guía por '+guia+', se efectúa punción en el espacio intervertebral '+espacio+', '
+      +'constatando el correcto posicionamiento. '
+      +'Tras la administración del fármaco, se comprueba nivel sensitivo máximo alcanzado en el dermatoma '+resultado+'.';
+  } else {
+    var nombre=bloqueo||subtipo||'bloqueo nervioso periférico';
+    txt='Se realiza procedimiento bajo anestesia regional de tipo Bloqueo de Nervio Periférico. '
+      +'Bajo guía por '+guia+' en tiempo real, se identifica la estructura diana para proceder al '
+      +nombre+' de localización '+lateral+'. '
+      +'Se realiza el depósito del anestésico local sin incidentes, constatando un '
+      +resultado+' previo al inicio de la cirugía.';
+  }
+  var metodos=document.getElementById('fj-metodos');
+  if(metodos)metodos.value=txt;
 }
 
 function tecLimpiar(){
   document.getElementById('fj-tec-tipo').value = '';
   document.getElementById('tec-nivel2-wrap').style.display = 'none';
   document.getElementById('tec-nivel3-wrap').style.display = 'none';
+  document.getElementById('tec-nivel4-wrap').style.display = 'none';
   document.getElementById('tec-resumen').style.display = 'none';
   document.getElementById('fj-tec').value = '';
 }
