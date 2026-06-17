@@ -335,7 +335,7 @@ select.fi option{background:var(--bg2)}
     <!-- Nivel 1: Tipo principal -->
     <div class="field">
       <label>Tipo de anestesia</label>
-      <select class="fi" id="fj-tec-tipo" onchange="tecNivel1();_sugerirDrogasPorTec(this.value);calcPremed()">
+      <select class="fi" id="fj-tec-tipo" onchange="tecNivel1();_sugerirDrogasPorTec(this.value);calcPremed(true)">
         <option value="">Seleccionar...</option>
         <option value="general">Anestesia General</option>
         <option value="neuroaxial">Anestesia Regional Neuroaxial</option>
@@ -348,7 +348,7 @@ select.fi option{background:var(--bg2)}
     <!-- Nivel 2: Subtipo -->
     <div class="field" id="tec-nivel2-wrap" style="display:none">
       <label id="tec-nivel2-label">Subtipo</label>
-      <select class="fi" id="fj-tec-subtipo" onchange="tecNivel2();_sugerirDrogasPorTec(this.value||document.getElementById('fj-tec-tipo').value);calcPremed()">
+      <select class="fi" id="fj-tec-subtipo" onchange="tecNivel2();_sugerirDrogasPorTec(this.value||document.getElementById('fj-tec-tipo').value);calcPremed(true)">
         <option value="">Seleccionar...</option>
       </select>
     </div>
@@ -869,7 +869,7 @@ var PREMED_CHIPS=['Midazolam 2mg EV','Midazolam 1mg EV','Atropina 0.5mg EV','Cef
 // ═══════════════════════════════════════════════════
 // PREMEDICACIÓN INTELIGENTE
 // ═══════════════════════════════════════════════════
-function calcPremed(){
+function calcPremed(silencioso){
   // 1. LEER DATOS (solo lectura, sin modificar nada externo)
   var pesoEl=document.getElementById('f-peso');
   var peso=parseFloat((S.cur&&S.cur.peso)||(pesoEl?pesoEl.value:0)||0);
@@ -880,7 +880,7 @@ function calcPremed(){
   var ciru=((S.cur&&S.cur.ciru)||'').toLowerCase();
   var diagCiru=diag+' '+ciru;
 
-  if(!peso||peso<=0){alert('Ingresá el peso del paciente primero.');return;}
+  if(!peso||peso<=0){if(!silencioso)alert('Ingresá el peso del paciente primero.');return;}
 
   // 2. TIPO DE ANESTESIA
   var esGeneral  = tecTipo==='general';
@@ -4530,6 +4530,7 @@ function actualizarMetodos(){
 
 // === RECUPERACIÓN ALDRETE + DESTINO ===
 var _aldrete='',_destino='',_destinoExtra='',_arm='',_inotrop='';
+var _antecedentes=[];
 var _viaEgreso='',_spo2='',_neuro='',_hemo='',_anal='',_ahem='';
 function setAldrete(val){_aldrete=val;var inp=document.getElementById('fj-aldrete');if(inp)inp.value='Aldrete '+val+'/10';document.querySelectorAll('#aldrete-chips .chip').forEach(function(b){b.style.background='var(--bg3)';b.style.borderColor='var(--border)';b.style.color='var(--text)';});if(event&&event.target){event.target.style.background='rgba(29,185,84,.15)';event.target.style.borderColor='var(--green)';event.target.style.color='var(--green)';}actualizarRecup();}
 function setDestino(val){_destino=val;_destinoExtra='';_arm='';_inotrop='';var extra=document.getElementById('destino-extra');var intoExtra=document.getElementById('intubado-extra');if(extra)extra.style.display=(val==='UTI'||val==='UCI')?'block':'none';if(intoExtra)intoExtra.style.display='none';actualizarRecup();}
