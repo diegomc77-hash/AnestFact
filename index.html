@@ -366,7 +366,7 @@ select.fi option{background:var(--bg2)}
       <!-- Espacio de abordaje (solo neuroaxial) -->
       <div class="field" id="tec-espacio-wrap" style="display:none">
         <label>Espacio intervertebral</label>
-        <select class="fi" id="fj-tec-espacio" onchange="tecNivel4Check()">
+        <select class="fi" id="fj-tec-espacio" onchange="tecActualizarDermatomas();tecNivel4Check()">
           <option value="">Seleccionar...</option>
         </select>
       </div>
@@ -4852,6 +4852,37 @@ function tecNivel4Activar(tipo){
   ['fj-tec-espacio','fj-tec-lateral','fj-tec-guia','fj-tec-resultado'].forEach(function(id){
     var el=document.getElementById(id);if(el)el.value='';
   });
+}
+
+function tecActualizarDermatomas(){
+  var espacio=document.getElementById('fj-tec-espacio').value;
+  var selRes=document.getElementById('fj-tec-resultado');
+  if(!selRes||!espacio)return;
+  var tipo=document.getElementById('fj-tec-tipo').value;
+  if(tipo!=='neuroaxial')return;
+  // Matriz de dermatomas según espacio
+  var matriz={
+    'T3-T4':['T2','T4','T6'],
+    'T4-T5':['T2','T4','T6'],
+    'T5-T6':['T2','T4','T6'],
+    'T6-T7':['T4','T6','T8','T10'],
+    'T7-T8':['T4','T6','T8','T10'],
+    'T8-T9':['T4','T6','T8','T10'],
+    'T9-T10':['T6','T8','T10','T12'],
+    'T10-T11':['T6','T8','T10','T12'],
+    'T11-T12':['T6','T8','T10','T12'],
+    'T12-L1':['T8','T10','T12','L1'],
+    'L1-L2':['T8','T10','T12','L1'],
+    'L2-L3':['T6','T8','T10','T12','L1'],
+    'L3-L4':['T10','T12','L1','L2','L3'],
+    'L4-L5':['T12','L1','L2','L3','L4','L5']
+  };
+  var opts=matriz[espacio]||[];
+  selRes.innerHTML='<option value="">Seleccionar dermatoma...</option>';
+  opts.forEach(function(d){
+    var op=document.createElement('option');op.value=d;op.textContent=d;selRes.appendChild(op);
+  });
+  selRes.value='';
 }
 
 function tecNivel4Check(){
