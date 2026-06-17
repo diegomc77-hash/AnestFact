@@ -335,7 +335,7 @@ select.fi option{background:var(--bg2)}
     <!-- Nivel 1: Tipo principal -->
     <div class="field">
       <label>Tipo de anestesia</label>
-      <select class="fi" id="fj-tec-tipo" onchange="tecNivel1();_sugerirDrogasPorTec(this.value)">
+      <select class="fi" id="fj-tec-tipo" onchange="tecNivel1();_sugerirDrogasPorTec(this.value);calcPremed()">
         <option value="">Seleccionar...</option>
         <option value="general">Anestesia General</option>
         <option value="neuroaxial">Anestesia Regional Neuroaxial</option>
@@ -348,7 +348,7 @@ select.fi option{background:var(--bg2)}
     <!-- Nivel 2: Subtipo -->
     <div class="field" id="tec-nivel2-wrap" style="display:none">
       <label id="tec-nivel2-label">Subtipo</label>
-      <select class="fi" id="fj-tec-subtipo" onchange="tecNivel2();_sugerirDrogasPorTec(this.value||document.getElementById('fj-tec-tipo').value)">
+      <select class="fi" id="fj-tec-subtipo" onchange="tecNivel2();_sugerirDrogasPorTec(this.value||document.getElementById('fj-tec-tipo').value);calcPremed()">
         <option value="">Seleccionar...</option>
       </select>
     </div>
