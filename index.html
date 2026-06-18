@@ -378,6 +378,20 @@ select.fi option{background:var(--bg2)}
           <option>Derecho</option><option>Izquierdo</option><option>Bilateral</option>
         </select>
       </div>
+      <!-- Aguja (según subtipo) -->
+      <div class="field" id="tec-aguja-wrap" style="display:none">
+        <label>Tipo de aguja</label>
+        <select class="fi" id="fj-tec-aguja" onchange="tecActualizarCalibres();tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
+      <!-- Calibre (según aguja) -->
+      <div class="field" id="tec-calibre-wrap" style="display:none">
+        <label>Calibre</label>
+        <select class="fi" id="fj-tec-calibre" onchange="tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
       <!-- Guía de localización (siempre) -->
       <div class="field" id="tec-guia-wrap" style="display:none">
         <label>Guía de localización</label>
@@ -467,6 +481,7 @@ select.fi option{background:var(--bg2)}
         <option value="peridural">Peridural</option>
         <option value="localasistida">Local asistida</option>
         <option value="sedacion">Sedación</option>
+        <option value="bloqueo">Bloqueo nervioso periférico</option>
       </select>
     </div>
     <div id="metodos-extra" style="display:none;margin-bottom:8px"></div>
@@ -4332,7 +4347,8 @@ var METODOS_TEXTOS={
   tiva:function(){return 'TIVA (Anestesia Total Intravenosa). Infusi\u00f3n continua de agentes anest\u00e9sicos EV.';},
   peridural:function(){return 'Anestesia peridural. T\u00e9cnica as\u00e9ptica estricta. Cat\u00e9ter peridural.';},
   localasistida:function(){return 'Anestesia local asistida / MAC (Monitoreo Anestesiologico Controlado).';},
-  sedacion:function(){return 'Sedaci\u00f3n consciente. Monitoreo continuo.';}
+  sedacion:function(){return 'Sedación consciente. Monitoreo continuo.';},
+  bloqueo:function(){var a=document.getElementById('metodos-aguja-bloqueo');return 'Bloqueo nervioso periférico.'+(a&&a.value?' '+a.value+'.':'');}
 };
 // ═══════════════════════════════════════════════════
 // DROGAS SUGERIDAS POR TÉCNICA
@@ -4876,6 +4892,25 @@ function tecNivel4Activar(tipo){
   }
   // Lateralidad — solo bloqueos periféricos
   document.getElementById('tec-lateral-wrap').style.display=esNeuroaxial?'none':'block';
+  // Aguja — según subtipo
+  var subtipo3=document.getElementById('fj-tec-subtipo').value||'';
+  var selAguja=document.getElementById('fj-tec-aguja');
+  var agujas=[];
+  if(esNeuroaxial){
+    if(subtipo3.indexOf('pidural')>=0||subtipo3.indexOf('atéter')>=0||subtipo3.indexOf('ombinada')>=0||subtipo3.indexOf('CSE')>=0){
+      agujas=['Tuohy','Crawford'];
+    } else {
+      agujas=['Punta de Lápiz','Cortante (Quincke)'];
+    }
+  } else {
+    agujas=['Aguja Ecogénica','Aguja Estimulable','Aguja de Bisel Corto'];
+  }
+  selAguja.innerHTML='<option value="">Seleccionar...</option>';
+  agujas.forEach(function(a){var op=document.createElement('option');op.value=a;op.textContent=a;selAguja.appendChild(op);});
+  document.getElementById('tec-aguja-wrap').style.display='block';
+  document.getElementById('tec-calibre-wrap').style.display='none';
+  document.getElementById('fj-tec-aguja').value='';
+  document.getElementById('fj-tec-calibre').value='';
   // Guía — siempre
   document.getElementById('tec-guia-wrap').style.display='block';
   // Resultado clínico — opciones según tipo
@@ -4892,6 +4927,29 @@ function tecNivel4Activar(tipo){
   ['fj-tec-espacio','fj-tec-lateral','fj-tec-guia','fj-tec-resultado'].forEach(function(id){
     var el=document.getElementById(id);if(el)el.value='';
   });
+}
+
+function tecActualizarCalibres(){
+  var aguja=document.getElementById('fj-tec-aguja').value;
+  if(!aguja)return;
+  var calibresMap={
+    'Punta de Lápiz':['25G','27G'],
+    'Cortante (Quincke)':['22G','25G','27G'],
+    'Tuohy':['16G','17G','18G'],
+    'Crawford':['16G','17G','18G'],
+    'Aguja Ecogénica':['21G','22G'],
+    'Aguja Estimulable':['21G','22G'],
+    'Aguja de Bisel Corto':['21G','22G']
+  };
+  var calibres=calibresMap[aguja]||[];
+  var selCal=document.getElementById('fj-tec-calibre');
+  selCal.innerHTML='<option value="">Seleccionar calibre...</option>';
+  calibres.forEach(function(c){var op=document.createElement('option');op.value=c;op.textContent=c;selCal.appendChild(op);});
+  selCal.value='';
+  document.getElementById('tec-calibre-wrap').style.display='block';
+  // Actualizar materiales descartables
+  var mat=document.getElementById('fj-materiales');
+  if(mat&&aguja)mat.value=aguja+' (calibre por seleccionar).';
 }
 
 function tecActualizarDermatomas(){
@@ -4925,6 +4983,24 @@ function tecActualizarDermatomas(){
   selRes.value='';
 }
 
+function getDescTecnica(aguja, calibre){
+  var c=calibre||'';
+  if(aguja==='Tuohy'||aguja==='Crawford'){
+    return 'se realiza punción con aguja de tipo '+aguja+' número '+c+', identificando el espacio epidural mediante la técnica de pérdida de resistencia con solución salina/aire, procediendo a la colocación de catéter epidural avanzado sin dificultad';
+  } else if(aguja==='Punta de Lápiz'){
+    return 'se realiza punción lumbar con aguja número '+c+' de tipo Punta de Lápiz, logrando el correcto posicionamiento tras constatar flujo de líquido cefalorraquideo libre, límpido y filante';
+  } else if(aguja==='Cortante (Quincke)'){
+    return 'se realiza punción lumbar con aguja número '+c+' de tipo Cortante (Quincke), orientando el bisel de forma paralela a las fibras longitudinales de la duramadre y constatando el retorno inmediato de líquido cefalorraquideo';
+  } else if(aguja==='Aguja Ecogénica'){
+    return 'bajo guía ecográfica en tiempo real, se avanza aguja de alta ecogenicidad número '+c+', manteniendo la correcta visibilidad de la punta en todo momento hasta posicionarla en el plano diana';
+  } else if(aguja==='Aguja Estimulable'){
+    return 'se introduce aguja aislada número '+c+' conectada a neuroestimulador periférico, buscando la respuesta motora específica con un umbral de intensidad óptimo entre 0.3 y 0.5 mA antes de la inyección';
+  } else if(aguja==='Aguja de Bisel Corto'){
+    return 'se avanza aguja de bisel corto número '+c+' mediante referencias anatómicas de superficie, avanzando con precaución hasta percibir los clics fasciales correspondientes';
+  }
+  return '';
+}
+
 function tecNivel4Check(){
   // Verificar si todos los campos requeridos están completos
   var tipo=document.getElementById('fj-tec-tipo').value;
@@ -4936,25 +5012,42 @@ function tecNivel4Check(){
   if(!guia||!resultado)return;
   if(esNeuroaxial&&!espacio)return;
   if(!esNeuroaxial&&!lateral)return;
-  // Generar texto narrativo
+  var aguja=document.getElementById('fj-tec-aguja')?document.getElementById('fj-tec-aguja').value:'';
+  var calibre=document.getElementById('fj-tec-calibre')?document.getElementById('fj-tec-calibre').value:'';
+  if(!aguja||!calibre)return;
+  var descTec=getDescTecnica(aguja,calibre);
+  // Generar texto narrativo con seguridad médico-legal
   var subtipo=document.getElementById('fj-tec-subtipo').value||document.getElementById('fj-tec').value||'';
   var bloqueo=document.getElementById('fj-tec-bloqueo')?document.getElementById('fj-tec-bloqueo').value:'';
   var txt='';
   if(esNeuroaxial){
-    txt='Se realiza procedimiento bajo anestesia regional de tipo '+subtipo+'. '
-      +'Mediante guía por '+guia+', se efectúa punción en el espacio intervertebral '+espacio+', '
-      +'constatando el correcto posicionamiento. '
-      +'Tras la administración del fármaco, se comprueba nivel sensitivo máximo alcanzado en el dermatoma '+resultado+'.';
+    txt='Bajo estrictas medidas de asepsia y antisepsia, se realiza preparación del campo quirúrgico. '
+      +'Se realiza procedimiento bajo anestesia regional de tipo '+subtipo+'. '
+      +'Mediante guía por '+guia+' en el espacio intervertebral '+espacio+', '+descTec+'. '
+      +'Tras realizar aspiración manual negativa para sangre y líquido cefalorraquideo según la técnica, '
+      +'se procede a la administración del fármaco de forma segura, comprobando posteriormente '
+      +'un nivel sensitivo máximo alcanzado en el dermatoma '+resultado+' con éxito.';
   } else {
     var nombre=bloqueo||subtipo||'bloqueo nervioso periférico';
-    txt='Se realiza procedimiento bajo anestesia regional de tipo Bloqueo de Nervio Periférico. '
-      +'Bajo guía por '+guia+' en tiempo real, se identifica la estructura diana para proceder al '
-      +nombre+' de localización '+lateral+'. '
-      +'Se realiza el depósito del anestésico local sin incidentes, constatando un '
-      +resultado+' previo al inicio de la cirugía.';
+    txt='Bajo estrictas medidas de asepsia y antisepsia, se realiza preparación del campo quirúrgico. '
+      +'Se realiza procedimiento bajo anestesia regional de tipo Bloqueo de Nervio Periférico. '
+      +'Mediante el uso de '+guia+', se procede al abordaje del '+nombre+' de localización '+lateral+'; '
+      +descTec+'. '
+      +'Tras comprobar el correcto posicionamiento y realizar aspiración manual negativa '
+      +'para descartar inyección intravascular, se efectúa el depósito del anestésico local sin incidentes, '
+      +'constatando un '+resultado+' previo al inicio de la cirugía.';
   }
   var metodos=document.getElementById('fj-metodos');
   if(metodos)metodos.value=txt;
+  // Actualizar materiales descartables
+  var mat=document.getElementById('fj-materiales');
+  if(mat)mat.value=aguja+' '+calibre+'.';
+  // Sincronizar con metodos-tipo-sel
+  var msel=document.getElementById('metodos-tipo-sel');
+  if(msel){
+    var tipoMet=esNeuroaxial?(subtipo.indexOf('pidural')>=0?'peridural':'raquidea'):'bloqueo';
+    msel.value=tipoMet;
+  }
 }
 
 function tecLimpiar(){
