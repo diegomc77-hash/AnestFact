@@ -243,7 +243,7 @@ function rellenar(d){
   // BLOQUE 4 — Evaluación preanestésica y monitoreo
   if(d.edad&&setId('8083',d.edad))ok++;                        // Edad
   if(d.peso&&setId('8085',d.peso))ok++;                        // Peso
-  if(d.observaciones&&setId('8088',d.observaciones))ok++;      // Examen físico / antecedentes
+  if(d.examenFisico&&setId('8088',d.examenFisico))ok++;      // Examen físico (Mallampati + auscultación)
   if(d.asa){
     var asaV=String(d.asa).replace(/ASA\s*/i,'').trim();
     if(setSelect('8090',asaV))ok++;                            // Riesgo ASA

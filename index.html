@@ -425,6 +425,31 @@ select.fi option{background:var(--bg2)}
       <div class="field"><label>ASA</label>
         <select class="fi" id="fj-asa"><option value="">&mdash;</option><option>I</option><option>II</option><option>III</option><option>IV</option><option>V</option></select>
       </div>
+      <div class="field"><label>Mallampati</label>
+        <select class="fi" id="fj-mallampati" onchange="actualizarExamenFisico()"><option value="">&mdash;</option><option>I</option><option>II</option><option>III</option><option>IV</option></select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>Aparato respiratorio</label>
+        <select class="fi" id="fj-ausc-resp" onchange="actualizarExamenFisico()">
+          <option value="MV conservado bilateral, sin agregados">Normal</option>
+          <option value="Rales/sibilancias presentes">Patológico</option>
+        </select>
+      </div>
+      <div class="field"><label>Aparato cardiovascular</label>
+        <select class="fi" id="fj-ausc-cv" onchange="actualizarExamenFisico()">
+          <option value="Ruidos cardíacos normofonéticos, sin soplos">Normal</option>
+          <option value="Soplo/arritmia presente">Patológico</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Examen Físico</label>
+      <div class="fr" style="align-items:flex-start">
+        <textarea class="fi" id="fj-examen-fisico" placeholder="Se completa automáticamente con Mallampati y auscultación..."></textarea>
+        <button class="mic" id="m-examen-fisico" onclick="mic('fj-examen-fisico','m-examen-fisico')">&#127897;</button>
+      </div>
+    </div>
+    <div class="g2" style="margin-top:10px">
       <div class="field"><label>V&iacute;a a&eacute;rea</label>
         <select class="fi" id="fj-via" onchange="actualizarMetodos()"><option value="">&mdash;</option><option>IOT</option><option>M&aacute;scara lar&iacute;ngea</option><option>Mascarilla facial</option><option>Traqueostom&iacute;a</option><option>Sin dispositivo</option></select>
       </div>
@@ -3555,7 +3580,7 @@ function nuevaInter(){
   S.vitals=[];_aldrete='';_destino='';_viaEgreso='';_spo2='';_neuro='';_hemo='';_anal='';_ahem='';document.getElementById('ia-badge').style.display='none';
   cargarForm(S.cur);
   // Limpiar campos de foja que no resetea cargarForm
-  ['fj-asa','fj-via','fj-ind','fj-fin','fj-tec-tipo','fj-tec-subtipo',
+  ['fj-asa','fj-via','fj-ind','fj-fin','fj-tec-tipo','fj-tec-subtipo','fj-examen-fisico','fj-mallampati','fj-ausc-resp','fj-ausc-cv',
    'fj-premed','fj-metodos','fj-recup','fj-obs','fj-materiales',
    'fj-suero','fj-sangre','fj-plasma','fj-otro',
    'fj-fluido1','fj-fluido2','fj-orina','fj-sangrado',
@@ -3635,7 +3660,7 @@ function cargarFojaUI(){cargarFojaVG();setTimeout(function(){tecRestaurar((S.cur
   sv('fj-tec',f.tec);sv('fj-asa',f.asa);sv('fj-via',f.via);sv('fj-fin',f.fin);
   sv('fj-ind',f.ind||'');sv('fj-hint',f.hint||'');sv('fj-hext',f.hext||'');
   sv('fj-premed',f.premed||'');sv('fj-atb',f.atb||'');sv('fj-metodos',f.metodos||'');
-  sv('fj-recup',f.recup||'');sv('fj-obs',f.obs||'');
+  sv('fj-recup',f.recup||'');sv('fj-obs',f.obs||'');sv('fj-examen-fisico',f.examenFisico||'');sv('fj-mallampati',f.mallampati||'');
   sv('fj-suero',f.suero||'');sv('fj-sangre',f.sangre||'');sv('fj-plasma',f.plasma||'');sv('fj-otro',f.otro||'');
   S.vitals=f.vitals||[];
   if(f.sign)S.signData=f.sign;
@@ -3654,7 +3679,7 @@ function guardarFoja(){guardarFojaVG();
   S.cur.foja={
     tec:gv('fj-tec'),asa:gv('fj-asa'),via:gv('fj-via'),fin:gv('fj-fin'),
     ind:gv('fj-ind'),hint:gv('fj-hint'),hext:gv('fj-hext'),
-    premed:gv('fj-premed'),atb:gv('fj-atb'),metodos:gv('fj-metodos'),recup:gv('fj-recup'),obs:gv('fj-obs'),
+    premed:gv('fj-premed'),atb:gv('fj-atb'),metodos:gv('fj-metodos'),recup:gv('fj-recup'),obs:gv('fj-obs'),examenFisico:gv('fj-examen-fisico'),mallampati:gv('fj-mallampati'),
     suero:gv('fj-suero'),sangre:gv('fj-sangre'),plasma:gv('fj-plasma'),otro:gv('fj-otro'),
     drogas:S.cur.foja.drogas||[],vitals:S.vitals||[],sign:S.signData||null
   };
@@ -3753,7 +3778,7 @@ function renderGeclisa(){
     +secT('4 — Evaluación Preanestésica')
     +cpRow('Peso (kg)',i.peso||'')+cpRow('Edad',i.edad||'')
     +cpRow('Riesgo ASA','ASA '+(f.asa||'?'))
-    +cpRow('Examen Físico / Observaciones',f.obs||'')
+    +cpRow('Examen Físico',f.examenFisico||'')
     +secT('5 — Técnica Anestésica')
     +cpRow('Premedicación',f.premed||'')
     +cpRow('Inducción',f.ind||'')
@@ -4179,6 +4204,19 @@ function confirmarPosicion(pos){
   if(sug)sug.style.display='none';
 }
 // ═══════════════════════════════════════════════════
+function actualizarExamenFisico(){
+  var mall=document.getElementById('fj-mallampati')?document.getElementById('fj-mallampati').value:'';
+  var resp=document.getElementById('fj-ausc-resp')?document.getElementById('fj-ausc-resp').value:'';
+  var cv=document.getElementById('fj-ausc-cv')?document.getElementById('fj-ausc-cv').value:'';
+  var partes=[];
+  if(mall)partes.push('Mallampati '+mall+'.');
+  partes.push('Apertura bucal conservada.');
+  if(resp)partes.push('Aparato respiratorio: '+resp+'.');
+  if(cv)partes.push('Aparato cardiovascular: '+cv+'.');
+  var ta=document.getElementById('fj-examen-fisico');
+  if(ta)ta.value=partes.join(' ');
+}
+
 function actualizarViaAerea(){
   var tipo=document.getElementById('fj-tec-tipo')?document.getElementById('fj-tec-tipo').value:'';
   var sel=document.getElementById('fj-via');
@@ -4338,6 +4376,7 @@ function abrirGeclisa(){
     anestesista:'HUERTA MARIA SOLEDAD',matricula:'32393',
     horaFin:f.fin||'',cirujano:i.ciru||'',especialidad:i.serv||'',
     observaciones:f.obs_geclisa||f.obs||'',
+    examenFisico:f.examenFisico||'',
     premedicacion:f.premed||'',
     antibioticoprofilaxis:(document.getElementById('fj-atb')?document.getElementById('fj-atb').value:''),
     medicamentos:(f.drogas||[]).map(function(d){return(d.n||'')+' '+(d.d||'')+' '+(d.v||'');}).filter(function(x){return x.trim();}).join(', '),
