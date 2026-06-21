@@ -335,7 +335,7 @@ select.fi option{background:var(--bg2)}
     <!-- Nivel 1: Tipo principal -->
     <div class="field">
       <label>Tipo de anestesia</label>
-      <select class="fi" id="fj-tec-tipo" onchange="tecNivel1();_sugerirDrogasPorTec(this.value);calcPremed(true)">
+      <select class="fi" id="fj-tec-tipo" onchange="tecNivel1();_sugerirDrogasPorTec(this.value);calcPremed(true);actualizarViaAerea()">
         <option value="">Seleccionar...</option>
         <option value="general">Anestesia General</option>
         <option value="neuroaxial">Anestesia Regional Neuroaxial</option>
@@ -348,7 +348,7 @@ select.fi option{background:var(--bg2)}
     <!-- Nivel 2: Subtipo -->
     <div class="field" id="tec-nivel2-wrap" style="display:none">
       <label id="tec-nivel2-label">Subtipo</label>
-      <select class="fi" id="fj-tec-subtipo" onchange="tecNivel2();_sugerirDrogasPorTec(this.value||document.getElementById('fj-tec-tipo').value);calcPremed(true)">
+      <select class="fi" id="fj-tec-subtipo" onchange="tecNivel2();_sugerirDrogasPorTec(this.value||document.getElementById('fj-tec-tipo').value);calcPremed(true);actualizarMetodos()">
         <option value="">Seleccionar...</option>
       </select>
     </div>
@@ -4179,6 +4179,44 @@ function confirmarPosicion(pos){
   if(sug)sug.style.display='none';
 }
 // ═══════════════════════════════════════════════════
+function actualizarViaAerea(){
+  var tipo=document.getElementById('fj-tec-tipo')?document.getElementById('fj-tec-tipo').value:'';
+  var sel=document.getElementById('fj-via');
+  var viaWrap=sel?sel.closest('.field'):null;
+  if(!sel)return;
+  var prevVal=sel.value;
+  sel.innerHTML='<option value="">&mdash;</option>';
+  if(tipo==='general'){
+    // Anestesia General — dispositivos de vía aérea
+    [['IOT','Intubación Orotraqueal'],
+     ['INT_NASO','Intubación Nasotraqueal'],
+     ['TRAQUEO','Traqueostomía'],
+     ['ML','Máscara Laríngea (Dispositivo Supraglótico)']
+    ].forEach(function(op){
+      var o=document.createElement('option');o.value=op[0];o.textContent=op[1];sel.appendChild(o);
+    });
+    if(viaWrap)viaWrap.style.display='block';
+  } else if(tipo==='sedacion'){
+    // Sedación — soporte de oxígeno
+    ['Puntas nasales','Máscara simple','Máscara con reservorio','Ventilación espontánea al aire ambiente'
+    ].forEach(function(op){
+      var o=document.createElement('option');o.value=op;o.textContent=op;sel.appendChild(o);
+    });
+    if(viaWrap)viaWrap.style.display='block';
+  } else {
+    // Regional / Bloqueo / Local — no aplica vía aérea
+    var o=document.createElement('option');o.value='no_aplica';o.textContent='No aplica';sel.appendChild(o);
+    sel.value='no_aplica';
+    if(viaWrap)viaWrap.style.display='none';
+    // Limpiar materiales descartables
+    var mat=document.getElementById('fj-materiales');if(mat)mat.value='';
+    return;
+  }
+  // Restaurar valor previo si sigue siendo válido
+  if(prevVal)sel.value=prevVal;
+  actualizarMetodos();
+}
+
 function toggleMayoHelper(){
   var body=document.getElementById('mayo-helper-body');
   var arrow=document.getElementById('mayo-helper-arrow');
@@ -4343,11 +4381,32 @@ function abrirGeclisa(){
 // === MÉTODOS ANESTÉSICOS SMART ===
 var METODOS_TEXTOS={
   raquidea:function(){var a=document.getElementById('metodos-aguja');return 'Raqu\u00eddea. T\u00e9cnica as\u00e9ptica estricta con materiales provistos por la instituci\u00f3n. Punci\u00f3n \u00fanica atraumatica con aguja '+(a?a.value:'AR 25 PL')+' (aguja raqu\u00eddea punta l\u00e1piz).';},
-  general:function(){var t=document.getElementById('metodos-tubo');var via=document.getElementById('fj-via')?document.getElementById('fj-via').value:'';if(via==='Traqueostomía'){return 'Anestesia general balanceada. Intubación por traqueostoma con Traqueoflex Nº '+(t?t.value:'8')+' con manguito de baja presión.';}return 'Anestesia general balanceada. Intubación orotraqueal con tubo endotraqueal Nº '+(t?t.value:'7')+' con manguito de baja presión.';},
+  general:function(){
+    var t=document.getElementById('metodos-tubo');
+    var via=document.getElementById('fj-via')?document.getElementById('fj-via').value:'';
+    var dispTxt='';
+    if(via==='TRAQUEO'||via==='Traqueostomía'){
+      dispTxt='manejo de la vía aérea mediante Traqueostomía con Traqueoflex Nº '+(t?t.value:'8')+' con manguito de baja presión';
+    } else if(via==='INT_NASO'){
+      dispTxt='manejo de la vía aérea mediante Intubación Nasotraqueal con tubo Nº '+(t?t.value:'7')+' con manguito de baja presión';
+    } else if(via==='ML'){
+      dispTxt='manejo de la vía aérea mediante Máscara Laríngea (Dispositivo Supraglótico)';
+    } else {
+      dispTxt='manejo de la vía aérea mediante Intubación Orotraqueal con tubo endotraqueal Nº '+(t?t.value:'7')+' con manguito de baja presión';
+    }
+    return 'Anestesia general balanceada. Bajo estrictas medidas de seguridad, se realiza inducción anestésica. Se procede al '+dispTxt+' al primer intento, confirmando la correcta colocación mediante capnografía y auscultación simétrica del murmullo vesicular.';
+  },
   tiva:function(){return 'TIVA (Anestesia Total Intravenosa). Infusi\u00f3n continua de agentes anest\u00e9sicos EV.';},
   peridural:function(){return 'Anestesia peridural. T\u00e9cnica as\u00e9ptica estricta. Cat\u00e9ter peridural.';},
   localasistida:function(){return 'Anestesia local asistida / MAC (Monitoreo Anestesiologico Controlado).';},
-  sedacion:function(){return 'Sedación consciente. Monitoreo continuo.';},
+  sedacion:function(){
+    var via=document.getElementById('fj-via')?document.getElementById('fj-via').value:'';
+    if(via==='Ventilación espontánea al aire ambiente'){
+      return 'Se realiza procedimiento bajo Sedación Consciente superficial. Paciente en ventilación espontánea al aire ambiente, conservando reflejos de protección de la vía aérea y estabilidad hemodinámica.';
+    }
+    var sop=via||'puntas nasales';
+    return 'Se realiza procedimiento bajo Sedación Consciente profunda. Paciente en ventilación espontánea, con soporte de oxígeno suplementario a través de '+sop+', manteniendo una adecuada dinámica respiratoria y estabilidad hemodinámica sin incidentes.';
+  },
   bloqueo:function(){var a=document.getElementById('metodos-aguja-bloqueo');return 'Bloqueo nervioso periférico.'+(a&&a.value?' '+a.value+'.':'');}
 };
 // ═══════════════════════════════════════════════════
@@ -4565,14 +4624,30 @@ function setMetodos(tipo){
 function actualizarMetodos(){
   var extra=document.getElementById('metodos-extra');
   var tipo=extra?extra.getAttribute('data-tipo'):'';
+  // Si no hay tipo en metodos-extra, leer de fj-tec-tipo
+  if(!tipo){
+    var tecTipoEl=document.getElementById('fj-tec-tipo');
+    var tecTipo=tecTipoEl?tecTipoEl.value:'';
+    if(tecTipo==='general')tipo='general';
+    else if(tecTipo==='sedacion')tipo='sedacion';
+    else if(tecTipo==='neuroaxial'){
+      var sub=document.getElementById('fj-tec-subtipo')?document.getElementById('fj-tec-subtipo').value:'';
+      tipo=sub.indexOf('pidural')>=0||sub.indexOf('ombinada')>=0?'peridural':'raquidea';
+    }
+  }
   var fn=METODOS_TEXTOS[tipo];
   var ta=document.getElementById('fj-metodos');
   if(ta&&fn)ta.value=fn();
   // Autollenar materiales descartables
   var mat=document.getElementById('fj-materiales');
   if(mat){
+    var tipo2=document.getElementById('fj-tec-tipo')?document.getElementById('fj-tec-tipo').value:'';
+    // Sedación y regional no tienen material descartable de vía aérea
+    if(tipo2==='sedacion'||tipo2==='neuroaxial'||tipo2==='bloqueo'||tipo2==='local'){
+      mat.value=''; return;
+    }
     var via2=document.getElementById('fj-via')?document.getElementById('fj-via').value:'';
-    if(via2==='Traqueostomía'){
+    if(via2==='TRAQUEO'||via2==='Traqueostomía'){
       // Cambiar selector de tubos a Traqueoflex solo si no existe ya
       var extra=document.getElementById('metodos-extra');
       if(extra&&!document.getElementById('metodos-tubo-traqueo')){
@@ -4590,8 +4665,16 @@ function actualizarMetodos(){
       var t=document.getElementById('metodos-tubo');
       mat.value='Traqueoflex con balón Nº '+(t?t.value:'8')+'.';
     } else if(tipo==='general'||tipo==='tiva'){
-      var t=document.getElementById('metodos-tubo');
-      mat.value='Tubo endotraqueal Nº '+(t?t.value:'7')+' con manguito de baja presion.';
+      var via2b=document.getElementById('fj-via')?document.getElementById('fj-via').value:'';
+      if(via2b==='ML'){
+        mat.value='Máscara Laríngea (Dispositivo Supraglótico).';
+      } else if(via2b==='INT_NASO'){
+        var t=document.getElementById('metodos-tubo');
+        mat.value='Tubo nasotraqueal Nº '+(t?t.value:'7')+' con manguito de baja presión.';
+      } else {
+        var t=document.getElementById('metodos-tubo');
+        mat.value='Tubo endotraqueal Nº '+(t?t.value:'7')+' con manguito de baja presión.';
+      }
     } else if(tipo==='raquidea'){
       var a=document.getElementById('metodos-aguja');
       mat.value='Aguja raquidea punta lapiz '+(a?a.value:'AR 25 PL')+'.';
