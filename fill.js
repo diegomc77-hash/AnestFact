@@ -232,10 +232,8 @@ function rellenar(d){
   // BLOQUE 3 — Textos libres
   if(d.diagnostico&&setId('8054',d.diagnostico))ok++;          // Diagnóstico
   if(d.metodos&&setId('8070',d.metodos))ok++;                  // Observaciones (metodos)
-  // 8072 Nivel Regional — solo si es bloqueo, dejar vacio si general
-  var esBloqueo=/raquid|bloqueo|peridural|regional|espinal/i.test(
-    (d.tecnica||d.mantenimiento||d.induccion||''));
-  if(esBloqueo&&d.nivelRegional)setId('8072',d.nivelRegional);
+  // 8072 Nivel Regional — ya viene vacío del payload si no aplica
+  if(d.nivelRegional)setId('8072',d.nivelRegional);
   if(setId('8075',textoMonitoreo(d)))ok++;                     // Medicamentos generales = monitoreo
   if(d.medicamentos&&setId('8077',d.medicamentos))ok++;        // Medicamentos anestésicos
   if(d.materiales&&setId('8079',d.materiales))ok++;            // Materiales descartables

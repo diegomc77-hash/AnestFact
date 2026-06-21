@@ -4363,6 +4363,33 @@ function abrirGeclisa(){
   var _nom=(i.pac||'').trim().replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'').slice(0,20);
   var _fec=(i.fecha||new Date().toISOString().slice(0,10)).replace(/-/g,'');
   var clave=_dni||(_nom?_nom+'_'+_fec:'sin_id_'+_fec);
+  // Separar drogas por grupo: Inductores/Relajantes/Analgésicos -> inducción; Mantenimiento/Inotrópicos -> mantenimiento
+  var _drogasInd=[],_drogasMant=[];
+  (f.drogas||[]).forEach(function(dr){
+    var txt=(dr.n||'')+' '+(dr.d||'')+' '+(dr.v||'');
+    if(!txt.trim())return;
+    var g=(dr.grupo||'').toLowerCase();
+    if(g.indexOf('mantenimiento')>=0||g.indexOf('inotr')>=0){
+      _drogasMant.push(txt);
+    } else if(g.indexOf('inductor')>=0||g.indexOf('relajante')>=0||g.indexOf('analg')>=0||
+              g.indexOf('intratecal')>=0||g.indexOf('peridural')>=0||g.indexOf('local')>=0||g.indexOf('coadyuv')>=0){
+      _drogasInd.push(txt);
+    } else {
+      // Sin grupo (agregado manual) -> va a inducción por defecto
+      _drogasInd.push(txt);
+    }
+  });
+  // Nivel regional: espacio intervertebral o bloqueo+lateralidad, solo si aplica
+  var _tipoTec=document.getElementById('fj-tec-tipo')?document.getElementById('fj-tec-tipo').value:'';
+  var _nivelRegional='';
+  if(_tipoTec==='neuroaxial'){
+    var _esp=document.getElementById('fj-tec-espacio')?document.getElementById('fj-tec-espacio').value:'';
+    if(_esp)_nivelRegional='Espacio '+_esp;
+  } else if(_tipoTec==='bloqueo'){
+    var _lat=document.getElementById('fj-tec-lateral')?document.getElementById('fj-tec-lateral').value:'';
+    var _tecVal=document.getElementById('fj-tec')?document.getElementById('fj-tec').value:'';
+    if(_tecVal)_nivelRegional=_tecVal+(_lat?' - '+_lat:'');
+  }
   var payload={
     apellido:(parts[0]||'').trim().toUpperCase(),
     nombre:(parts[1]||'').trim().toUpperCase(),
@@ -4388,7 +4415,10 @@ function abrirGeclisa(){
     monPani:document.getElementById('mon-pani')?document.getElementById('mon-pani').checked:true,
     monDecub:document.getElementById('mon-decub')?document.getElementById('mon-decub').checked:false,
     monEmerg:(i.mayo_tipociru||'').toLowerCase()==='urgencia',
-    induccion:f.ind||'',mantenimiento:f.tec||'',viaAerea:f.via||'',metodos:f.metodos||'',
+    induccion:(f.ind||'')+(_drogasInd.length?'. '+_drogasInd.join(', '):''),
+    mantenimiento:(f.tec||'')+(_drogasMant.length?' con '+_drogasMant.join(', '):''),
+    nivelRegional:_nivelRegional,
+    viaAerea:f.via||'',metodos:f.metodos||'',
     vitals:f.mayo_vitals||[],
     fluido1:f.fluido1||f.suero||'',fluido2:f.fluido2||'',
     orina:(f.orina!==undefined&&f.orina!==''?f.orina:'0'),sangrado:(f.sangrado||f.sangre||'0'),
@@ -4623,14 +4653,16 @@ function sugerirDrogas(tipo){
     };
 
     // Al confirmar -> agregar a la lista
-    btn.onclick=function(){
-      if(!sel.value)return;
-      var parts=sel.value.split('|');
-      var nombre=parts[0];
-      var dosis=inp.value.trim()||parts[1]+' '+parts[2];
-      addDrogaDirecta(nombre+'|'+dosis);
-      sel.value='';inp.value='';inp.readOnly=true;btn.disabled=true;
-    };
+    (function(grupoNombre){
+      btn.onclick=function(){
+        if(!sel.value)return;
+        var parts=sel.value.split('|');
+        var nombre=parts[0];
+        var dosis=inp.value.trim()||parts[1]+' '+parts[2];
+        addDrogaDirecta(nombre,dosis,grupoNombre);
+        sel.value='';inp.value='';inp.readOnly=true;btn.disabled=true;
+      };
+    })(g.t);
 
     wrap.appendChild(sel);
     wrap.appendChild(inp);
@@ -4638,17 +4670,22 @@ function sugerirDrogas(tipo){
     cont.appendChild(wrap);
   });
 }
-function addDrogaDirecta(label){
+function addDrogaDirecta(nombre,dosis,grupo){
   if(!S.cur)return;
   if(!S.cur.foja)S.cur.foja={drogas:[],vitals:[]};
   if(!S.cur.foja.drogas)S.cur.foja.drogas=[];
-  var parts=label.split(' ');
-  var n=parts[0]||'';
-  var d=parts[1]||'';
-  var v=parts.slice(2).join(' ')||'EV';
-  S.cur.foja.drogas.push({n:n,d:d,v:v});
+  // Compatibilidad: si se llama con un solo string "Nombre dosis unidad" (legacy)
+  if(dosis===undefined){
+    var parts=nombre.split(' ');
+    nombre=parts[0]||'';
+    dosis=parts.slice(1).join(' ')||'';
+  }
+  var dparts=(dosis||'').trim().split(' ');
+  var d=dparts[0]||'';
+  var v=dparts.slice(1).join(' ')||'EV';
+  S.cur.foja.drogas.push({n:nombre,d:d,v:v,grupo:grupo||''});
   renderDrogas();
-  toast(n+' agregado');
+  toast(nombre+' agregado');
 }
 // ═══════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════
