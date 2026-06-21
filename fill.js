@@ -253,8 +253,8 @@ function rellenar(d){
     if(emerg){emerg.checked=true;ok++;}                        // EMERGENCIA checkbox
   }
   // Monitoreo radios SI/NO
-  setRadio('8095','8096',d.monEtco2!==false);    // EtCO2
-  setRadio('8099','8100',d.monPam!==false);       // PAM
+  setRadio('8095','8099',d.monEtco2!==false);    // EtCO2
+  setRadio('8096','8100',d.monPam!==false);       // PAM
   setRadio('8103','8104',d.monEcg!==false);       // ECG
   setRadio('8107','8108',d.monSato2!==false);     // SAT O2
   setRadio('8111','8112',d.monPani!==false);      // PANI
