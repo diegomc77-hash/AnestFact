@@ -4495,22 +4495,19 @@ var METODOS_TEXTOS={
 // DROGAS SUGERIDAS POR TÉCNICA
 // ═══════════════════════════════════════════════════
 function autoPremedRegional(){
-  // Auto-agrega premedicación estándar para raquídea/peridural
+  // Preselecciona drogas regionales en los selects de premed-selects
+  // y las agrega a fj-premed si no están ya
   var fp=document.getElementById('fj-premed');
   if(!fp)return;
-  var peso=parseFloat((S.cur&&S.cur.peso)||(document.getElementById('f-peso')?document.getElementById('f-peso').value:0)||70);
-  function rnd(n){return parseFloat(n.toFixed(1));}
-  var drogas=[
-    'Ketorolac 30 mg EV',
-    'Dexametasona 8 mg EV',
-    'Metoclopramida 10 mg EV'
+  var presets=[
+    {nombre:'Ketorolac',txt:'Ketorolac 30 mg EV'},
+    {nombre:'Dexametasona',txt:'Dexametasona 8 mg EV'},
+    {nombre:'Metoclopramida',txt:'Metoclopramida 10 mg EV'}
   ];
-  // Agregar solo si no están ya en el campo
   var actual=fp.value||'';
-  drogas.forEach(function(d){
-    var nombre=d.split(' ')[0].toLowerCase();
-    if(actual.toLowerCase().indexOf(nombre)<0){
-      fp.value=(actual?actual+'. ':'')+d;
+  presets.forEach(function(p){
+    if(actual.toLowerCase().indexOf(p.nombre.toLowerCase())<0){
+      fp.value=(actual?actual+'. ':'')+p.txt;
       actual=fp.value;
     }
   });
@@ -4722,8 +4719,9 @@ function addDrogaDirecta(nombre,dosis,grupo){
 function setMetodos(tipo){
   var extra=document.getElementById('metodos-extra');
   if(!extra)return;
-  if(tipo==='raquidea'){extra.style.display='block';extra.innerHTML='<div class="field" style="margin-bottom:8px"><label>Aguja raqu\u00eddea</label><select class="fi" id="metodos-aguja" onchange="actualizarMetodos()"><option>AR 25 PL</option><option>AR 26 PL</option><option>AR 27 PL</option></select></div>';}
-  else if(tipo==='general'){extra.style.display='block';extra.innerHTML='<div class="field" style="margin-bottom:8px"><label>Tubo endotraqueal N\u00ba</label><select class="fi" id="metodos-tubo" onchange="actualizarMetodos()"><option>5</option><option>6</option><option>7</option><option>7 1/2</option><option>8</option></select></div>';}
+  if(tipo==='raquidea'){extra.style.display='block';extra.innerHTML='<div class="field" style="margin-bottom:8px"><label>Aguja raquídea</label><select class="fi" id="metodos-aguja" onchange="actualizarMetodos()"><option>AR 25 PL</option><option>AR 26 PL</option><option>AR 27 PL</option></select></div>';}
+  else if(tipo==='general'||tipo==='tiva'){extra.style.display='block';extra.innerHTML='<div class="field" style="margin-bottom:8px"><label>Tubo endotraqueal Nº</label><select class="fi" id="metodos-tubo" onchange="actualizarMetodos()"><option>5</option><option>6</option><option>7</option><option>7 1/2</option><option>8</option></select></div>';}
+  if(tipo!=='raquidea'&&tipo!=='general'&&tipo!=='tiva'){extra.style.display='none';extra.innerHTML='';}
   else{extra.style.display='none';}
   extra.setAttribute('data-tipo',tipo);
   var fn=METODOS_TEXTOS[tipo];var ta=document.getElementById('fj-metodos');
@@ -4766,7 +4764,10 @@ function actualizarMetodos(){
         var sub2=document.getElementById('fj-tec-subtipo')?document.getElementById('fj-tec-subtipo').value:'';
         var esPeri=/pidural|ombinada/i.test(sub2);
         mat.value=agTec+(calTec?' '+calTec:'')+(esPeri?'. Catéter peridural.':'.');
+        return;
       }
+      // Sin aguja elegida aún — no poner nada
+      mat.value='';
       return;
     }
     var via2=document.getElementById('fj-via')?document.getElementById('fj-via').value:'';
