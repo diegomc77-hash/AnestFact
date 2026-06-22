@@ -3787,7 +3787,17 @@ function renderGeclisa(){
     +secT('5 — Técnica Anestésica')
     +cpRow('Premedicación',f.premed||'')
     +cpRow('Inducción',f.ind||'')
-    +cpRow('Mantenimiento / Técnica',f.tec||'')
+    +cpRow('Mantenimiento / Técnica',(function(){
+      var base=f.tec||'';
+      var drogas=(f.drogas||[]).filter(function(d){
+        if(!d.n||!d.n.trim())return false;
+        var g=(d.grupo||'').toLowerCase();
+        return g.indexOf('mantenimiento')>=0||g.indexOf('inotr')>=0||
+               g.indexOf('intratecal')>=0||g.indexOf('peridural')>=0||
+               g.indexOf('local')>=0||g.indexOf('coadyuv')>=0;
+      }).map(function(d){return d.n+' '+d.d+' '+d.v;}).join(', ');
+      return base+(drogas?' con '+drogas:'');
+    })())
     +cpRow('Vía Aérea',f.via||'')
     +secT('6 — Signos Vitales (resumen)')
     +(f.mayo_vitals&&f.mayo_vitals.length?
