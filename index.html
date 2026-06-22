@@ -4526,7 +4526,7 @@ function _sugerirDrogasPorTec(tec){
   else if(/neuroaxial/.test(v)&&!/raqui|peridural/.test(v)){sugerirDrogas('raquidea');setTimeout(autoPremedRegional,100);}
   else if(/general/.test(v)&&!/raqui|peridural|neuroaxial/.test(v))sugerirDrogas('general');
   else if(/sedac|cam|local/.test(v))sugerirDrogas('sedacion');
-  else if(/bloqueo/.test(v)){sugerirDrogas('bloqueo');setTimeout(autoPremedRegional,100);}
+  else if(/bloqueo|miembro_sup|miembro_inf|tronco/.test(v)){sugerirDrogas('bloqueo');setTimeout(autoPremedRegional,100);}
   else sugerirDrogas('');
 }
 
