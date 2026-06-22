@@ -3786,7 +3786,15 @@ function renderGeclisa(){
     +cpRow('Examen Físico',f.examenFisico||'')
     +secT('5 — Técnica Anestésica')
     +cpRow('Premedicación',f.premed||'')
-    +cpRow('Inducción',f.ind||'')
+    +cpRow('Inducción',(function(){
+      var base=f.ind||'';
+      var drogas=(f.drogas||[]).filter(function(d){
+        if(!d.n||!d.n.trim())return false;
+        var g=(d.grupo||'').toLowerCase();
+        return g.indexOf('inductor')>=0||g.indexOf('relajante')>=0||g.indexOf('analg')>=0;
+      }).map(function(d){return d.n+' '+d.d+' '+d.v;}).join(', ');
+      return base+(drogas?(base?'. ':'')+drogas:'');
+    })())
     +cpRow('Mantenimiento / Técnica',(function(){
       var base=f.tec||'';
       var drogas=(f.drogas||[]).filter(function(d){
