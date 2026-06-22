@@ -4224,6 +4224,7 @@ function actualizarViaAerea(){
   if(!sel)return;
   var prevVal=sel.value;
   sel.innerHTML='<option value="">&mdash;</option>';
+  var etco2chk=document.getElementById('mon-etco2');
   if(tipo==='general'){
     // Anestesia General — dispositivos de vía aérea
     [['IOT','Intubación Orotraqueal'],
@@ -4234,6 +4235,8 @@ function actualizarViaAerea(){
       var o=document.createElement('option');o.value=op[0];o.textContent=op[1];sel.appendChild(o);
     });
     if(viaWrap)viaWrap.style.display='block';
+    // Con vía aérea artificial -> hay capnografía
+    if(etco2chk)etco2chk.checked=true;
   } else if(tipo==='sedacion'){
     // Sedación — soporte de oxígeno
     ['Puntas nasales','Máscara simple','Máscara con reservorio','Ventilación espontánea al aire ambiente'
@@ -4241,6 +4244,8 @@ function actualizarViaAerea(){
       var o=document.createElement('option');o.value=op;o.textContent=op;sel.appendChild(o);
     });
     if(viaWrap)viaWrap.style.display='block';
+    // Sedación sin tubo -> no hay capnografía real
+    if(etco2chk)etco2chk.checked=false;
   } else {
     // Regional / Bloqueo / Local — no aplica vía aérea
     var o=document.createElement('option');o.value='no_aplica';o.textContent='No aplica';sel.appendChild(o);
@@ -4248,6 +4253,8 @@ function actualizarViaAerea(){
     if(viaWrap)viaWrap.style.display='none';
     // Limpiar materiales descartables
     var mat=document.getElementById('fj-materiales');if(mat)mat.value='';
+    // Sin vía aérea artificial -> no hay capnografía
+    if(etco2chk)etco2chk.checked=false;
     return;
   }
   // Restaurar valor previo si sigue siendo válido
