@@ -4522,9 +4522,10 @@ function abrirGeclisa(){
     var g=(dr.grupo||'').toLowerCase();
     if(g.indexOf('mantenimiento')>=0||g.indexOf('inotr')>=0){
       _drogasMant.push(txt);
-    } else if(g.indexOf('inductor')>=0||g.indexOf('relajante')>=0||g.indexOf('analg')>=0||
-              g.indexOf('intratecal')>=0||g.indexOf('peridural')>=0||g.indexOf('local')>=0||g.indexOf('coadyuv')>=0){
+    } else if(g.indexOf('inductor')>=0||g.indexOf('relajante')>=0||g.indexOf('analg')>=0){
       _drogasInd.push(txt);
+    } else if(g.indexOf('intratecal')>=0||g.indexOf('peridural')>=0||g.indexOf('local')>=0||g.indexOf('coadyuv')>=0){
+      _drogasMant.push(txt);
     } else {
       // Sin grupo (agregado manual) -> va a inducción por defecto
       _drogasInd.push(txt);
@@ -4815,13 +4816,14 @@ function sugerirDrogas(tipo){
     btn.textContent='+ Agregar';
     btn.disabled=true;
 
-    // Al cambiar select -> prellenar dosis
+    // Al cambiar select -> agregar automáticamente
     sel.onchange=function(){
       if(!sel.value){inp.value='';inp.readOnly=true;btn.disabled=true;return;}
       var parts=sel.value.split('|');
       inp.value=parts[1]+' '+parts[2];
       inp.readOnly=false;
       btn.disabled=false;
+      btn.click(); // Auto-agregar sin presionar +
     };
 
     // Al confirmar -> agregar a la lista
