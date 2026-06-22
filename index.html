@@ -992,11 +992,12 @@ function calcPremed(silencioso){
     extras.push('Diclofenac 75mg EV');
   } else if(esRegional){
     lineas.push('Midazolam '+midazLow+'mg EV (dosis reducida – regional)');
-    lineas.push('Ondansetrón '+ondan+'mg EV');
+    lineas.push('Ketorolac 30mg EV');
+    lineas.push('Dexametasona 8mg EV');
+    lineas.push('Metoclopramida 10mg EV');
     if(reflujo) lineas.push('Ranitidina '+rani+'mg EV');
-    if(ondan===4) alerta+='Ondansetrón limitado a techo 4mg. ';
     extras.push('Atropina '+atro+'mg EV');
-    extras.push('Dexametasona 8mg EV');
+    extras.push('Ondansetrón '+ondan+'mg EV');
   } else if(esSedacion){
     lineas.push('Ondansetrón '+ondan+'mg EV');
     lineas.push('Sedación: a demanda intraoperatoria');
