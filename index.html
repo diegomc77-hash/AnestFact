@@ -449,6 +449,10 @@ select.fi option{background:var(--bg2)}
         <button class="mic" id="m-examen-fisico" onclick="mic('fj-examen-fisico','m-examen-fisico')">&#127897;</button>
       </div>
     </div>
+    <div id="examen-regional-wrap" style="display:none">
+      <div class="ct" style="font-size:13px;margin-bottom:8px">Examen Regional</div>
+      <div id="examen-regional-selects"></div>
+    </div>
     <div class="g2" style="margin-top:10px">
       <div class="field"><label>V&iacute;a a&eacute;rea</label>
         <select class="fi" id="fj-via" onchange="actualizarMetodos()"><option value="">&mdash;</option><option>IOT</option><option>M&aacute;scara lar&iacute;ngea</option><option>Mascarilla facial</option><option>Traqueostom&iacute;a</option><option>Sin dispositivo</option></select>
@@ -4212,10 +4216,149 @@ function actualizarExamenFisico(){
   var partes=[];
   if(mall)partes.push('Mallampati '+mall+'.');
   partes.push('Apertura bucal conservada.');
-  if(resp)partes.push('Aparato respiratorio: '+resp+'.');
-  if(cv)partes.push('Aparato cardiovascular: '+cv+'.');
+  partes.push('Aparato respiratorio: '+(resp||'MV conservado bilateral, sin agregados')+'.');
+  partes.push('Aparato cardiovascular: '+(cv||'Ruidos cardíacos normofonéticos, sin soplos')+'.');
   var ta=document.getElementById('fj-examen-fisico');
   if(ta)ta.value=partes.join(' ');
+}
+
+function renderExamenRegional(tipoTec){
+  var wrap=document.getElementById('examen-regional-wrap');
+  var cont=document.getElementById('examen-regional-selects');
+  if(!wrap||!cont)return;
+  var esNeuroaxial=(tipoTec==='neuroaxial');
+  var esBloqueo=(tipoTec==='bloqueo');
+  if(!esNeuroaxial&&!esBloqueo){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  cont.innerHTML='';
+
+  var grupos=[];
+  if(esNeuroaxial){
+    grupos=[
+      {id:'er-anat',t:'Anatomía de superficie',items:[
+        'Puntos de reparo palp. y conservados',
+        'Difícil palpación por obesidad',
+        'Puntos de reparo no palpables'
+      ]},
+      {id:'er-eje',t:'Eje de la columna',items:[
+        'Alineada',
+        'Escoliosis',
+        'Cifosis',
+        'Escoliosis corregida quirúrgicamente'
+      ]},
+      {id:'er-esp',t:'Espacios intervertebrales',items:[
+        'Conservados',
+        'Disminuidos',
+        'Pinzamientos',
+        'Calcificación de ligamentos'
+      ]},
+      {id:'er-mov',t:'Movilidad / Flexión',items:[
+        'Buena flexión lumbar',
+        'Limitada',
+        'Rigidez total'
+      ]},
+      {id:'er-piel',t:'Piel en zona de punción',items:[
+        'Piel sana, sin contraindicaciones',
+        'Tatuaje en zona de punción',
+        'Signos de infección local ⚠️'
+      ]}
+    ];
+  } else {
+    // Bloqueo periférico
+    var lat=document.getElementById('fj-tec-lateral')?document.getElementById('fj-tec-lateral').value:'';
+    var blq=document.getElementById('fj-tec-bloqueo')?document.getElementById('fj-tec-bloqueo').value:'';
+    var region=lat?(blq||'miembro')+' '+lat:'región a bloquear';
+    grupos=[
+      {id:'er-acc',t:'Anatomía / Accesibilidad',items:[
+        'Reparos anatómicos conservados',
+        'Edema severo',
+        'Deformidad ósea',
+        'Vendaje o yeso limitante'
+      ]},
+      {id:'er-neuro',t:'Estado neurológico basal',items:[
+        'Sin déficit neurológico previo',
+        'Parestesias',
+        'Déficit motor previo',
+        'Hipoestesia en territorio a bloquear'
+      ]},
+      {id:'er-vasc',t:'Estado vascular periférico',items:[
+        'Pulsos distales presentes y simétricos',
+        'Pulsos disminuidos',
+        'Perfusión conservada'
+      ]},
+      {id:'er-piel2',t:'Sitio de punción',items:[
+        'Piel indémne, libre de infección',
+        'Escoriaciones',
+        'Infección cercana a la zona',
+        'Hematoma'
+      ]}
+    ];
+  }
+
+  grupos.forEach(function(g){
+    var row=document.createElement('div');
+    row.style.marginBottom='6px';
+    var sel=document.createElement('select');
+    sel.className='fi';
+    sel.id=g.id;
+    sel.style.fontSize='12px';
+    var opt0=document.createElement('option');
+    opt0.value='';opt0.textContent=g.t+' — elegir...';
+    sel.appendChild(opt0);
+    g.items.forEach(function(it,idx){
+      var op=document.createElement('option');
+      op.value=it;op.textContent=it;
+      sel.appendChild(op);
+      if(idx===0)sel.value=it; // Preseleccionar la primera (normal)
+    });
+    sel.onchange=function(){generarTextoRegional(tipoTec);};
+    row.appendChild(sel);
+    cont.appendChild(row);
+  });
+
+  // Generar texto inicial con valores por defecto
+  generarTextoRegional(tipoTec);
+}
+
+function generarTextoRegional(tipoTec){
+  var ta=document.getElementById('fj-examen-fisico');
+  if(!ta)return;
+  // Mantener el texto de Mallampati+auscultación al principio
+  var esNeuroaxial=(tipoTec==='neuroaxial');
+
+  if(esNeuroaxial){
+    var anat=document.getElementById('er-anat')?document.getElementById('er-anat').value:'';
+    var eje=document.getElementById('er-eje')?document.getElementById('er-eje').value:'';
+    var esp=document.getElementById('er-esp')?document.getElementById('er-esp').value:'';
+    var mov=document.getElementById('er-mov')?document.getElementById('er-mov').value:'';
+    var piel=document.getElementById('er-piel')?document.getElementById('er-piel').value:'';
+    var txt='Examen regional: Columna vertebral con '+
+      (anat||'puntos de reparo palpables y conservados')+', eje '+
+      (eje||'alineado').toLowerCase()+', espacios intervertebrales '+
+      (esp||'conservados').toLowerCase()+'. '+
+      (mov||'Buena flexión lumbar')+'. '+
+      (piel||'Piel sana sin contraindicaciones locales para el procedimiento')+'.';
+    // Preservar examen general (Mallampati etc.) y agregar regional
+    var actual=ta.value||'';
+    var sinRegional=actual.replace(/\s*Examen regional:.*$/,'').trim();
+    ta.value=(sinRegional?sinRegional+' ':'')+txt;
+  } else {
+    var lat=document.getElementById('fj-tec-lateral')?document.getElementById('fj-tec-lateral').value:'';
+    var blq=document.getElementById('fj-tec-bloqueo')?document.getElementById('fj-tec-bloqueo').value:'';
+    var region=(lat?lat+' ':'')+( blq?'('+blq+')':'');
+    var acc=document.getElementById('er-acc')?document.getElementById('er-acc').value:'';
+    var neuro=document.getElementById('er-neuro')?document.getElementById('er-neuro').value:'';
+    var vasc=document.getElementById('er-vasc')?document.getElementById('er-vasc').value:'';
+    var piel2=document.getElementById('er-piel2')?document.getElementById('er-piel2').value:'';
+    var txt='Examen regional: '+( region||'Miembro a bloquear')+' con '+
+      (acc||'reparos anatómicos conservados')+'. '+
+      'Examen neurológico basal: '+(neuro||'sin déficit motor ni sensitivo previo')+'. '+
+      (vasc||'Pulsos distales presentes, adecuado relleno capilar')+'. '+
+      (piel2||'Piel sana, libre de signos de infección local')+'.';
+    var actual=ta.value||'';
+    var sinRegional=actual.replace(/\s*Examen regional:.*$/,'').trim();
+    ta.value=(sinRegional?sinRegional+' ':'')+txt;
+  }
 }
 
 function actualizarViaAerea(){
@@ -5026,6 +5169,10 @@ function tecNivel1(){
     sel2.appendChild(o);
   });
   n2wrap.style.display = 'block';
+  // Activar selector de tubo automáticamente para general/tiva
+  if(tipo==='general'||tipo==='tiva')setMetodos(tipo);
+  else{var ex=document.getElementById('metodos-extra');if(ex){ex.style.display='none';ex.innerHTML='';}}
+  renderExamenRegional(tipo);
 }
 
 function tecNivel2(){
