@@ -4516,9 +4516,10 @@ function autoPremedRegional(){
 
 function _sugerirDrogasPorTec(tec){
   var t=(tec||'').toLowerCase();
-  // Leer subtipo si existe para mayor precision
-  var sub=(document.getElementById('fj-tec-subtipo')?document.getElementById('fj-tec-subtipo').value||'':'').toLowerCase();
-  var v=sub||t;
+  // Leer subtipo y normalizar quitando tildes
+  var sub=(document.getElementById('fj-tec-subtipo')?document.getElementById('fj-tec-subtipo').value||'':'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  var tn=t.normalize('NFD').replace(/[̀-ͯ]/g,'');
+  var v=sub||tn;
   if(/tiva/.test(v))sugerirDrogas('tiva');
   else if(/raqui/.test(v)){sugerirDrogas('raquidea');setTimeout(autoPremedRegional,100);}
   else if(/peridural|epidural/.test(v)){sugerirDrogas('peridural');setTimeout(autoPremedRegional,100);}
