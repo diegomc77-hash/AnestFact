@@ -4494,17 +4494,40 @@ var METODOS_TEXTOS={
 // ═══════════════════════════════════════════════════
 // DROGAS SUGERIDAS POR TÉCNICA
 // ═══════════════════════════════════════════════════
+function autoPremedRegional(){
+  // Auto-agrega premedicación estándar para raquídea/peridural
+  var fp=document.getElementById('fj-premed');
+  if(!fp)return;
+  var peso=parseFloat((S.cur&&S.cur.peso)||(document.getElementById('f-peso')?document.getElementById('f-peso').value:0)||70);
+  function rnd(n){return parseFloat(n.toFixed(1));}
+  var drogas=[
+    'Ketorolac 30 mg EV',
+    'Dexametasona 8 mg EV',
+    'Metoclopramida 10 mg EV'
+  ];
+  // Agregar solo si no están ya en el campo
+  var actual=fp.value||'';
+  drogas.forEach(function(d){
+    var nombre=d.split(' ')[0].toLowerCase();
+    if(actual.toLowerCase().indexOf(nombre)<0){
+      fp.value=(actual?actual+'. ':'')+d;
+      actual=fp.value;
+    }
+  });
+}
+
 function _sugerirDrogasPorTec(tec){
   var t=(tec||'').toLowerCase();
   // Leer subtipo si existe para mayor precision
   var sub=(document.getElementById('fj-tec-subtipo')?document.getElementById('fj-tec-subtipo').value||'':'').toLowerCase();
   var v=sub||t;
   if(/tiva/.test(v))sugerirDrogas('tiva');
-  else if(/raqui/.test(v))sugerirDrogas('raquidea');
-  else if(/peridural|epidural/.test(v))sugerirDrogas('peridural');
-  else if(/general|neuroaxial/.test(v)&&!/raqui|peridural/.test(v))sugerirDrogas('general');
+  else if(/raqui/.test(v)){sugerirDrogas('raquidea');autoPremedRegional();}
+  else if(/peridural|epidural/.test(v)){sugerirDrogas('peridural');autoPremedRegional();}
+  else if(/neuroaxial/.test(v)&&!/raqui|peridural/.test(v)){sugerirDrogas('raquidea');autoPremedRegional();}
+  else if(/general/.test(v)&&!/raqui|peridural|neuroaxial/.test(v))sugerirDrogas('general');
   else if(/sedac|cam|local/.test(v))sugerirDrogas('sedacion');
-  else if(/bloqueo/.test(v))sugerirDrogas('bloqueo');
+  else if(/bloqueo/.test(v)){sugerirDrogas('bloqueo');autoPremedRegional();}
   else sugerirDrogas('');
 }
 
@@ -4731,9 +4754,20 @@ function actualizarMetodos(){
   var mat=document.getElementById('fj-materiales');
   if(mat){
     var tipo2=document.getElementById('fj-tec-tipo')?document.getElementById('fj-tec-tipo').value:'';
-    // Sedación y regional no tienen material descartable de vía aérea
-    if(tipo2==='sedacion'||tipo2==='neuroaxial'||tipo2==='bloqueo'||tipo2==='local'){
+    // Sedación y local no tienen material descartable
+    if(tipo2==='sedacion'||tipo2==='local'){
       mat.value=''; return;
+    }
+    // Regional/bloqueo: leer aguja y calibre elegidos arriba
+    if(tipo2==='neuroaxial'||tipo2==='bloqueo'){
+      var agTec=document.getElementById('fj-tec-aguja')?document.getElementById('fj-tec-aguja').value:'';
+      var calTec=document.getElementById('fj-tec-calibre')?document.getElementById('fj-tec-calibre').value:'';
+      if(agTec){
+        var sub2=document.getElementById('fj-tec-subtipo')?document.getElementById('fj-tec-subtipo').value:'';
+        var esPeri=/pidural|ombinada/i.test(sub2);
+        mat.value=agTec+(calTec?' '+calTec:'')+(esPeri?'. Catéter peridural.':'.');
+      }
+      return;
     }
     var via2=document.getElementById('fj-via')?document.getElementById('fj-via').value:'';
     if(via2==='TRAQUEO'||via2==='Traqueostomía'){
@@ -4765,10 +4799,14 @@ function actualizarMetodos(){
         mat.value='Tubo endotraqueal Nº '+(t?t.value:'7')+' con manguito de baja presión.';
       }
     } else if(tipo==='raquidea'){
-      var a=document.getElementById('metodos-aguja');
-      mat.value='Aguja raquidea punta lapiz '+(a?a.value:'AR 25 PL')+'.';
+      // Leer aguja y calibre elegidos arriba en Técnica Anestésica
+      var agTec=document.getElementById('fj-tec-aguja')?document.getElementById('fj-tec-aguja').value:'';
+      var calTec=document.getElementById('fj-tec-calibre')?document.getElementById('fj-tec-calibre').value:'';
+      mat.value=agTec?agTec+' '+(calTec||'')+'.':'Aguja raquídea punta lápiz.';
     } else if(tipo==='peridural'){
-      mat.value='Aguja de Tuohy 18G. Cateter peridural.';
+      var agTec2=document.getElementById('fj-tec-aguja')?document.getElementById('fj-tec-aguja').value:'';
+      var calTec2=document.getElementById('fj-tec-calibre')?document.getElementById('fj-tec-calibre').value:'';
+      mat.value=(agTec2?agTec2+' '+(calTec2||'')+'. Catéter peridural.':'Aguja de Tuohy 18G. Catéter peridural.');
     } else if(tipo==='bloqueo'||tipo==='localasistida'){
       // Mostrar selector de aguja para bloqueos periféricos
       var agWrap=document.getElementById('metodos-aguja-bloqueo-wrap');
