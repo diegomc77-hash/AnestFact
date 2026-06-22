@@ -4519,12 +4519,12 @@ function _sugerirDrogasPorTec(tec){
   var sub=(document.getElementById('fj-tec-subtipo')?document.getElementById('fj-tec-subtipo').value||'':'').toLowerCase();
   var v=sub||t;
   if(/tiva/.test(v))sugerirDrogas('tiva');
-  else if(/raqui/.test(v)){sugerirDrogas('raquidea');autoPremedRegional();}
-  else if(/peridural|epidural/.test(v)){sugerirDrogas('peridural');autoPremedRegional();}
-  else if(/neuroaxial/.test(v)&&!/raqui|peridural/.test(v)){sugerirDrogas('raquidea');autoPremedRegional();}
+  else if(/raqui/.test(v)){sugerirDrogas('raquidea');setTimeout(autoPremedRegional,100);}
+  else if(/peridural|epidural/.test(v)){sugerirDrogas('peridural');setTimeout(autoPremedRegional,100);}
+  else if(/neuroaxial/.test(v)&&!/raqui|peridural/.test(v)){sugerirDrogas('raquidea');setTimeout(autoPremedRegional,100);}
   else if(/general/.test(v)&&!/raqui|peridural|neuroaxial/.test(v))sugerirDrogas('general');
   else if(/sedac|cam|local/.test(v))sugerirDrogas('sedacion');
-  else if(/bloqueo/.test(v)){sugerirDrogas('bloqueo');autoPremedRegional();}
+  else if(/bloqueo/.test(v)){sugerirDrogas('bloqueo');setTimeout(autoPremedRegional,100);}
   else sugerirDrogas('');
 }
 
@@ -4722,7 +4722,6 @@ function setMetodos(tipo){
   if(tipo==='raquidea'){extra.style.display='block';extra.innerHTML='<div class="field" style="margin-bottom:8px"><label>Aguja raquídea</label><select class="fi" id="metodos-aguja" onchange="actualizarMetodos()"><option>AR 25 PL</option><option>AR 26 PL</option><option>AR 27 PL</option></select></div>';}
   else if(tipo==='general'||tipo==='tiva'){extra.style.display='block';extra.innerHTML='<div class="field" style="margin-bottom:8px"><label>Tubo endotraqueal Nº</label><select class="fi" id="metodos-tubo" onchange="actualizarMetodos()"><option>5</option><option>6</option><option>7</option><option>7 1/2</option><option>8</option></select></div>';}
   if(tipo!=='raquidea'&&tipo!=='general'&&tipo!=='tiva'){extra.style.display='none';extra.innerHTML='';}
-  else{extra.style.display='none';}
   extra.setAttribute('data-tipo',tipo);
   var fn=METODOS_TEXTOS[tipo];var ta=document.getElementById('fj-metodos');
   if(ta&&fn)ta.value=fn();
