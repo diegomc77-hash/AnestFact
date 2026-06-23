@@ -4499,18 +4499,17 @@ function getMayoVitals(){
   var tbody=document.getElementById('mayo-vitals-body');
   if(!tbody)return[];
   var rows=[];
-  Array.from(tbody.rows).forEach(function(tr){
-    var cells=tr.querySelectorAll('input');
+  for(var i=0;i<tbody.rows.length;i++){
+    var tr=tbody.rows[i];
+    var cells=tr.cells;
     if(cells.length>=7){
-      rows.push({min:cells[0].value||tr.cells[0].textContent.trim(),sist:cells[1]?cells[1].value:'',diast:cells[2]?cells[2].value:'',sato2:cells[3]?cells[3].value:'',eco2:cells[4]?cells[4].value:'',fc:cells[5]?cells[5].value:'',pam:cells[6]?cells[6].value:''});
-    } else if(cells.length===6){
-      var min=tr.cells[0].textContent.trim();
-      rows.push({min:min,sist:cells[0].value,diast:cells[1].value,sato2:cells[2].value,eco2:cells[3].value,fc:cells[4].value,pam:cells[5].value});
+      var cv=function(c){if(!c)return'';var inp=c.querySelector('input');return(inp?inp.value:c.textContent||'').trim();};
+      var r={min:cv(cells[0]),sist:cv(cells[1]),diast:cv(cells[2]),sato2:cv(cells[3]),eco2:cv(cells[4]),fc:cv(cells[5]),pam:cv(cells[6])};
+      if(r.sist||r.fc||r.sato2)rows.push(r);
     }
-  });
-  return rows.filter(function(r){return r.sist||r.fc||r.sato2;});
+  }
+  return rows;
 }
-
 function getMayoMonitoreo(){
   var items=[];
   [['mon-etco2','EtCO2'],['mon-pam','PAM'],['mon-ecg','ECG'],['mon-sato2','SAT O2'],['mon-pani','PANI'],['mon-decub','PROT.DECUB.'],['mon-emerg','EMERGENCIA']].forEach(function(p){
