@@ -342,8 +342,9 @@ function rellenar(d){
   }
   // Recuperación — 8458
   if(d.recuperacion&&setId('8458',d.recuperacion))ok++;
-  // Observación/Complicación — 8460
-  if(d.observaciones&&setId('8460',d.observaciones))ok++;
+  // Observación/Complicación — 8460 (observaciones finales de la foja)
+  var obs460=(d.observacionesFinal||d.observaciones||'');
+  if(obs460&&setId('8460',obs460))ok++;
 
   alert('AnestFact \u2192 GECLISA \u2713\n'+ok+' campos rellenados.\nRevisa y haz clic en GRABAR.');
 }

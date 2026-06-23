@@ -3828,7 +3828,8 @@ function renderGeclisa(){
     +cpRow('Otro',f.otro||'')
     +secT('8 — Postoperatorio')
     +cpRow('Recuperación',f.recup||'S/p')
-    +cpRow('Observación/Complicación',f.obs||'S/p');
+    +cpRow('Observación/Complicación',f.obs||'S/p')
+    +cpRow('Observaciones finales (foja)',f.obs||'');
   var gS=[{n:1,t:'Ingresar a GECLISA',d:'<b>sanatoriomayo.myvnc.com:84</b> — usuario Mhuerta'},{n:2,t:'Ubicación y sector',d:'Ubicación: <b>SANATORIO MAYO</b> → Sector: <b>PRE-QUIRÚRGICO</b> → Consultor'},{n:3,t:'Buscar paciente',d:'Click en ≡ de <b>'+(i.pac||'el paciente')+'</b>'},{n:4,t:'Evoluciones',d:'Tocar <b>Evoluciones</b>'},{n:5,t:'Nuevo protocolo',d:'Columna derecha → <b>Nuevo</b>'},{n:6,t:'Plantilla',d:'Elegir <b>"Anestesia - Ficha Anestesia"</b> → Seleccionar'},{n:7,t:'Llenar con 📋',d:'Copiar cada campo y pegarlo en GECLISA'},{n:8,t:'Guardar',d:'Click en <b>GRABAR</b>'}];
   steps.innerHTML=gS.map(function(s){return'<div class="step-item"><div class="step-num">'+s.n+'</div><div class="step-txt"><b>'+s.t+'</b><br>'+s.d+'</div></div>';}).join('');
   fojaqx.innerHTML='<div style="font-size:12px;color:var(--text2);line-height:2">'
@@ -4582,6 +4583,7 @@ function abrirGeclisa(){
     anestesista:'HUERTA MARIA SOLEDAD',matricula:'32393',
     horaFin:f.fin||'',cirujano:i.ciru||'',especialidad:i.serv||'',
     observaciones:f.obs_geclisa||f.obs||'',
+    observacionesFinal:f.obs||'',
     examenFisico:f.examenFisico||'',
     premedicacion:f.premed||'',
     antibioticoprofilaxis:(document.getElementById('fj-atb')?document.getElementById('fj-atb').value:''),
@@ -4968,10 +4970,10 @@ function actualizarMetodos(){
         mat.value='Máscara Laríngea (Dispositivo Supraglótico).';
       } else if(via2b==='INT_NASO'){
         var t=document.getElementById('metodos-tubo');
-        mat.value='Tubo nasotraqueal Nº '+(t?t.value:'7')+' con manguito de baja presión.';
+        mat.value='Tubo nasotraqueal Nº '+(t?t.value:'7')+'.';
       } else {
         var t=document.getElementById('metodos-tubo');
-        mat.value='Tubo endotraqueal Nº '+(t?t.value:'7')+' con manguito de baja presión.';
+        mat.value='Tubo endotraqueal Nº '+(t?t.value:'7')+'.';
       }
     } else if(tipo==='raquidea'){
       // Leer aguja y calibre elegidos arriba en Técnica Anestésica
