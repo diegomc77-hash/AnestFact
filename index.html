@@ -623,8 +623,6 @@ select.fi option{background:var(--bg2)}
       <div style="display:none">
         <input type="text" id="fj-fluido1">
         <input type="text" id="fj-fluido2">
-        <input type="text" id="fj-orina">
-        <input type="text" id="fj-sangrado">
       </div>
       <button class="btn btn-b" style="margin-top:10px;width:100%" onclick="go('geclisa')">&#127973; Ver Guía GECLISA completa</button>
       </div><!-- /mayo-helper-body -->
@@ -663,16 +661,24 @@ select.fi option{background:var(--bg2)}
       <div class="field"><label>Suero</label>
         <select class="fi" id="fj-suero"><option value="">—</option><option>250 ml</option><option>500 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option></select>
       </div>
-      <div class="field"><label>Sangre</label>
-        <select class="fi" id="fj-sangre"><option value="">—</option><option>0 ml</option><option>250 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option></select>
+      <div class="field"><label>Sangre (Glóbulos rojos)</label>
+        <select class="fi" id="fj-sangre"><option value="">—</option><option>0 ml</option><option>250 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1 unidad</option><option>2 unidades</option><option>3 unidades</option><option>4 unidades</option></select>
       </div>
     </div>
     <div class="g2">
       <div class="field"><label>Plasma</label>
-        <select class="fi" id="fj-plasma"><option value="">—</option><option>0 ml</option><option>200 ml</option><option>400 ml</option><option>600 ml</option><option>800 ml</option></select>
+        <select class="fi" id="fj-plasma"><option value="">—</option><option>0 ml</option><option>200 ml</option><option>400 ml</option><option>600 ml</option><option>800 ml</option><option>1 unidad</option><option>2 unidades</option><option>3 unidades</option><option>4 unidades</option></select>
       </div>
-      <div class="field"><label>Otro</label>
-        <select class="fi" id="fj-otro"><option value="">—</option><option>0 ml</option><option>100 ml</option><option>250 ml</option><option>500 ml</option><option>1000 ml</option></select>
+      <div class="field"><label>Orina / Diuresis</label>
+        <input class="fi" type="text" id="fj-orina" placeholder="ej: 400 ml">
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>Sangrado intraoperatorio</label>
+        <input class="fi" type="text" id="fj-sangrado" placeholder="ej: 200 ml">
+      </div>
+      <div class="field"><label>Otro (especificar)</label>
+        <input class="fi" type="text" id="fj-otro" placeholder="ej: Coloides 500ml, Plaquetas 1u">
       </div>
     </div>
   </div>
@@ -3814,8 +3820,12 @@ function renderGeclisa(){
       }).join('')
       :'<div style="font-size:12px;color:var(--text3);padding:6px 0">Registrá los valores en la tabla de la Foja Mayo</div>')
     +secT('7 — Balance')
-    +cpRow('Fluidos / Suero',f.suero||'')+cpRow('Sangre',f.sangre||'')
-    +cpRow('Plasma',f.plasma||'')+cpRow('Otro',f.otro||'')
+    +cpRow('Fluidos / Suero',f.suero||'')
+    +cpRow('Sangre / Glóbulos rojos',f.sangre||'')
+    +cpRow('Plasma',f.plasma||'')
+    +cpRow('Orina / Diuresis',f.orina||'')
+    +cpRow('Sangrado intraoperatorio',f.sangrado||'')
+    +cpRow('Otro',f.otro||'')
     +secT('8 — Postoperatorio')
     +cpRow('Recuperación',f.recup||'S/p')
     +cpRow('Observación/Complicación',f.obs||'S/p');
@@ -4590,7 +4600,7 @@ function abrirGeclisa(){
     viaAerea:f.via||'',metodos:f.metodos||'',materiales:f.materiales||'',
     vitals:f.mayo_vitals||[],
     fluido1:f.fluido1||f.suero||'',fluido2:f.fluido2||'',
-    sangre:f.sangre||'0',plasma:f.plasma||'0',otro:f.otro||'0',
+    sangre:f.sangre||'',plasma:f.plasma||'',otro:f.otro||'',
     orina:(f.orina!==undefined&&f.orina!==''?f.orina:'0'),sangrado:(f.sangrado||'0'),
     recuperacion:f.recup||'S/p',
     timestamp:new Date().toISOString()
