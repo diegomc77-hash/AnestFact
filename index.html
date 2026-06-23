@@ -662,20 +662,20 @@ select.fi option{background:var(--bg2)}
         <select class="fi" id="fj-suero"><option value="">—</option><option>250 ml</option><option>500 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option></select>
       </div>
       <div class="field"><label>Sangre (Glóbulos rojos)</label>
-        <select class="fi" id="fj-sangre"><option value="">—</option><option>0 ml</option><option>250 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1 unidad</option><option>2 unidades</option><option>3 unidades</option><option>4 unidades</option></select>
+        <select class="fi" id="fj-sangre"><option value="">—</option><option>0 ml</option><option>250 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option><option>1 unidad (~275 ml)</option><option>2 unidades (~550 ml)</option><option>3 unidades (~825 ml)</option><option>4 unidades (~1100 ml)</option><option>5 unidades (~1375 ml)</option><option>6 unidades (~1650 ml)</option><option>7 unidades (~1925 ml)</option><option>8 unidades (~2200 ml)</option><option>9 unidades (~2475 ml)</option><option>10 unidades (~2750 ml)</option></select>
       </div>
     </div>
     <div class="g2">
-      <div class="field"><label>Plasma</label>
-        <select class="fi" id="fj-plasma"><option value="">—</option><option>0 ml</option><option>200 ml</option><option>400 ml</option><option>600 ml</option><option>800 ml</option><option>1 unidad</option><option>2 unidades</option><option>3 unidades</option><option>4 unidades</option></select>
+      <div class="field"><label>Plasma Fresco Congelado</label>
+        <select class="fi" id="fj-plasma"><option value="">—</option><option>0 ml</option><option>200 ml</option><option>400 ml</option><option>600 ml</option><option>800 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>1 unidad (~225 ml)</option><option>2 unidades (~450 ml)</option><option>3 unidades (~675 ml)</option><option>4 unidades (~900 ml)</option><option>5 unidades (~1125 ml)</option><option>6 unidades (~1350 ml)</option><option>7 unidades (~1575 ml)</option><option>8 unidades (~1800 ml)</option><option>9 unidades (~2025 ml)</option><option>10 unidades (~2250 ml)</option></select>
       </div>
       <div class="field"><label>Orina / Diuresis</label>
-        <input class="fi" type="text" id="fj-orina" placeholder="ej: 400 ml">
+        <select class="fi" id="fj-orina"><option value="">—</option><option>0 ml</option><option>100 ml</option><option>200 ml</option><option>300 ml</option><option>400 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option><option>4000 ml</option><option>5000 ml</option><option>6000 ml</option></select>
       </div>
     </div>
     <div class="g2">
       <div class="field"><label>Sangrado intraoperatorio</label>
-        <input class="fi" type="text" id="fj-sangrado" placeholder="ej: 200 ml">
+        <select class="fi" id="fj-sangrado"><option value="">—</option><option>0 ml</option><option>50 ml</option><option>100 ml</option><option>200 ml</option><option>300 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option><option>4000 ml</option><option>5000 ml</option></select>
       </div>
       <div class="field"><label>Otro (especificar)</label>
         <input class="fi" type="text" id="fj-otro" placeholder="ej: Coloides 500ml, Plaquetas 1u">
@@ -3671,7 +3671,7 @@ function cargarFojaUI(){cargarFojaVG();setTimeout(function(){tecRestaurar((S.cur
   sv('fj-tec',f.tec);sv('fj-asa',f.asa);sv('fj-via',f.via);sv('fj-fin',f.fin);
   sv('fj-ind',f.ind||'');sv('fj-hint',f.hint||'');sv('fj-hext',f.hext||'');
   sv('fj-premed',f.premed||'');sv('fj-atb',f.atb||'');sv('fj-metodos',f.metodos||'');
-  sv('fj-recup',f.recup||'');sv('fj-obs',f.obs||'');sv('fj-examen-fisico',f.examenFisico||'');sv('fj-mallampati',f.mallampati||'');
+  sv('fj-recup',f.recup||'');sv('fj-obs',f.obs||'');sv('fj-examen-fisico',f.examenFisico||'');sv('fj-mallampati',f.mallampati||'');sv('fj-orina',f.orina||'');sv('fj-sangrado',f.sangrado||'');
   sv('fj-suero',f.suero||'');sv('fj-sangre',f.sangre||'');sv('fj-plasma',f.plasma||'');sv('fj-otro',f.otro||'');
   S.vitals=f.vitals||[];
   if(f.sign)S.signData=f.sign;
