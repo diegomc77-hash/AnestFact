@@ -101,7 +101,7 @@ select.fi option{background:var(--bg2)}
 <div id="topbar">
   <button id="back-btn" onclick="goBack()">&#8249;</button>
   <div style="flex:1"><div class="logo" id="t-title">AnesFact <span>v6</span></div>
-  <div style="font-size:11px;color:var(--text3)">Dra. Huerta &middot; M.P.32393 &middot; ADAARC</div></div>
+  <div style="font-size:11px;color:var(--text3)" id="header-anest-info">Dra. Huerta &middot; M.P.32393 &middot; ADAARC</div></div>
   <button onclick="irScan()" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px" title="Configuraci&oacute;n">&#9881;</button>
 </div>
 
@@ -248,6 +248,23 @@ select.fi option{background:var(--bg2)}
 </div>
 
 <div id="view-scan" class="view">
+  <div class="card">
+    <div class="ct">&#128100; Datos del Anestesista</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Estos datos se usan en la guía GECLISA y en la firma de la foja.</p>
+    <div class="field"><label>Nombre completo</label>
+      <input class="fi" type="text" id="cfg-anest-nombre" placeholder="APELLIDO Nombre">
+    </div>
+    <div class="g2" style="margin-top:8px">
+      <div class="field"><label>Matrícula Provincial (M.P.)</label>
+        <input class="fi" type="text" id="cfg-anest-mp" placeholder="32393">
+      </div>
+      <div class="field"><label>Matrícula Especial (M.E.)</label>
+        <input class="fi" type="text" id="cfg-anest-me" placeholder="15518">
+      </div>
+    </div>
+    <button class="btn btn-g" style="margin-top:10px" onclick="guardarAnestesista()">&#128190; Guardar datos</button>
+    <div id="anest-status" style="font-size:12px;margin-top:8px;color:var(--green)"></div>
+  </div>
   <div class="card">
     <div class="ct">API Key Gemini (Gratis)</div>
     <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Gratis en <b>aistudio.google.com</b> → Get API Key. 1500 req/día sin tarjeta.</p>
@@ -3481,7 +3498,7 @@ function go(id,addH){
   if(addH)S.hist.push(id);
   document.getElementById('back-btn').style.display=S.hist.length>1?'block':'none';
   document.getElementById('t-title').textContent=TITLES[id]||'AnesFact v5';
-  if(id==='home')renderHome();if(id==='foja')renderRecupSelects();
+  if(id==='home'){renderHome();if(S.hist.length===1)cargarAnestesista();}if(id==='foja')renderRecupSelects();
   if(id==='resumen')renderResumen();
   if(id==='foja'){cargarFojaUI();setTimeout(initSign,80);renderPesoChips();renderRecupChips();renderFojaPorSanatorio();}
   if(id==='geclisa'){window._geclisaTexto='';renderGeclisa();}
@@ -3495,6 +3512,37 @@ function goBack(){
   var dest=S.hist[S.hist.length-1]||'home';
   go(dest,false);
 }
+function guardarAnestesista(){
+  var nombre=document.getElementById('cfg-anest-nombre').value.trim().toUpperCase();
+  var mp=document.getElementById('cfg-anest-mp').value.trim();
+  var me=document.getElementById('cfg-anest-me').value.trim();
+  if(!nombre){alert('Ingresá el nombre del anestesista');return;}
+  localStorage.setItem('af_anest_nombre',nombre);
+  localStorage.setItem('af_anest_mp',mp);
+  localStorage.setItem('af_anest_me',me);
+  document.getElementById('anest-status').textContent='✓ Guardado: '+nombre+' M.P.'+mp;
+  // Actualizar header
+  var h=document.getElementById('header-anest-info');
+  if(h)h.textContent=nombre+' · M.P.'+mp+' · ADAARC';
+  toast('Datos del anestesista guardados ✓');
+}
+
+function cargarAnestesista(){
+  var nombre=localStorage.getItem('af_anest_nombre')||'';
+  var mp=localStorage.getItem('af_anest_mp')||'';
+  var me=localStorage.getItem('af_anest_me')||'';
+  var el=document.getElementById('cfg-anest-nombre');if(el)el.value=nombre;
+  var el2=document.getElementById('cfg-anest-mp');if(el2)el2.value=mp;
+  var el3=document.getElementById('cfg-anest-me');if(el3)el3.value=me;
+  var h=document.getElementById('header-anest-info');
+  if(h&&nombre)h.textContent=nombre+' · M.P.'+mp+' · ADAARC';
+  // Primera vez: redirigir a config
+  if(!nombre&&!localStorage.getItem('af_anest_visto')){
+    localStorage.setItem('af_anest_visto','1');
+    setTimeout(function(){go('scan');toast('Configurá tus datos de anestesista → Ajustes');},800);
+  }
+}
+
 function irScan(){document.getElementById('err-panel').classList.remove('on');document.getElementById('btn-extraer').style.display='none';document.getElementById('file-prev').innerHTML='';S.pendFiles=[];go('scan');}
 var _tt;
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(function(){t.classList.remove('show');},2600);}
@@ -3772,8 +3820,8 @@ function renderGeclisa(){
     +cpRow('Tipo de Cirugía',(i.mayo_tipociru||'PROGRAMADA').toUpperCase()+(i.ob?' - Obesidad Mórbida':''))
     +cpRow('Diagnóstico/cx realizada',i.diag||'')
     +secT('2 — Equipo y Procedimiento')
-    +cpRow('Anestesista','HUERTA MARIA SOLEDAD')
-    +cpRow('Matrícula','32393')
+    +cpRow('Anestesista',localStorage.getItem('af_anest_nombre')||'HUERTA MARIA SOLEDAD')
+    +cpRow('Matrícula',localStorage.getItem('af_anest_mp')||'32393')
     +cpRow('Hora Inicio',i.hora||'')+cpRow('Hora Fin',f.fin||'')
     +cpRow('Cirujano',i.ciru||'')+cpRow('Especialidad',i.serv||'')
     +cpRow('Observaciones generales',f.obs_geclisa||f.obs||'')
@@ -4580,7 +4628,7 @@ function abrirGeclisa(){
     tipoCirugia:i.mayo_tipociru||'PROGRAMADA',
     posicion:i.mayo_posicion||'',
     diagnostico:i.diag||'',
-    anestesista:'HUERTA MARIA SOLEDAD',matricula:'32393',
+    anestesista:(localStorage.getItem('af_anest_nombre')||'HUERTA MARIA SOLEDAD'),matricula:(localStorage.getItem('af_anest_mp')||'32393'),
     horaFin:f.fin||'',cirujano:i.ciru||'',especialidad:i.serv||'',
     observaciones:f.obs_geclisa||f.obs||'',
     observacionesFinal:((f.obs_geclisa||'')+(f.obs?(f.obs_geclisa?' | ':'')+f.obs:'')).trim(),
