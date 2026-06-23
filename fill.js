@@ -266,24 +266,44 @@ function rellenar(d){
   if(d.induccion&&setId('8121',d.induccion))ok++;             // Inducción
   if(d.mantenimiento&&setId('8123',d.mantenimiento))ok++;     // Mantenimiento (typo nativo: MANTEMIENTO)
 
-  // BLOQUE 6 — Signos vitales (grilla 108 inputs)
-  // IDs SIST por columna temporal:
-  var sistIds=[8134,8140,8147,8153,8159,8166,8172,8178,8185,
-               8191,8197,8204,8210,8216,8222,8223,8224];
-  // Cada columna: SIST(+0), DIAST(+1), SAT02(+2), ECO2(+3), FC(+4), PAM(+5)
+  // BLOQUE 6 — Signos vitales (grilla Mayo)
+  // IDs base de SIST por tiempo (cada columna: +0=SIST +1=DIAST +2=SAT02 +3=ECO2 +4=FC +5=PAM)
+  var tiemposVitals=[
+    {min:5,   base:8134},
+    {min:15,  base:8147},
+    {min:30,  base:8166},
+    {min:45,  base:8185},
+    {min:60,  base:8204},
+    {min:75,  base:8222},
+    {min:90,  base:8225},
+    {min:105, base:8228},
+    {min:120, base:8231},
+    {min:125, base:8289},
+    {min:135, base:8291},
+    {min:150, base:8295},
+    {min:165, base:8299},
+    {min:180, base:8303},
+    {min:195, base:8307},
+    {min:210, base:8311},
+    {min:225, base:8315},
+    {min:240, base:8319}
+  ];
   try{
     if(d.vitals&&d.vitals.length){
-      d.vitals.forEach(function(v,idx){
-        if(idx>=sistIds.length)return;
-        var base=sistIds[idx];
+      d.vitals.forEach(function(v){
+        // Buscar el tiempo que corresponde
+        var min=parseInt(v.min)||0;
+        var tv=tiemposVitals.find(function(t){return t.min===min;});
+        if(!tv)return;
+        var base=tv.base;
         var vals=[v.sist,v.diast,v.sato2,v.eco2,v.fc,v.pam];
         vals.forEach(function(val,ci){
           if(val===undefined||val===null||val==='')return;
           var el=D.getElementById(String(base+ci));
           if(el)setVal(el,String(val));
         });
+        ok++;
       });
-      ok+=d.vitals.length;
     }
   }catch(e){}
 
