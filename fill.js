@@ -306,37 +306,33 @@ function rellenar(d){
     }
   }catch(e){}
 
-  // BLOQUE 7 — Balances y cierre
-  // Fluidos — dos inputs correlativos, buscar por posicion relativa
-  try{
-    var allInp=Array.from(D.querySelectorAll('input[type=text],input:not([type])'));
-    var rec=D.getElementById('8458');
-    var recIdx=allInp.indexOf(rec);
-    // Fluidos, orina, sangrado estan antes de recuperacion
-    // Buscar inputs numericos antes del 8458
-    if(d.fluido1){
-      var flu=D.querySelector('input[name*="fluido"],input[name*="FLUIDO"]');
-      if(!flu){
-        // Buscar por posicion: ~10 inputs antes de recuperacion
-        if(recIdx>10)flu=allInp[recIdx-10];
-      }
-      if(flu)setVal(flu,d.fluido1);
-    }
-  }catch(e){}
-
-  // Orina y sangrado — solo si tienen valor distinto de 0
-  // (no pisar campos si no hay dato real)
-  if(d.orina&&d.orina!=='0'&&d.orina!==0){
-    var orinaEl=D.querySelector('input[name*="orina"],input[name*="ORINA"]');
-    if(orinaEl)setVal(orinaEl,String(d.orina));
+  // BLOQUE 7 — Balances y cierre (IDs reales confirmados)
+  // Fluidos/Suero — 8448
+  if(d.fluido1)setId('8448',d.fluido1);
+  // Sangre/Glóbulos rojos — 8449
+  if(d.sangre&&d.sangre!=='0 ml'&&d.sangre!=='0'){
+    setId('8449','Glóbulos rojos: '+d.sangre);ok++;
   }
-  if(d.sangrado&&d.sangrado!=='0'&&d.sangrado!==0){
-    var sangEl=D.querySelector('input[name*="sangrado"],input[name*="SANGRADO"],input[name*="sangre"]');
-    if(sangEl)setVal(sangEl,String(d.sangrado));
+  // Orina/Diuresis — 8451
+  if(d.orina&&d.orina!=='0'&&d.orina!==''){
+    setId('8451',d.orina);ok++;
   }
-
-  // Recuperación — id=8458
+  // Plasma — 8452
+  if(d.plasma&&d.plasma!=='0 ml'&&d.plasma!=='0'){
+    setId('8452','Plasma: '+d.plasma);ok++;
+  }
+  // Otro (cristaloides/plaquetas/etc) — 8454
+  if(d.otro&&d.otro!=='0 ml'&&d.otro!=='0'){
+    setId('8454','Otros fluidos: '+d.otro);ok++;
+  }
+  // Sangrado intraoperatorio — 8455
+  if(d.sangrado&&d.sangrado!=='0'&&d.sangrado!==''){
+    setId('8455',d.sangrado);ok++;
+  }
+  // Recuperación — 8458
   if(d.recuperacion&&setId('8458',d.recuperacion))ok++;
+  // Observación/Complicación — 8460
+  if(d.observaciones&&setId('8460',d.observaciones))ok++;
 
   alert('AnestFact \u2192 GECLISA \u2713\n'+ok+' campos rellenados.\nRevisa y haz clic en GRABAR.');
 }

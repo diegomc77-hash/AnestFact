@@ -4590,7 +4590,8 @@ function abrirGeclisa(){
     viaAerea:f.via||'',metodos:f.metodos||'',materiales:f.materiales||'',
     vitals:f.mayo_vitals||[],
     fluido1:f.fluido1||f.suero||'',fluido2:f.fluido2||'',
-    orina:(f.orina!==undefined&&f.orina!==''?f.orina:'0'),sangrado:(f.sangrado||f.sangre||'0'),
+    sangre:f.sangre||'0',plasma:f.plasma||'0',otro:f.otro||'0',
+    orina:(f.orina!==undefined&&f.orina!==''?f.orina:'0'),sangrado:(f.sangrado||'0'),
     recuperacion:f.recup||'S/p',
     timestamp:new Date().toISOString()
   };
