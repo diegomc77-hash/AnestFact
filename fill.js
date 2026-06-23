@@ -289,8 +289,19 @@ function rellenar(d){
   ];
   try{
     if(d.vitals&&d.vitals.length){
+      // Calcular duración real de cirugía para no rellenar tiempos inexistentes
+      var duracionMax=999;
+      try{
+        if(d.horaInicio&&d.horaFin){
+          var t1=d.horaInicio.split(':');var t2=d.horaFin.split(':');
+          var minInicio=parseInt(t1[0])*60+parseInt(t1[1]);
+          var minFin=parseInt(t2[0])*60+parseInt(t2[1]);
+          if(minFin>minInicio)duracionMax=minFin-minInicio;
+        }
+      }catch(e){}
       d.vitals.forEach(function(v){
         var min=parseInt(v.min)||0;
+        if(min>duracionMax)return; // No rellenar tiempos que superan la duración real
         var tv=null;
         for(var ti=0;ti<tiemposVitals.length;ti++){if(tiemposVitals[ti].min===min){tv=tiemposVitals[ti];break;}}
         if(!tv)return;
