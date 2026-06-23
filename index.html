@@ -101,7 +101,7 @@ select.fi option{background:var(--bg2)}
 <div id="topbar">
   <button id="back-btn" onclick="goBack()">&#8249;</button>
   <div style="flex:1"><div class="logo" id="t-title">AnesFact <span>v6</span></div>
-  <div style="font-size:11px;color:var(--text3)">Dra. Huerta &middot; M.P.32393 &middot; ADAARC</div></div>
+  <div style="font-size:11px;color:var(--text3)" id="header-anest-info">Dra. Huerta &middot; M.P.32393 &middot; ADAARC</div></div>
   <button onclick="irScan()" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px" title="Configuraci&oacute;n">&#9881;</button>
 </div>
 
@@ -248,6 +248,23 @@ select.fi option{background:var(--bg2)}
 </div>
 
 <div id="view-scan" class="view">
+  <div class="card">
+    <div class="ct">&#128100; Datos del Anestesista</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Estos datos se usan en la guía GECLISA y en la firma de la foja.</p>
+    <div class="field"><label>Nombre completo</label>
+      <input class="fi" type="text" id="cfg-anest-nombre" placeholder="APELLIDO Nombre">
+    </div>
+    <div class="g2" style="margin-top:8px">
+      <div class="field"><label>Matrícula Provincial (M.P.)</label>
+        <input class="fi" type="text" id="cfg-anest-mp" placeholder="32393">
+      </div>
+      <div class="field"><label>Matrícula Especial (M.E.)</label>
+        <input class="fi" type="text" id="cfg-anest-me" placeholder="15518">
+      </div>
+    </div>
+    <button class="btn btn-g" style="margin-top:10px" onclick="guardarAnestesista()">&#128190; Guardar datos</button>
+    <div id="anest-status" style="font-size:12px;margin-top:8px;color:var(--green)"></div>
+  </div>
   <div class="card">
     <div class="ct">API Key Gemini (Gratis)</div>
     <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Gratis en <b>aistudio.google.com</b> → Get API Key. 1500 req/día sin tarjeta.</p>
@@ -623,8 +640,6 @@ select.fi option{background:var(--bg2)}
       <div style="display:none">
         <input type="text" id="fj-fluido1">
         <input type="text" id="fj-fluido2">
-        <input type="text" id="fj-orina">
-        <input type="text" id="fj-sangrado">
       </div>
       <button class="btn btn-b" style="margin-top:10px;width:100%" onclick="go('geclisa')">&#127973; Ver Guía GECLISA completa</button>
       </div><!-- /mayo-helper-body -->
@@ -663,16 +678,24 @@ select.fi option{background:var(--bg2)}
       <div class="field"><label>Suero</label>
         <select class="fi" id="fj-suero"><option value="">—</option><option>250 ml</option><option>500 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option></select>
       </div>
-      <div class="field"><label>Sangre</label>
-        <select class="fi" id="fj-sangre"><option value="">—</option><option>0 ml</option><option>250 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option></select>
+      <div class="field"><label>Sangre (Glóbulos rojos)</label>
+        <select class="fi" id="fj-sangre"><option value="">—</option><option>0 ml</option><option>250 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option><option>1 unidad (~275 ml)</option><option>2 unidades (~550 ml)</option><option>3 unidades (~825 ml)</option><option>4 unidades (~1100 ml)</option><option>5 unidades (~1375 ml)</option><option>6 unidades (~1650 ml)</option><option>7 unidades (~1925 ml)</option><option>8 unidades (~2200 ml)</option><option>9 unidades (~2475 ml)</option><option>10 unidades (~2750 ml)</option></select>
       </div>
     </div>
     <div class="g2">
-      <div class="field"><label>Plasma</label>
-        <select class="fi" id="fj-plasma"><option value="">—</option><option>0 ml</option><option>200 ml</option><option>400 ml</option><option>600 ml</option><option>800 ml</option></select>
+      <div class="field"><label>Plasma Fresco Congelado</label>
+        <select class="fi" id="fj-plasma"><option value="">—</option><option>0 ml</option><option>200 ml</option><option>400 ml</option><option>600 ml</option><option>800 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>1 unidad (~225 ml)</option><option>2 unidades (~450 ml)</option><option>3 unidades (~675 ml)</option><option>4 unidades (~900 ml)</option><option>5 unidades (~1125 ml)</option><option>6 unidades (~1350 ml)</option><option>7 unidades (~1575 ml)</option><option>8 unidades (~1800 ml)</option><option>9 unidades (~2025 ml)</option><option>10 unidades (~2250 ml)</option></select>
       </div>
-      <div class="field"><label>Otro</label>
-        <select class="fi" id="fj-otro"><option value="">—</option><option>0 ml</option><option>100 ml</option><option>250 ml</option><option>500 ml</option><option>1000 ml</option></select>
+      <div class="field"><label>Orina / Diuresis</label>
+        <select class="fi" id="fj-orina"><option value="">—</option><option>0 ml</option><option>100 ml</option><option>200 ml</option><option>300 ml</option><option>400 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option><option>4000 ml</option><option>5000 ml</option><option>6000 ml</option></select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>Sangrado intraoperatorio</label>
+        <select class="fi" id="fj-sangrado"><option value="">—</option><option>0 ml</option><option>50 ml</option><option>100 ml</option><option>200 ml</option><option>300 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option><option>4000 ml</option><option>5000 ml</option></select>
+      </div>
+      <div class="field"><label>Otro (especificar)</label>
+        <input class="fi" type="text" id="fj-otro" placeholder="ej: Coloides 500ml, Plaquetas 1u">
       </div>
     </div>
   </div>
@@ -3475,7 +3498,7 @@ function go(id,addH){
   if(addH)S.hist.push(id);
   document.getElementById('back-btn').style.display=S.hist.length>1?'block':'none';
   document.getElementById('t-title').textContent=TITLES[id]||'AnesFact v5';
-  if(id==='home')renderHome();if(id==='foja')renderRecupSelects();
+  if(id==='home'){renderHome();if(S.hist.length===1)cargarAnestesista();}if(id==='foja')renderRecupSelects();
   if(id==='resumen')renderResumen();
   if(id==='foja'){cargarFojaUI();setTimeout(initSign,80);renderPesoChips();renderRecupChips();renderFojaPorSanatorio();}
   if(id==='geclisa'){window._geclisaTexto='';renderGeclisa();}
@@ -3489,6 +3512,37 @@ function goBack(){
   var dest=S.hist[S.hist.length-1]||'home';
   go(dest,false);
 }
+function guardarAnestesista(){
+  var nombre=document.getElementById('cfg-anest-nombre').value.trim().toUpperCase();
+  var mp=document.getElementById('cfg-anest-mp').value.trim();
+  var me=document.getElementById('cfg-anest-me').value.trim();
+  if(!nombre){alert('Ingresá el nombre del anestesista');return;}
+  localStorage.setItem('af_anest_nombre',nombre);
+  localStorage.setItem('af_anest_mp',mp);
+  localStorage.setItem('af_anest_me',me);
+  document.getElementById('anest-status').textContent='✓ Guardado: '+nombre+' M.P.'+mp;
+  // Actualizar header
+  var h=document.getElementById('header-anest-info');
+  if(h)h.textContent=nombre+' · M.P.'+mp+' · ADAARC';
+  toast('Datos del anestesista guardados ✓');
+}
+
+function cargarAnestesista(){
+  var nombre=localStorage.getItem('af_anest_nombre')||'';
+  var mp=localStorage.getItem('af_anest_mp')||'';
+  var me=localStorage.getItem('af_anest_me')||'';
+  var el=document.getElementById('cfg-anest-nombre');if(el)el.value=nombre;
+  var el2=document.getElementById('cfg-anest-mp');if(el2)el2.value=mp;
+  var el3=document.getElementById('cfg-anest-me');if(el3)el3.value=me;
+  var h=document.getElementById('header-anest-info');
+  if(h&&nombre)h.textContent=nombre+' · M.P.'+mp+' · ADAARC';
+  // Primera vez: redirigir a config
+  if(!nombre&&!localStorage.getItem('af_anest_visto')){
+    localStorage.setItem('af_anest_visto','1');
+    setTimeout(function(){go('scan');toast('Configurá tus datos de anestesista → Ajustes');},800);
+  }
+}
+
 function irScan(){document.getElementById('err-panel').classList.remove('on');document.getElementById('btn-extraer').style.display='none';document.getElementById('file-prev').innerHTML='';S.pendFiles=[];go('scan');}
 var _tt;
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(function(){t.classList.remove('show');},2600);}
@@ -3665,7 +3719,7 @@ function cargarFojaUI(){cargarFojaVG();setTimeout(function(){tecRestaurar((S.cur
   sv('fj-tec',f.tec);sv('fj-asa',f.asa);sv('fj-via',f.via);sv('fj-fin',f.fin);
   sv('fj-ind',f.ind||'');sv('fj-hint',f.hint||'');sv('fj-hext',f.hext||'');
   sv('fj-premed',f.premed||'');sv('fj-atb',f.atb||'');sv('fj-metodos',f.metodos||'');
-  sv('fj-recup',f.recup||'');sv('fj-obs',f.obs||'');sv('fj-examen-fisico',f.examenFisico||'');sv('fj-mallampati',f.mallampati||'');
+  sv('fj-recup',f.recup||'');sv('fj-obs',f.obs||'');sv('fj-examen-fisico',f.examenFisico||'');sv('fj-mallampati',f.mallampati||'');sv('fj-orina',f.orina||'');sv('fj-sangrado',f.sangrado||'');
   sv('fj-suero',f.suero||'');sv('fj-sangre',f.sangre||'');sv('fj-plasma',f.plasma||'');sv('fj-otro',f.otro||'');
   S.vitals=f.vitals||[];
   if(f.sign)S.signData=f.sign;
@@ -3766,8 +3820,8 @@ function renderGeclisa(){
     +cpRow('Tipo de Cirugía',(i.mayo_tipociru||'PROGRAMADA').toUpperCase()+(i.ob?' - Obesidad Mórbida':''))
     +cpRow('Diagnóstico/cx realizada',i.diag||'')
     +secT('2 — Equipo y Procedimiento')
-    +cpRow('Anestesista','HUERTA MARIA SOLEDAD')
-    +cpRow('Matrícula','32393')
+    +cpRow('Anestesista',localStorage.getItem('af_anest_nombre')||'HUERTA MARIA SOLEDAD')
+    +cpRow('Matrícula',localStorage.getItem('af_anest_mp')||'32393')
     +cpRow('Hora Inicio',i.hora||'')+cpRow('Hora Fin',f.fin||'')
     +cpRow('Cirujano',i.ciru||'')+cpRow('Especialidad',i.serv||'')
     +cpRow('Observaciones generales',f.obs_geclisa||f.obs||'')
@@ -3814,11 +3868,16 @@ function renderGeclisa(){
       }).join('')
       :'<div style="font-size:12px;color:var(--text3);padding:6px 0">Registrá los valores en la tabla de la Foja Mayo</div>')
     +secT('7 — Balance')
-    +cpRow('Fluidos / Suero',f.suero||'')+cpRow('Sangre',f.sangre||'')
-    +cpRow('Plasma',f.plasma||'')+cpRow('Otro',f.otro||'')
+    +cpRow('Fluidos / Suero',f.suero||'')
+    +cpRow('Sangre / Glóbulos rojos',f.sangre||'')
+    +cpRow('Plasma',f.plasma||'')
+    +cpRow('Orina / Diuresis',f.orina||'')
+    +cpRow('Sangrado intraoperatorio',f.sangrado||'')
+    +cpRow('Otro',f.otro||'')
     +secT('8 — Postoperatorio')
     +cpRow('Recuperación',f.recup||'S/p')
-    +cpRow('Observación/Complicación',f.obs||'S/p');
+    +cpRow('Observación/Complicación',f.obs||'S/p')
+    +cpRow('Observaciones finales (foja)',f.obs||'');
   var gS=[{n:1,t:'Ingresar a GECLISA',d:'<b>sanatoriomayo.myvnc.com:84</b> — usuario Mhuerta'},{n:2,t:'Ubicación y sector',d:'Ubicación: <b>SANATORIO MAYO</b> → Sector: <b>PRE-QUIRÚRGICO</b> → Consultor'},{n:3,t:'Buscar paciente',d:'Click en ≡ de <b>'+(i.pac||'el paciente')+'</b>'},{n:4,t:'Evoluciones',d:'Tocar <b>Evoluciones</b>'},{n:5,t:'Nuevo protocolo',d:'Columna derecha → <b>Nuevo</b>'},{n:6,t:'Plantilla',d:'Elegir <b>"Anestesia - Ficha Anestesia"</b> → Seleccionar'},{n:7,t:'Llenar con 📋',d:'Copiar cada campo y pegarlo en GECLISA'},{n:8,t:'Guardar',d:'Click en <b>GRABAR</b>'}];
   steps.innerHTML=gS.map(function(s){return'<div class="step-item"><div class="step-num">'+s.n+'</div><div class="step-txt"><b>'+s.t+'</b><br>'+s.d+'</div></div>';}).join('');
   fojaqx.innerHTML='<div style="font-size:12px;color:var(--text2);line-height:2">'
@@ -3969,7 +4028,7 @@ function imprimirFoja(){
     +'<h1>FOJA DE ANESTESIA</h1>'
     +'<div class="r"><div style="flex:3"><span class="l">Apellido y nombres</span><div class="f">'+(i.pac||'')+'</div></div><div style="flex:0 0 118px"><span class="l">D.N.I. N&#176;</span><div class="f">'+(i.dni||'')+'</div></div></div>'
     +'<div class="r"><div style="flex:2"><span class="l">Servicio</span><div class="f">'+(i.serv||i.diag||'')+'</div></div><div style="flex:0 0 72px"><span class="l">Sala</span><div class="f">'+(i.sala||'')+'</div></div><div style="flex:0 0 60px"><span class="l">Cama N&#176;</span><div class="f">'+(i.cama||'')+'</div></div></div>'
-    +'<div class="r"><div style="flex:0 0 64px"><span class="l">Fecha</span><div class="f">'+fmt(i.fecha)+'</div></div><div style="flex:0 0 36px"><span class="l">Edad</span><div class="f">'+(i.edad||'')+'</div></div><div style="flex:0 0 26px"><span class="l">Sexo</span><div class="f">'+(i.sexo||'')+'</div></div><div style="flex:0 0 42px"><span class="l">Peso</span><div class="f">'+(i.peso?i.peso+' kg':'')+'</div></div><div style="flex:1"><span class="l">Premedicaci&#243;n</span><div class="f">'+(f.premed||'')+'<div style="flex:0 0 44px"><span class="l">Inicio</span><div class="f">'+(i.hora||'')+'</div></div><div style="flex:0 0 44px"><span class="l">Fin</span><div class="f">'+(f.fin||'')+'</div></div></div>'
+    +'<div class="r"><div style="flex:0 0 64px"><span class="l">Fecha</span><div class="f">'+fmt(i.fecha)+'</div></div><div style="flex:0 0 36px"><span class="l">Edad</span><div class="f">'+(i.edad||'')+'</div></div><div style="flex:0 0 26px"><span class="l">Sexo</span><div class="f">'+(i.sexo||'')+'</div></div><div style="flex:0 0 42px"><span class="l">Peso</span><div class="f">'+(i.peso?i.peso+' kg':'')+'</div></div><div style="flex:1"><span class="l">Premedicaci&#243;n</span><div class="f">'+(f.premed||'')+'</div></div><div style="flex:0 0 44px"><span class="l">Hora</span><div class="f">'+(i.hora||'')+'</div></div></div>'
     +'<div class="r"><div style="flex:1"><span class="l">Hallazgos f&#237;sicos anormales</span><div class="f" style="min-height:14px">&nbsp;</div></div></div>'
     +'<div style="margin:3px 0;font-size:9.5px"><b>Inducci&#243;n:</b>&nbsp;<span class="chk">'+(f.ind==="Satisfactoria"?"&#10003;":"")+'</span>Satisfactoria&nbsp;&nbsp;<span class="chk">'+(f.ind==="Prolongada"?"&#10003;":"")+'</span>Prolongada&nbsp;&nbsp;<span class="chk">'+(f.ind==="Tormentosa"?"&#10003;":"")+'</span>Tormentosa</div>'
     +'<div class="r"><div style="flex:1"><span class="l">Hora intubaci&#243;n</span><div class="f">'+(f.hint||'')+'</div></div><div style="flex:2"></div><div style="flex:1"><span class="l">Hora extubaci&#243;n</span><div class="f">'+(f.hext||'')+'</div></div></div>'
@@ -3985,7 +4044,7 @@ function imprimirFoja(){
     +'<div style="display:flex;gap:8px;margin-top:5px"><div style="flex:2"><div class="s">Observaciones:</div><div style="border:1px solid #ccc;padding:3px;min-height:65px;font-size:10px">'+(f.obs||'')+'</div>'
     +'<div style="border:1px solid #ccc;border-top:none;padding:2px 3px;text-align:center;font-size:7.5px;font-weight:bold">FIRMA Y SELLO DEL ANESTESISTA</div></div>'
     +'<div style="flex:0 0 138px;display:flex;flex-direction:column;justify-content:flex-end;text-align:center">'+signImg
-    +'<div style="border-top:1.5px solid #000;padding-top:3px;font-size:8px"><b>'+(localStorage.getItem('af_anest_nombre')||'MARIA SOLEDAD HUERTA')+'</b><br>M.P. '+(localStorage.getItem('af_anest_mp')||'32393')+' &nbsp; M.E. '+(localStorage.getItem('af_anest_me')||'15518')+'<br>Anest&#243;loga &middot; ADAARC</div></div></div>'
+    +'<div style="border-top:1.5px solid #000;padding-top:3px;font-size:8px"><b>MARIA SOLEDAD HUERTA</b><br>M.P. 32393 &nbsp; M.E. 15518<br>Anest&#243;loga &middot; ADAARC</div></div></div>'
     +'<div style="display:flex;gap:8px;margin-top:5px;border-top:2px solid #000;padding-top:4px"><div style="flex:1"><div class="s">Hemoterapia:</div><div style="font-size:9.5px;line-height:2.1">'
     +'Sangre: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.sangre||'')+'</span> cm&#179;<br>'
     +'Plasma: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.plasma||'')+'</span> cm&#179;<br>'
@@ -4100,7 +4159,7 @@ var Y_VALS=[200,187.5,175,162.5,150,137.5,125,112.5,100,87.5,75,62.5,50,37.5,25,
 function hm2min(s){var p=s.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
 function min2hm(m){var h=Math.floor(m/60)%24,mm=m%60;return(h<10?'0':'')+h+':'+(mm<10?'0':'')+mm;}
 function selParam(btn){document.querySelectorAll('.param-btn').forEach(function(b){b.style.borderColor='var(--border)';b.style.color='var(--text2)';b.classList.remove('active');});btn.style.borderColor='var(--green)';btn.style.color='var(--green)';btn.classList.add('active');VG.activeParam=btn.getAttribute('data-p');}
-function generarColumnas(){var hi=document.getElementById('vg-inicio').value||document.getElementById('f-hora').value||'';var hf=document.getElementById('vg-fin').value||'';if(!hi){toast('Completá la hora de inicio');return;}var sm=hm2min(hi),em=hf?hm2min(hf):sm+90;VG.cols=[];VG.cells={};VG.obs={};VG.fluidos={};for(var t=sm;t<=em;t+=5)VG.cols.push({t:min2hm(t)});renderVitalsGrid();guardarFojaVG();if(S.cur)guardar();toast('Columnas generadas: '+VG.cols.length);}
+function generarColumnas(){var hi=document.getElementById('vg-inicio').value||document.getElementById('f-hora').value||'';var hf=document.getElementById('vg-fin').value||'';if(!hi){toast('Complet\u00e1 la hora de inicio');return;}var sm=hm2min(hi),em=hf?hm2min(hf):sm+90;VG.cols=[];VG.cells={};VG.obs={};VG.fluidos={};for(var t=sm;t<=em;t+=5)VG.cols.push({t:min2hm(t)});renderVitalsGrid();toast('Columnas generadas: '+VG.cols.length);}
 function cellKey(ci,val){return ci+'_'+val;}
 function toggleCell(ci,val){var k=cellKey(ci,val);var p=VG.activeParam;if(VG.cells[k]&&VG.cells[k].param===p){delete VG.cells[k];}else{VG.cells[k]={param:p,sym:PARAMS[p].sym,color:PARAMS[p].color};}renderVitalsGrid();}
 function renderVitalsGrid(){
@@ -4499,18 +4558,17 @@ function getMayoVitals(){
   var tbody=document.getElementById('mayo-vitals-body');
   if(!tbody)return[];
   var rows=[];
-  Array.from(tbody.rows).forEach(function(tr){
-    var cells=tr.querySelectorAll('input');
+  for(var i=0;i<tbody.rows.length;i++){
+    var tr=tbody.rows[i];
+    var cells=tr.cells;
     if(cells.length>=7){
-      rows.push({min:cells[0].value||tr.cells[0].textContent.trim(),sist:cells[1]?cells[1].value:'',diast:cells[2]?cells[2].value:'',sato2:cells[3]?cells[3].value:'',eco2:cells[4]?cells[4].value:'',fc:cells[5]?cells[5].value:'',pam:cells[6]?cells[6].value:''});
-    } else if(cells.length===6){
-      var min=tr.cells[0].textContent.trim();
-      rows.push({min:min,sist:cells[0].value,diast:cells[1].value,sato2:cells[2].value,eco2:cells[3].value,fc:cells[4].value,pam:cells[5].value});
+      var cv=function(c){if(!c)return'';var inp=c.querySelector('input');return(inp?inp.value:c.textContent||'').trim();};
+      var r={min:cv(cells[0]),sist:cv(cells[1]),diast:cv(cells[2]),sato2:cv(cells[3]),eco2:cv(cells[4]),fc:cv(cells[5]),pam:cv(cells[6])};
+      if(r.sist||r.fc||r.sato2)rows.push(r);
     }
-  });
-  return rows.filter(function(r){return r.sist||r.fc||r.sato2;});
+  }
+  return rows;
 }
-
 function getMayoMonitoreo(){
   var items=[];
   [['mon-etco2','EtCO2'],['mon-pam','PAM'],['mon-ecg','ECG'],['mon-sato2','SAT O2'],['mon-pani','PANI'],['mon-decub','PROT.DECUB.'],['mon-emerg','EMERGENCIA']].forEach(function(p){
@@ -4570,9 +4628,10 @@ function abrirGeclisa(){
     tipoCirugia:i.mayo_tipociru||'PROGRAMADA',
     posicion:i.mayo_posicion||'',
     diagnostico:i.diag||'',
-    anestesista:'HUERTA MARIA SOLEDAD',matricula:'32393',
+    anestesista:(localStorage.getItem('af_anest_nombre')||'HUERTA MARIA SOLEDAD'),matricula:(localStorage.getItem('af_anest_mp')||'32393'),
     horaFin:f.fin||'',cirujano:i.ciru||'',especialidad:i.serv||'',
     observaciones:f.obs_geclisa||f.obs||'',
+    observacionesFinal:((f.obs_geclisa||'')+(f.obs?(f.obs_geclisa?' | ':'')+f.obs:'')).trim(),
     examenFisico:f.examenFisico||'',
     premedicacion:f.premed||'',
     antibioticoprofilaxis:(document.getElementById('fj-atb')?document.getElementById('fj-atb').value:''),
@@ -4591,7 +4650,8 @@ function abrirGeclisa(){
     viaAerea:f.via||'',metodos:f.metodos||'',materiales:f.materiales||'',
     vitals:f.mayo_vitals||[],
     fluido1:f.fluido1||f.suero||'',fluido2:f.fluido2||'',
-    orina:(f.orina!==undefined&&f.orina!==''?f.orina:'0'),sangrado:(f.sangrado||f.sangre||'0'),
+    sangre:f.sangre||'',plasma:f.plasma||'',otro:f.otro||'',
+    orina:(f.orina!==undefined&&f.orina!==''?f.orina:'0'),sangrado:(f.sangrado||'0'),
     recuperacion:f.recup||'S/p',
     timestamp:new Date().toISOString()
   };
@@ -4958,10 +5018,10 @@ function actualizarMetodos(){
         mat.value='Máscara Laríngea (Dispositivo Supraglótico).';
       } else if(via2b==='INT_NASO'){
         var t=document.getElementById('metodos-tubo');
-        mat.value='Tubo nasotraqueal Nº '+(t?t.value:'7')+' con manguito de baja presión.';
+        mat.value='Tubo nasotraqueal Nº '+(t?t.value:'7')+'.';
       } else {
         var t=document.getElementById('metodos-tubo');
-        mat.value='Tubo endotraqueal Nº '+(t?t.value:'7')+' con manguito de baja presión.';
+        mat.value='Tubo endotraqueal Nº '+(t?t.value:'7')+'.';
       }
     } else if(tipo==='raquidea'){
       // Leer aguja y calibre elegidos arriba en Técnica Anestésica
