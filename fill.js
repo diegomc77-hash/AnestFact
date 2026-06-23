@@ -266,40 +266,39 @@ function rellenar(d){
   if(d.induccion&&setId('8121',d.induccion))ok++;             // Inducción
   if(d.mantenimiento&&setId('8123',d.mantenimiento))ok++;     // Mantenimiento (typo nativo: MANTEMIENTO)
 
-  // BLOQUE 6 — Signos vitales (grilla Mayo)
-  // IDs base de SIST por tiempo (cada columna: +0=SIST +1=DIAST +2=SAT02 +3=ECO2 +4=FC +5=PAM)
+  // BLOQUE 6 — Signos vitales (grilla Mayo) — IDs reales mapeados desde Foja_Anestesica.html
   var tiemposVitals=[
-    {min:5,   base:8134},
-    {min:15,  base:8147},
-    {min:30,  base:8166},
-    {min:45,  base:8185},
-    {min:60,  base:8204},
-    {min:75,  base:8222},
-    {min:90,  base:8225},
-    {min:105, base:8228},
-    {min:120, base:8231},
-    {min:125, base:8289},
-    {min:135, base:8291},
-    {min:150, base:8295},
-    {min:165, base:8299},
-    {min:180, base:8303},
-    {min:195, base:8307},
-    {min:210, base:8311},
-    {min:225, base:8315},
-    {min:240, base:8319}
+    {min:5,   sist:8134,diast:8135,sato2:8136,eco2:8137,fc:8138,pam:8139},
+    {min:15,  sist:8147,diast:8148,sato2:8149,eco2:8150,fc:8151,pam:8152},
+    {min:30,  sist:8166,diast:8167,sato2:8168,eco2:8169,fc:8170,pam:8171},
+    {min:45,  sist:8185,diast:8186,sato2:8187,eco2:8188,fc:8189,pam:8190},
+    {min:60,  sist:8204,diast:8205,sato2:8206,eco2:8207,fc:8208,pam:8209},
+    {min:75,  sist:8222,diast:8236,sato2:8246,eco2:8256,fc:8266,pam:8276},
+    {min:90,  sist:8225,diast:8239,sato2:8249,eco2:8259,fc:8269,pam:8279},
+    {min:105, sist:8228,diast:8242,sato2:8253,eco2:8262,fc:8272,pam:8282},
+    {min:120, sist:8231,diast:8245,sato2:8255,eco2:8265,fc:8275,pam:8285},
+    {min:125, sist:8289,diast:8321,sato2:8347,eco2:8372,fc:8397,pam:8422},
+    {min:135, sist:8291,diast:8324,sato2:8349,eco2:8374,fc:8399,pam:8424},
+    {min:150, sist:8295,diast:8327,sato2:8352,eco2:8377,fc:8402,pam:8427},
+    {min:165, sist:8299,diast:8330,sato2:8355,eco2:8380,fc:8405,pam:8430},
+    {min:180, sist:8303,diast:8333,sato2:8358,eco2:8383,fc:8408,pam:8433},
+    {min:195, sist:8307,diast:8336,sato2:8361,eco2:8386,fc:8411,pam:8436},
+    {min:210, sist:8311,diast:8339,sato2:8364,eco2:8389,fc:8414,pam:8439},
+    {min:225, sist:8315,diast:8342,sato2:8367,eco2:8392,fc:8417,pam:8442},
+    {min:240, sist:8319,diast:8345,sato2:8370,eco2:8395,fc:8420,pam:8445}
   ];
   try{
     if(d.vitals&&d.vitals.length){
       d.vitals.forEach(function(v){
-        // Buscar el tiempo que corresponde
         var min=parseInt(v.min)||0;
-        var tv=tiemposVitals.find(function(t){return t.min===min;});
+        var tv=null;
+        for(var ti=0;ti<tiemposVitals.length;ti++){if(tiemposVitals[ti].min===min){tv=tiemposVitals[ti];break;}}
         if(!tv)return;
-        var base=tv.base;
-        var vals=[v.sist,v.diast,v.sato2,v.eco2,v.fc,v.pam];
-        vals.forEach(function(val,ci){
+        var campos={sist:v.sist,diast:v.diast,sato2:v.sato2,eco2:v.eco2,fc:v.fc,pam:v.pam};
+        Object.keys(campos).forEach(function(k){
+          var val=campos[k];
           if(val===undefined||val===null||val==='')return;
-          var el=D.getElementById(String(base+ci));
+          var el=D.getElementById(String(tv[k]));
           if(el)setVal(el,String(val));
         });
         ok++;
