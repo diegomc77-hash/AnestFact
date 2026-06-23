@@ -4583,7 +4583,7 @@ function abrirGeclisa(){
     anestesista:'HUERTA MARIA SOLEDAD',matricula:'32393',
     horaFin:f.fin||'',cirujano:i.ciru||'',especialidad:i.serv||'',
     observaciones:f.obs_geclisa||f.obs||'',
-    observacionesFinal:f.obs||'',
+    observacionesFinal:((f.obs_geclisa||'')+(f.obs?(f.obs_geclisa?' | ':'')+f.obs:'')).trim(),
     examenFisico:f.examenFisico||'',
     premedicacion:f.premed||'',
     antibioticoprofilaxis:(document.getElementById('fj-atb')?document.getElementById('fj-atb').value:''),
