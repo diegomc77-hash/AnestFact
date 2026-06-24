@@ -480,6 +480,8 @@ select.fi option{background:var(--bg2)}
         <select class="fi" id="fj-ind"><option value="">&mdash;</option><option>Satisfactoria</option><option>Prolongada</option><option>Tormentosa</option></select>
       </div>
       <div class="field"><label>Hora fin</label><input class="fi" type="time" id="fj-fin"></div>
+      <div class="field" id="hint-wrap"><label>Hora intubaci&oacute;n</label><input class="fi" type="time" id="fj-hint"></div>
+      <div class="field" id="hext-wrap"><label>Hora extubaci&oacute;n</label><input class="fi" type="time" id="fj-hext"></div>
     </div>
     <div class="field"><label>Premedicaci&oacute;n</label>
       <div class="ac-wrap">
@@ -4027,7 +4029,7 @@ function imprimirFoja(){
     +'</style></head><body>'
     +'<h1>FOJA DE ANESTESIA</h1>'
     +'<div class="r"><div style="flex:3"><span class="l">Apellido y nombres</span><div class="f">'+(i.pac||'')+'</div></div><div style="flex:0 0 118px"><span class="l">D.N.I. N&#176;</span><div class="f">'+(i.dni||'')+'</div></div></div>'
-    +'<div class="r"><div style="flex:2"><span class="l">Servicio</span><div class="f">'+(i.serv||i.diag||'')+'</div></div><div style="flex:0 0 72px"><span class="l">Sala</span><div class="f">'+(i.sala||'')+'</div></div><div style="flex:0 0 60px"><span class="l">Cama N&#176;</span><div class="f">'+(i.cama||'')+'</div></div></div>'
+    +'<div class="r"><div style="flex:2"><span class="l">Servicio</span><div class="f">'+(i.serv||'')+'</div></div><div style="flex:3"><span class="l">Procedimiento</span><div class="f">'+(i.diag||'')+'</div></div><div style="flex:0 0 72px"><span class="l">Sala</span><div class="f">'+(i.sala||'')+'</div></div><div style="flex:0 0 60px"><span class="l">Cama N&#176;</span><div class="f">'+(i.cama||'')+'</div></div></div>'
     +'<div class="r"><div style="flex:0 0 64px"><span class="l">Fecha</span><div class="f">'+fmt(i.fecha)+'</div></div><div style="flex:0 0 36px"><span class="l">Edad</span><div class="f">'+(i.edad||'')+'</div></div><div style="flex:0 0 26px"><span class="l">Sexo</span><div class="f">'+(i.sexo||'')+'</div></div><div style="flex:0 0 42px"><span class="l">Peso</span><div class="f">'+(i.peso?i.peso+' kg':'')+'</div></div><div style="flex:1"><span class="l">Premedicaci&#243;n</span><div class="f">'+(f.premed||'')+'</div></div><div style="flex:0 0 44px"><span class="l">Hora</span><div class="f">'+(i.hora||'')+'</div></div></div>'
     +'<div class="r"><div style="flex:1"><span class="l">Hallazgos f&#237;sicos anormales</span><div class="f" style="min-height:14px">&nbsp;</div></div></div>'
     +'<div style="margin:3px 0;font-size:9.5px"><b>Inducci&#243;n:</b>&nbsp;<span class="chk">'+(f.ind==="Satisfactoria"?"&#10003;":"")+'</span>Satisfactoria&nbsp;&nbsp;<span class="chk">'+(f.ind==="Prolongada"?"&#10003;":"")+'</span>Prolongada&nbsp;&nbsp;<span class="chk">'+(f.ind==="Tormentosa"?"&#10003;":"")+'</span>Tormentosa</div>'
@@ -4507,6 +4509,8 @@ function renderFojaPorSanatorio(){
   // Imprimir button - hide for Mayo (they use GECLISA)
   var bi=document.getElementById('btn-imprimir-foja');
   if(bi)bi.style.display=esMayo?'none':'block';
+  var hw=document.getElementById('hint-wrap');if(hw)hw.style.display=esMayo?'none':'block';
+  var hw2=document.getElementById('hext-wrap');if(hw2)hw2.style.display=esMayo?'none':'block';
   // Generate Mayo vitals rows if Mayo and no rows yet
   if(esMayo){
     var tbody=document.getElementById('mayo-vitals-body');
