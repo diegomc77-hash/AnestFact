@@ -479,9 +479,8 @@ select.fi option{background:var(--bg2)}
       <div class="field"><label>Inducci&oacute;n</label>
         <select class="fi" id="fj-ind"><option value="">&mdash;</option><option>Satisfactoria</option><option>Prolongada</option><option>Tormentosa</option></select>
       </div>
-      <div class="field"><label>Hora fin</label><input class="fi" type="time" id="fj-fin"></div>
-      <div class="field" id="hint-wrap"><label>Hora intubaci&oacute;n</label><input class="fi" type="time" id="fj-hint"></div>
-      <div class="field" id="hext-wrap"><label>Hora extubaci&oacute;n</label><input class="fi" type="time" id="fj-hext"></div>
+      <!-- Hora fin oculta - se muestra en card Tiempos para Aeronáutico -->
+      <div style="display:none"><input type="time" id="fj-fin"><input type="time" id="fj-hint"><input type="time" id="fj-hext"></div>
     </div>
     <div class="field"><label>Premedicaci&oacute;n</label>
       <div class="ac-wrap">
@@ -649,13 +648,20 @@ select.fi option{background:var(--bg2)}
       <button class="btn btn-b" style="width:100%;margin-top:10px;font-size:14px;padding:12px" onclick="guardarFoja();abrirGeclisa()">&#127973; Enviar a GECLISA</button>
     </div>
   </div>
+  <div class="card" id="aero-tiempos-wrap" style="display:none">
+    <div class="ct">&#9200; Tiempos quir&#250;rgicos</div>
+    <div class="g2" style="margin-bottom:6px">
+      <div class="field"><label>Hora inicio cirug&#237;a</label><input class="fi" type="time" id="vg-inicio"></div>
+      <div class="field"><label>Hora fin cirug&#237;a</label><input class="fi" type="time" id="vg-fin" onchange="document.getElementById('fj-fin').value=this.value"></div>
+    </div>
+    <div class="g2" style="margin-bottom:6px">
+      <div class="field"><label>Hora intubaci&#243;n</label><input class="fi" type="time" id="fj-hint-vis" onchange="document.getElementById('fj-hint').value=this.value"></div>
+      <div class="field"><label>Hora extubaci&#243;n</label><input class="fi" type="time" id="fj-hext-vis" onchange="document.getElementById('fj-hext').value=this.value"></div>
+    </div>
+  </div>
   <div class="card" id="vitals-card">
     <div class="ct">Gr&#225;fico intraoperatorio</div>
     <p style="font-size:11px;color:var(--text3);margin-bottom:8px">Cada cuadrado = 12.5 unidades &middot; Y: 0&ndash;200 &middot; X: tiempo c/5 min</p>
-    <div class="g2" style="margin-bottom:10px">
-      <div class="field"><label>Hora inicio</label><input class="fi" type="time" id="vg-inicio"></div>
-      <div class="field"><label>Hora fin</label><input class="fi" type="time" id="vg-fin"></div>
-    </div>
     <button class="btn btn-s" style="margin-bottom:12px;font-size:13px" onclick="generarColumnas()">&#9200; Generar columnas</button>
     <div style="margin-bottom:10px">
       <div style="font-size:12px;color:var(--text3);margin-bottom:6px;font-weight:500">Par&#225;metro activo:</div>
@@ -3721,6 +3727,8 @@ function cargarFojaUI(){cargarFojaVG();setTimeout(function(){tecRestaurar((S.cur
   var vgF=document.getElementById('vg-fin');
   if(vgI&&!vgI.value&&S.cur&&S.cur.hora)vgI.value=S.cur.hora;
   if(vgF&&!vgF.value&&S.cur&&S.cur.foja&&S.cur.foja.fin)vgF.value=S.cur.foja.fin;
+  var hintV=document.getElementById('fj-hint-vis');if(hintV&&S.cur&&S.cur.foja)hintV.value=S.cur.foja.hint||'';
+  var hextV=document.getElementById('fj-hext-vis');if(hextV&&S.cur&&S.cur.foja)hextV.value=S.cur.foja.hext||'';
   if(!S.cur||!S.cur.foja)return;
   var f=S.cur.foja;
   sv('fj-tec',f.tec);sv('fj-asa',f.asa);sv('fj-via',f.via);sv('fj-fin',f.fin);
@@ -4514,8 +4522,7 @@ function renderFojaPorSanatorio(){
   // Imprimir button - hide for Mayo (they use GECLISA)
   var bi=document.getElementById('btn-imprimir-foja');
   if(bi)bi.style.display=esMayo?'none':'block';
-  var hw=document.getElementById('hint-wrap');if(hw)hw.style.display=esMayo?'none':'block';
-  var hw2=document.getElementById('hext-wrap');if(hw2)hw2.style.display=esMayo?'none':'block';
+  var atw=document.getElementById('aero-tiempos-wrap');if(atw)atw.style.display=esMayo?'none':'block';
   // Generate Mayo vitals rows if Mayo and no rows yet
   if(esMayo){
     var tbody=document.getElementById('mayo-vitals-body');
