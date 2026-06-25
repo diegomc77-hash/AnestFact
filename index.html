@@ -3716,6 +3716,11 @@ function quitarPrac(i){S.cur.pracs.splice(i,1);renderPracs();}
 // FOJA
 // ═══════════════════════════════════════════════════
 function cargarFojaUI(){cargarFojaVG();setTimeout(function(){tecRestaurar((S.cur&&S.cur.foja&&S.cur.foja.tec)||'');},50);
+  // Precargar horas del gráfico desde i.hora y fj-fin
+  var vgI=document.getElementById('vg-inicio');
+  var vgF=document.getElementById('vg-fin');
+  if(vgI&&!vgI.value&&S.cur&&S.cur.hora)vgI.value=S.cur.hora;
+  if(vgF&&!vgF.value&&S.cur&&S.cur.foja&&S.cur.foja.fin)vgF.value=S.cur.foja.fin;
   if(!S.cur||!S.cur.foja)return;
   var f=S.cur.foja;
   sv('fj-tec',f.tec);sv('fj-asa',f.asa);sv('fj-via',f.via);sv('fj-fin',f.fin);
