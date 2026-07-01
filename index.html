@@ -479,7 +479,8 @@ select.fi option{background:var(--bg2)}
       <div class="field"><label>Inducci&oacute;n</label>
         <select class="fi" id="fj-ind"><option value="">&mdash;</option><option>Satisfactoria</option><option>Prolongada</option><option>Tormentosa</option></select>
       </div>
-      <div class="field"><label>Hora fin</label><input class="fi" type="time" id="fj-fin"></div>
+      <!-- Hora fin oculta - se muestra en card Tiempos para Aeronáutico -->
+      <div style="display:none"><input type="time" id="fj-fin"><input type="time" id="fj-hint"><input type="time" id="fj-hext"></div>
     </div>
     <div class="field"><label>Premedicaci&oacute;n</label>
       <div class="ac-wrap">
@@ -647,14 +648,46 @@ select.fi option{background:var(--bg2)}
       <button class="btn btn-b" style="width:100%;margin-top:10px;font-size:14px;padding:12px" onclick="guardarFoja();abrirGeclisa()">&#127973; Enviar a GECLISA</button>
     </div>
   </div>
+  <div class="card" id="aero-tiempos-wrap" style="display:none">
+    <div class="ct">&#9200; Tiempos quir&#250;rgicos</div>
+    <div class="g2" style="margin-bottom:6px">
+      <div class="field"><label>Hora inicio cirug&#237;a</label><input class="fi" type="time" id="vg-inicio"></div>
+      <div class="field"><label>Hora fin cirug&#237;a</label><input class="fi" type="time" id="vg-fin" onchange="document.getElementById('fj-fin').value=this.value"></div>
+    </div>
+    <div class="g2" style="margin-bottom:6px">
+      <div class="field"><label>Hora inicio anestesia / intubaci&#243;n</label><input class="fi" type="time" id="fj-hint-vis" onchange="document.getElementById('fj-hint').value=this.value"></div>
+      <div class="field"><label>Hora fin anestesia / extubaci&#243;n</label><input class="fi" type="time" id="fj-hext-vis" onchange="document.getElementById('fj-hext').value=this.value"></div>
+    </div>
+  </div>
   <div class="card" id="vitals-card">
     <div class="ct">Gr&#225;fico intraoperatorio</div>
     <p style="font-size:11px;color:var(--text3);margin-bottom:8px">Cada cuadrado = 12.5 unidades &middot; Y: 0&ndash;200 &middot; X: tiempo c/5 min</p>
-    <div class="g2" style="margin-bottom:10px">
-      <div class="field"><label>Hora inicio</label><input class="fi" type="time" id="vg-inicio"></div>
-      <div class="field"><label>Hora fin</label><input class="fi" type="time" id="vg-fin"></div>
+    <div id="aero-prediccion-wrap">
+      <p style="font-size:11px;color:var(--text3);margin-bottom:8px">Ingresá los valores base y el sistema predice el gráfico automáticamente.</p>
+      <div class="g2" style="margin-bottom:6px">
+        <div class="field"><label>TA Sist. base</label><input class="fi" type="number" id="aero-sist" placeholder="120" min="60" max="250"></div>
+        <div class="field"><label>TA Diast. base</label><input class="fi" type="number" id="aero-diast" placeholder="75" min="40" max="150"></div>
+      </div>
+      <div class="g2" style="margin-bottom:6px">
+        <div class="field"><label>FC base</label><input class="fi" type="number" id="aero-fc" placeholder="75" min="40" max="180"></div>
+        <div class="field"><label>SAT O2 base (%)</label><input class="fi" type="number" id="aero-sat" placeholder="98" min="85" max="100"></div>
+      </div>
+      <div class="g2" style="margin-bottom:6px">
+        <div class="field"><label>EtCO2 base</label><input class="fi" type="number" id="aero-eco2" placeholder="35" min="20" max="60"></div>
+        <div class="field"><label>Resp. base</label><input class="fi" type="number" id="aero-resp" placeholder="14" min="8" max="40"></div>
+      </div>
+      <div class="field" style="margin-bottom:10px">
+        <label>Evolución durante la cirugía</label>
+        <select class="fi" id="aero-evol">
+          <option value="estable">Estable (variación mínima ±5%)</option>
+          <option value="leve_descenso">Leve descenso inicial y recuperación</option>
+          <option value="descenso_mod">Descenso moderado sostenido (~15%)</option>
+          <option value="leve_aumento">Leve aumento (cirugía dolorosa/stress)</option>
+          <option value="variable">Variable (oscilante)</option>
+        </select>
+      </div>
     </div>
-    <button class="btn btn-s" style="margin-bottom:12px;font-size:13px" onclick="generarColumnas()">&#9200; Generar columnas</button>
+    <button class="btn btn-g" style="margin-bottom:8px;font-size:13px" onclick="generarColumnas()">&#9200; Generar y predecir gráfico</button>
     <div style="margin-bottom:10px">
       <div style="font-size:12px;color:var(--text3);margin-bottom:6px;font-weight:500">Par&#225;metro activo:</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px" id="param-selector">
@@ -3643,9 +3676,20 @@ function nuevaInter(){
    'fj-premed','fj-metodos','fj-recup','fj-obs','fj-materiales',
    'fj-suero','fj-sangre','fj-plasma','fj-otro',
    'fj-fluido1','fj-fluido2','fj-orina','fj-sangrado',
-   'fj-mayo-quir','fj-hint','fj-hext'].forEach(function(id){
+   'fj-mayo-quir','fj-hint','fj-hext','fj-hint-vis','fj-hext-vis',
+   'vg-inicio','vg-fin',
+   'fj-tec-bloqueo','fj-tec-espacio','fj-tec-lateral','fj-tec-aguja','fj-tec-calibre','fj-tec-guia','fj-tec-resultado',
+   'fj-atb','fj-obs-geclisa'].forEach(function(id){
     var el=document.getElementById(id);if(el)el.value='';
   });
+  // Limpiar gráfico VG
+  VG.cols=[];VG.cells={};VG.obs={};VG.fluidos={};
+  var vgBody=document.getElementById('vitals-body');if(vgBody)vgBody.innerHTML='';
+  var chartDiv=document.getElementById('vitals-chart');if(chartDiv)chartDiv.innerHTML='';
+  // Limpiar antecedentes y examen regional
+  _antecedentes=[];
+  var exReg=document.getElementById('examen-regional-wrap');if(exReg){exReg.style.display='none';}
+  var recupSel=document.getElementById('recup-selects');if(recupSel)recupSel.innerHTML='';
   var droList=document.getElementById('drogas-list');if(droList)droList.innerHTML='';
   var droSug=document.getElementById('drogas-sugeridas');if(droSug){droSug.innerHTML='';droSug.style.display='none';}
   var premedSel=document.getElementById('premed-selects');if(premedSel)premedSel.innerHTML='';
@@ -3714,6 +3758,13 @@ function quitarPrac(i){S.cur.pracs.splice(i,1);renderPracs();}
 // FOJA
 // ═══════════════════════════════════════════════════
 function cargarFojaUI(){cargarFojaVG();setTimeout(function(){tecRestaurar((S.cur&&S.cur.foja&&S.cur.foja.tec)||'');},50);
+  // Precargar horas del gráfico desde i.hora y fj-fin
+  var vgI=document.getElementById('vg-inicio');
+  var vgF=document.getElementById('vg-fin');
+  if(vgI&&!vgI.value&&S.cur&&S.cur.hora)vgI.value=S.cur.hora;
+  if(vgF&&!vgF.value&&S.cur&&S.cur.foja&&S.cur.foja.fin)vgF.value=S.cur.foja.fin;
+  var hintV=document.getElementById('fj-hint-vis');if(hintV&&S.cur&&S.cur.foja)hintV.value=S.cur.foja.hint||'';
+  var hextV=document.getElementById('fj-hext-vis');if(hextV&&S.cur&&S.cur.foja)hextV.value=S.cur.foja.hext||'';
   if(!S.cur||!S.cur.foja)return;
   var f=S.cur.foja;
   sv('fj-tec',f.tec);sv('fj-asa',f.asa);sv('fj-via',f.via);sv('fj-fin',f.fin);
@@ -3975,6 +4026,28 @@ function marcarEnviado(){
 // ═══════════════════════════════════════════════════
 // IMPRIMIR FOJA AERONÁUTICO — fiel al original
 // ═══════════════════════════════════════════════════
+function getHallazgosFisicos(f){
+  var h=[];
+  if(f.mallampati){
+    var mRom={'I':1,'II':2,'III':3,'IV':4};
+    var mVal=mRom[f.mallampati]||parseInt(f.mallampati)||0;
+    if(mVal>=3)h.push('Mallampati '+f.mallampati);
+  }
+  if(f.examenFisico){
+    // Extraer solo frases patológicas
+    var frases=f.examenFisico.split('.');
+    frases.forEach(function(fr){
+      if(/patol|anormal|soplo|arritmia|sibilancia|rale|estertore|limitad|rigidez|infecci/i.test(fr)){
+        h.push(fr.trim());
+      }
+    });
+  }
+  // Examen regional patológico
+  if(f.examenRegional&&/patol|anormal|edema|déficit|hipoestesia|infecci/i.test(f.examenRegional)){
+    h.push(f.examenRegional.slice(0,80));
+  }
+  return h.length?h.join('. '):'Sin hallazgos patológicos';
+}
 function imprimirFoja(){
   // Auto-save current form data before printing
   if(document.getElementById('f-pac'))guardar();
@@ -4027,11 +4100,11 @@ function imprimirFoja(){
     +'</style></head><body>'
     +'<h1>FOJA DE ANESTESIA</h1>'
     +'<div class="r"><div style="flex:3"><span class="l">Apellido y nombres</span><div class="f">'+(i.pac||'')+'</div></div><div style="flex:0 0 118px"><span class="l">D.N.I. N&#176;</span><div class="f">'+(i.dni||'')+'</div></div></div>'
-    +'<div class="r"><div style="flex:2"><span class="l">Servicio</span><div class="f">'+(i.serv||i.diag||'')+'</div></div><div style="flex:0 0 72px"><span class="l">Sala</span><div class="f">'+(i.sala||'')+'</div></div><div style="flex:0 0 60px"><span class="l">Cama N&#176;</span><div class="f">'+(i.cama||'')+'</div></div></div>'
+    +'<div class="r"><div style="flex:2"><span class="l">Servicio</span><div class="f">'+(i.serv||'')+'</div></div><div style="flex:3"><span class="l">Procedimiento</span><div class="f">'+(i.diag||'')+'</div></div><div style="flex:0 0 72px"><span class="l">Sala</span><div class="f">'+(i.sala||'')+'</div></div><div style="flex:0 0 60px"><span class="l">Cama N&#176;</span><div class="f">'+(i.cama||'')+'</div></div></div>'
     +'<div class="r"><div style="flex:0 0 64px"><span class="l">Fecha</span><div class="f">'+fmt(i.fecha)+'</div></div><div style="flex:0 0 36px"><span class="l">Edad</span><div class="f">'+(i.edad||'')+'</div></div><div style="flex:0 0 26px"><span class="l">Sexo</span><div class="f">'+(i.sexo||'')+'</div></div><div style="flex:0 0 42px"><span class="l">Peso</span><div class="f">'+(i.peso?i.peso+' kg':'')+'</div></div><div style="flex:1"><span class="l">Premedicaci&#243;n</span><div class="f">'+(f.premed||'')+'</div></div><div style="flex:0 0 44px"><span class="l">Hora</span><div class="f">'+(i.hora||'')+'</div></div></div>'
-    +'<div class="r"><div style="flex:1"><span class="l">Hallazgos f&#237;sicos anormales</span><div class="f" style="min-height:14px">&nbsp;</div></div></div>'
+    +'<div class="r"><div style="flex:1"><span class="l">Hallazgos f&#237;sicos anormales</span><div class="f" style="min-height:14px;font-size:7px">'+(getHallazgosFisicos(f))+'</div></div></div>'
     +'<div style="margin:3px 0;font-size:9.5px"><b>Inducci&#243;n:</b>&nbsp;<span class="chk">'+(f.ind==="Satisfactoria"?"&#10003;":"")+'</span>Satisfactoria&nbsp;&nbsp;<span class="chk">'+(f.ind==="Prolongada"?"&#10003;":"")+'</span>Prolongada&nbsp;&nbsp;<span class="chk">'+(f.ind==="Tormentosa"?"&#10003;":"")+'</span>Tormentosa</div>'
-    +'<div class="r"><div style="flex:1"><span class="l">Hora intubaci&#243;n</span><div class="f">'+(f.hint||'')+'</div></div><div style="flex:2"></div><div style="flex:1"><span class="l">Hora extubaci&#243;n</span><div class="f">'+(f.hext||'')+'</div></div></div>'
+    +'<div class="r"><div style="flex:1"><span class="l">Inicio anestesia/intub.</span><div class="f">'+(f.hint||'')+'</div></div><div style="flex:2"></div><div style="flex:1"><span class="l">Fin anestesia/extub.</span><div class="f">'+(f.hext||'')+'</div></div></div>'
     +'<div style="border:1.5px solid #000;margin:4px 0;display:flex;min-height:155px">'
     +'<div style="flex:0 0 56px;border-right:1px solid #000;padding:2px 3px;font-size:7px"><div style="font-weight:bold;line-height:1.2;margin-bottom:4px">Plano de 3er.<br>Estudio</div>'
     +'<div style="text-align:right">200</div><div style="height:22px"></div><div style="text-align:right">150</div><div style="height:22px"></div><div style="text-align:right">100</div><div style="height:22px"></div><div style="text-align:right">50</div>'
@@ -4159,8 +4232,85 @@ var Y_VALS=[200,187.5,175,162.5,150,137.5,125,112.5,100,87.5,75,62.5,50,37.5,25,
 function hm2min(s){var p=s.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
 function min2hm(m){var h=Math.floor(m/60)%24,mm=m%60;return(h<10?'0':'')+h+':'+(mm<10?'0':'')+mm;}
 function selParam(btn){document.querySelectorAll('.param-btn').forEach(function(b){b.style.borderColor='var(--border)';b.style.color='var(--text2)';b.classList.remove('active');});btn.style.borderColor='var(--green)';btn.style.color='var(--green)';btn.classList.add('active');VG.activeParam=btn.getAttribute('data-p');}
-function generarColumnas(){var hi=document.getElementById('vg-inicio').value||document.getElementById('f-hora').value||'';var hf=document.getElementById('vg-fin').value||'';if(!hi){toast('Complet\u00e1 la hora de inicio');return;}var sm=hm2min(hi),em=hf?hm2min(hf):sm+90;VG.cols=[];VG.cells={};VG.obs={};VG.fluidos={};for(var t=sm;t<=em;t+=5)VG.cols.push({t:min2hm(t)});renderVitalsGrid();toast('Columnas generadas: '+VG.cols.length);}
 function cellKey(ci,val){return ci+'_'+val;}
+function roundTo25(v){return Math.round(v/25)*25;}
+function generarColumnas(){
+  var hi=document.getElementById('vg-inicio')?document.getElementById('vg-inicio').value:'';
+  if(!hi&&S.cur)hi=S.cur.hora||'';
+  var hf=document.getElementById('vg-fin')?document.getElementById('vg-fin').value:'';
+  if(!hf&&S.cur&&S.cur.foja)hf=S.cur.foja.fin||'';
+  if(!hi){toast('Completá la hora de inicio en Tiempos quirúrgicos');return;}
+  if(!hf){toast('Completá la hora de fin en Tiempos quirúrgicos');return;}
+  var sm=hm2min(hi),em=hm2min(hf);
+  if(em<=sm){toast('Hora fin debe ser mayor a hora inicio');return;}
+  var dur=em-sm;
+  VG.cols=[];VG.cells={};VG.obs={};VG.fluidos={};
+  for(var t=sm;t<=em;t+=5)VG.cols.push({t:min2hm(t)});
+
+  // Predicción si hay valores base
+  var sist=parseInt((document.getElementById('aero-sist')||{value:'0'}).value)||0;
+  var diast=parseInt((document.getElementById('aero-diast')||{value:'0'}).value)||0;
+  var fc=parseInt((document.getElementById('aero-fc')||{value:'0'}).value)||0;
+  var sat=parseInt((document.getElementById('aero-sat')||{value:'0'}).value)||0;
+  var eco2=parseInt((document.getElementById('aero-eco2')||{value:'0'}).value)||0;
+  var resp=parseInt((document.getElementById('aero-resp')||{value:'0'}).value)||0;
+  var evol=(document.getElementById('aero-evol')||{value:'estable'}).value;
+
+  if(sist>0||fc>0){
+    function aeroCurva(base,p){
+      if(!base)return 0;
+      var f=1;
+      if(evol==='estable'){
+        // Variación suave con patrón sinusoidal + ruido
+        f=1+Math.sin(p*Math.PI*4)*0.06+(Math.random()-0.5)*0.06;
+      }
+      else if(evol==='leve_descenso')f=(p<0.33?1-(p/0.33)*0.12:0.88+(p-0.33)*0.18)+(Math.random()-0.5)*0.06;
+      else if(evol==='descenso_mod')f=1-(p*0.15)+(Math.random()-0.5)*0.06;
+      else if(evol==='leve_aumento')f=1+(p*0.12)+(Math.random()-0.5)*0.06;
+      else f=1+Math.sin(p*Math.PI*3)*0.15+(Math.random()-0.5)*0.08;
+      return Math.round(base*f);
+    }
+
+    VG.cols.forEach(function(col,ci){
+      var tAbs=hm2min(col.t);
+      var p=(tAbs-sm)/dur;
+      // FC → Pulso ●
+      if(fc>0){var fcV=aeroCurva(fc,p);if(fcV>0)VG.cells[cellKey(ci,roundTo25(fcV))]={param:'pulso',sym:PARAMS['pulso'].sym,color:PARAMS['pulso'].color};}
+      // SIST → T.A. )(
+      if(sist>0){var sV=aeroCurva(sist,p);if(sV>0)VG.cells[cellKey(ci,roundTo25(sV))]={param:'ta',sym:PARAMS['ta'].sym,color:PARAMS['ta'].color};}
+      // SAT → OXIMET —
+      if(sat>0){var satV=Math.min(100,Math.max(90,Math.round(sat+(Math.random()-0.5)*2)));VG.cells[cellKey(ci,roundTo25(satV))]={param:'oximet',sym:PARAMS['oximet'].sym,color:PARAMS['oximet'].color};}
+      // CO2 → □
+      if(eco2>0){var co2V=Math.round(eco2+(Math.random()-0.5)*3);VG.cells[cellKey(ci,roundTo25(co2V))]={param:'co2',sym:PARAMS['co2'].sym,color:PARAMS['co2'].color};}
+      // Resp → ○
+      if(resp>0){var rV=Math.round(resp+(Math.random()-0.5)*2);VG.cells[cellKey(ci,roundTo25(rV))]={param:'resp',sym:PARAMS['resp'].sym,color:PARAMS['resp'].color};}
+    });
+
+    // ■ Operac → columna de hora inicio y hora fin de cirugía
+    var ciInicio=0;
+    var ciFin=VG.cols.length-1;
+    VG.cells[cellKey(ciInicio,150)]={param:'operac',sym:PARAMS['operac'].sym,color:PARAMS['operac'].color};
+    VG.cells[cellKey(ciFin,150)]={param:'operac',sym:PARAMS['operac'].sym,color:PARAMS['operac'].color};
+
+    // × Anestes → columna de hora intubación y extubación
+    var hintEl=document.getElementById('fj-hint-vis');
+    var hextEl=document.getElementById('fj-hext-vis');
+    if(hintEl&&hintEl.value){
+      var mHint=hm2min(hintEl.value);
+      var ciHint=Math.round((mHint-sm)/5);
+      if(ciHint>=0&&ciHint<VG.cols.length)VG.cells[cellKey(ciHint,175)]={param:'anestes',sym:PARAMS['anestes'].sym,color:PARAMS['anestes'].color};
+    }
+    if(hextEl&&hextEl.value){
+      var mHext=hm2min(hextEl.value);
+      var ciHext=Math.round((mHext-sm)/5);
+      if(ciHext>=0&&ciHext<VG.cols.length)VG.cells[cellKey(ciHext,125)]={param:'anestes',sym:PARAMS['anestes'].sym,color:PARAMS['anestes'].color};
+    }
+  }
+
+  renderVitalsGrid();
+  toast('Gráfico generado ✓ '+VG.cols.length+' columnas ('+hi+' → '+hf+')');
+}
+
 function toggleCell(ci,val){var k=cellKey(ci,val);var p=VG.activeParam;if(VG.cells[k]&&VG.cells[k].param===p){delete VG.cells[k];}else{VG.cells[k]={param:p,sym:PARAMS[p].sym,color:PARAMS[p].color};}renderVitalsGrid();}
 function renderVitalsGrid(){
   var wrap=document.getElementById('vitals-grid-wrap');if(!wrap)return;
@@ -4507,6 +4657,7 @@ function renderFojaPorSanatorio(){
   // Imprimir button - hide for Mayo (they use GECLISA)
   var bi=document.getElementById('btn-imprimir-foja');
   if(bi)bi.style.display=esMayo?'none':'block';
+  var atw=document.getElementById('aero-tiempos-wrap');if(atw)atw.style.display=esMayo?'none':'block';
   // Generate Mayo vitals rows if Mayo and no rows yet
   if(esMayo){
     var tbody=document.getElementById('mayo-vitals-body');
