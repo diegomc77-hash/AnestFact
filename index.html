@@ -655,8 +655,8 @@ select.fi option{background:var(--bg2)}
       <div class="field"><label>Hora fin cirug&#237;a</label><input class="fi" type="time" id="vg-fin" onchange="document.getElementById('fj-fin').value=this.value"></div>
     </div>
     <div class="g2" style="margin-bottom:6px">
-      <div class="field"><label>Hora intubaci&#243;n</label><input class="fi" type="time" id="fj-hint-vis" onchange="document.getElementById('fj-hint').value=this.value"></div>
-      <div class="field"><label>Hora extubaci&#243;n</label><input class="fi" type="time" id="fj-hext-vis" onchange="document.getElementById('fj-hext').value=this.value"></div>
+      <div class="field"><label>Hora inicio anestesia / intubaci&#243;n</label><input class="fi" type="time" id="fj-hint-vis" onchange="document.getElementById('fj-hint').value=this.value"></div>
+      <div class="field"><label>Hora fin anestesia / extubaci&#243;n</label><input class="fi" type="time" id="fj-hext-vis" onchange="document.getElementById('fj-hext').value=this.value"></div>
     </div>
   </div>
   <div class="card" id="vitals-card">
@@ -4028,12 +4028,25 @@ function marcarEnviado(){
 // ═══════════════════════════════════════════════════
 function getHallazgosFisicos(f){
   var h=[];
-  if(f.mallampati&&parseInt(f.mallampati)>=3)h.push('Mallampati '+f.mallampati);
-  if(f.examenFisico){
-    var ef=f.examenFisico;
-    if(/patol|anormal|soplo|arritmia|sibilancia|rale|estertores/i.test(ef))h.push(ef.slice(0,100));
+  if(f.mallampati){
+    var mRom={'I':1,'II':2,'III':3,'IV':4};
+    var mVal=mRom[f.mallampati]||parseInt(f.mallampati)||0;
+    if(mVal>=3)h.push('Mallampati '+f.mallampati);
   }
-  return h.length?h.join('. '):'Sin hallazgos patólógicos';
+  if(f.examenFisico){
+    // Extraer solo frases patológicas
+    var frases=f.examenFisico.split('.');
+    frases.forEach(function(fr){
+      if(/patol|anormal|soplo|arritmia|sibilancia|rale|estertore|limitad|rigidez|infecci/i.test(fr)){
+        h.push(fr.trim());
+      }
+    });
+  }
+  // Examen regional patológico
+  if(f.examenRegional&&/patol|anormal|edema|déficit|hipoestesia|infecci/i.test(f.examenRegional)){
+    h.push(f.examenRegional.slice(0,80));
+  }
+  return h.length?h.join('. '):'Sin hallazgos patológicos';
 }
 function imprimirFoja(){
   // Auto-save current form data before printing
@@ -4089,9 +4102,9 @@ function imprimirFoja(){
     +'<div class="r"><div style="flex:3"><span class="l">Apellido y nombres</span><div class="f">'+(i.pac||'')+'</div></div><div style="flex:0 0 118px"><span class="l">D.N.I. N&#176;</span><div class="f">'+(i.dni||'')+'</div></div></div>'
     +'<div class="r"><div style="flex:2"><span class="l">Servicio</span><div class="f">'+(i.serv||'')+'</div></div><div style="flex:3"><span class="l">Procedimiento</span><div class="f">'+(i.diag||'')+'</div></div><div style="flex:0 0 72px"><span class="l">Sala</span><div class="f">'+(i.sala||'')+'</div></div><div style="flex:0 0 60px"><span class="l">Cama N&#176;</span><div class="f">'+(i.cama||'')+'</div></div></div>'
     +'<div class="r"><div style="flex:0 0 64px"><span class="l">Fecha</span><div class="f">'+fmt(i.fecha)+'</div></div><div style="flex:0 0 36px"><span class="l">Edad</span><div class="f">'+(i.edad||'')+'</div></div><div style="flex:0 0 26px"><span class="l">Sexo</span><div class="f">'+(i.sexo||'')+'</div></div><div style="flex:0 0 42px"><span class="l">Peso</span><div class="f">'+(i.peso?i.peso+' kg':'')+'</div></div><div style="flex:1"><span class="l">Premedicaci&#243;n</span><div class="f">'+(f.premed||'')+'</div></div><div style="flex:0 0 44px"><span class="l">Hora</span><div class="f">'+(i.hora||'')+'</div></div></div>'
-    +'<div class="r"><div style="flex:1"><span class="l">Hallazgos f&#237;sicos anormales</span><div class="f" style="min-height:14px">'+(getHallazgosFisicos(f))+'</div></div></div>'
+    +'<div class="r"><div style="flex:1"><span class="l">Hallazgos f&#237;sicos anormales</span><div class="f" style="min-height:14px;font-size:7px">'+(getHallazgosFisicos(f))+'</div></div></div>'
     +'<div style="margin:3px 0;font-size:9.5px"><b>Inducci&#243;n:</b>&nbsp;<span class="chk">'+(f.ind==="Satisfactoria"?"&#10003;":"")+'</span>Satisfactoria&nbsp;&nbsp;<span class="chk">'+(f.ind==="Prolongada"?"&#10003;":"")+'</span>Prolongada&nbsp;&nbsp;<span class="chk">'+(f.ind==="Tormentosa"?"&#10003;":"")+'</span>Tormentosa</div>'
-    +'<div class="r"><div style="flex:1"><span class="l">Hora intubaci&#243;n</span><div class="f">'+(f.hint||'')+'</div></div><div style="flex:2"></div><div style="flex:1"><span class="l">Hora extubaci&#243;n</span><div class="f">'+(f.hext||'')+'</div></div></div>'
+    +'<div class="r"><div style="flex:1"><span class="l">Inicio anestesia/intub.</span><div class="f">'+(f.hint||'')+'</div></div><div style="flex:2"></div><div style="flex:1"><span class="l">Fin anestesia/extub.</span><div class="f">'+(f.hext||'')+'</div></div></div>'
     +'<div style="border:1.5px solid #000;margin:4px 0;display:flex;min-height:155px">'
     +'<div style="flex:0 0 56px;border-right:1px solid #000;padding:2px 3px;font-size:7px"><div style="font-weight:bold;line-height:1.2;margin-bottom:4px">Plano de 3er.<br>Estudio</div>'
     +'<div style="text-align:right">200</div><div style="height:22px"></div><div style="text-align:right">150</div><div style="height:22px"></div><div style="text-align:right">100</div><div style="height:22px"></div><div style="text-align:right">50</div>'
@@ -4219,6 +4232,8 @@ var Y_VALS=[200,187.5,175,162.5,150,137.5,125,112.5,100,87.5,75,62.5,50,37.5,25,
 function hm2min(s){var p=s.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
 function min2hm(m){var h=Math.floor(m/60)%24,mm=m%60;return(h<10?'0':'')+h+':'+(mm<10?'0':'')+mm;}
 function selParam(btn){document.querySelectorAll('.param-btn').forEach(function(b){b.style.borderColor='var(--border)';b.style.color='var(--text2)';b.classList.remove('active');});btn.style.borderColor='var(--green)';btn.style.color='var(--green)';btn.classList.add('active');VG.activeParam=btn.getAttribute('data-p');}
+function cellKey(ci,val){return ci+'_'+val;}
+function roundTo25(v){return Math.round(v/25)*25;}
 function generarColumnas(){
   var hi=document.getElementById('vg-inicio')?document.getElementById('vg-inicio').value:'';
   if(!hi&&S.cur)hi=S.cur.hora||'';
@@ -4245,7 +4260,10 @@ function generarColumnas(){
     function aeroCurva(base,p){
       if(!base)return 0;
       var f=1;
-      if(evol==='estable')f=1+(Math.random()-0.5)*0.08;
+      if(evol==='estable'){
+        // Variación suave con patrón sinusoidal + ruido
+        f=1+Math.sin(p*Math.PI*4)*0.06+(Math.random()-0.5)*0.06;
+      }
       else if(evol==='leve_descenso')f=(p<0.33?1-(p/0.33)*0.12:0.88+(p-0.33)*0.18)+(Math.random()-0.5)*0.06;
       else if(evol==='descenso_mod')f=1-(p*0.15)+(Math.random()-0.5)*0.06;
       else if(evol==='leve_aumento')f=1+(p*0.12)+(Math.random()-0.5)*0.06;
@@ -4257,22 +4275,22 @@ function generarColumnas(){
       var tAbs=hm2min(col.t);
       var p=(tAbs-sm)/dur;
       // FC → Pulso ●
-      if(fc>0){var fcV=aeroCurva(fc,p);if(fcV>0)VG.cells[cellKey(ci,fcV)]={param:'pulso',sym:PARAMS['pulso'].sym,color:PARAMS['pulso'].color};}
+      if(fc>0){var fcV=aeroCurva(fc,p);if(fcV>0)VG.cells[cellKey(ci,roundTo25(fcV))]={param:'pulso',sym:PARAMS['pulso'].sym,color:PARAMS['pulso'].color};}
       // SIST → T.A. )(
-      if(sist>0){var sV=aeroCurva(sist,p);if(sV>0)VG.cells[cellKey(ci,sV)]={param:'ta',sym:PARAMS['ta'].sym,color:PARAMS['ta'].color};}
+      if(sist>0){var sV=aeroCurva(sist,p);if(sV>0)VG.cells[cellKey(ci,roundTo25(sV))]={param:'ta',sym:PARAMS['ta'].sym,color:PARAMS['ta'].color};}
       // SAT → OXIMET —
-      if(sat>0){var satV=Math.min(100,Math.max(90,Math.round(sat+(Math.random()-0.5)*2)));VG.cells[cellKey(ci,satV)]={param:'oximet',sym:PARAMS['oximet'].sym,color:PARAMS['oximet'].color};}
+      if(sat>0){var satV=Math.min(100,Math.max(90,Math.round(sat+(Math.random()-0.5)*2)));VG.cells[cellKey(ci,roundTo25(satV))]={param:'oximet',sym:PARAMS['oximet'].sym,color:PARAMS['oximet'].color};}
       // CO2 → □
-      if(eco2>0){var co2V=Math.round(eco2+(Math.random()-0.5)*3);VG.cells[cellKey(ci,co2V)]={param:'co2',sym:PARAMS['co2'].sym,color:PARAMS['co2'].color};}
+      if(eco2>0){var co2V=Math.round(eco2+(Math.random()-0.5)*3);VG.cells[cellKey(ci,roundTo25(co2V))]={param:'co2',sym:PARAMS['co2'].sym,color:PARAMS['co2'].color};}
       // Resp → ○
-      if(resp>0){var rV=Math.round(resp+(Math.random()-0.5)*2);VG.cells[cellKey(ci,rV)]={param:'resp',sym:PARAMS['resp'].sym,color:PARAMS['resp'].color};}
+      if(resp>0){var rV=Math.round(resp+(Math.random()-0.5)*2);VG.cells[cellKey(ci,roundTo25(rV))]={param:'resp',sym:PARAMS['resp'].sym,color:PARAMS['resp'].color};}
     });
 
     // ■ Operac → columna de hora inicio y hora fin de cirugía
     var ciInicio=0;
     var ciFin=VG.cols.length-1;
-    VG.cells[cellKey(ciInicio,160)]={param:'operac',sym:PARAMS['operac'].sym,color:PARAMS['operac'].color};
-    VG.cells[cellKey(ciFin,160)]={param:'operac',sym:PARAMS['operac'].sym,color:PARAMS['operac'].color};
+    VG.cells[cellKey(ciInicio,150)]={param:'operac',sym:PARAMS['operac'].sym,color:PARAMS['operac'].color};
+    VG.cells[cellKey(ciFin,150)]={param:'operac',sym:PARAMS['operac'].sym,color:PARAMS['operac'].color};
 
     // × Anestes → columna de hora intubación y extubación
     var hintEl=document.getElementById('fj-hint-vis');
@@ -4280,12 +4298,12 @@ function generarColumnas(){
     if(hintEl&&hintEl.value){
       var mHint=hm2min(hintEl.value);
       var ciHint=Math.round((mHint-sm)/5);
-      if(ciHint>=0&&ciHint<VG.cols.length)VG.cells[cellKey(ciHint,170)]={param:'anestes',sym:PARAMS['anestes'].sym,color:PARAMS['anestes'].color};
+      if(ciHint>=0&&ciHint<VG.cols.length)VG.cells[cellKey(ciHint,175)]={param:'anestes',sym:PARAMS['anestes'].sym,color:PARAMS['anestes'].color};
     }
     if(hextEl&&hextEl.value){
       var mHext=hm2min(hextEl.value);
       var ciHext=Math.round((mHext-sm)/5);
-      if(ciHext>=0&&ciHext<VG.cols.length)VG.cells[cellKey(ciHext,150)]={param:'anestes',sym:PARAMS['anestes'].sym,color:PARAMS['anestes'].color};
+      if(ciHext>=0&&ciHext<VG.cols.length)VG.cells[cellKey(ciHext,125)]={param:'anestes',sym:PARAMS['anestes'].sym,color:PARAMS['anestes'].color};
     }
   }
 
