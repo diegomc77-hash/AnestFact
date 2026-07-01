@@ -4037,8 +4037,12 @@ function getHallazgosFisicos(f){
     // Extraer solo frases patológicas
     var frases=f.examenFisico.split('.');
     frases.forEach(function(fr){
-      if(/patol|anormal|soplo|arritmia|sibilancia|rale|estertore|limitad|rigidez|infecci/i.test(fr)){
-        h.push(fr.trim());
+      var ft=fr.trim();
+      if(!ft)return;
+      if(/patol|anormal|soplo|arritmia|sibilancia|rale|estertore|limitad|rigidez|infecci|tatuaje|déficit|edema/i.test(ft)){
+        // Agregar contexto si la frase es muy corta
+        if(ft.length<15)ft='Hallazgo: '+ft;
+        h.push(ft);
       }
     });
   }
@@ -4063,17 +4067,34 @@ function imprimirFoja(){
   var vgFluidos=(VG.cols&&VG.cols.length)?VG.fluidos:(f.vg_fluidos||{});
   var chartHtml='';
   if(vgCols.length){
-    var CW=Math.max(7,Math.min(14,Math.floor(148/vgCols.length)));
-    var YVALS=[200,187.5,175,162.5,150,137.5,125,112.5,100,87.5,75,62.5,50,37.5,25,12.5];
-    chartHtml='<table style="border-collapse:collapse;width:100%"><tbody>';
+    var CW=Math.max(6,Math.min(14,Math.floor(170/vgCols.length)));
+    var YVALS=[];for(var yv=200;yv>=50;yv-=5)YVALS.push(yv);
+    chartHtml='<table style="border-collapse:collapse;width:100%;table-layout:fixed"><tbody>';
     chartHtml+='<tr><td style="width:54px"></td>';
     vgCols.forEach(function(col){chartHtml+='<td style="width:'+CW+'px;font-size:5px;text-align:center;border:1px solid #ccc">'+col.t+'</td>';});
     chartHtml+='</tr>';
     YVALS.forEach(function(yval){
-      var sl=(yval===200||yval===150||yval===100||yval===50);
-      var th=(yval%50===0);
+      var sl=(yval%25===0);
+      var th=(yval%25===0);
       chartHtml+='<tr><td style="font-size:6.5px;text-align:right;padding-right:3px;font-weight:'+(sl?'bold':'normal')+'">'+(sl?yval:'')+'</td>';
-      vgCols.forEach(function(col,ci){var k=ci+'_'+yval;var cell=vgCells[k];var sym=cell?('<b style="font-size:8px">'+cell.sym+'</b>'):'';chartHtml+='<td style="width:'+CW+'px;height:12px;border:1px solid '+(th?'#aaa':'#e0e0e0')+';text-align:center;vertical-align:middle">'+sym+'</td>';});
+      vgCols.forEach(function(col,ci){
+          // Pre-calcular mapeo anti-duplicado para esta columna
+          var _colMap={};
+          Object.keys(vgCells).forEach(function(k2){
+            var pts=k2.split('_');
+            if(parseInt(pts[0])===ci){
+              var v=parseFloat(pts[1]);
+              var targetRow=v<50?50:(v>200?200:Math.round(v/5)*5);
+              if(!_colMap[targetRow]||Math.abs(v-targetRow)<Math.abs(parseFloat(_colMap[targetRow].split('_')[1])-targetRow)){
+                _colMap[targetRow]=k2;
+              }
+            }
+          });
+          var mappedKey=_colMap[yval];
+          var cell=mappedKey?vgCells[mappedKey]:null;
+          var valReal=cell&&cell.val?cell.val:null;
+          var fuera=valReal&&(valReal<50||valReal>200);
+          var sym=cell?('<b style="font-size:8px">'+cell.sym+(fuera?'<sup style="font-size:5px">'+valReal+'</sup>':'')+'</b>'):'';chartHtml+='<td style="width:'+CW+'px;height:12px;border:1px solid '+(th?'#aaa':'#e0e0e0')+';text-align:center;vertical-align:middle">'+sym+'</td>';});
       chartHtml+='</tr>';
     });
     chartHtml+='<tr><td style="font-size:6px;text-align:right;padding-right:3px;line-height:1.1">Hora<br>obs.</td>';
@@ -4091,7 +4112,7 @@ function imprimirFoja(){
   }
   var signImg=signSrc?('<img src="'+signSrc+'" style="max-height:46px;max-width:130px;display:block;margin:0 auto 3px;filter:grayscale(1) brightness(0) contrast(2)">'):('<div style="height:46px"></div>');
   var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Foja de Anestesia</title>'
-    +'<style>*{box-sizing:border-box;margin:0;padding:0}@page{size:A4;margin:0}html,body{width:210mm;font-family:Arial,Helvetica,sans-serif;font-size:10.5px;color:#000;line-height:1.35}body{padding:6mm 8mm}'
+    +'<style>*{box-sizing:border-box;margin:0;padding:0}@page{size:A4;margin:0}html,body{width:210mm;font-family:Arial,Helvetica,sans-serif;font-size:10.5px;color:#000;line-height:1.35}body{padding:6mm 8mm;overflow:hidden}'
     +'h1{font-size:14px;text-align:center;font-weight:bold;border-bottom:2px solid #000;padding-bottom:5px;margin-bottom:7px;letter-spacing:.07em}'
     +'.r{display:flex;gap:5px;margin-bottom:5px;align-items:flex-end}.f{border-bottom:1.5px solid #000;padding:0 2px 1px;min-height:17px;flex:1;font-size:10.5px}'
     +'.l{font-size:8px;color:#333;font-weight:bold;text-transform:uppercase;display:block;margin-bottom:1px}'
@@ -4102,7 +4123,7 @@ function imprimirFoja(){
     +'<div class="r"><div style="flex:3"><span class="l">Apellido y nombres</span><div class="f">'+(i.pac||'')+'</div></div><div style="flex:0 0 118px"><span class="l">D.N.I. N&#176;</span><div class="f">'+(i.dni||'')+'</div></div></div>'
     +'<div class="r"><div style="flex:2"><span class="l">Servicio</span><div class="f">'+(i.serv||'')+'</div></div><div style="flex:3"><span class="l">Procedimiento</span><div class="f">'+(i.diag||'')+'</div></div><div style="flex:0 0 72px"><span class="l">Sala</span><div class="f">'+(i.sala||'')+'</div></div><div style="flex:0 0 60px"><span class="l">Cama N&#176;</span><div class="f">'+(i.cama||'')+'</div></div></div>'
     +'<div class="r"><div style="flex:0 0 64px"><span class="l">Fecha</span><div class="f">'+fmt(i.fecha)+'</div></div><div style="flex:0 0 36px"><span class="l">Edad</span><div class="f">'+(i.edad||'')+'</div></div><div style="flex:0 0 26px"><span class="l">Sexo</span><div class="f">'+(i.sexo||'')+'</div></div><div style="flex:0 0 42px"><span class="l">Peso</span><div class="f">'+(i.peso?i.peso+' kg':'')+'</div></div><div style="flex:1"><span class="l">Premedicaci&#243;n</span><div class="f">'+(f.premed||'')+'</div></div><div style="flex:0 0 44px"><span class="l">Hora</span><div class="f">'+(i.hora||'')+'</div></div></div>'
-    +'<div class="r"><div style="flex:1"><span class="l">Hallazgos f&#237;sicos anormales</span><div class="f" style="min-height:14px;font-size:7px">'+(getHallazgosFisicos(f))+'</div></div></div>'
+    +'<div class="r"><div style="flex:1"><span class="l">Hallazgos f&#237;sicos anormales</span><div class="f" style="min-height:28px;font-size:7px;line-height:1.4">'+(getHallazgosFisicos(f))+'</div></div></div>'
     +'<div style="margin:3px 0;font-size:9.5px"><b>Inducci&#243;n:</b>&nbsp;<span class="chk">'+(f.ind==="Satisfactoria"?"&#10003;":"")+'</span>Satisfactoria&nbsp;&nbsp;<span class="chk">'+(f.ind==="Prolongada"?"&#10003;":"")+'</span>Prolongada&nbsp;&nbsp;<span class="chk">'+(f.ind==="Tormentosa"?"&#10003;":"")+'</span>Tormentosa</div>'
     +'<div class="r"><div style="flex:1"><span class="l">Inicio anestesia/intub.</span><div class="f">'+(f.hint||'')+'</div></div><div style="flex:2"></div><div style="flex:1"><span class="l">Fin anestesia/extub.</span><div class="f">'+(f.hext||'')+'</div></div></div>'
     +'<div style="border:1.5px solid #000;margin:4px 0;display:flex;min-height:155px">'
@@ -4114,7 +4135,7 @@ function imprimirFoja(){
     +'<div class="s">Agentes Anest&#233;sicos:</div><div style="border-bottom:1px solid #ccc;padding:2px 3px;min-height:20px;font-size:10px">'+(drogaLines||'')+'</div>'
     +'<div class="s">M&#233;todos Anest&#233;sicos:</div><div style="border-bottom:1px solid #ccc;padding:2px 3px;min-height:20px;font-size:10px">'+(f.metodos||'')+'</div>'
     +'<div class="s">Recuperaci&#243;n:</div><div style="border-bottom:1px solid #ccc;padding:2px 3px;min-height:20px;font-size:10px">'+(f.recup||'')+'</div>'
-    +'<div style="display:flex;gap:8px;margin-top:5px"><div style="flex:2"><div class="s">Observaciones:</div><div style="border:1px solid #ccc;padding:3px;min-height:65px;font-size:10px">'+(f.obs||'')+'</div>'
+    +'<div style="display:flex;gap:8px;margin-top:5px"><div style="flex:2"><div class="s">Observaciones:</div><div style="border:1px solid #ccc;padding:3px;min-height:65px;font-size:10px;word-wrap:break-word;overflow-wrap:break-word">'+(f.obs||'')+'</div>'
     +'<div style="border:1px solid #ccc;border-top:none;padding:2px 3px;text-align:center;font-size:7.5px;font-weight:bold">FIRMA Y SELLO DEL ANESTESISTA</div></div>'
     +'<div style="flex:0 0 138px;display:flex;flex-direction:column;justify-content:flex-end;text-align:center">'+signImg
     +'<div style="border-top:1.5px solid #000;padding-top:3px;font-size:8px"><b>MARIA SOLEDAD HUERTA</b><br>M.P. 32393 &nbsp; M.E. 15518<br>Anest&#243;loga &middot; ADAARC</div></div></div>'
@@ -4123,7 +4144,7 @@ function imprimirFoja(){
     +'Plasma: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.plasma||'')+'</span> cm&#179;<br>'
     +'Suero: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.suero||'')+'</span> cm&#179;<br>'
     +'Otro: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.otro||'')+'</span> cm&#179;</div></div>'
-    +'<div style="flex:2"><div class="s">Observaciones</div><div style="border:1px solid #ccc;min-height:70px;padding:3px;font-size:10px"></div></div>'
+    +'<div style="flex:2"><div class="s">Observaciones</div><div style="border:1px solid #ccc;min-height:70px;padding:3px;font-size:10px;word-wrap:break-word;overflow-wrap:break-word"></div></div>'
     +'</div></body></html>';
   var w=window.open('','_blank');if(!w){toast('Permitir ventanas emergentes');return;}
   w.document.write(html);w.document.close();
@@ -4233,7 +4254,7 @@ function hm2min(s){var p=s.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
 function min2hm(m){var h=Math.floor(m/60)%24,mm=m%60;return(h<10?'0':'')+h+':'+(mm<10?'0':'')+mm;}
 function selParam(btn){document.querySelectorAll('.param-btn').forEach(function(b){b.style.borderColor='var(--border)';b.style.color='var(--text2)';b.classList.remove('active');});btn.style.borderColor='var(--green)';btn.style.color='var(--green)';btn.classList.add('active');VG.activeParam=btn.getAttribute('data-p');}
 function cellKey(ci,val){return ci+'_'+val;}
-function roundTo25(v){return Math.round(v/25)*25;}
+function roundTo25(v){return Math.round(v/12.5)*12.5;}
 function generarColumnas(){
   var hi=document.getElementById('vg-inicio')?document.getElementById('vg-inicio').value:'';
   if(!hi&&S.cur)hi=S.cur.hora||'';
@@ -4261,8 +4282,8 @@ function generarColumnas(){
       if(!base)return 0;
       var f=1;
       if(evol==='estable'){
-        // Variación suave con patrón sinusoidal + ruido
-        f=1+Math.sin(p*Math.PI*4)*0.06+(Math.random()-0.5)*0.06;
+        // Variación suave pero visible entre filas de 25 unidades
+        f=1+Math.sin(p*Math.PI*5)*0.12+(Math.random()-0.5)*0.08;
       }
       else if(evol==='leve_descenso')f=(p<0.33?1-(p/0.33)*0.12:0.88+(p-0.33)*0.18)+(Math.random()-0.5)*0.06;
       else if(evol==='descenso_mod')f=1-(p*0.15)+(Math.random()-0.5)*0.06;
@@ -4275,22 +4296,22 @@ function generarColumnas(){
       var tAbs=hm2min(col.t);
       var p=(tAbs-sm)/dur;
       // FC → Pulso ●
-      if(fc>0){var fcV=aeroCurva(fc,p);if(fcV>0)VG.cells[cellKey(ci,roundTo25(fcV))]={param:'pulso',sym:PARAMS['pulso'].sym,color:PARAMS['pulso'].color};}
+      if(fc>0){var fcV=aeroCurva(fc,p);if(fcV>0)VG.cells[cellKey(ci,fcV)]={param:'pulso',sym:PARAMS['pulso'].sym,color:PARAMS['pulso'].color,val:fcV};}
       // SIST → T.A. )(
-      if(sist>0){var sV=aeroCurva(sist,p);if(sV>0)VG.cells[cellKey(ci,roundTo25(sV))]={param:'ta',sym:PARAMS['ta'].sym,color:PARAMS['ta'].color};}
+      if(sist>0){var sV=aeroCurva(sist,p);if(sV>0)VG.cells[cellKey(ci,sV)]={param:'ta',sym:PARAMS['ta'].sym,color:PARAMS['ta'].color,val:sV};}
       // SAT → OXIMET —
-      if(sat>0){var satV=Math.min(100,Math.max(90,Math.round(sat+(Math.random()-0.5)*2)));VG.cells[cellKey(ci,roundTo25(satV))]={param:'oximet',sym:PARAMS['oximet'].sym,color:PARAMS['oximet'].color};}
+      if(sat>0){var satV=Math.min(100,Math.max(90,Math.round(sat+(Math.random()-0.5)*2)));VG.cells[cellKey(ci,satV)]={param:'oximet',sym:PARAMS['oximet'].sym,color:PARAMS['oximet'].color,val:satV};}
       // CO2 → □
-      if(eco2>0){var co2V=Math.round(eco2+(Math.random()-0.5)*3);VG.cells[cellKey(ci,roundTo25(co2V))]={param:'co2',sym:PARAMS['co2'].sym,color:PARAMS['co2'].color};}
-      // Resp → ○
-      if(resp>0){var rV=Math.round(resp+(Math.random()-0.5)*2);VG.cells[cellKey(ci,roundTo25(rV))]={param:'resp',sym:PARAMS['resp'].sym,color:PARAMS['resp'].color};}
+      if(eco2>0){var co2V=Math.round(eco2+(Math.random()-0.5)*3);VG.cells[cellKey(ci,co2V)]={param:'co2',sym:PARAMS['co2'].sym,color:PARAMS['co2'].color,val:co2V};}
+      // Resp → ○ (valor real, con número si < 50)
+      if(resp>0){var rV=Math.round(resp+(Math.random()-0.5)*2);VG.cells[cellKey(ci,rV)]={param:'resp',sym:PARAMS['resp'].sym,color:PARAMS['resp'].color,val:rV};}
     });
 
     // ■ Operac → columna de hora inicio y hora fin de cirugía
     var ciInicio=0;
     var ciFin=VG.cols.length-1;
-    VG.cells[cellKey(ciInicio,150)]={param:'operac',sym:PARAMS['operac'].sym,color:PARAMS['operac'].color};
-    VG.cells[cellKey(ciFin,150)]={param:'operac',sym:PARAMS['operac'].sym,color:PARAMS['operac'].color};
+    VG.cells[cellKey(ciInicio,162.5)]={param:'operac',sym:PARAMS['operac'].sym,color:PARAMS['operac'].color};
+    VG.cells[cellKey(ciFin,162.5)]={param:'operac',sym:PARAMS['operac'].sym,color:PARAMS['operac'].color};
 
     // × Anestes → columna de hora intubación y extubación
     var hintEl=document.getElementById('fj-hint-vis');
@@ -4323,7 +4344,24 @@ function renderVitalsGrid(){
     var showLabel=(yval===200||yval===150||yval===100||yval===50);
     var isMajor=(yval%50===0);
     html+='<div style="display:flex;align-items:stretch"><div style="width:'+LABEL_W+'px;font-size:8px;color:var(--text2);text-align:right;padding-right:4px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:flex-end;padding-bottom:1px;font-weight:'+(showLabel?'bold':'normal')+'">'+(showLabel?yval:'')+'</div>';
-    VG.cols.forEach(function(col,ci){var k=cellKey(ci,yval);var cell=VG.cells[k];var bt=isMajor?'1.5px solid rgba(100,100,100,.5)':'1px solid rgba(48,54,61,.5)';var bg=cell?'rgba(29,185,84,.12)':'transparent';var sym=cell?('<span style="font-size:13px;font-weight:bold;line-height:1;color:'+cell.color+'">'+cell.sym+'</span>'):'';html+='<div onclick="toggleCell('+ci+','+yval+')" style="width:'+CELL+'px;height:18px;border-left:1px solid rgba(48,54,61,.4);border-top:'+bt+';background:'+bg+';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">'+sym+'</div>';});
+    VG.cols.forEach(function(col,ci){
+      // Buscar el valor real más cercano a este yval en VG.cells
+      var cell=VG.cells[cellKey(ci,yval)];
+      if(!cell){
+        // Solo mostrar si yval es el más cercano a ese valor real
+        var nearest=null,minDist=13;
+        Object.keys(VG.cells).forEach(function(k2){
+          var parts=k2.split('_');
+          if(parseInt(parts[0])===ci){
+            var v=parseFloat(parts[1]);
+            var dist=Math.abs(v-yval);
+            // Verificar que yval sea efectivamente el más cercano en Y_VALS
+            var closestYval=Y_VALS.reduce(function(a,b){return Math.abs(b-v)<Math.abs(a-v)?b:a;});
+            if(dist<minDist&&closestYval===yval){minDist=dist;nearest=VG.cells[k2];}
+          }
+        });
+        cell=nearest;
+      }var bt=isMajor?'1.5px solid rgba(100,100,100,.5)':'1px solid rgba(48,54,61,.5)';var bg=cell?'rgba(29,185,84,.12)':'transparent';var sym=cell?('<span style="font-size:13px;font-weight:bold;line-height:1;color:'+cell.color+'">'+cell.sym+'</span>'):'';html+='<div onclick="toggleCell('+ci+','+yval+')" style="width:'+CELL+'px;height:18px;border-left:1px solid rgba(48,54,61,.4);border-top:'+bt+';background:'+bg+';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">'+sym+'</div>';});
     html+='</div>';
   });
   html+='<div style="display:flex;margin-top:2px;align-items:stretch"><div style="width:'+LABEL_W+'px;font-size:7px;color:var(--text3);text-align:right;padding-right:4px;flex-shrink:0;line-height:1.2">Hora<br>obs.</div>';
