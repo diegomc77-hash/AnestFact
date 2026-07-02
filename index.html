@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+  <script src="seguridad.js"></script>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -97,7 +98,7 @@ select.fi option{background:var(--bg2)}
 .dose-hint{font-size:10px;color:var(--green);margin-top:2px;display:none}
 </style>
 </head>
-<body>
+<body><div id="app">
 <div id="topbar">
   <button id="back-btn" onclick="goBack()">&#8249;</button>
   <div style="flex:1"><div class="logo" id="t-title">AnesFact <span>v6</span></div>
@@ -4145,7 +4146,7 @@ function imprimirFoja(){
     +'Suero: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.suero||'')+'</span> cm&#179;<br>'
     +'Otro: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.otro||'')+'</span> cm&#179;</div></div>'
     +'<div style="flex:2"><div class="s">Observaciones</div><div style="border:1px solid #ccc;min-height:70px;padding:3px;font-size:10px;word-wrap:break-word;overflow-wrap:break-word"></div></div>'
-    +'</div></body></html>';
+    +'</div></div></body></html>';
   var w=window.open('','_blank');if(!w){toast('Permitir ventanas emergentes');return;}
   w.document.write(html);w.document.close();
   setTimeout(function(){w.print();},signSrc?700:400);
