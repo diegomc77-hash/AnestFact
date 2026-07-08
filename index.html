@@ -2,7 +2,6 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-  <script src="seguridad.js"></script>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -548,7 +547,16 @@ select.fi option{background:var(--bg2)}
 
   <div class="card">
   <!-- Mayo GECLISA helper - shown only for Mayo -->
-  <div id="mayo-foja-helper" style="display:none">
+  <div id="mayo-hora-fin-wrap" style="display:none">
+  <div class="card" style="border-color:rgba(56,139,253,.4);background:rgba(56,139,253,.06)">
+    <div class="ct">&#9200; Tiempos quir&#250;rgicos</div>
+    <div class="g2">
+      <div class="field"><label>Hora inicio cirug&#237;a</label><input class="fi" type="time" id="mayo-hora-inicio" onchange="document.getElementById('f-hora').value=this.value"></div>
+      <div class="field"><label>Hora fin cirug&#237;a</label><input class="fi" type="time" id="mayo-hora-fin" onchange="document.getElementById('fj-fin').value=this.value"></div>
+    </div>
+  </div>
+</div>
+<div id="mayo-foja-helper" style="display:none">
     <div class="card" style="border-color:rgba(56,139,253,.4);background:rgba(56,139,253,.06)">
       <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleMayoHelper()">
         <div class="ct" style="color:var(--blue);margin:0">&#127973; Sanatorio Mayo — Datos para GECLISA</div>
@@ -1000,7 +1008,7 @@ var DRUGS=[
   {n:'Ranitidina',cat:'Anti-H2',mgKg:null,doses:['50mg'],via:'EV'},
   {n:'Omeprazol',cat:'IBP',mgKg:null,doses:['40mg'],via:'EV'},
 ];
-var VIAS=['EV','IM','IT','Peridural','INH','SC','SL','Tópica'];
+var VIAS=['mg EV','mcg EV','ml EV','mg IM','mcg/kg/min inf','% CAM','mg intratecal','mcg intratecal','ml peridural','mg peridural','EV','IM','IT','Peridural','INH','SC','SL','Tópica'];
 
 var PREMED_CHIPS=['Midazolam 2mg EV','Midazolam 1mg EV','Atropina 0.5mg EV','Cefalotina 2g EV','Ketorolac 30mg EV','Diclofenac 75mg EV','Ondansetrón 8mg EV','Dexametasona 8mg EV','Metoclopramida 10mg EV','Ranitidina 50mg EV'];
 
@@ -1041,8 +1049,8 @@ function calcPremed(silencioso){
 
   if(esGeneral){
     lineas.push('Midazolam '+midazFull+'mg EV');
-    lineas.push('Atropina '+atro+'mg EV');
     lineas.push('Ranitidina '+rani+'mg EV');
+    extras.push('Atropina '+atro+'mg EV');
     lineas.push('Ondansetrón '+ondan+'mg EV');
     lineas.push('Dexametasona '+dexameta+'mg EV');
     if(rani===50)  alerta+='Ranitidina limitada a techo 50mg. ';
@@ -3769,6 +3777,20 @@ function cargarFojaUI(){cargarFojaVG();setTimeout(function(){tecRestaurar((S.cur
   if(!S.cur||!S.cur.foja)return;
   var f=S.cur.foja;
   sv('fj-tec',f.tec);sv('fj-asa',f.asa);sv('fj-via',f.via);sv('fj-fin',f.fin);
+  if(f.tec_tipo){sv('fj-tec-tipo',f.tec_tipo);tecNivel1();}
+  if(f.tec_subtipo){sv('fj-tec-subtipo',f.tec_subtipo);tecNivel2();}
+  // Restaurar campos niveles 3 y 4 con delay para que el DOM esté listo
+  setTimeout(function(){
+    if(f.tec_bloqueo)sv('fj-tec-bloqueo',f.tec_bloqueo);
+    if(f.tec_lateral)sv('fj-tec-lateral',f.tec_lateral);
+    if(f.tec_espacio)sv('fj-tec-espacio',f.tec_espacio);
+    if(f.tec_aguja)sv('fj-tec-aguja',f.tec_aguja);
+    if(f.tec_calibre)sv('fj-tec-calibre',f.tec_calibre);
+    if(f.tec_guia)sv('fj-tec-guia',f.tec_guia);
+    if(f.tec_resultado)sv('fj-tec-resultado',f.tec_resultado);
+  },150);
+  // Restaurar número de tubo y actualizar materiales
+  if(f.tubo){setTimeout(function(){var t=document.getElementById('metodos-tubo');if(t){t.value=f.tubo;actualizarMetodos();}},250);}
   sv('fj-ind',f.ind||'');sv('fj-hint',f.hint||'');sv('fj-hext',f.hext||'');
   sv('fj-premed',f.premed||'');sv('fj-atb',f.atb||'');sv('fj-metodos',f.metodos||'');
   sv('fj-recup',f.recup||'');sv('fj-obs',f.obs||'');sv('fj-examen-fisico',f.examenFisico||'');sv('fj-mallampati',f.mallampati||'');sv('fj-orina',f.orina||'');sv('fj-sangrado',f.sangrado||'');
@@ -3787,12 +3809,23 @@ function guardarFoja(){guardarFojaVG();
       if(ni)d.n=ni.value;if(di)d.d=di.value;if(si)d.v=si.value;
     });
   }
+  // Preservar datos del gráfico VG antes de sobreescribir
+  var _vgCols=S.cur.foja.vg_cols;var _vgCells=S.cur.foja.vg_cells;
+  var _vgObs=S.cur.foja.vg_obs;var _vgFluidos=S.cur.foja.vg_fluidos;
+  var _aeroBase={sist:S.cur.foja.aero_sist,diast:S.cur.foja.aero_diast,fc:S.cur.foja.aero_fc,
+    sat:S.cur.foja.aero_sat,eco2:S.cur.foja.aero_eco2,resp:S.cur.foja.aero_resp,evol:S.cur.foja.aero_evol};
   S.cur.foja={
-    tec:gv('fj-tec'),asa:gv('fj-asa'),via:gv('fj-via'),fin:gv('fj-fin'),
+    tec:gv('fj-tec'),tec_tipo:gv('fj-tec-tipo'),tec_subtipo:gv('fj-tec-subtipo'),
+    tec_bloqueo:gv('fj-tec-bloqueo'),tec_lateral:gv('fj-tec-lateral'),tec_espacio:gv('fj-tec-espacio'),
+    tec_aguja:gv('fj-tec-aguja'),tec_calibre:gv('fj-tec-calibre'),tec_guia:gv('fj-tec-guia'),tec_resultado:gv('fj-tec-resultado'),
+    asa:gv('fj-asa'),via:gv('fj-via'),fin:gv('fj-fin'),tubo:gv('metodos-tubo'),
     ind:gv('fj-ind'),hint:gv('fj-hint'),hext:gv('fj-hext'),
     premed:gv('fj-premed'),atb:gv('fj-atb'),metodos:gv('fj-metodos'),recup:gv('fj-recup'),obs:gv('fj-obs'),examenFisico:gv('fj-examen-fisico'),mallampati:gv('fj-mallampati'),
-    suero:gv('fj-suero'),sangre:gv('fj-sangre'),plasma:gv('fj-plasma'),otro:gv('fj-otro'),
-    drogas:S.cur.foja.drogas||[],vitals:S.vitals||[],sign:S.signData||null
+    suero:gv('fj-suero'),sangre:gv('fj-sangre'),plasma:gv('fj-plasma'),otro:gv('fj-otro'),orina:gv('fj-orina'),sangrado:gv('fj-sangrado'),
+    drogas:S.cur.foja.drogas||[],vitals:S.vitals||[],sign:S.signData||null,
+    vg_cols:_vgCols,vg_cells:_vgCells,vg_obs:_vgObs,vg_fluidos:_vgFluidos,
+    aero_sist:_aeroBase.sist,aero_diast:_aeroBase.diast,aero_fc:_aeroBase.fc,
+    aero_sat:_aeroBase.sat,aero_eco2:_aeroBase.eco2,aero_resp:_aeroBase.resp,aero_evol:_aeroBase.evol
   };
   // Save Mayo-specific fields
   if(S.cur&&(S.cur.san||'').indexOf('Mayo')>=0){
@@ -3853,7 +3886,7 @@ function renderGeclisa(){
   function cpRow(label,val){
     if(!val)return'';
     return '<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--text3);margin-bottom:3px">'+label+'</div>'
-      +'<div class="cp-row"><span style="font-family:monospace;font-size:13px;flex:1">'+val+'</span>'
+      +'<div class="cp-row"><span style="font-family:monospace;font-size:13px;flex:1;word-wrap:break-word;overflow-wrap:break-word;white-space:pre-wrap;min-width:0">'+val+'</span>'
       +'<button onclick="copyVal(\''+val.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\',\''+label+'\')" style="background:none;border:none;font-size:18px;cursor:pointer;flex-shrink:0">📋</button></div></div>';
   }
   var sectorCama=(i.mayo_sector&&i.mayo_cama)?(i.mayo_sector+' - '+i.mayo_cama):(i.sala&&i.cama?i.sala+' - Cama '+i.cama:'');
@@ -4136,7 +4169,7 @@ function imprimirFoja(){
     +'<div class="s">Agentes Anest&#233;sicos:</div><div style="border-bottom:1px solid #ccc;padding:2px 3px;min-height:20px;font-size:10px">'+(drogaLines||'')+'</div>'
     +'<div class="s">M&#233;todos Anest&#233;sicos:</div><div style="border-bottom:1px solid #ccc;padding:2px 3px;min-height:20px;font-size:10px">'+(f.metodos||'')+'</div>'
     +'<div class="s">Recuperaci&#243;n:</div><div style="border-bottom:1px solid #ccc;padding:2px 3px;min-height:20px;font-size:10px">'+(f.recup||'')+'</div>'
-    +'<div style="display:flex;gap:8px;margin-top:5px"><div style="flex:2"><div class="s">Observaciones:</div><div style="border:1px solid #ccc;padding:3px;min-height:65px;font-size:10px;word-wrap:break-word;overflow-wrap:break-word">'+(f.obs||'')+'</div>'
+    +'<div style="display:flex;gap:8px;margin-top:5px"><div style="flex:2;min-width:0;overflow:hidden"><div class="s">Observaciones:</div><div style="border:1px solid #ccc;padding:3px;min-height:65px;max-height:65px;font-size:10px;word-wrap:break-word;overflow-wrap:break-word;overflow:hidden">'+(f.obs||'')+'</div>'
     +'<div style="border:1px solid #ccc;border-top:none;padding:2px 3px;text-align:center;font-size:7.5px;font-weight:bold">FIRMA Y SELLO DEL ANESTESISTA</div></div>'
     +'<div style="flex:0 0 138px;display:flex;flex-direction:column;justify-content:flex-end;text-align:center">'+signImg
     +'<div style="border-top:1.5px solid #000;padding-top:3px;font-size:8px"><b>MARIA SOLEDAD HUERTA</b><br>M.P. 32393 &nbsp; M.E. 15518<br>Anest&#243;loga &middot; ADAARC</div></div></div>'
@@ -4145,7 +4178,7 @@ function imprimirFoja(){
     +'Plasma: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.plasma||'')+'</span> cm&#179;<br>'
     +'Suero: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.suero||'')+'</span> cm&#179;<br>'
     +'Otro: <span style="border-bottom:1px solid #000;display:inline-block;min-width:42px">'+(f.otro||'')+'</span> cm&#179;</div></div>'
-    +'<div style="flex:2"><div class="s">Observaciones</div><div style="border:1px solid #ccc;min-height:70px;padding:3px;font-size:10px;word-wrap:break-word;overflow-wrap:break-word"></div></div>'
+    +'<div style="flex:2"><div class="s">Observaciones</div><div style="border:1px solid #ccc;min-height:70px;max-height:70px;padding:3px;font-size:10px;word-wrap:break-word;overflow-wrap:break-word;overflow:hidden;white-space:normal;word-wrap:break-word;overflow-wrap:break-word"></div></div>'
     +'</div></div></body></html>';
   var w=window.open('','_blank');if(!w){toast('Permitir ventanas emergentes');return;}
   w.document.write(html);w.document.close();
@@ -4380,8 +4413,36 @@ function addVitalRow(){}
 function renderVitals(){}
 function editV(){}
 function delV(){}
-function guardarFojaVG(){if(S.cur&&S.cur.foja){S.cur.foja.vg_cols=VG.cols;S.cur.foja.vg_cells=VG.cells;S.cur.foja.vg_obs=VG.obs;S.cur.foja.vg_fluidos=VG.fluidos;}}
-function cargarFojaVG(){var f=(S.cur&&S.cur.foja)||{};if(f.vg_cols){VG.cols=f.vg_cols;VG.cells=f.vg_cells||{};VG.obs=f.vg_obs||{};VG.fluidos=f.vg_fluidos||{};setTimeout(renderVitalsGrid,80);}}
+function guardarFojaVG(){
+  if(S.cur&&S.cur.foja){
+    S.cur.foja.vg_cols=VG.cols;
+    S.cur.foja.vg_cells=VG.cells;
+    S.cur.foja.vg_obs=VG.obs;
+    S.cur.foja.vg_fluidos=VG.fluidos;
+    // Guardar campos base del gráfico Aeronáutico
+    function gv2(id){var e=document.getElementById(id);return e?e.value:'';}
+    S.cur.foja.aero_sist=gv2('aero-sist');
+    S.cur.foja.aero_diast=gv2('aero-diast');
+    S.cur.foja.aero_fc=gv2('aero-fc');
+    S.cur.foja.aero_sat=gv2('aero-sat');
+    S.cur.foja.aero_eco2=gv2('aero-eco2');
+    S.cur.foja.aero_resp=gv2('aero-resp');
+    S.cur.foja.aero_evol=gv2('aero-evol');
+  }
+}
+function cargarFojaVG(){
+  var f=(S.cur&&S.cur.foja)||{};
+  if(f.vg_cols){
+    VG.cols=f.vg_cols;VG.cells=f.vg_cells||{};VG.obs=f.vg_obs||{};VG.fluidos=f.vg_fluidos||{};
+    setTimeout(renderVitalsGrid,80);
+  }
+  // Restaurar campos base del gráfico Aeronáutico
+  function sv2(id,val){var e=document.getElementById(id);if(e&&val)e.value=val;}
+  sv2('aero-sist',f.aero_sist);sv2('aero-diast',f.aero_diast);
+  sv2('aero-fc',f.aero_fc);sv2('aero-sat',f.aero_sat);
+  sv2('aero-eco2',f.aero_eco2);sv2('aero-resp',f.aero_resp);
+  sv2('aero-evol',f.aero_evol);
+}
 // === ACKEY + closeAllAC ===
 function acKey(e,lid){
   var list=document.getElementById(lid);if(!list||list.style.display==='none')return;
@@ -4697,6 +4758,8 @@ function renderFojaPorSanatorio(){
   var bi=document.getElementById('btn-imprimir-foja');
   if(bi)bi.style.display=esMayo?'none':'block';
   var atw=document.getElementById('aero-tiempos-wrap');if(atw)atw.style.display=esMayo?'none':'block';
+  // Mayo: mostrar hora fin en la card del helper Mayo
+  var mhf=document.getElementById('mayo-hora-fin-wrap');if(mhf)mhf.style.display=esMayo?'block':'none';
   // Generate Mayo vitals rows if Mayo and no rows yet
   if(esMayo){
     var tbody=document.getElementById('mayo-vitals-body');
@@ -4706,6 +4769,11 @@ function renderFojaPorSanatorio(){
   if(esMayo&&S.cur&&S.cur.foja){
     var f=S.cur.foja;
     function sv2(id,val){var e=document.getElementById(id);if(e&&val)e.value=val;}
+    sv2('mayo-hora-inicio',S.cur.hora||'');
+    sv2('mayo-hora-fin',f.fin||'');
+    // Sincronizar con los campos ocultos
+    var elFHora=document.getElementById('f-hora');if(elFHora&&S.cur.hora&&!elFHora.value)elFHora.value=S.cur.hora;
+    var elFin=document.getElementById('fj-fin');if(elFin&&f.fin&&!elFin.value)elFin.value=f.fin;
     sv2('fj-posicion',f.posicion);
     sv2('fj-nivel-regional',f.nivel_regional);
     sv2('fj-obs-geclisa',f.obs_geclisa);
@@ -5091,7 +5159,7 @@ function sugerirDrogas(tipo){
       inp.value=parts[1]+' '+parts[2];
       inp.readOnly=false;
       btn.disabled=false;
-      btn.click(); // Auto-agregar sin presionar +
+      setTimeout(function(){btn.click();},10); // Auto-agregar sin presionar +
     };
 
     // Al confirmar -> agregar a la lista
