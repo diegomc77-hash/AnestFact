@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AnestFact → GECLISA</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#0d1117;color:#e6edf3;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:24px;max-width:440px;width:100%}
+h2{color:#1db954;font-size:18px;margin-bottom:6px}
+.sub{color:#8b949e;font-size:13px;margin-bottom:20px}
+.paciente{background:#0d1117;border:1px solid #1db954;border-radius:8px;padding:12px;margin-bottom:16px;font-size:14px}
+.paciente b{color:#1db954}
+.btn{width:100%;border:none;border-radius:8px;padding:14px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px}
+.btn-g{background:#1db954;color:#fff}
+.btn-g:hover{background:#17a349}
+.btn-g:disabled{background:#444;cursor:not-allowed}
+.btn-s{background:#21262d;color:#e6edf3;border:1px solid #30363d}
+.status{border-radius:8px;padding:10px 12px;font-size:13px;margin-top:10px;display:none}
+.ok{background:rgba(29,185,84,.1);border:1px solid rgba(29,185,84,.3);color:#1db954}
+.err{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);color:#f85149}
+.info{background:rgba(56,139,253,.1);border:1px solid rgba(56,139,253,.3);color:#58a6ff}
+.steps{font-size:12px;color:#8b949e;line-height:2;margin-top:14px}
+.steps b{color:#e6edf3}
+#progress{height:4px;background:#1db954;width:0;border-radius:2px;transition:width .3s;margin-bottom:16px}
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>AnestFact → GECLISA</h2>
+  <p class="sub">Relleno automático de la foja anestésica</p>
+  <div id="progress"></div>
+  <div id="paciente-info" class="paciente" style="display:none"></div>
+  <button class="btn btn-g" id="btn-main" onclick="iniciar()">🏥 Abrir GECLISA y rellenar</button>
+  <button class="btn btn-s" id="btn-reintentar" onclick="reintentar()" style="display:none">🔄 Reintentar relleno</button>
+  <div class="status" id="status"></div>
+  <div class="steps" id="instrucciones">
+    <b>Cómo funciona:</b><br>
+    1. Tocá el botón de arriba<br>
+    2. GECLISA se abre en una nueva pestaña<br>
+    3. Esta página rellena los campos automáticamente<br>
+    4. Volvé a GECLISA y hacé clic en <b>GRABAR</b>
+  </div>
+</div>
+
+<script>
+var datos = null;
+var ventanaGeclisa = null;
+var intentos = 0;
+var maxIntentos = 20;
+
+// ── Leer datos del hash ───────────────────────────────────────────────
+function init(){
+  var hash = window.location.hash || '';
+  var m = hash.match(/AF=([^&]+)/);
+  if(!m){ showStatus('Sin datos. Volvé a AnesFact y tocá "Abrir GECLISA".','err'); return; }
+  try{
+    var b64 = decodeURIComponent(m[1]);
+    var json = decodeURIComponent(escape(atob(b64)));
+    datos = JSON.parse(json);
+    // Make data available to child windows via window.AF_DATA
+    window.AF_DATA = datos;
+    var info = document.getElementById('paciente-info');
+    info.style.display = 'block';
+    info.innerHTML = '<b>' + datos.apellido + ', ' + datos.nombre + '</b><br>'
+      + '<span style="color:#8b949e;font-size:12px">'
+      + (datos.diagnostico||'') + ' · ' + (datos.fechaCirugia||'') + '</span>';
+  }catch(e){
+    showStatus('Error leyendo datos: ' + e.message,'err');
+  }
+}
+
+function showStatus(msg, tipo){
+  var el = document.getElementById('status');
+  el.style.display = 'block';
+  el.className = 'status ' + tipo;
+  el.textContent = msg;
+}
+
+function setProgress(pct){
+  document.getElementById('progress').style.width = pct + '%';
+}
+
+// ── Abrir GECLISA y esperar a que cargue ──────────────────────────────
+function iniciar(){
+  if(!datos){ showStatus('Sin datos del paciente','err'); return; }
+  document.getElementById('btn-main').disabled = true;
+  document.getElementById('btn-main').textContent = '⏳ Abriendo GECLISA...';
+  document.getElementById('instrucciones').style.display = 'none';
+  showStatus('Abriendo GECLISA...','info');
+  setProgress(10);
+
+  ventanaGeclisa = window.open('http://sanatoriomayo.myvnc.com:84','_blank');
+
+  if(!ventanaGeclisa){
+    showStatus('El navegador bloqueó la ventana. Habilitá los pop-ups para este sitio.','err');
+    document.getElementById('btn-main').disabled = false;
+    document.getElementById('btn-main').textContent = '🏥 Abrir GECLISA';
+    return;
+  }
+
+  setProgress(50);
+  showStatus('✓ GECLISA abierto. Buscá el paciente, abrí la foja y ejecutá el bookmarklet "Rellenar GECLISA".','ok');
+  document.getElementById('btn-main').textContent = '✓ GECLISA abierto';
+  document.getElementById('instrucciones').innerHTML =
+    '<b>Próximos pasos:</b><br>' +
+    '1. En la pestaña de GECLISA: buscá el paciente<br>' +
+    '2. Abrí la foja anestésica<br>' +
+    '3. Ejecutá el marcador <b>"Rellenar GECLISA"</b><br>' +
+    '4. Verificá los campos y hacé clic en <b>GRABAR</b>';
+  document.getElementById('instrucciones').style.display='block';
+  setProgress(100);
+}
+
+function esperarCarga(){
+  intentos++;
+  setProgress(Math.min(10 + intentos * 4, 80));
+  showStatus('Esperando que cargue GECLISA (' + intentos + '/' + maxIntentos + ')...','info');
+
+  try{
+    // Check if GECLISA has loaded by trying to access its document
+    var doc = ventanaGeclisa.document;
+    if(!doc || !doc.body){
+      if(intentos < maxIntentos){ setTimeout(esperarCarga, 1500); }
+      else{ onTimeout(); }
+      return;
+    }
+    // Check if page is fully loaded
+    if(doc.readyState !== 'complete'){
+      if(intentos < maxIntentos){ setTimeout(esperarCarga, 1500); }
+      else{ onTimeout(); }
+      return;
+    }
+    // Page loaded - try to fill
+    var inputs = doc.querySelectorAll('input:not([type=hidden]), select, textarea');
+    if(inputs.length < 5){
+      // Not enough fields yet - might still be loading
+      if(intentos < maxIntentos){ setTimeout(esperarCarga, 1500); }
+      else{ onTimeout(); }
+      return;
+    }
+    // Ready!
+    setProgress(85);
+    showStatus('GECLISA cargado. Rellenando campos...','info');
+    setTimeout(function(){ rellenar(doc); }, 500);
+
+  }catch(e){
+    // Cross-origin error - can't access window
+    // This means GECLISA loaded but we can't inject from here
+    onCrossOriginError();
+  }
+}
+
+function onTimeout(){
+  showStatus('GECLISA tardó demasiado. Usá el botón "Reintentar".','err');
+  document.getElementById('btn-reintentar').style.display = 'block';
+  document.getElementById('btn-main').disabled = false;
+  document.getElementById('btn-main').textContent = '🏥 Abrir GECLISA y rellenar';
+}
+
+function onCrossOriginError(){
+  // GECLISA is on a different domain - can't inject JS directly
+  // Fallback: show the data as text so user can copy manually
+  setProgress(100);
+  showStatus('GECLISA está en otro servidor. Usando modo manual.','info');
+  document.getElementById('btn-reintentar').style.display = 'none';
+  mostrarDatosManual();
+}
+
+function reintentar(){
+  if(!ventanaGeclisa || ventanaGeclisa.closed){
+    ventanaGeclisa = window.open('http://sanatoriomayo.myvnc.com:84','_blank');
+    setTimeout(esperarCarga, 2000);
+  } else {
+    intentos = 0;
+    esperarCarga();
+  }
+}
+
+// ── Rellenar campos en GECLISA ────────────────────────────────────────
+function rellenar(doc){
+  var d = datos;
+
+  function set(el, val){
+    if(!el || !val) return false;
+    try{
+      var proto = Object.getPrototypeOf(el);
+      var desc = Object.getOwnPropertyDescriptor(proto, 'value');
+      if(desc && desc.set) desc.set.call(el, String(val));
+      else el.value = String(val);
+    }catch(e){ el.value = String(val); }
+    el.dispatchEvent(new Event('input',{bubbles:true}));
+    el.dispatchEvent(new Event('change',{bubbles:true}));
+    return true;
+  }
+
+  function byLabel(textos){
+    if(typeof textos==='string') textos=[textos];
+    var all = doc.querySelectorAll('label,td,th,span,div,b,p');
+    for(var i=0;i<all.length;i++){
+      var t=all[i].textContent.trim().toLowerCase();
+      for(var j=0;j<textos.length;j++){
+        if(t.indexOf(textos[j].toLowerCase())>=0){
+          var p=all[i].closest('tr,div,td,fieldset')||all[i].parentElement;
+          if(p){
+            var inp=p.querySelector('input:not([type=hidden]):not([type=checkbox]),textarea,select');
+            if(inp) return inp;
+          }
+          if(all[i].htmlFor){
+            var el=doc.getElementById(all[i].htmlFor);
+            if(el) return el;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  var PROHIBIDOS=['apellido','nombre','dni','n° hc','n hc','obra social','fecha nac','domicilio'];
+  function prohibido(el){
+    var txt='';
+    if(el.id){var l=doc.querySelector('label[for="'+el.id+'"]');if(l)txt=l.textContent.toLowerCase();}
+    if(!txt){var p=el.closest('tr,div,td');if(p)txt=p.textContent.toLowerCase().slice(0,60);}
+    return PROHIBIDOS.some(function(k){return txt.indexOf(k)>=0;});
+  }
+
+  var ok=0;
+  var mapa=[
+    [['Diagnostico/cx realizada','Diagnóstico'], d.diagnostico],
+    [['Hora Inicio','hora inicio'],               d.horaInicio],
+    [['Hora Fin','hora fin'],                     d.horaFin],
+    [['Observaciones'],                            d.observaciones],
+    [['Medicamentos Generales','Monitorizacion'],  d.premedicacion],
+    [['Medicamentos Anestésicos'],                 d.medicamentos],
+    [['Inducción','induccion'],                    d.induccion],
+    [['Mantenimiento'],                            d.mantenimiento],
+    [['Vía Aérea','via aerea'],                    d.viaAerea],
+    [['Métodos','metodos'],                        d.metodos],
+    [['Recuperación'],                             d.recuperacion],
+  ];
+  mapa.forEach(function(e){
+    var inp=byLabel(e[0]);
+    if(inp&&!prohibido(inp)&&e[1]) if(set(inp,e[1])) ok++;
+  });
+
+  // Selects
+  doc.querySelectorAll('select').forEach(function(sel){
+    var lbl='';
+    if(sel.id){var l=doc.querySelector('label[for="'+sel.id+'"]');if(l)lbl=l.textContent.toLowerCase();}
+    if(!lbl){var p=sel.closest('tr,div,td');if(p)lbl=p.textContent.toLowerCase().slice(0,60);}
+    if(lbl.indexOf('quirofano')>=0||lbl.indexOf('quirófano')>=0){
+      var m2=Array.from(sel.options).find(function(o){return o.text.toLowerCase().indexOf((d.quirofano||'').toLowerCase())>=0;});
+      if(m2){sel.value=m2.value;sel.dispatchEvent(new Event('change',{bubbles:true}));ok++;}
+    }
+    if(lbl.indexOf('anestesista')>=0||lbl.indexOf('profesional')>=0){
+      var m3=Array.from(sel.options).find(function(o){return o.text.indexOf('HUERTA')>=0;});
+      if(m3){sel.value=m3.value;sel.dispatchEvent(new Event('change',{bubbles:true}));ok++;}
+    }
+    if(lbl.indexOf('asa')>=0&&d.asa){
+      var m4=Array.from(sel.options).find(function(o){return o.text.indexOf(d.asa)>=0;});
+      if(m4){sel.value=m4.value;sel.dispatchEvent(new Event('change',{bubbles:true}));ok++;}
+    }
+  });
+
+  // Checkboxes monitoreo
+  var mon={etco2:d.monEtco2,'e-co2':d.monEtco2,pam:d.monPam,ecg:d.monEcg,'sat o2':d.monSato2,sato2:d.monSato2,pani:d.monPani};
+  doc.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+    var lbl='';
+    if(cb.id){var l=doc.querySelector('label[for="'+cb.id+'"]');if(l)lbl=l.textContent.toLowerCase();}
+    if(!lbl){var p=cb.closest('label,td,div');if(p)lbl=p.textContent.toLowerCase().slice(0,30);}
+    Object.keys(mon).forEach(function(k){
+      if(lbl.indexOf(k)>=0&&mon[k]!==undefined&&cb.checked!==!!mon[k])cb.click();
+    });
+  });
+
+  // Evaluacion preanestesica
+  var secEval=null;
+  doc.querySelectorAll('*').forEach(function(el){
+    if(el.children.length===0&&el.textContent.trim().toLowerCase().indexOf('evaluacion preanestesica')>=0){
+      secEval=el.closest('table,div,fieldset')||el.parentElement;
+    }
+  });
+  if(secEval){
+    secEval.querySelectorAll('label,td,span').forEach(function(lbl){
+      var t=lbl.textContent.trim().toLowerCase();
+      var p=lbl.closest('tr,div,td');
+      var inp=p?p.querySelector('input'):null;
+      if(t==='edad'||t==='edad:'){if(inp&&!prohibido(inp)&&d.edad){set(inp,d.edad);ok++;}}
+      if(t.indexOf('peso')===0){if(inp&&!prohibido(inp)&&d.peso){set(inp,d.peso);ok++;}}
+    });
+  }
+
+  // Signos vitales
+  if(d.vitals&&d.vitals.length){
+    doc.querySelectorAll('table').forEach(function(tabla){
+      var h=tabla.textContent.toLowerCase();
+      if(h.indexOf('sist')<0&&h.indexOf('fc')<0)return;
+      var rows=tabla.querySelectorAll('tbody tr');
+      d.vitals.forEach(function(v,idx){
+        if(!rows[idx])return;
+        var inputs=rows[idx].querySelectorAll('input');
+        [v.sist,v.diast,v.sato2,v.eco2,v.fc,v.pam].forEach(function(val,i){
+          if(inputs[i]&&val)set(inputs[i],val);
+        });
+      });
+    });
+  }
+
+  setProgress(100);
+  showStatus('✓ ' + ok + ' campos rellenados. Andá a GECLISA y hacé clic en GRABAR.','ok');
+  document.getElementById('btn-main').textContent = '✓ Rellenado (' + ok + ' campos)';
+  ventanaGeclisa.focus();
+}
+
+// ── Fallback: mostrar datos para copiar manualmente ───────────────────
+function mostrarDatosManual(){
+  if(!datos) return;
+  var d = datos;
+  var f = d;
+  var lineas = [
+    'Diagnóstico: ' + (d.diagnostico||''),
+    'Hora inicio: ' + (d.horaInicio||'') + '  Hora fin: ' + (d.horaFin||''),
+    'Quirófano: ' + (d.quirofano||''),
+    '',
+    'Anestesista: HUERTA MARIA SOLEDAD (MP 32393)',
+    'Cirujano: ' + (d.cirujano||''),
+    'Observaciones: ' + (d.observaciones||''),
+    '',
+    'Premedicación: ' + (d.premedicacion||''),
+    'Medicamentos: ' + (d.medicamentos||''),
+    '',
+    'Peso: ' + (d.peso||'') + 'kg  ASA: ' + (d.asa||''),
+    'Inducción: ' + (d.induccion||''),
+    'Mantenimiento: ' + (d.mantenimiento||''),
+    'Vía aérea: ' + (d.viaAerea||''),
+    'Métodos: ' + (d.metodos||''),
+    '',
+    'Recuperación: ' + (d.recuperacion||'S/p'),
+  ];
+  if(d.vitals && d.vitals.length){
+    lineas.push('','Signos vitales:','MIN  SIST  DIAST  SAT  CO2  FC  PAM');
+    d.vitals.forEach(function(r){
+      lineas.push(String(r.min).padEnd(5)+String(r.sist).padEnd(6)+String(r.diast).padEnd(7)+String(r.sato2).padEnd(5)+String(r.eco2).padEnd(5)+String(r.fc).padEnd(4)+String(r.pam));
+    });
+  }
+  var txt = lineas.join('\n');
+  document.getElementById('instrucciones').innerHTML =
+    '<b>Copiá estos datos y pegálos en GECLISA:</b><br><br>'
+    + '<button class="btn btn-g" onclick="copiarTodo()" style="margin-bottom:10px">📋 Copiar todo</button>'
+    + '<pre id="datos-texto" style="background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:12px;font-size:11px;white-space:pre-wrap;text-align:left">'
+    + txt.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</pre>';
+  document.getElementById('instrucciones').style.display = 'block';
+  window._textoGeclisa = txt;
+}
+
+function copiarTodo(){
+  var txt = window._textoGeclisa || '';
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(txt).then(function(){
+      showStatus('✓ Copiado. Pegá en GECLISA.','ok');
+    });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showStatus('✓ Copiado. Pegá en GECLISA.','ok');
+  }
+}
+
+init();
+</script>
+</body>
+</html>

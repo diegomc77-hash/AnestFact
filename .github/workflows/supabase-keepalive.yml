@@ -1,0 +1,23 @@
+# Ping diario a Supabase para evitar pausa por inactividad (plan free).
+# Configurar secrets en GitHub: Settings → Secrets → Actions
+#   SUPABASE_URL = https://xntvibfsuubedplptvzs.supabase.co
+#   SUPABASE_ANON_KEY = (anon key del proyecto)
+name: Supabase keepalive
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping anesfact_datos
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/anesfact_datos?select=clave&limit=1")
+          echo "HTTP $code"
+          test "$code" = "200" -o "$code" = "206"
