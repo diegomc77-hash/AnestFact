@@ -574,7 +574,7 @@
       <button class="btn btn-b" style="margin-top:10px;width:100%" onclick="go('geclisa')">&#127973; Ver Guía GECLISA completa</button>
       </div><!-- /mayo-helper-body -->
       <!-- Botón Enviar a GECLISA siempre visible -->
-      <button class="btn btn-b" style="width:100%;margin-top:10px;font-size:14px;padding:12px" onclick="guardarFoja();abrirGeclisa()">&#127973; Enviar a GECLISA</button>
+      <button class="btn btn-b" style="width:100%;margin-top:10px;font-size:14px;padding:12px" onclick="abrirGeclisa()">&#127973; Enviar a GECLISA</button>
     </div>
   </div>
   <div class="card" id="aero-tiempos-wrap" style="display:none">
@@ -2727,7 +2727,8 @@ function abrirGeclisa(){
   var i=S.cur;
   var f=(i&&i.foja)||{};
   if(!i){toast('Carg\u00e1 un paciente primero');return;}
-  if(document.getElementById('f-pac'))guardar();
+  if(document.getElementById('fj-tec'))guardarFoja();
+  else if(document.getElementById('f-pac'))guardar();
   i=S.cur;f=(i&&i.foja)||{};
   var parts=(i.pac||'').split(',');
   // Clave: DNI sin ceros, sino nombre+fecha, nunca 'ultimo'

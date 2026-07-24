@@ -32,6 +32,17 @@ toast.textContent='\u23f3 Cargando datos de AnesFact...';
 document.body.appendChild(toast);
 function rmToast(){try{document.body.removeChild(toast);}catch(e){}}
 
+// Fecha GECLISA (DD/MM/AAAA) o ISO (AAAA-MM-DD) -> AAAAMMDD (misma clave que AnesFact)
+function fechaClave(feStr){
+  if(!feStr)return '';
+  feStr=String(feStr).trim();
+  var m=feStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if(m)return m[3]+m[2]+m[1];
+  m=feStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m)return m[1]+m[2]+m[3];
+  return feStr.replace(/[\/\-]/g,'');
+}
+
 // DNI desde foja — sacar ceros iniciales
 function getClave(){
   try{
@@ -48,11 +59,11 @@ function getClave(){
     var fe=D.getElementById('8058');
     if(ap&&ap.value){
       var nom=(ap.value+'_'+(nm?nm.value:'')).trim().replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'').slice(0,20);
-      var fec=(fe&&fe.value?fe.value.replace(/\//g,''):'');
+      var fec=fechaClave(fe&&fe.value?fe.value:'');
       if(nom)return nom+(fec?'_'+fec:'');
     }
   }catch(e){}
-  return 'ultimo';
+  return null;
 }
 
 function verificarPaciente(d){
@@ -93,16 +104,16 @@ function xhrGet(url,ok,fail){
 }
 
 function cargarDatos(k){
+  if(!k){
+    rmToast();
+    alert('No se pudo identificar al paciente en la foja.\nVerificá DNI o apellido/nombre y volvé a intentar.');
+    return;
+  }
   var url=SURL+'/rest/v1/anesfact_datos?clave=eq.'+encodeURIComponent(k)+'&select=datos&limit=1';
   xhrGet(url,function(rows){
     if(!rows||!rows.length){
-      if(k!=='ultimo'){
-        toast.textContent='\u23f3 Buscando ultimo registro...';
-        cargarDatos('ultimo');
-        return;
-      }
       rmToast();
-      alert('Sin datos.\nAbri AnesFact, carga el paciente y toca "Enviar a GECLISA" primero.');
+      alert('Sin datos para este paciente.\nAbrí AnesFact, cargá el paciente y tocá "Enviar a GECLISA" primero.');
       return;
     }
     try{

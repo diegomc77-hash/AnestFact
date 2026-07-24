@@ -50,6 +50,10 @@ var ventanaGeclisa = null;
 var intentos = 0;
 var maxIntentos = 20;
 
+function escHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 // ── Leer datos del hash ───────────────────────────────────────────────
 function init(){
   var hash = window.location.hash || '';
@@ -63,9 +67,9 @@ function init(){
     window.AF_DATA = datos;
     var info = document.getElementById('paciente-info');
     info.style.display = 'block';
-    info.innerHTML = '<b>' + datos.apellido + ', ' + datos.nombre + '</b><br>'
+    info.innerHTML = '<b>' + escHtml(datos.apellido) + ', ' + escHtml(datos.nombre) + '</b><br>'
       + '<span style="color:#8b949e;font-size:12px">'
-      + (datos.diagnostico||'') + ' · ' + (datos.fechaCirugia||'') + '</span>';
+      + escHtml(datos.diagnostico||'') + ' · ' + escHtml(datos.fechaCirugia||'') + '</span>';
   }catch(e){
     showStatus('Error leyendo datos: ' + e.message,'err');
   }
