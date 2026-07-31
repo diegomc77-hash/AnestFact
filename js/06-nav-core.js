@@ -52,6 +52,7 @@ function go(id,addH){
   if(id==='home'){
     if(S.cur){try{guardar();}catch(e){}}
     renderHome();if(S.hist.length===1)cargarAnestesista();
+  }
   if(id==='resumen')renderResumen();
   if(id==='foja'){
     cargarFojaUI();

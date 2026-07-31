@@ -30,8 +30,11 @@ function aplicarIA(j){
   if(j.drogas&&j.drogas.length)S.cur.foja.drogas=j.drogas;
   if(j.practicas&&j.practicas.length)j.practicas.forEach(function(p){S.cur.pracs.push({cod:'?',desc:p,comp:0});});
   var conf=j.confianza||'media';
-  var badge=document.getElementById('ia-badge');badge.style.display='block';
-  badge.innerHTML='<span class="badge '+(conf==='alta'?'bg':conf==='media'?'by':'br')+'">IA: '+conf+'</span>'+(j.dudosos&&j.dudosos.length?' <span class="badge by">⚠ '+j.dudosos.length+' dudoso(s)</span>':'');
-  cargarForm(S.cur);go('nueva');toast('Datos extraídos ✓ — Foja o Facturación evweb');
+  var badge=document.getElementById('ia-badge');
+  if(badge){
+    badge.style.display='block';
+    badge.innerHTML='<span class="badge '+(conf==='alta'?'bg':conf==='media'?'by':'br')+'">IA: '+conf+'</span>'+(j.dudosos&&j.dudosos.length?' <span class="badge by">⚠ '+j.dudosos.length+' dudoso(s)</span>':'');
+  }
+  cargarForm(S.cur);go('facturacion');toast('Datos extraídos ✓ — revisá facturación evweb');
 }
 

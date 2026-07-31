@@ -62,14 +62,14 @@ function abrirInter(id){
     S.vitals=S.cur.foja&&S.cur.foja.vitals||[];
     cargarForm(S.cur);
     if(typeof cargarFojaUI==='function')cargarFojaUI();
-    document.getElementById('ia-badge').style.display='none';
+    var badge=document.getElementById('ia-badge');if(badge)badge.style.display='none';
     go('nueva');
   }
 }
 function nuevaInter(){
   S.cur={id:Date.now()+'',estado:'borrador',fecha:new Date().toISOString().slice(0,10),hora:'',pac:'',edad:'',sexo:'',dni:'',peso:'',ciru:'',serv:'',diag:'',san:'Hospital Aeronáutico',sala:'',cama:'',mayo_sector:'',mayo_cama:'',mayo_quir:'',mayo_tipociru:'',mayo_posicion:'',obra:'',afil:'',docs:{},ob:false,env:true,pracs:[],foja:{drogas:[],vitals:[]}};
   S.vitals=[];
-  document.getElementById('ia-badge').style.display='none';
+  var badge=document.getElementById('ia-badge');if(badge)badge.style.display='none';
   cargarForm(S.cur);
   if(typeof cargarFojaUI==='function')cargarFojaUI();
   go('nueva');
