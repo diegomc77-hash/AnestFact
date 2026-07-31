@@ -1,0 +1,39 @@
+<div id="view-ayuda" class="view">
+  <div class="card">
+    <div class="ct">&#128736; Mesa de ayuda</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px">Contanos qué falló o qué no funciona. Lo recibimos en la nube para revisarlo y corregirlo.</p>
+    <div class="field"><label>Tipo de problema</label>
+      <select class="fi" id="help-cat">
+        <option value="sync">Sync celular / PC</option>
+        <option value="geclisa">GECLISA / bookmark</option>
+        <option value="foja">Foja / impresión</option>
+        <option value="scan">Escaneo / IA</option>
+        <option value="nom">Nomenclador ADAARC</option>
+        <option value="datos">Carga de datos / formulario</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+    <div class="field"><label>&#191;Qu&eacute; pas&oacute;? *</label>
+      <textarea class="fi" id="help-msg" rows="4" placeholder="Ej.: Sync Guardar dice OK pero en la PC no aparecen las fojas"></textarea>
+    </div>
+    <div class="field"><label>Pasos para reproducir (opcional)</label>
+      <textarea class="fi" id="help-pasos" rows="2" placeholder="1. Celular Sync Guardar&#10;2. PC Ctrl+F5 Sync Cargar"></textarea>
+    </div>
+    <label class="tog-row" style="margin-bottom:12px">
+      <div><div style="font-size:13px">Incluir contexto de la intervenci&oacute;n abierta</div><div style="font-size:11px;color:var(--text3)">Paciente, sanatorio, cirug&iacute;a (sin DNI)</div></div>
+      <label class="tog"><input type="checkbox" id="help-ctx" checked><span class="ts"></span></label>
+    </label>
+    <button class="btn btn-g" style="width:100%" onclick="enviarReporteAyuda()">&#128228; Enviar reporte</button>
+    <div id="help-status" style="display:none;font-size:12px;padding:8px 12px;border-radius:8px;margin-top:10px;text-align:center"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Mis reportes en este equipo</div>
+    <div id="help-list"><p style="font-size:12px;color:var(--text3)">Sin reportes todav&iacute;a</p></div>
+  </div>
+  <div class="card">
+    <div class="ct">Soporte t&eacute;cnico</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:8px">Para revisar todos los reportes de usuarios (desarrollo).</p>
+    <button class="btn btn-s" style="width:100%;font-size:12px;margin-bottom:8px" onclick="cargarReportesNube()">&#9729; Ver reportes en la nube</button>
+    <div id="help-cloud-list"></div>
+  </div>
+</div>

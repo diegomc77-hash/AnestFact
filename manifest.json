@@ -1,43 +1,18 @@
 {
-  "name": "AnesFact v6",
+  "name": "AnesFact — Suite Anestésica",
   "short_name": "AnesFact",
-  "description": "App de anestesiología - Dra. Huerta ADAARC",
+  "description": "Suite de gestión anestésica para anestesiólogos.",
   "start_url": "/AnestFact/",
+  "scope": "/AnestFact/",
   "display": "standalone",
   "background_color": "#0D1117",
-  "theme_color": "#1DB954",
+  "theme_color": "#0284c7",
   "orientation": "any",
+  "lang": "es-AR",
+  "categories": ["medical", "health", "productivity"],
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "share_target": {
-    "action": "/AnestFact/",
-    "method": "GET",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    },
-    "enctype": "multipart/form-data",
-    "files": [
-      {
-        "name": "file",
-        "accept": [
-          "image/*",
-          "application/pdf"
-        ]
-      }
-    ]
-  }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
 }

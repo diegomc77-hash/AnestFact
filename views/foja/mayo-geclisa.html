@@ -1,0 +1,100 @@
+  <div id="mayo-foja-helper" style="display:none">
+    <div class="card" style="border-color:rgba(56,139,253,.4);background:rgba(56,139,253,.06)">
+      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleMayoHelper()">
+        <div class="ct" style="color:var(--blue);margin:0">&#127973; Sanatorio Mayo — Datos para GECLISA</div>
+        <span id="mayo-helper-arrow" style="font-size:18px;color:var(--blue);transition:transform .2s">&#8964;</span>
+      </div>
+      <div id="mayo-helper-body" style="display:block;margin-top:12px">
+
+      <div class="field">
+        <label>Antecedentes del paciente</label>
+        <p style="font-size:11px;color:var(--text3);margin:0 0 6px">Única sección de antecedentes en Mayo (sincronizada con GECLISA). Los chips de Técnica se ocultan aquí para evitar duplicados.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px" id="antec-chips">
+          <button class="chip" onclick="toggleAntec(this,'HTA')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">HTA</button>
+          <button class="chip" onclick="toggleAntec(this,'DBT')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">DBT</button>
+          <button class="chip" onclick="toggleAntec(this,'IRC s/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC s/diálisis</button>
+          <button class="chip" onclick="toggleAntec(this,'IRC c/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC c/diálisis</button>
+          <button class="chip" onclick="toggleAntec(this,'IC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IC</button>
+          <button class="chip" onclick="toggleAntec(this,'Obesidad')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Obesidad</button>
+          <button class="chip" onclick="toggleAntec(this,'EPOC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">EPOC</button>
+          <button class="chip" onclick="toggleAntec(this,'Asma')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Asma</button>
+          <button class="chip" onclick="toggleAntec(this,'Coronario')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Coronario</button>
+          <button class="chip" onclick="toggleAntec(this,'ACV previo')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">ACV previo</button>
+          <button class="chip" onclick="toggleAntec(this,'Fumador')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Fumador</button>
+          <button class="chip" onclick="toggleAntec(this,'Anticoagulado')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Anticoagulado</button>
+        </div>
+        <div class="fr" style="align-items:flex-start">
+          <textarea class="fi" id="fj-obs-geclisa" placeholder="Otros antecedentes..." rows="2"></textarea>
+          <button class="mic" id="m-obs-geclisa" onclick="mic('fj-obs-geclisa','m-obs-geclisa')">&#127897;</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px">Monitoreo intraoperatorio:</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-etco2"> EtCO2</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-pam"> PAM</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-ecg" checked> ECG</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-sato2" checked> SAT O2</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-pani" checked> PANI</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-decub"> PROT.DECUB.</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-emerg"> EMERGENCIA</label>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:14px">
+        <label>Signos vitales intraoperatorios — Generación por curva</label>
+        <p style="font-size:11px;color:var(--text3);margin-bottom:10px">Ingresá los valores base y la evolución. El sistema genera la tabla completa según la duración de la cirugía.</p>
+        <div class="g2" style="margin-bottom:8px">
+          <div class="field"><label>TA Sist. base</label><input class="fi" type="number" id="sv-sist" placeholder="120" min="60" max="250"></div>
+          <div class="field"><label>TA Diast. base</label><input class="fi" type="number" id="sv-diast" placeholder="75" min="40" max="150"></div>
+        </div>
+        <div class="g2" style="margin-bottom:8px">
+          <div class="field"><label>FC base</label><input class="fi" type="number" id="sv-fc" placeholder="75" min="40" max="180"></div>
+          <div class="field"><label>SAT O2 base (%)</label><input class="fi" type="number" id="sv-sat" placeholder="98" min="85" max="100"></div>
+        </div>
+        <div class="g2" style="margin-bottom:10px">
+          <div class="field"><label>EtCO2 base</label><input class="fi" type="number" id="sv-eco2" placeholder="35" min="20" max="60"></div>
+          <div class="field"><label>PAM base</label><input class="fi" type="number" id="sv-pam" placeholder="90" min="40" max="160"></div>
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <label>Evolución durante la cirugía</label>
+          <select class="fi" id="sv-evol">
+            <option value="estable">Estable (variación mínima ±5%)</option>
+            <option value="leve_descenso">Leve descenso inicial y recuperación</option>
+            <option value="descenso_mod">Descenso moderado sostenido (~15%)</option>
+            <option value="leve_aumento">Leve aumento (cirugía dolorosa/stress)</option>
+            <option value="variable">Variable (oscilante)</option>
+          </select>
+        </div>
+        <button class="btn btn-g" onclick="generarCurvaVitales()" style="margin-bottom:10px">&#9685; Generar curva de signos vitales</button>
+        <div id="mayo-vitals-preview" style="display:none">
+          <div style="font-size:11px;color:var(--green);margin-bottom:6px" id="mayo-vitals-info"></div>
+          <div style="overflow-x:auto">
+            <table style="border-collapse:collapse;font-size:11px;min-width:400px" id="mayo-vitals-table">
+              <thead>
+                <tr style="background:var(--bg3)">
+                  <th style="border:1px solid var(--border);padding:4px 6px">MIN</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">SIST</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">DIAST</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">SAT</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">CO2</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">FC</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">PAM</th>
+                </tr>
+              </thead>
+              <tbody id="mayo-vitals-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:none">
+        <input type="text" id="fj-fluido1">
+        <input type="text" id="fj-fluido2">
+      </div>
+      <button class="btn btn-b" style="margin-top:10px;width:100%" onclick="go('geclisa')">&#127973; Ver Guía GECLISA completa</button>
+      </div>
+      <button class="btn btn-b" style="width:100%;margin-top:10px;font-size:14px;padding:12px" onclick="abrirGeclisa()">&#127973; Enviar a GECLISA</button>
+    </div>
+  </div>

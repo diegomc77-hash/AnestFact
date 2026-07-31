@@ -1,0 +1,49 @@
+<div id="view-config" class="view">
+  <div class="card cfg-admin-only" id="cfg-admin-card">
+    <div class="ct">&#9733; Panel admin</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Usuarios, planes y backups legacy.</p>
+    <button class="btn btn-g" onclick="goAdminGuarded()">Abrir panel admin</button>
+  </div>
+  <div class="card">
+    <div class="ct">&#128100; Datos del Anestesista</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Estos datos se usan en la guía GECLISA y en la firma de la foja.</p>
+    <div class="field"><label>Nombre completo</label>
+      <input class="fi" type="text" id="cfg-anest-nombre" placeholder="APELLIDO Nombre">
+    </div>
+    <div class="g2" style="margin-top:8px">
+      <div class="field"><label>Matrícula Provincial (M.P.)</label>
+        <input class="fi" type="text" id="cfg-anest-mp" placeholder="32393">
+      </div>
+      <div class="field"><label>Matrícula Especial (M.E.)</label>
+        <input class="fi" type="text" id="cfg-anest-me" placeholder="15518">
+      </div>
+    </div>
+    <button class="btn btn-g" style="margin-top:10px" onclick="guardarAnestesista()">&#128190; Guardar datos</button>
+    <div id="anest-status" style="font-size:12px;margin-top:8px;color:var(--green)"></div>
+  </div>
+  <div class="card cfg-admin-only" id="cfg-gemini-card">
+    <div class="ct">API Key Gemini (Gratis)</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Gratis en <b>aistudio.google.com</b> → Get API Key. 1500 req/día sin tarjeta.</p>
+    <div class="fr"><input class="fi" type="password" id="cfg-key" placeholder="AIza..." style="flex:1"><button class="btn btn-g" style="width:auto;padding:10px 14px" onclick="saveKey()">Guardar</button></div>
+    <div id="key-status" style="font-size:12px;margin-top:8px;color:var(--text3)"></div>
+  </div>
+  <div class="card" id="cfg-sync-card">
+    <div class="ct">&#9729; Sincronizaci&oacute;n</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:8px">La app <b>sincroniza sola</b> con Supabase al abrir y al guardar.</p>
+    <p id="cfg-sync-user-note" style="font-size:11px;color:var(--text3);display:none">Respaldo autom&aacute;tico activo. No hace falta configurar nada.</p>
+    <div class="cfg-admin-only" id="cfg-sync-admin">
+      <div class="field"><label>URL Apps Script (solo admin)</label>
+        <div class="fr">
+          <input class="fi" type="text" id="cfg-sync-url" placeholder="https://script.google.com/macros/s/..." style="flex:1;font-size:11px">
+          <button class="btn btn-g" style="width:auto;padding:10px 14px;flex-shrink:0" onclick="saveSyncUrl()">OK</button>
+        </div>
+      </div>
+      <button class="btn btn-s" style="font-size:12px;margin-top:6px" onclick="mostrarCodigoScript()">&#128196; Ver c&oacute;digo Apps Script</button>
+      <div id="script-code-panel" style="display:none;margin-top:8px">
+        <textarea id="script-code-text" class="fi" rows="5" style="font-size:10px;font-family:monospace" readonly></textarea>
+        <button class="btn btn-g" style="margin-top:6px;font-size:12px" onclick="copiarCodigoScript()">&#128203; Copiar</button>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:10px;color:var(--text3);text-align:center;margin-top:16px;padding:0 8px 12px;line-height:1.4">&copy; 2026 AnesFact &mdash; Diego MC / Dra. Huerta</p>
+</div>

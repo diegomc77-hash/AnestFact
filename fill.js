@@ -142,7 +142,11 @@ function setVal(el,val){
 }
 
 function byId(id){return D.getElementById(String(id));}
+function findGeclisaEl(id){
+  return D.getElementById(id)||document.getElementById(id)||(D.querySelector?D.querySelector('#'+id):null)||(document.querySelector?document.querySelector('#'+id):null);
+}
 function setId(id,val){return setVal(byId(id),val);}
+function setGestionId(id,val){return setVal(findGeclisaEl(id),val);}
 
 // Normalizar — quita tildes, DR./DRA., espacios extra
 function norm(s){
@@ -194,12 +198,10 @@ function fmtFecha(s){
 
 // Texto monitoreo segun tecnica
 function textoMonitoreo(d){
-  var va=(d.viaAerea||'').toLowerCase();
-  var tec=(d.tecnica||d.mantenimiento||d.induccion||'').toLowerCase();
-  var esGen=/iot|intub|tubo|general|balanceada|tiva/.test(va+' '+tec);
-  return esGen
-    ? 'Paciente bajo monitoreo cardiovascular con oximetria de pulso, control de tension arterial cada 5 minutos y medicion de capnografia.'
-    : 'Paciente bajo monitoreo cardiovascular con oximetria de pulso y control de tension arterial cada 5 minutos.';
+  if(d.monEtco2){
+    return 'Paciente bajo monitoreo cardiovascular con oximetria de pulso, control de tension arterial cada 5 minutos y medicion de capnografia.';
+  }
+  return 'Paciente bajo monitoreo cardiovascular con oximetria de pulso y control de tension arterial no invasivo cada 5 minutos.';
 }
 
 // ── Inyectar CSS correctivo en el iframe ─────────────────────────────
@@ -231,9 +233,12 @@ function rellenar(d){
   // BLOQUE 1 — Quirófano y tiempos
   if(d.quirofano&&setSelect('8049',d.quirofano))ok++;          // Quirófano
   if(d.tipoCirugia&&setSelect('8050',d.tipoCirugia))ok++;      // Tipo cirugía
-  if(d.fechaCirugia&&setId('8058',fmtFecha(d.fechaCirugia)))ok++; // Fecha DD/MM/AAAA
-  if(d.horaInicio&&setId('8061',d.horaInicio))ok++;            // Hora inicio HH:MM
-  if(d.horaFin&&setId('8063',d.horaFin))ok++;                  // Hora fin HH:MM
+  if(d.fechaCirugia&&setId('8058',fmtFecha(d.fechaCirugia)))ok++; // Fecha cirugía DD/MM/AAAA
+  if(d.horaInicio&&setId('8061',d.horaInicio))ok++;            // Hora inicio cirugía
+  if(d.horaFin&&setId('8063',d.horaFin))ok++;                  // Hora fin cirugía
+  // Fecha/hora confección foja (obligatorio para GRABAR en GECLISA)
+  if(d.fechaGestion&&setGestionId('txtFechaGestion',fmtFecha(d.fechaGestion)))ok++;
+  if(d.horaGestion&&setGestionId('txtHoraGestion',d.horaGestion))ok++;
 
   // BLOQUE 2 — Staff y posición
   if(setSelect('8057',d.anestesista||'HUERTA'))ok++;           // Anestesista
@@ -262,8 +267,8 @@ function rellenar(d){
     if(emerg){emerg.checked=true;ok++;}                        // EMERGENCIA checkbox
   }
   // Monitoreo radios SI/NO
-  setRadio('8095','8096',d.monEtco2!==false);    // EtCO2
-  setRadio('8099','8100',d.monPam!==false);       // PAM
+  setRadio('8095','8096',!!d.monEtco2);    // EtCO2
+  setRadio('8099','8100',!!d.monPam);       // PAM
   setRadio('8103','8104',d.monEcg!==false);       // ECG
   setRadio('8107','8108',d.monSato2!==false);     // SAT O2
   setRadio('8111','8112',d.monPani!==false);      // PANI
@@ -275,7 +280,7 @@ function rellenar(d){
   if(d.antibioticoprofilaxis)premed+=(premed?' / ':'')+d.antibioticoprofilaxis;
   if(premed&&setId('8119',premed))ok++;           // Premedicación (typo nativo: txt_premeicacion)
   if(d.induccion&&setId('8121',d.induccion))ok++;             // Inducción
-  if(d.mantenimiento&&setId('8123',d.mantenimiento))ok++;     // Mantenimiento (typo nativo: MANTEMIENTO)
+  if(d.mantenimiento&&String(d.mantenimiento).trim()&&setId('8123',d.mantenimiento))ok++;     // Mantenimiento
 
   // BLOQUE 6 — Signos vitales (grilla Mayo) — IDs reales mapeados desde Foja_Anestesica.html
   var tiemposVitals=[
@@ -316,7 +321,9 @@ function rellenar(d){
         var tv=null;
         for(var ti=0;ti<tiemposVitals.length;ti++){if(tiemposVitals[ti].min===min){tv=tiemposVitals[ti];break;}}
         if(!tv)return;
-        var campos={sist:v.sist,diast:v.diast,sato2:v.sato2,eco2:v.eco2,fc:v.fc,pam:v.pam};
+        var campos={sist:v.sist,diast:v.diast,sato2:v.sato2,fc:v.fc};
+        if(d.monEtco2)campos.eco2=v.eco2;
+        if(d.monPam)campos.pam=v.pam;
         Object.keys(campos).forEach(function(k){
           var val=campos[k];
           if(val===undefined||val===null||val==='')return;

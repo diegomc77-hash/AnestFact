@@ -1,0 +1,22 @@
+  <div class="card">
+    <div class="ct">Recuperación</div>
+    <div class="field" style="margin-bottom:10px">
+      <label>Escala de Aldrete</label>
+      <div id="aldrete-chips">
+        <select class="fi" onchange="if(this.value)setAldrete(this.value)">
+          <option value="">— Puntaje Aldrete —</option>
+          <option value="1">1/10</option><option value="2">2/10</option>
+          <option value="3">3/10</option><option value="4">4/10</option>
+          <option value="5">5/10</option><option value="6">6/10</option>
+          <option value="7">7/10</option><option value="8">8/10</option>
+          <option value="9">9/10</option><option value="10">10/10</option>
+        </select>
+      </div>
+      <input class="fi" type="text" id="fj-aldrete" placeholder="Aldrete .../10" style="margin-top:8px" readonly>
+    </div>
+    <div id="recup-selects" style="margin-bottom:10px"></div>
+    <div class="fr" style="align-items:flex-start">
+      <textarea class="fi" id="fj-recup" placeholder="Observaciones adicionales de recuperación..."></textarea>
+      <button class="mic" id="m-recup" onclick="mic('fj-recup','m-recup')">&#127897;</button>
+    </div>
+  </div>

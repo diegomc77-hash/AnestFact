@@ -1,0 +1,180 @@
+  <div class="card">
+    <div class="ct">T&eacute;cnica anest&eacute;sica</div>
+
+    <div class="field">
+      <label>Tipo de anestesia</label>
+      <select class="fi" id="fj-tec-tipo" onchange="tecNivel1();_sugerirDrogasPorTec(this.value);calcPremed(true);actualizarViaAerea()">
+        <option value="">Seleccionar...</option>
+        <option value="general">Anestesia General</option>
+        <option value="neuroaxial">Anestesia Regional Neuroaxial</option>
+        <option value="bloqueo">Bloqueo de Nervio Perif&eacute;rico</option>
+        <option value="local">Anestesia Local</option>
+        <option value="sedacion">Sedaci&oacute;n / CAM</option>
+      </select>
+    </div>
+
+    <div class="field" id="tec-nivel2-wrap" style="display:none">
+      <label id="tec-nivel2-label">Subtipo</label>
+      <select class="fi" id="fj-tec-subtipo" onchange="tecNivel2();_sugerirDrogasPorTec(this.value||document.getElementById('fj-tec-tipo').value);calcPremed(true);actualizarMetodos()">
+        <option value="">Seleccionar...</option>
+      </select>
+    </div>
+
+    <div class="field" id="tec-nivel3-wrap" style="display:none">
+      <label id="tec-nivel3-label">Bloqueo espec&iacute;fico</label>
+      <select class="fi" id="fj-tec-bloqueo" onchange="tecNivel3()">
+        <option value="">Seleccionar...</option>
+      </select>
+    </div>
+
+    <div id="tec-nivel4-wrap" style="display:none">
+      <div class="field" id="tec-espacio-wrap" style="display:none">
+        <label>Espacio intervertebral</label>
+        <select class="fi" id="fj-tec-espacio" onchange="tecActualizarDermatomas();tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
+      <div class="field" id="tec-lateral-wrap" style="display:none">
+        <label>Lateralidad</label>
+        <select class="fi" id="fj-tec-lateral" onchange="tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+          <option>Derecho</option><option>Izquierdo</option><option>Bilateral</option>
+        </select>
+      </div>
+      <div class="field" id="tec-aguja-wrap" style="display:none">
+        <label>Tipo de aguja</label>
+        <select class="fi" id="fj-tec-aguja" onchange="tecActualizarCalibres();tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
+      <div class="field" id="tec-calibre-wrap" style="display:none">
+        <label>Calibre</label>
+        <select class="fi" id="fj-tec-calibre" onchange="tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
+      <div class="field" id="tec-guia-wrap" style="display:none">
+        <label>Guía de localización</label>
+        <select class="fi" id="fj-tec-guia" onchange="tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+          <option>Ultrasonografía (Ecoguiado)</option>
+          <option>Neuroestimulación</option>
+          <option>Referencias anatómicas (A ciegas)</option>
+          <option>Combinada (Ultrasonografía + Neuroestimulación)</option>
+        </select>
+      </div>
+      <div class="field" id="tec-resultado-wrap" style="display:none">
+        <label>Resultado clínico</label>
+        <select class="fi" id="fj-tec-resultado" onchange="tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
+    </div>
+
+    <input type="hidden" id="fj-tec" value="">
+
+    <div id="tec-resumen" style="display:none;background:var(--bg3);border:1px solid var(--green);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);margin-top:6px">
+      <span id="tec-resumen-txt"></span>
+      <button onclick="tecLimpiar()" style="background:none;border:none;color:var(--text3);cursor:pointer;float:right;font-size:16px">&times;</button>
+    </div>
+
+    <div class="g2" style="margin-top:10px">
+      <div class="field"><label>ASA</label>
+        <select class="fi" id="fj-asa" onchange="if(typeof renderAlertasClinicas==='function')renderAlertasClinicas()"><option value="">&mdash;</option><option>I</option><option>II</option><option>III</option><option>IV</option><option>V</option></select>
+      </div>
+      <div class="field"><label>Mallampati</label>
+        <select class="fi" id="fj-mallampati" onchange="actualizarExamenFisico()"><option value="">&mdash;</option><option>I</option><option>II</option><option>III</option><option>IV</option></select>
+      </div>
+    </div>
+    <div class="field" style="margin-top:4px" id="antec-tec-wrap">
+      <label>Antecedentes relevantes (alertas clínicas)</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px" id="antec-chips-tec">
+        <button type="button" class="chip" onclick="toggleAntec(this,'IRC s/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC s/diálisis</button>
+        <button type="button" class="chip" onclick="toggleAntec(this,'IRC c/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC c/diálisis</button>
+        <button type="button" class="chip" onclick="toggleAntec(this,'IC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IC</button>
+        <button type="button" class="chip" onclick="toggleAntec(this,'Coronario')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Coronario</button>
+        <button type="button" class="chip" onclick="toggleAntec(this,'Anticoagulado')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Anticoagulado</button>
+      </div>
+    </div>
+    <div class="field" style="margin-top:8px">
+      <label>Aparato respiratorio</label>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button type="button" id="ausc-resp-normal" class="chip" style="border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Normal</button>
+        <button type="button" id="ausc-resp-alterado" class="chip" style="border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Alterado</button>
+      </div>
+      <div id="ausc-resp-detail" style="display:none">
+        <div style="font-size:11px;color:var(--text3);margin:4px 0 2px">MV</div>
+        <div id="ausc-resp-mv" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+        <div style="font-size:11px;color:var(--text3);margin:4px 0 2px">Agregados</div>
+        <div id="ausc-resp-agreg" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+        <div style="font-size:11px;color:var(--text3);margin:4px 0 2px">Contexto clínico</div>
+        <div id="ausc-resp-ctx" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+      </div>
+      <input type="text" class="fi" id="ausc-resp-otro" placeholder="Texto adicional respiratorio..." style="margin-top:4px;font-size:12px;display:none">
+    </div>
+    <div class="field" style="margin-top:8px">
+      <label>Aparato cardiovascular</label>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button type="button" id="ausc-cv-normal" class="chip" style="border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Normal</button>
+        <button type="button" id="ausc-cv-alterado" class="chip" style="border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Alterado</button>
+      </div>
+      <div id="ausc-cv-detail" style="display:none">
+        <div style="font-size:11px;color:var(--text3);margin:4px 0 2px">Ruidos</div>
+        <div id="ausc-cv-ruidos" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+        <div style="font-size:11px;color:var(--text3);margin:4px 0 2px">Ritmo</div>
+        <div id="ausc-cv-ritmo" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+        <div style="font-size:11px;color:var(--text3);margin:4px 0 2px">Soplos</div>
+        <div id="ausc-cv-soplos" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+        <div style="font-size:11px;color:var(--text3);margin:4px 0 2px">Foco</div>
+        <div id="ausc-cv-foco" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+        <div style="font-size:11px;color:var(--text3);margin:4px 0 2px">Intensidad</div>
+        <div id="ausc-cv-int" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+        <div style="font-size:11px;color:var(--text3);margin:4px 0 2px">Contexto</div>
+        <div id="ausc-cv-ctx" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+      </div>
+      <input type="text" class="fi" id="ausc-cv-otro" placeholder="Texto adicional cardiovascular..." style="margin-top:4px;font-size:12px;display:none">
+    </div>
+    <div class="field"><label>Examen Físico</label>
+      <div class="fr" style="align-items:flex-start">
+        <textarea class="fi" id="fj-examen-fisico" placeholder="Se completa automáticamente con Mallampati y auscultación..."></textarea>
+        <button class="mic" id="m-examen-fisico" onclick="mic('fj-examen-fisico','m-examen-fisico')">&#127897;</button>
+      </div>
+    </div>
+    <div id="examen-regional-wrap" style="display:none">
+      <div class="ct" style="font-size:13px;margin-bottom:8px">Examen Regional</div>
+      <div id="examen-regional-selects"></div>
+    </div>
+    <div class="g2" style="margin-top:10px">
+      <div class="field"><label>V&iacute;a a&eacute;rea</label>
+        <select class="fi" id="fj-via" onchange="actualizarMetodos()"><option value="">&mdash;</option><option>IOT</option><option>M&aacute;scara lar&iacute;ngea</option><option>Mascarilla facial</option><option>Traqueostom&iacute;a</option><option>Sin dispositivo</option></select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>Inducci&oacute;n</label>
+        <select class="fi" id="fj-ind"><option value="">&mdash;</option><option>Satisfactoria</option><option>Prolongada</option><option>Tormentosa</option></select>
+      </div>
+      <div style="display:none"><input type="time" id="fj-fin"><input type="time" id="fj-hint"><input type="time" id="fj-hext"><input type="time" id="vg-inicio"><input type="time" id="vg-fin"></div>
+    </div>
+    <div class="field"><label>Premedicaci&oacute;n</label>
+      <div class="ac-wrap">
+        <div class="fr">
+          <input class="fi" type="text" id="fj-premed" placeholder="Midazolam 2mg EV" autocomplete="off" oninput="acDrugField('fj-premed','ac-premed')" onkeydown="acKey(event,'ac-premed')">
+          <button class="mic" id="m-premed" onclick="mic('fj-premed','m-premed')">&#127897;</button>
+        </div>
+        <div class="ac-list" id="ac-premed"></div>
+      </div>
+      <div id="premed-selects"></div>
+      <div style="margin-top:6px">
+        <button class="btn btn-s" style="font-size:12px;background:rgba(29,185,84,.15);border:1px solid var(--green);color:var(--green)" onclick="calcPremed()">&#9889; Sugerir por peso / anestesia</button>
+      </div>
+      <div id="premed-smart-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      <div id="premed-alert" style="display:none;margin-top:6px;padding:6px 10px;border-radius:8px;background:rgba(255,180,0,.13);border:1px solid #ffb400;color:#ffb400;font-size:12px"></div>
+    </div>
+    <div class="field" style="margin-top:8px"><label>Antibioticoprofilaxis</label>
+      <div class="fr">
+        <input class="fi" type="text" id="fj-atb" placeholder="Cefazolina 2g EV" autocomplete="off">
+        <button class="mic" onclick="mic('fj-atb','m-atb')" id="m-atb">&#127897;</button>
+      </div>
+      <div id="atb-alert" style="display:none;margin-top:6px;padding:6px 10px;border-radius:8px;background:rgba(255,80,80,.13);border:1px solid #ff5050;color:#ff5050;font-size:12px"></div>
+    </div>
+  </div>

@@ -1,0 +1,58 @@
+<div id="view-auth" class="view active auth-screen">
+  <div class="auth-wrap">
+    <div class="auth-logo">&#128137; AnesFact</div>
+    <p class="auth-sub">Suite anestésica</p>
+
+    <div id="auth-panel-login">
+      <div class="card auth-card">
+        <div class="ct">Ingresar</div>
+        <div class="field"><label>Email</label><input class="fi" type="email" id="auth-email" autocomplete="username" placeholder="tu@email.com"></div>
+        <div class="field"><label>Contraseña</label><input class="fi" type="password" id="auth-pass" autocomplete="current-password" placeholder="********"></div>
+        <p id="auth-err" class="auth-err"></p>
+        <button class="btn btn-g" style="width:100%;margin-top:8px" onclick="authSignIn()">Ingresar</button>
+        <p class="auth-links"><a href="#" onclick="authRecover();return false">Olvidé mi contraseña</a></p>
+        <p class="auth-links">¿No tenés cuenta? <a href="#" onclick="authShowRegister();return false">Registrate</a></p>
+      </div>
+    </div>
+
+    <div id="auth-panel-reset" style="display:none">
+      <div class="card auth-card">
+        <div class="ct">Nueva contrase&ntilde;a</div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.4;margin-bottom:8px">Eleg&iacute; una contrase&ntilde;a nueva (m&iacute;nimo 6 caracteres).</p>
+        <div class="field"><label>Contrase&ntilde;a nueva</label><input class="fi" type="password" id="reset-pass" autocomplete="new-password"></div>
+        <div class="field"><label>Confirmar</label><input class="fi" type="password" id="reset-pass2" autocomplete="new-password"></div>
+        <p id="reset-err" class="auth-err"></p>
+        <button class="btn btn-g" style="width:100%;margin-top:8px" onclick="authApplyReset()">Guardar contrase&ntilde;a</button>
+        <p class="auth-links"><a href="#" onclick="authShowLogin();return false">Volver al login</a></p>
+      </div>
+    </div>
+
+    <div id="auth-panel-register" style="display:none">
+      <div class="card auth-card">
+        <div class="ct">Crear cuenta</div>
+        <div class="field"><label>Email</label><input class="fi" type="email" id="reg-email" autocomplete="username"></div>
+        <div class="field"><label>Contraseña</label><input class="fi" type="password" id="reg-pass" autocomplete="new-password"></div>
+        <div class="field"><label>Confirmar contraseña</label><input class="fi" type="password" id="reg-pass2" autocomplete="new-password"></div>
+        <div class="field"><label>Nombre completo</label><input class="fi" type="text" id="reg-nombre" placeholder="APELLIDO Nombre"></div>
+        <div class="g2">
+          <div class="field"><label>M.P.</label><input class="fi" type="text" id="reg-mp" placeholder="32393"></div>
+          <div class="field"><label>M.E. (opcional)</label><input class="fi" type="text" id="reg-me" placeholder="15518"></div>
+        </div>
+        <p id="reg-err" class="auth-err"></p>
+        <button class="btn btn-g" style="width:100%;margin-top:8px" onclick="authSignUp()">Crear cuenta</button>
+        <p class="auth-links">¿Ya tenés cuenta? <a href="#" onclick="authShowLogin();return false">Ingresar</a></p>
+      </div>
+    </div>
+
+    <p class="auth-copy">&copy; 2026 AnesFact &mdash; Diego MC / Dra. Huerta</p>
+  </div>
+</div>
+
+<div id="plan-modal" class="plan-modal" style="display:none">
+  <div class="plan-modal-inner card">
+    <div class="ct" id="plan-modal-title">Función no disponible</div>
+    <p id="plan-modal-msg" style="font-size:13px;color:var(--text2);line-height:1.45"></p>
+    <a class="btn btn-g" style="display:block;text-align:center;margin-top:12px;text-decoration:none" id="plan-modal-mail" href="mailto:anesfact@gmail.com?subject=Activar%20plan%20AnesFact">Contactar para activar</a>
+    <button class="btn btn-s" style="width:100%;margin-top:8px" onclick="closePlanModal()">Cerrar</button>
+  </div>
+</div>

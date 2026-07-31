@@ -1,0 +1,149 @@
+  <div class="card">
+
+    <div class="ct">Fluidos y balance</div>
+
+    <div id="balance-alertas" style="display:none;margin-bottom:10px"></div>
+
+    <div class="g2">
+
+      <div class="field"><label>Tipo de suero</label>
+
+        <select class="fi" id="fj-suero-tipo" onchange="if(typeof _balOnFluidChange==='function')_balOnFluidChange()">
+
+          <option value="">— Elegir —</option>
+
+          <optgroup label="Cloruro de sodio (NaCl)">
+
+            <option>Soluci&oacute;n fisiol&oacute;gica 0.9% (NaCl)</option>
+
+            <option>NaCl 3% (hipert&oacute;nica)</option>
+
+            <option>NaCl 7.5% (hipert&oacute;nica)</option>
+
+          </optgroup>
+
+          <optgroup label="Dextrosa / glucosa">
+
+            <option>Dextrosa 5%</option>
+
+            <option>Dextrosa 10%</option>
+
+          </optgroup>
+
+          <optgroup label="Combinadas">
+
+            <option>Glucosalina / Glucofisiol&oacute;gica (D5 + NaCl)</option>
+
+          </optgroup>
+
+          <optgroup label="Balanceadas">
+
+            <option>Ringer lactato</option>
+
+            <option>Hartmann</option>
+
+            <option>Plasmalyte / Soluci&oacute;n balanceada</option>
+
+          </optgroup>
+
+          <optgroup label="Especiales">
+
+            <option>Manitol 15%</option>
+
+            <option>Manitol 20%</option>
+
+          </optgroup>
+
+        </select>
+
+        <p style="font-size:10px;color:var(--text3);margin:4px 0 0">Presentaciones AR: sachets 100–1000 ml (quir&oacute;fano); coloides/plaquetas en Otros.</p>
+
+      </div>
+
+      <div class="field"><label>Volumen suero</label>
+
+        <select class="fi" id="fj-suero" onchange="if(typeof _balOnFluidChange==='function')_balOnFluidChange()">
+
+          <option value="">—</option>
+
+          <option>100 ml</option>
+
+          <option>250 ml</option>
+
+          <option>500 ml</option>
+
+          <option>1000 ml</option>
+
+          <option>1500 ml</option>
+
+          <option>2000 ml</option>
+
+          <option>2500 ml</option>
+
+          <option>3000 ml</option>
+
+          <option>5000 ml</option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+    <div class="g2">
+
+      <div class="field"><label>Sangre (Gl&oacute;bulos rojos)</label>
+
+        <select class="fi" id="fj-sangre" onchange="if(typeof _balOnFluidChange==='function')_balOnFluidChange()"><option value="">—</option><option>0 ml</option><option>250 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option><option>1 unidad (~275 ml)</option><option>2 unidades (~550 ml)</option><option>3 unidades (~825 ml)</option><option>4 unidades (~1100 ml)</option><option>5 unidades (~1375 ml)</option><option>6 unidades (~1650 ml)</option><option>7 unidades (~1925 ml)</option><option>8 unidades (~2200 ml)</option><option>9 unidades (~2475 ml)</option><option>10 unidades (~2750 ml)</option></select>
+
+      </div>
+
+      <div class="field"><label>Plasma Fresco Congelado</label>
+
+        <select class="fi" id="fj-plasma" onchange="if(typeof _balOnFluidChange==='function')_balOnFluidChange()"><option value="">—</option><option>0 ml</option><option>200 ml</option><option>400 ml</option><option>600 ml</option><option>800 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>1 unidad (~225 ml)</option><option>2 unidades (~450 ml)</option><option>3 unidades (~675 ml)</option><option>4 unidades (~900 ml)</option><option>5 unidades (~1125 ml)</option><option>6 unidades (~1350 ml)</option><option>7 unidades (~1575 ml)</option><option>8 unidades (~1800 ml)</option><option>9 unidades (~2025 ml)</option><option>10 unidades (~2250 ml)</option></select>
+
+      </div>
+
+    </div>
+
+    <div class="g2">
+
+      <div class="field"><label>Orina / Diuresis</label>
+
+        <select class="fi" id="fj-orina"><option value="">—</option><option>0 ml</option><option>100 ml</option><option>200 ml</option><option>300 ml</option><option>400 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option><option>4000 ml</option><option>5000 ml</option><option>6000 ml</option></select>
+
+      </div>
+
+      <div class="field"><label>Sangrado intraoperatorio</label>
+
+        <select class="fi" id="fj-sangrado" onchange="if(typeof _balOnFluidChange==='function')_balOnFluidChange()"><option value="">—</option><option>0 ml</option><option>50 ml</option><option>100 ml</option><option>200 ml</option><option>300 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option><option>4000 ml</option><option>5000 ml</option></select>
+
+      </div>
+
+    </div>
+
+    <div class="field"><label>Otro (coloides, plaquetas, lavados, etc.)</label>
+
+      <input class="fi" type="text" id="fj-otro" placeholder="Ej: Gelatina 500 ml, Alb&uacute;mina 20% 100 ml, Plaquetas 1 u, Lavado vesical 3000 ml" oninput="if(typeof renderBalanceAlertas==='function')renderBalanceAlertas()">
+
+    </div>
+
+    <div class="field" id="obs-hemo-wrap" style="margin-top:8px">
+
+      <label>Observaciones hemoterapia / balance</label>
+
+      <p style="font-size:11px;color:var(--text3);margin:0 0 6px">Motivo de sangre/plasma, respuesta a volumen, etc. (impreso en foja Aeron&aacute;utico junto a hemoterapia).</p>
+
+      <div class="fr" style="align-items:flex-start">
+
+        <textarea class="fi" id="fj-obs-hemo" rows="2" placeholder="Ej: 2 CH por Hb 7.2 intraoperatoria. Respuesta hemodin&aacute;mica favorable." oninput="if(typeof renderBalanceAlertas==='function')renderBalanceAlertas()"></textarea>
+
+        <button class="mic" id="m-obs-hemo" onclick="mic('fj-obs-hemo','m-obs-hemo')">&#127897;</button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+

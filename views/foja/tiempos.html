@@ -1,0 +1,15 @@
+  <div class="card" id="foja-tiempos-card">
+    <div class="ct">&#9200; Tiempos de la intervenci&oacute;n</div>
+    <div class="g2">
+      <div class="field"><label>Hora inicio cirug&iacute;a *</label><input class="fi" type="time" id="foja-hora-inicio" onchange="syncFojaHoras('cir_inicio')"></div>
+      <div class="field"><label>Hora fin cirug&iacute;a</label><input class="fi" type="time" id="foja-hora-fin" onchange="syncFojaHoras('cir_fin')"></div>
+    </div>
+    <div id="aero-tiempos-inline" style="display:none">
+      <div class="g2" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+        <div class="field"><label>Hora inicio anestesia / intubaci&oacute;n</label><input class="fi" type="time" id="fj-hint-vis" onchange="syncFojaHoras('anes_inicio')"></div>
+        <div class="field"><label>Hora fin anestesia / extubaci&oacute;n</label><input class="fi" type="time" id="fj-hext-vis" onchange="syncFojaHoras('anes_fin')"></div>
+      </div>
+      <p style="font-size:11px;color:var(--text3);margin:6px 0 0">Al cargar inicio/fin de cirug&iacute;a o anestesia, el horario pareado se completa con &plusmn;15 min (editable).</p>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin:8px 0 0">Evweb, curva de signos vitales y GECLISA usan estos horarios.</p>
+  </div>

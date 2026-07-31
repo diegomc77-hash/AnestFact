@@ -1,0 +1,43 @@
+<div id="view-facturacion" class="view">
+  <div id="ia-badge" style="display:none;margin-bottom:10px"></div>
+  <div id="fact-pac-badge" style="font-size:12px;color:var(--text2);margin-bottom:10px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px"></div>
+  <div class="card">
+    <div class="ct">Obra social</div>
+    <div class="field"><label>Obra social *</label>
+      <div class="ac-wrap">
+        <div class="fr"><input class="fi" type="text" id="f-obra" placeholder="IOSFA / PAMI / OSDE..." autocomplete="off" oninput="acObraSocial('f-obra','ac-obra')" onkeydown="acKey(event,'ac-obra')"><button class="mic" id="m-obra" onclick="mic('f-obra','m-obra')">&#127897;</button></div>
+        <div class="ac-list" id="ac-obra"></div>
+      </div>
+    </div>
+    <div class="field"><label>N&deg; Afiliado *</label>
+      <div class="fr"><input class="fi" type="text" id="f-afil" name="paciente_num_afiliado" placeholder="D352042102" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" inputmode="numeric" readonly onfocus="this.removeAttribute('readonly')"><button class="mic" id="m-afil" onclick="mic('f-afil','m-afil')">&#127897;</button></div>
+    </div>
+    <hr class="hr">
+    <div class="tog-row">
+      <div><div style="font-size:14px">Obesidad m&oacute;rbida</div><div style="font-size:11px;color:var(--text3)">+2 complejidades ADAARC</div></div>
+      <label class="tog"><input type="checkbox" id="f-ob"><span class="ts"></span></label>
+    </div>
+    <hr class="hr">
+    <div class="tog-row">
+      <div style="font-size:14px">Enviar a ADAARC/evweb</div>
+      <label class="tog"><input type="checkbox" id="f-env" checked><span class="ts"></span></label>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Pr&aacute;cticas ADAARC</div>
+    <div id="pracs-list"><p style="font-size:12px;color:var(--text3)">Sin pr&aacute;cticas</p></div>
+    <button class="btn btn-s" style="margin-top:10px" onclick="go('nom')">&#128269; Buscar pr&aacute;ctica ADAARC</button>
+  </div>
+  <div class="card" id="docs-card">
+    <div class="ct">&#128206; Documentaci&oacute;n para evweb</div>
+    <div id="docs-card-body"><p style="font-size:12px;color:var(--text3)">Guardá primero los datos</p></div>
+  </div>
+  <div class="brow" style="margin-bottom:8px">
+    <button class="btn btn-s" onclick="guardar();go('foja')">&#128203; Foja anest.</button>
+    <button class="btn btn-s" onclick="guardar()">&#128190; Guardar</button>
+  </div>
+  <div id="btn-mayo-wrap" style="display:none;margin-bottom:8px">
+    <button class="btn btn-b" onclick="go('geclisa')">&#127973; Gu&iacute;a GECLISA</button>
+  </div>
+  <button class="btn btn-g" style="margin-bottom:24px" onclick="marcarListo()">&#9989; Ver resumen evweb</button>
+</div>

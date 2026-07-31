@@ -1,0 +1,81 @@
+<div id="view-nueva" class="view">
+  <div class="card" autocomplete="off">
+    <div class="ct">Datos de la intervenci&oacute;n</div>
+    <div class="field"><label>Fecha *</label><input class="fi" type="date" id="f-fecha"></div>
+    <div class="field"><label>Paciente *</label>
+      <div class="fr"><input class="fi" type="text" id="f-pac" placeholder="GARCIA, Juan"><button class="mic" id="m-pac" onclick="mic('f-pac','m-pac')">&#127897;</button></div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>Edad *</label><input class="fi" type="number" id="f-edad" min="0" max="120" placeholder="45" oninput="onPesoEdadChange()"></div>
+      <div class="field"><label>Sexo</label><select class="fi" id="f-sexo"><option value="">—</option><option>F</option><option>M</option></select></div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>DNI</label>
+        <div class="fr"><input class="fi" type="text" id="f-dni" placeholder="20123456" inputmode="numeric"><button class="mic" id="m-dni" onclick="mic('f-dni','m-dni')">&#127897;</button></div>
+      </div>
+      <div class="field"><label>Peso (kg)</label><input class="fi" type="number" id="f-peso" placeholder="70" oninput="onPesoEdadChange()"></div>
+    </div>
+    <div class="field"><label>Cirujano</label>
+      <div class="ac-wrap">
+        <div class="fr"><input class="fi" type="text" id="f-ciru" placeholder="LOPEZ, Carlos" autocomplete="off" oninput="acCirujano()" onfocus="acCirujano()" onkeydown="acKey(event,'ac-ciru')"><button class="mic" id="m-ciru" onclick="mic('f-ciru','m-ciru')">&#127897;</button></div>
+        <div class="ac-list" id="ac-ciru"></div>
+      </div>
+    </div>
+    <div class="field"><label>Servicio / Especialidad</label>
+      <select class="fi" id="f-serv" onchange="onSanChange();acCirujano();">
+        <option value="">Seleccionar...</option>
+        <option>Cirugía General</option><option>Cirugía Laparoscópica</option>
+        <option>Cirugía de Cabeza y Cuello</option><option>Cirugía Torácica</option>
+        <option>Cirugía Vascular</option><option>Cirugía Plástica y Reparadora</option>
+        <option>Ginecología y Obstetricia</option><option>Traumatología y Ortopedia</option>
+        <option>Neurocirugía</option><option>Urología</option><option>ORL (Otorrinolaringología)</option>
+        <option>Oftalmología</option><option>Proctología</option><option>Mastología</option>
+        <option>Cirugía Pediátrica</option><option>Cardiocirugía</option><option>Cirugía Cardiovascular</option>
+        <option>Endoscopía Digestiva</option><option>Hemodinamia</option>
+        <option>Radiología Intervencionista</option><option>Odontología</option>
+      </select>
+    </div>
+    <div class="field"><label>Diagn&oacute;stico / Cirug&iacute;a *</label>
+      <div class="ac-wrap">
+        <div class="fr"><input class="fi" type="text" id="f-diag" placeholder="Varias cirug&iacute;as: separ&aacute; con punto (.)" autocomplete="off" oninput="acCirugia('f-diag','ac-diag');sugerirPosicion()" onkeydown="acKey(event,'ac-diag')"><button class="mic" id="m-diag" onclick="mic('f-diag','m-diag')">&#127897;</button></div>
+        <div class="ac-list" id="ac-diag"></div>
+      </div>
+    </div>
+    <div class="field"><label>Sanatorio *</label>
+      <select class="fi" id="f-san" onchange="onSanChange()">
+        <option>Hospital Aeron&aacute;utico</option><option>Sanatorio Mayo</option>
+        <option>Cl&iacute;nica Allende</option><option>Cl&iacute;nica Privada C&oacute;rdoba</option>
+      </select>
+    </div>
+    <div id="f-aero-wrap" style="display:none">
+      <div class="g2">
+        <div class="field"><label>Quir&oacute;fano / Sala</label>
+          <select class="fi" id="f-sala">
+            <option value="">—</option><option>Quirófano 1</option><option>Quirófano 2</option>
+            <option>Quirófano 3</option><option>Quirófano 4</option><option>Quirófano 5</option>
+            <option>Sala de Partos</option><option>Endoscopía</option><option>Hemodinamia</option><option>UCPA</option>
+          </select>
+        </div>
+        <div class="field"><label>Cama N&deg;</label>
+          <select class="fi" id="f-cama"><option value="">—</option><option>Cama 1</option><option>Cama 2</option><option>Cama 3</option><option>Cama 4</option><option>Cama 5</option><option>Cama 6</option><option>Cama 7</option><option>Cama 8</option><option>Cama 9</option><option>Cama 10</option><option>Cama 11</option><option>Cama 12</option><option>Cama 13</option><option>Cama 14</option><option>Cama 15</option><option>Cama 16</option><option>Cama 17</option><option>Cama 18</option><option>Cama 19</option><option>Cama 20</option><option>Cama 21</option><option>Cama 22</option><option>Cama 23</option><option>Cama 24</option><option>Cama 25</option><option>UTI 1</option><option>UTI 2</option><option>UTI 3</option><option>UTI 4</option><option>UTI 5</option></select>
+        </div>
+      </div>
+    </div>
+    <div id="f-mayo-wrap" style="display:none">
+      <div class="g2">
+        <div class="field"><label>Sector</label>
+          <select class="fi" id="f-mayo-sector" onchange="updateMayoCamas()">
+            <option value="">—</option>
+            <option>PISO</option><option>VIP</option><option>UCI</option>
+            <option>UTI</option><option>HOSPITAL DE DIA</option><option>GUARDIA</option>
+          </select>
+        </div>
+        <div class="field"><label>Habitaci&oacute;n / Cama</label>
+          <select class="fi" id="f-mayo-cama"><option value="">—</option></select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-s" style="margin-bottom:8px" onclick="go('escanear')">&#128247; Escanear documentos (IA)</button>
+  <button class="btn btn-g" style="margin-bottom:24px" onclick="goFacturacion()">Facturaci&oacute;n evweb &#8594;</button>
+</div>

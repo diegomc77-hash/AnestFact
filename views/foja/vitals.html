@@ -1,0 +1,46 @@
+  <div class="card" id="vitals-card">
+    <div class="ct">Gr&#225;fico intraoperatorio</div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:8px">Cada cuadrado = 12.5 unidades &middot; Y: 0&ndash;200 &middot; X: tiempo c/5 min</p>
+    <div id="aero-prediccion-wrap">
+      <p style="font-size:11px;color:var(--text3);margin-bottom:8px">Ingresá los valores base y el sistema predice el gráfico automáticamente.</p>
+      <div class="g2" style="margin-bottom:6px">
+        <div class="field"><label>TA Sist. base</label><input class="fi" type="number" id="aero-sist" placeholder="120" min="60" max="250"></div>
+        <div class="field"><label>TA Diast. base</label><input class="fi" type="number" id="aero-diast" placeholder="75" min="40" max="150"></div>
+      </div>
+      <div class="g2" style="margin-bottom:6px">
+        <div class="field"><label>FC base</label><input class="fi" type="number" id="aero-fc" placeholder="75" min="40" max="180"></div>
+        <div class="field"><label>SAT O2 base (%)</label><input class="fi" type="number" id="aero-sat" placeholder="98" min="85" max="100"></div>
+      </div>
+      <div class="g2" style="margin-bottom:6px">
+        <div class="field"><label>EtCO2 base</label><input class="fi" type="number" id="aero-eco2" placeholder="35" min="20" max="60"></div>
+        <div class="field"><label>Resp. base</label><input class="fi" type="number" id="aero-resp" placeholder="14" min="8" max="40"></div>
+      </div>
+      <div class="field" style="margin-bottom:10px">
+        <label>Evolución durante la cirugía</label>
+        <select class="fi" id="aero-evol">
+          <option value="estable">Estable (variación mínima ±5%)</option>
+          <option value="leve_descenso">Leve descenso inicial y recuperación</option>
+          <option value="descenso_mod">Descenso moderado sostenido (~15%)</option>
+          <option value="leve_aumento">Leve aumento (cirugía dolorosa/stress)</option>
+          <option value="variable">Variable (oscilante)</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-g" style="margin-bottom:8px;font-size:13px" onclick="generarColumnas()">&#9200; Generar y predecir gráfico</button>
+    <div style="margin-bottom:10px">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:6px;font-weight:500">Par&#225;metro activo:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px" id="param-selector">
+        <button class="param-btn active" data-p="resp" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--green);color:var(--green);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Resp &#9675;</button>
+        <button class="param-btn" data-p="pulso" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Pulso &#9679;</button>
+        <button class="param-btn" data-p="ta" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">T.A. )(</button>
+        <button class="param-btn" data-p="oximet" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">OXIMET &mdash;</button>
+        <button class="param-btn" data-p="co2" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">CO&#8322; &#9633;</button>
+        <button class="param-btn" data-p="operac" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Operac &#9632;</button>
+        <button class="param-btn" data-p="anest" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Anestes &#215;</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <div id="vitals-grid-wrap"><p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Gener&#225; las columnas para empezar</p></div>
+    </div>
+    <button class="btn btn-s" style="margin-top:8px;font-size:12px" onclick="limpiarGrafico()">&#128465; Limpiar</button>
+  </div>
