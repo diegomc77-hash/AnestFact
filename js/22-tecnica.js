@@ -551,7 +551,7 @@ function tecNivel4Check(){
     txt='Bajo estrictas medidas de asepsia y antisepsia, se realiza preparación del campo quirúrgico. '
       +'Se realiza procedimiento bajo anestesia regional de tipo '+subtipo+'. '
       +'Mediante guía por '+guia+' en el espacio intervertebral '+espacio+', '+descTec+'. '
-      +'Tras realizar aspiración manual negativa para sangre y líquido cefalorraquideo según la técnica, '
+      +'Tras realizar aspiración manual negativa para sangre, '
       +'se procede a la administración del fármaco de forma segura, comprobando posteriormente '
       +'un nivel sensitivo máximo alcanzado en el dermatoma '+resultado+' con éxito.';
   } else {
