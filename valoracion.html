@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Valoración preanestésica — AnesFact</title>
+<meta name="theme-color" content="#0284c7">
+<link rel="stylesheet" href="styles.css?v=8.7">
+<style>
+.chip.sel{background:rgba(29,185,84,.15);border-color:var(--green);color:var(--green)}
+#val-ok{display:none;text-align:center;padding:40px 16px}
+#val-form-wrap{display:none}
+.val-banner{background:rgba(56,139,253,.12);border:1px solid rgba(56,139,253,.35);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--text2);line-height:1.45}
+.med-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+@media(max-width:400px){.med-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div style="padding:16px;max-width:520px;margin:0 auto">
+  <div style="text-align:center;margin-bottom:16px">
+    <div style="font-size:20px;font-weight:600;color:var(--green)">AnesFact</div>
+    <div style="font-size:13px;color:var(--text3);margin-top:4px">Valoración preanestésica</div>
+  </div>
+
+  <div id="val-invalid" class="err-panel on">
+    <div class="err-title">Enlace inválido</div>
+    <div class="err-msg" style="font-family:inherit">Abrí el enlace o QR que te dio tu anestesiólogo/a. Si el enlace expiró, pedí uno nuevo.</div>
+  </div>
+
+  <div id="val-ok">
+    <div style="font-size:48px;margin-bottom:12px">&#10003;</div>
+    <div style="font-size:18px;font-weight:600;margin-bottom:8px">Datos enviados</div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.5">Gracias. Tu anestesiólogo/a revisará la información antes de la cirugía. Podés cerrar esta página.</p>
+    <p id="val-asa" style="font-size:12px;color:var(--text3);margin-top:16px"></p>
+  </div>
+
+  <div id="val-form-wrap">
+    <div class="val-banner">Completá con calma. Los datos van de forma segura a tu anestesiólogo/a. No se pide teléfono.</div>
+    <form id="val-form" autocomplete="off">
+
+      <div class="card">
+        <div class="ct">Cirugía programada</div>
+        <div class="field"><label>Diagnóstico o tipo de cirugía *</label><input class="fi" id="v-dx" required placeholder="Ej. Colecistectomía"></div>
+        <div class="field"><label>Motivo de esta valoración</label>
+          <select class="fi" id="v-motivo">
+            <option value="primera">Primera vez</option>
+            <option value="reprogramacion">Reprogramación</option>
+            <option value="no_presentacion">No me operaron la vez anterior</option>
+            <option value="nueva_cirugia">Otra cirugía nueva</option>
+            <option value="control">Control / actualización</option>
+          </select>
+        </div>
+        <div class="field"><label>Fecha programada (opcional)</label><input class="fi" type="date" id="v-fecha-cx"></div>
+      </div>
+
+      <div class="card">
+        <div class="ct">Datos personales</div>
+        <div class="field"><label>Nombre y apellido *</label><input class="fi" id="v-nombre" required autocomplete="name"></div>
+        <div class="field"><label>DNI *</label><input class="fi" id="v-dni" required inputmode="numeric" autocomplete="off"></div>
+        <div class="g2">
+          <div class="field"><label>Edad</label><input class="fi" type="number" id="v-edad" min="0" max="120"></div>
+          <div class="field"><label>Sexo</label>
+            <select class="fi" id="v-sexo"><option value="">—</option><option value="F">F</option><option value="M">M</option><option value="X">Otro</option></select>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="field"><label>Peso (kg)</label><input class="fi" type="number" id="v-peso" step="0.1" min="0"></div>
+          <div class="field"><label>Talla (cm)</label><input class="fi" type="number" id="v-talla" step="1" min="0"></div>
+        </div>
+        <div class="field"><label>IMC</label><input class="fi" id="v-imc" readonly placeholder="Se calcula automáticamente"></div>
+        <div class="field"><label>Obra social</label><input class="fi" id="v-obra"></div>
+        <div class="field"><label>N° afiliado</label><input class="fi" id="v-afil"></div>
+      </div>
+
+      <div class="card">
+        <div class="ct">Antecedentes (tocá los que correspondan)</div>
+        <div class="chips" id="v-ant-chips"></div>
+        <hr class="hr">
+        <div class="field"><label>Anticoagulante / antiagregante</label><input class="fi" id="v-anticoag-farm" placeholder="Ej. AAS, rivaroxabán"></div>
+        <div class="field"><label>Última dosis / cuándo suspendió</label><input class="fi" id="v-anticoag-dosis"></div>
+        <div class="field"><label>Alergias</label><textarea class="fi" id="v-alergias" placeholder="Medicamentos, látex, yodo, otros"></textarea></div>
+      </div>
+
+      <div class="card">
+        <div class="ct">Medicación habitual</div>
+        <div id="v-meds"></div>
+        <button type="button" class="btn btn-s" style="margin-top:6px;font-size:13px;padding:10px" id="v-med-add">+ Agregar medicamento</button>
+      </div>
+
+      <div class="card">
+        <div class="ct">Antecedentes anestésicos</div>
+        <div class="field"><label>Cirugías previas</label><textarea class="fi" id="v-cx-prev"></textarea></div>
+        <div class="field"><label>Anestesias previas</label><textarea class="fi" id="v-an-prev"></textarea></div>
+        <div class="field"><label>Problemas (vía difícil, NVPO, alergia fármacos, hipertermia maligna, etc.)</label><textarea class="fi" id="v-prob-an"></textarea></div>
+      </div>
+
+      <div class="card" id="v-ayuno-card" style="display:none">
+        <div class="ct">Ayuno (urgencia)</div>
+        <div class="field"><label>Última comida sólida</label><input class="fi" type="datetime-local" id="v-ayuno-solido"></div>
+        <div class="field"><label>Último líquido claro</label><input class="fi" type="datetime-local" id="v-ayuno-liq"></div>
+      </div>
+      <div class="card">
+        <div class="ct">Funcional</div>
+        <div class="tog-row"><span>¿Sube 2 pisos de escalera sin detenerse?</span>
+          <label class="tog"><input type="checkbox" id="v-func-escalera"><span class="ts"></span></label>
+        </div>
+        <div class="tog-row" style="margin-top:8px"><span>Cirugía de urgencia</span>
+          <label class="tog"><input type="checkbox" id="v-urgencia"><span class="ts"></span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ct">Otros</div>
+        <div class="g2">
+          <div class="field"><label>Tabaco</label><input class="fi" id="v-tabaco" placeholder="No / cantidad"></div>
+          <div class="field"><label>Alcohol</label><input class="fi" id="v-alcohol" placeholder="No / cantidad"></div>
+        </div>
+        <div class="field"><label>Prótesis dental / cuello</label><input class="fi" id="v-protesis"></div>
+        <div class="field"><label>Marcapasos / DAI (modelo)</label><input class="fi" id="v-mcp"></div>
+        <div class="field"><label>Infección reciente / fiebre</label><input class="fi" id="v-fiebre"></div>
+        <div class="field"><label>Viaje reciente / TVP previa</label><input class="fi" id="v-tvp"></div>
+      </div>
+
+      <div class="err-panel" id="val-err"><div class="err-title">Error</div><div class="err-msg" id="val-err-msg"></div></div>
+      <button type="submit" class="btn btn-g" id="val-submit">Enviar valoración</button>
+    </form>
+  </div>
+</div>
+<script src="js/supabase-keepalive.js?v=8.0"></script>
+<script src="js/00-env.js?v=8.7"></script>
+<script src="js/valoracion-form.js?v=8.7"></script>
+</body>
+</html>
