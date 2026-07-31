@@ -5,14 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Valoración preanestésica — AnesFact</title>
 <meta name="theme-color" content="#0284c7">
-<link rel="stylesheet" href="styles.css?v=8.7">
+<link rel="stylesheet" href="styles.css?v=8.8">
 <style>
 .chip.sel{background:rgba(29,185,84,.15);border-color:var(--green);color:var(--green)}
 #val-ok{display:none;text-align:center;padding:40px 16px}
 #val-form-wrap{display:none}
 .val-banner{background:rgba(56,139,253,.12);border:1px solid rgba(56,139,253,.35);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--text2);line-height:1.45}
-.med-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.val-hint{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.35}
+.med-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;position:relative}
+.med-row .ac-list{left:0;right:0}
 @media(max-width:400px){.med-row{grid-template-columns:1fr}}
+.est-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.est-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:var(--bg3);border:1px dashed var(--border);border-radius:var(--r);cursor:pointer;font-size:12px;color:var(--text2);text-align:center}
+.est-btn.has-file{border-style:solid;border-color:var(--green);color:var(--green)}
+.est-btn input{display:none}
+.est-list{font-size:12px;color:var(--text2);margin-top:10px}
+.est-item{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
 </style>
 </head>
 <body>
@@ -35,76 +43,98 @@
   </div>
 
   <div id="val-form-wrap">
-    <div class="val-banner">Completá con calma. Los datos van de forma segura a tu anestesiólogo/a. No se pide teléfono.</div>
+    <div class="val-banner">Completá con calma. Los datos van de forma segura a tu anestesiólogo/a. Si no entendés algo, preguntale a tu médico antes de la cirugía.</div>
     <form id="val-form" autocomplete="off">
 
       <div class="card">
         <div class="ct">Cirugía programada</div>
-        <div class="field"><label>Diagnóstico o tipo de cirugía *</label><input class="fi" id="v-dx" required placeholder="Ej. Colecistectomía"></div>
-        <div class="field"><label>Motivo de esta valoración</label>
+        <div class="field"><label>¿Qué operación o estudio le van a hacer? *</label><input class="fi" id="v-dx" required placeholder="Ej. operación de vesícula, hernia, rodilla"></div>
+        <div class="field"><label>Motivo de este formulario</label>
           <select class="fi" id="v-motivo">
-            <option value="primera">Primera vez</option>
-            <option value="reprogramacion">Reprogramación</option>
-            <option value="no_presentacion">No me operaron la vez anterior</option>
-            <option value="nueva_cirugia">Otra cirugía nueva</option>
-            <option value="control">Control / actualización</option>
+            <option value="primera">Es la primera vez que lo completo</option>
+            <option value="reprogramacion">Cambiaron la fecha de la cirugía</option>
+            <option value="no_presentacion">La vez anterior no me operaron</option>
+            <option value="nueva_cirugia">Es otra operación distinta</option>
+            <option value="control">Actualizar mis datos</option>
           </select>
         </div>
-        <div class="field"><label>Fecha programada (opcional)</label><input class="fi" type="date" id="v-fecha-cx"></div>
+        <div class="field"><label>Fecha de la cirugía (si la sabe)</label><input class="fi" type="date" id="v-fecha-cx"></div>
       </div>
 
       <div class="card">
-        <div class="ct">Datos personales</div>
+        <div class="ct">Sus datos</div>
         <div class="field"><label>Nombre y apellido *</label><input class="fi" id="v-nombre" required autocomplete="name"></div>
         <div class="field"><label>DNI *</label><input class="fi" id="v-dni" required inputmode="numeric" autocomplete="off"></div>
         <div class="g2">
-          <div class="field"><label>Edad</label><input class="fi" type="number" id="v-edad" min="0" max="120"></div>
+          <div class="field"><label>Edad (años)</label><input class="fi" type="number" id="v-edad" min="0" max="120"></div>
           <div class="field"><label>Sexo</label>
-            <select class="fi" id="v-sexo"><option value="">—</option><option value="F">F</option><option value="M">M</option><option value="X">Otro</option></select>
+            <select class="fi" id="v-sexo"><option value="">—</option><option value="F">Mujer</option><option value="M">Hombre</option><option value="X">Otro</option></select>
           </div>
         </div>
         <div class="g2">
-          <div class="field"><label>Peso (kg)</label><input class="fi" type="number" id="v-peso" step="0.1" min="0"></div>
-          <div class="field"><label>Talla (cm)</label><input class="fi" type="number" id="v-talla" step="1" min="0"></div>
+          <div class="field"><label>Peso (kg)</label><input class="fi" type="number" id="v-peso" step="0.1" min="0" placeholder="Ej. 78"></div>
+          <div class="field"><label>Altura (cm)</label><input class="fi" type="number" id="v-talla" step="1" min="0" placeholder="Ej. 170"></div>
         </div>
-        <div class="field"><label>IMC</label><input class="fi" id="v-imc" readonly placeholder="Se calcula automáticamente"></div>
-        <div class="field"><label>Obra social</label><input class="fi" id="v-obra"></div>
-        <div class="field"><label>N° afiliado</label><input class="fi" id="v-afil"></div>
+        <div class="field"><label>Peso / altura (IMC)</label><input class="fi" id="v-imc" readonly placeholder="Se calcula solo"></div>
+        <div class="field ac-wrap"><label>Obra social o prepaga</label>
+          <input class="fi" id="v-obra" placeholder="Empezá a escribir: OSDE, PAMI, IOSFA..." autocomplete="off">
+          <div class="ac-list" id="ac-v-obra"></div>
+        </div>
+        <div class="field"><label>N° de afiliado / credencial</label><input class="fi" id="v-afil"></div>
       </div>
 
       <div class="card">
-        <div class="ct">Antecedentes (tocá los que correspondan)</div>
+        <div class="ct">Enfermedades que tengo (tocá las que correspondan)</div>
+        <p class="val-hint">No hace falta saber siglas médicas. Elegí lo que le dijeron alguna vez a un médico.</p>
         <div class="chips" id="v-ant-chips"></div>
         <hr class="hr">
-        <div class="field"><label>Anticoagulante / antiagregante</label><input class="fi" id="v-anticoag-farm" placeholder="Ej. AAS, rivaroxabán"></div>
-        <div class="field"><label>Última dosis / cuándo suspendió</label><input class="fi" id="v-anticoag-dosis"></div>
-        <div class="field"><label>Alergias</label><textarea class="fi" id="v-alergias" placeholder="Medicamentos, látex, yodo, otros"></textarea></div>
+        <div class="field ac-wrap"><label>¿Toma algo para <strong>fluidificar la sangre</strong>? (aspirina, Plavix, Sintrom, etc.)</label>
+          <input class="fi" id="v-anticoag-farm" placeholder="Ej. aspirina 100, Plavix, Xarelto..." autocomplete="off">
+          <div class="ac-list" id="ac-v-anticoag"></div>
+          <p class="val-hint">Incluye aspirina protectora, clopidogrel, rivaroxabán, warfarina/sintrom.</p>
+        </div>
+        <div class="field"><label>¿Cuándo tomó la última dosis o cuándo la dejó?</label><input class="fi" id="v-anticoag-dosis" placeholder="Ej. ayer a la noche / hace 3 días"></div>
+        <div class="field"><label>Alergias (medicamentos, yodo, látex, etc.)</label><textarea class="fi" id="v-alergias" placeholder="Si no tiene, escriba: ninguna"></textarea></div>
       </div>
 
       <div class="card">
-        <div class="ct">Medicación habitual</div>
+        <div class="ct">Medicamentos que toma todos los días</div>
+        <p class="val-hint">Escriba las primeras letras y elija de la lista. Si no aparece, escriba el nombre como figure en la caja.</p>
         <div id="v-meds"></div>
-        <button type="button" class="btn btn-s" style="margin-top:6px;font-size:13px;padding:10px" id="v-med-add">+ Agregar medicamento</button>
+        <button type="button" class="btn btn-s" style="margin-top:6px;font-size:13px;padding:10px" id="v-med-add">+ Agregar otro medicamento</button>
       </div>
 
       <div class="card">
-        <div class="ct">Antecedentes anestésicos</div>
-        <div class="field"><label>Cirugías previas</label><textarea class="fi" id="v-cx-prev"></textarea></div>
-        <div class="field"><label>Anestesias previas</label><textarea class="fi" id="v-an-prev"></textarea></div>
-        <div class="field"><label>Problemas (vía difícil, NVPO, alergia fármacos, hipertermia maligna, etc.)</label><textarea class="fi" id="v-prob-an"></textarea></div>
+        <div class="ct">Estudios y laboratorio (foto del informe)</div>
+        <p class="val-hint">Si tiene un papel o foto del estudio, súbalo acá. Máximo 3 fotos, bien legibles.</p>
+        <div class="est-grid">
+          <label class="est-btn" id="est-lab"><span style="font-size:22px">&#128203;</span><span>Laboratorio</span><input type="file" accept="image/*" capture="environment" data-tipo="laboratorio"></label>
+          <label class="est-btn" id="est-ecg"><span style="font-size:22px">&#128147;</span><span>Electrocardiograma</span><input type="file" accept="image/*" capture="environment" data-tipo="ecg"></label>
+          <label class="est-btn" id="est-eco"><span style="font-size:22px">&#128266;</span><span>Ecocardiograma</span><input type="file" accept="image/*" capture="environment" data-tipo="ecocardiograma"></label>
+          <label class="est-btn" id="est-espi"><span style="font-size:22px">&#127788;</span><span>Espirometría</span><input type="file" accept="image/*" capture="environment" data-tipo="espirometria"></label>
+        </div>
+        <label class="est-btn" style="margin-top:8px;width:100%" id="est-otro"><span style="font-size:22px">&#128247;</span><span>Otro estudio (foto)</span><input type="file" accept="image/*" capture="environment" data-tipo="otro"></label>
+        <div class="est-list" id="v-est-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="ct">Operaciones y anestesias anteriores</div>
+        <div class="field"><label>¿Se operó antes? ¿De qué?</label><textarea class="fi" id="v-cx-prev" placeholder="Ej. apendicitis en 2010"></textarea></div>
+        <div class="field"><label>¿Lo durmieron con anestesia? ¿Cómo le fue?</label><textarea class="fi" id="v-an-prev" placeholder="Ej. bien, sin problemas"></textarea></div>
+        <div class="field"><label>¿Tuvo problemas con anestesia o al despertar?</label><textarea class="fi" id="v-prob-an" placeholder="Ej. vómitos, le costó despertar, alergia a algún medicamento"></textarea></div>
       </div>
 
       <div class="card" id="v-ayuno-card" style="display:none">
-        <div class="ct">Ayuno (urgencia)</div>
+        <div class="ct">Ayuno (solo urgencia)</div>
         <div class="field"><label>Última comida sólida</label><input class="fi" type="datetime-local" id="v-ayuno-solido"></div>
-        <div class="field"><label>Último líquido claro</label><input class="fi" type="datetime-local" id="v-ayuno-liq"></div>
+        <div class="field"><label>Último líquido claro (agua, mate cocido)</label><input class="fi" type="datetime-local" id="v-ayuno-liq"></div>
       </div>
       <div class="card">
-        <div class="ct">Funcional</div>
-        <div class="tog-row"><span>¿Sube 2 pisos de escalera sin detenerse?</span>
+        <div class="ct">Actividad física</div>
+        <div class="tog-row"><span>¿Puede subir 2 pisos de escalera sin parar?</span>
           <label class="tog"><input type="checkbox" id="v-func-escalera"><span class="ts"></span></label>
         </div>
-        <div class="tog-row" style="margin-top:8px"><span>Cirugía de urgencia</span>
+        <div class="tog-row" style="margin-top:8px"><span>Es cirugía de urgencia (hoy / ahora)</span>
           <label class="tog"><input type="checkbox" id="v-urgencia"><span class="ts"></span></label>
         </div>
       </div>
@@ -112,13 +142,13 @@
       <div class="card">
         <div class="ct">Otros</div>
         <div class="g2">
-          <div class="field"><label>Tabaco</label><input class="fi" id="v-tabaco" placeholder="No / cantidad"></div>
-          <div class="field"><label>Alcohol</label><input class="fi" id="v-alcohol" placeholder="No / cantidad"></div>
+          <div class="field"><label>¿Fuma?</label><input class="fi" id="v-tabaco" placeholder="No / cuántos por día"></div>
+          <div class="field"><label>¿Toma alcohol?</label><input class="fi" id="v-alcohol" placeholder="No / cuánto"></div>
         </div>
-        <div class="field"><label>Prótesis dental / cuello</label><input class="fi" id="v-protesis"></div>
-        <div class="field"><label>Marcapasos / DAI (modelo)</label><input class="fi" id="v-mcp"></div>
-        <div class="field"><label>Infección reciente / fiebre</label><input class="fi" id="v-fiebre"></div>
-        <div class="field"><label>Viaje reciente / TVP previa</label><input class="fi" id="v-tvp"></div>
+        <div class="field"><label>Prótesis dental o problemas de cuello</label><input class="fi" id="v-protesis" placeholder="Ej. dientes postizos, collarín"></div>
+        <div class="field"><label>Marcapasos o desfibrilador (DAI)</label><input class="fi" id="v-mcp" placeholder="Si no tiene, dejar vacío"></div>
+        <div class="field"><label>¿Fiebre o infección en los últimos días?</label><input class="fi" id="v-fiebre" placeholder="Ej. gripe hace 1 semana"></div>
+        <div class="field"><label>¿Viajó lejos o tuvo trombosis antes?</label><input class="fi" id="v-tvp" placeholder="Si no, dejar vacío"></div>
       </div>
 
       <div class="err-panel" id="val-err"><div class="err-title">Error</div><div class="err-msg" id="val-err-msg"></div></div>
@@ -127,7 +157,9 @@
   </div>
 </div>
 <script src="js/supabase-keepalive.js?v=8.0"></script>
-<script src="js/00-env.js?v=8.7"></script>
-<script src="js/valoracion-form.js?v=8.7"></script>
+<script src="js/00-env.js?v=8.8"></script>
+<script src="data/obras-sociales.js?v=8.8"></script>
+<script src="data/medicacion-habitual.js?v=8.8"></script>
+<script src="js/valoracion-form.js?v=8.8"></script>
 </body>
 </html>

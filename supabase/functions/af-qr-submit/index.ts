@@ -30,6 +30,7 @@ type SubmitBody = {
   antecedentes?: Record<string, unknown>;
   medicacion?: unknown[];
   antec_anestesicos?: Record<string, unknown>;
+  estudios_extraidos?: Record<string, unknown>;
   extras?: Record<string, unknown>;
 };
 
@@ -150,6 +151,7 @@ Deno.serve(async (req) => {
       antec_anestesicos: payload.antec_anestesicos,
       ayuno: ayunoPayload,
       extras: payload.extras,
+      estudios_extraidos: body.estudios_extraidos || {},
       es_urgencia: urgencia,
       asa_sugerido: reglas.asa_sugerido,
       alertas_reglas: reglas.alertas,
