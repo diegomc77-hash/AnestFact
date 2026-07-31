@@ -52,9 +52,15 @@ function go(id,addH){
   if(id==='home'){
     if(S.cur){try{guardar();}catch(e){}}
     renderHome();if(S.hist.length===1)cargarAnestesista();
-  }if(id==='foja')renderRecupSelects();
   if(id==='resumen')renderResumen();
-  if(id==='foja'){cargarFojaUI();setTimeout(function(){if(typeof initExamenAuscUI==='function')initExamenAuscUI();},120);setTimeout(initSign,80);renderPesoChips();renderFojaPorSanatorio();}
+  if(id==='foja'){
+    cargarFojaUI();
+    renderRecupSelects();
+    setTimeout(function(){if(typeof initExamenAuscUI==='function')initExamenAuscUI();},120);
+    setTimeout(initSign,80);
+    renderPesoChips();
+    renderFojaPorSanatorio();
+  }
   if(id==='geclisa'){window._geclisaTexto='';renderGeclisa();}
   if(id==='admin'&&typeof renderAdmin==='function')renderAdmin();
   if(id==='nom'){document.getElementById('nom-q').value='';document.getElementById('nom-res').innerHTML='<p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Escribí para buscar</p>';}
