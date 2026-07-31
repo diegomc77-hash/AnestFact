@@ -1,5 +1,5 @@
 // AnesFact Service Worker v8
-var CACHE_NAME = 'anesfact-v8.4';
+var CACHE_NAME = 'anesfact-v8.5';
 var STATIC_CORE = ['index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'styles.css'];
 
 self.addEventListener('install', function(e){

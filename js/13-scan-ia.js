@@ -32,6 +32,6 @@ function aplicarIA(j){
   var conf=j.confianza||'media';
   var badge=document.getElementById('ia-badge');badge.style.display='block';
   badge.innerHTML='<span class="badge '+(conf==='alta'?'bg':conf==='media'?'by':'br')+'">IA: '+conf+'</span>'+(j.dudosos&&j.dudosos.length?' <span class="badge by">⚠ '+j.dudosos.length+' dudoso(s)</span>':'');
-  cargarForm(S.cur);go('facturacion');toast('Datos extraídos ✓ — revisá facturación evweb');
+  cargarForm(S.cur);go('nueva');toast('Datos extraídos ✓ — Foja o Facturación evweb');
 }
 
