@@ -1,9 +1,9 @@
 (function () {
   var TOKEN = '';
   var organState = {};
-  var estudiosFiles = [];
+  var estudiosExtraidos = {};
   var MAX_ESTUDIOS = 3;
-  var MAX_KB = 600;
+  var MAX_KB = 800;
 
   function $(id) { return document.getElementById(id); }
 
@@ -83,6 +83,9 @@
     box.innerHTML = '';
     ORGANOS_ENF.forEach(function (org) {
       organState[org.id] = { answer: null, selected: {} };
+      var opts = org.items.map(function (it, idx) {
+        return '<option value="' + idx + '">' + esc(it.label) + '</option>';
+      }).join('');
       var block = document.createElement('div');
       block.className = 'org-block';
       block.innerHTML =
@@ -91,23 +94,41 @@
         '<button type="button" class="chip" data-org="' + org.id + '" data-ans="no">No</button>' +
         '<button type="button" class="chip" data-org="' + org.id + '" data-ans="si">Sí</button>' +
         '</div>' +
-        '<div class="org-items" id="org-items-' + org.id + '"><div class="chips"></div></div>';
-      var chipsBox = block.querySelector('.org-items .chips');
-      org.items.forEach(function (it, idx) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'chip';
-        b.textContent = it.label;
-        b.setAttribute('data-org', org.id);
-        b.setAttribute('data-idx', String(idx));
-        b.onclick = function () {
-          var st = organState[org.id];
-          var key = org.id + '-' + idx;
-          if (st.selected[key]) { delete st.selected[key]; b.classList.remove('sel'); }
-          else { st.selected[key] = it; b.classList.add('sel'); }
-        };
-        chipsBox.appendChild(b);
-      });
+        '<div class="org-items" id="org-items-' + org.id + '">' +
+        '<p class="val-hint">Elija del desplegable y tocá Agregar (puede agregar varias).</p>' +
+        '<div class="org-pick">' +
+        '<select class="fi org-sel" id="org-sel-' + org.id + '"><option value="">— Elija enfermedad —</option>' + opts + '</select>' +
+        '<button type="button" class="btn btn-s btn-add">+ Agregar</button></div>' +
+        '<div class="org-sel-list" id="org-list-' + org.id + '"></div></div>';
+
+      function renderOrgList() {
+        var list = $('org-list-' + org.id);
+        if (!list) return;
+        var st = organState[org.id];
+        var keys = Object.keys(st.selected);
+        if (!keys.length) { list.innerHTML = ''; return; }
+        list.innerHTML = keys.map(function (k) {
+          return '<div class="org-sel-item"><span>' + esc(st.selected[k].label) + '</span>' +
+            '<button type="button" class="btn btn-s" style="width:auto;padding:3px 8px;font-size:11px" data-k="' + esc(k) + '">Quitar</button></div>';
+        }).join('');
+        list.querySelectorAll('button[data-k]').forEach(function (btn) {
+          btn.onclick = function () {
+            delete organState[org.id].selected[btn.getAttribute('data-k')];
+            renderOrgList();
+          };
+        });
+      }
+
+      block.querySelector('.btn-add').onclick = function () {
+        var sel = $('org-sel-' + org.id);
+        var idx = sel ? parseInt(sel.value, 10) : NaN;
+        if (isNaN(idx) || !org.items[idx]) return;
+        var it = org.items[idx];
+        var key = org.id + '-' + idx;
+        organState[org.id].selected[key] = it;
+        renderOrgList();
+      };
+
       block.querySelectorAll('.org-yesno .chip').forEach(function (btn) {
         btn.onclick = function () {
           var oid = btn.getAttribute('data-org');
@@ -123,7 +144,7 @@
             else {
               itemsEl.classList.remove('open');
               organState[oid].selected = {};
-              itemsEl.querySelectorAll('.chip.sel').forEach(function (c) { c.classList.remove('sel'); });
+              renderOrgList();
             }
           }
         };
@@ -220,41 +241,97 @@
     return out;
   }
 
+  function estResClass(ex) {
+    var g = ex && ex.resultado_general;
+    if (g === 'normal') return 'ok';
+    if (g === 'no_legible') return 'err';
+    return 'warn';
+  }
+
+  function estResText(ex) {
+    if (!ex) return 'No se pudo leer';
+    if (ex.resumen_paciente) return ex.resumen_paciente;
+    if (ex.resultado_general === 'normal') return 'Resultado normal';
+    if (ex.valores_alterados && ex.valores_alterados.length) {
+      return ex.valores_alterados.map(function (v) {
+        return v.nombre + ': ' + v.valor + (v.unidad ? ' ' + v.unidad : '');
+      }).join(' · ');
+    }
+    if (ex.hallazgos && ex.hallazgos.length) return ex.hallazgos.join(' · ');
+    return 'Ver detalle con el médico';
+  }
+
   function renderEstList() {
     var box = $('v-est-list');
     if (!box) return;
-    if (!estudiosFiles.length) { box.innerHTML = ''; return; }
-    box.innerHTML = estudiosFiles.map(function (f, i) {
-      return '<div class="est-item"><span>' + esc(f.label) + ' — ' + esc(f.nombre) + '</span>' +
-        '<button type="button" class="btn btn-s" style="width:auto;padding:4px 10px;font-size:11px" data-i="' + i + '">Quitar</button></div>';
+    var keys = Object.keys(estudiosExtraidos);
+    if (!keys.length) { box.innerHTML = ''; return; }
+    var labels = { laboratorio: 'Laboratorio', ecg: 'Electrocardiograma', ecocardiograma: 'Ecocardiograma', espirometria: 'Espirometría', otro: 'Otro estudio' };
+    box.innerHTML = keys.map(function (tipo) {
+      var item = estudiosExtraidos[tipo];
+      var ex = item.extracted || {};
+      return '<div class="est-res ' + estResClass(ex) + '"><strong>' + esc(labels[tipo] || tipo) + '</strong><br>' +
+        esc(estResText(ex)) +
+        ' <button type="button" class="btn btn-s" style="width:auto;padding:3px 8px;font-size:11px;margin-top:6px" data-t="' + tipo + '">Quitar</button></div>';
     }).join('');
-    box.querySelectorAll('button[data-i]').forEach(function (btn) {
+    box.querySelectorAll('button[data-t]').forEach(function (btn) {
       btn.onclick = function () {
-        estudiosFiles.splice(parseInt(btn.getAttribute('data-i'), 10), 1);
-        renderEstList();
+        delete estudiosExtraidos[btn.getAttribute('data-t')];
         document.querySelectorAll('.est-btn').forEach(function (b) { b.classList.remove('has-file'); });
+        renderEstList();
       };
     });
   }
 
+  function extractEstudio(tipo, mime, dataB64, btnEl) {
+    var slot = $('est-slot-' + tipo);
+    if (slot) slot.innerHTML = '<div class="est-spin">Leyendo informe…</div>';
+    return fetch(afSupabaseUrl() + '/functions/v1/af-estudio-extract', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: AF_SUPABASE_KEY },
+      body: JSON.stringify({ token: TOKEN, tipo: tipo, mime: mime, data_b64: dataB64 }),
+    })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok || !res.j.ok) throw new Error((res.j && res.j.error) || 'No se pudo leer');
+        estudiosExtraidos[tipo] = { extracted: res.j.extracted, leido_at: new Date().toISOString() };
+        if (btnEl) btnEl.classList.add('has-file');
+        if (slot) slot.innerHTML = '';
+        renderEstList();
+        hideErr();
+      })
+      .catch(function (err) {
+        if (slot) slot.innerHTML = '';
+        showErr(err.message || 'Error al leer estudio');
+      });
+  }
+
   function wireEstudios() {
-    document.querySelectorAll('.est-btn input[type=file]').forEach(function (inp) {
+    document.querySelectorAll('.est-btn').forEach(function (lbl) {
+      var inp = lbl.querySelector('input[type=file]');
+      if (!inp) return;
+      var tipo = inp.getAttribute('data-tipo') || 'otro';
+      var slot = document.createElement('div');
+      slot.id = 'est-slot-' + tipo;
+      lbl.parentNode.insertBefore(slot, lbl.nextSibling);
       inp.addEventListener('change', function () {
         var file = inp.files && inp.files[0];
+        inp.value = '';
         if (!file) return;
-        if (estudiosFiles.length >= MAX_ESTUDIOS) { showErr('Máximo ' + MAX_ESTUDIOS + ' fotos.'); inp.value = ''; return; }
-        if (file.size > MAX_KB * 1024) { showErr('Foto muy pesada (máx. ' + MAX_KB + ' KB).'); inp.value = ''; return; }
-        var tipo = inp.getAttribute('data-tipo') || 'otro';
-        var labels = { laboratorio: 'Laboratorio', ecg: 'Electrocardiograma', ecocardiograma: 'Ecocardiograma', espirometria: 'Espirometría', otro: 'Otro estudio' };
+        if (Object.keys(estudiosExtraidos).length >= MAX_ESTUDIOS) {
+          showErr('Máximo ' + MAX_ESTUDIOS + ' estudios.');
+          return;
+        }
+        if (file.size > MAX_KB * 1024) {
+          showErr('Foto muy pesada (máx. ' + MAX_KB + ' KB). Acercate más.');
+          return;
+        }
         var reader = new FileReader();
         reader.onload = function () {
-          estudiosFiles.push({ tipo: tipo, label: labels[tipo] || tipo, nombre: file.name, mime: file.type || 'image/jpeg', kb: Math.round(file.size / 1024), data_b64: String(reader.result).split(',')[1] || '' });
-          inp.closest('.est-btn').classList.add('has-file');
-          renderEstList();
-          hideErr();
+          var b64 = String(reader.result).split(',')[1] || '';
+          extractEstudio(tipo, file.type || 'image/jpeg', b64, lbl);
         };
         reader.readAsDataURL(file);
-        inp.value = '';
       });
     });
   }
@@ -297,7 +374,11 @@
         anestesias_previas: $('v-an-prev').value.trim() || null,
         problemas: $('v-prob-an').value.trim() || null,
       },
-      estudios_extraidos: { archivos: estudiosFiles.map(function (f) { return { tipo: f.tipo, nombre: f.nombre, mime: f.mime, kb: f.kb, data_b64: f.data_b64 }; }), cantidad: estudiosFiles.length },
+      estudios_extraidos: {
+        estudios: estudiosExtraidos,
+        cantidad: Object.keys(estudiosExtraidos).length,
+        imagen_guardada: false,
+      },
       extras: {
         es_urgencia: urg,
         ayuno: urg ? { solido: $('v-ayuno-solido').value || null, liquido_claro: $('v-ayuno-liq').value || null } : null,

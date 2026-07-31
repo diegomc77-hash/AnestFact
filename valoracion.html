@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Valoración preanestésica — AnesFact</title>
 <meta name="theme-color" content="#0284c7">
-<link rel="stylesheet" href="styles.css?v=8.9">
+<link rel="stylesheet" href="styles.css?v=9.0">
 <style>
 .chip.sel{background:rgba(29,185,84,.15);border-color:var(--green);color:var(--green)}
 #val-ok{display:none;text-align:center;padding:40px 16px}
@@ -29,6 +29,16 @@
 .org-yesno .chip.sel-yes{background:rgba(29,185,84,.15);border-color:var(--green);color:var(--green)}
 .org-items{margin-top:8px;display:none}
 .org-items.open{display:block}
+.org-pick{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:flex-start}
+.org-pick select{flex:1;min-width:160px}
+.org-pick .btn-add{width:auto;padding:10px 12px;font-size:12px;flex-shrink:0}
+.org-sel-list{margin-top:8px}
+.org-sel-item{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--bg3);border-radius:6px;margin-bottom:4px;font-size:13px}
+.est-res{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:13px;line-height:1.45}
+.est-res.ok{border-color:rgba(29,185,84,.4)}
+.est-res.warn{border-color:rgba(227,179,65,.5)}
+.est-res.err{border-color:rgba(248,81,73,.4)}
+.est-spin{font-size:12px;color:var(--text3);padding:8px 0}
 </style>
 </head>
 <body>
@@ -120,8 +130,8 @@
       </div>
 
       <div class="card">
-        <div class="ct">Estudios y laboratorio (foto del informe)</div>
-        <p class="val-hint">Si tiene un papel o foto del estudio, súbalo acá. Máximo 3 fotos, bien legibles.</p>
+        <div class="ct">Estudios (foto del informe)</div>
+        <p class="val-hint">Sacá foto al papel. <strong>No guardamos la imagen</strong>: leemos los datos (normal o valores alterados).</p>
         <div class="est-grid">
           <label class="est-btn" id="est-lab"><span style="font-size:22px">&#128203;</span><span>Laboratorio</span><input type="file" accept="image/*" capture="environment" data-tipo="laboratorio"></label>
           <label class="est-btn" id="est-ecg"><span style="font-size:22px">&#128147;</span><span>Electrocardiograma</span><input type="file" accept="image/*" capture="environment" data-tipo="ecg"></label>
@@ -172,10 +182,10 @@
   </div>
 </div>
 <script src="js/supabase-keepalive.js?v=8.0"></script>
-<script src="js/00-env.js?v=8.9"></script>
-<script src="data/obras-sociales-ar.js?v=8.9"></script>
-<script src="data/organos-enfermedades.js?v=8.9"></script>
-<script src="data/medicacion-habitual.js?v=8.9"></script>
-<script src="js/valoracion-form.js?v=8.9"></script>
+<script src="js/00-env.js?v=9.0"></script>
+<script src="data/obras-sociales-ar.js?v=9.0"></script>
+<script src="data/organos-enfermedades.js?v=9.0"></script>
+<script src="data/medicacion-habitual.js?v=9.0"></script>
+<script src="js/valoracion-form.js?v=9.0"></script>
 </body>
 </html>
