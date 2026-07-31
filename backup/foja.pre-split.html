@@ -1,0 +1,486 @@
+﻿<div id="view-foja" class="view">
+  <div id="dose-info-bar" style="display:none;background:rgba(56,139,253,.1);border:1px solid rgba(56,139,253,.4);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:var(--blue)"></div>
+  <!-- Quirófano Mayo — solo visible para Sanatorio Mayo -->
+  <div id="foja-mayo-quir-wrap" style="display:none">
+    <div class="card" style="padding:10px 14px">
+      <div class="g2">
+        <div class="field"><label>Quir&oacute;fano</label>
+          <select class="fi" id="f-mayo-quir">
+            <option value="">— Seleccionar —</option>
+            <option>QUIROFANO 1</option>
+            <option>QUIROFANO 2</option>
+            <option>QUIROFANO 3</option>
+            <option>QUIROFANO 4</option>
+            <option>SALA DE ENDOSCOP&#205;AS</option>
+            <option>SALA DE HEMODINAMIA</option>
+          </select>
+        </div>
+        <div class="field"><label>Tipo de cirug&iacute;a</label>
+          <select class="fi" id="f-mayo-tipociru">
+            <option value="">— Seleccionar —</option>
+            <option>PROGRAMADA</option>
+            <option>URGENCIA</option>
+          </select>
+        </div>
+      </div>
+      <div class="g2" style="margin-top:8px">
+        <div class="field">
+          <label>Posici&oacute;n quir&uacute;rgica</label>
+          <select class="fi" id="f-mayo-posicion">
+            <option value="">— Seleccionar —</option>
+            <option>DECUBITO DORSAL</option>
+            <option>DECUBITO VENTRAL</option>
+            <option>IZQUIERDO LATERAL</option>
+            <option>DERECHO LATERAL</option>
+            <option>GINECOLОГ&#205;A</option>
+            <option>DAKOTA DEL SUR</option>
+          </select>
+          <div id="posicion-sugerida" style="display:none;margin-top:4px;padding:5px 8px;background:rgba(29,185,84,.1);border:1px solid var(--green);border-radius:6px;font-size:11px;color:var(--green)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">T&eacute;cnica anest&eacute;sica</div>
+
+    <!-- Nivel 1: Tipo principal -->
+    <div class="field">
+      <label>Tipo de anestesia</label>
+      <select class="fi" id="fj-tec-tipo" onchange="tecNivel1();_sugerirDrogasPorTec(this.value);calcPremed(true);actualizarViaAerea()">
+        <option value="">Seleccionar...</option>
+        <option value="general">Anestesia General</option>
+        <option value="neuroaxial">Anestesia Regional Neuroaxial</option>
+        <option value="bloqueo">Bloqueo de Nervio Perif&eacute;rico</option>
+        <option value="local">Anestesia Local</option>
+        <option value="sedacion">Sedaci&oacute;n / CAM</option>
+      </select>
+    </div>
+
+    <!-- Nivel 2: Subtipo -->
+    <div class="field" id="tec-nivel2-wrap" style="display:none">
+      <label id="tec-nivel2-label">Subtipo</label>
+      <select class="fi" id="fj-tec-subtipo" onchange="tecNivel2();_sugerirDrogasPorTec(this.value||document.getElementById('fj-tec-tipo').value);calcPremed(true);actualizarMetodos()">
+        <option value="">Seleccionar...</option>
+      </select>
+    </div>
+
+    <!-- Nivel 3: Bloqueo específico (solo para bloqueos) -->
+    <div class="field" id="tec-nivel3-wrap" style="display:none">
+      <label id="tec-nivel3-label">Bloqueo espec&iacute;fico</label>
+      <select class="fi" id="fj-tec-bloqueo" onchange="tecNivel3()">
+        <option value="">Seleccionar...</option>
+      </select>
+    </div>
+
+    <!-- Campos adicionales para bloqueos regionales -->
+    <div id="tec-nivel4-wrap" style="display:none">
+      <!-- Espacio de abordaje (solo neuroaxial) -->
+      <div class="field" id="tec-espacio-wrap" style="display:none">
+        <label>Espacio intervertebral</label>
+        <select class="fi" id="fj-tec-espacio" onchange="tecActualizarDermatomas();tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
+      <!-- Lateralidad (solo bloqueos periféricos) -->
+      <div class="field" id="tec-lateral-wrap" style="display:none">
+        <label>Lateralidad</label>
+        <select class="fi" id="fj-tec-lateral" onchange="tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+          <option>Derecho</option><option>Izquierdo</option><option>Bilateral</option>
+        </select>
+      </div>
+      <!-- Aguja (según subtipo) -->
+      <div class="field" id="tec-aguja-wrap" style="display:none">
+        <label>Tipo de aguja</label>
+        <select class="fi" id="fj-tec-aguja" onchange="tecActualizarCalibres();tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
+      <!-- Calibre (según aguja) -->
+      <div class="field" id="tec-calibre-wrap" style="display:none">
+        <label>Calibre</label>
+        <select class="fi" id="fj-tec-calibre" onchange="tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
+      <!-- Guía de localización (siempre) -->
+      <div class="field" id="tec-guia-wrap" style="display:none">
+        <label>Guía de localización</label>
+        <select class="fi" id="fj-tec-guia" onchange="tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+          <option>Ultrasonografía (Ecoguiado)</option>
+          <option>Neuroestimulación</option>
+          <option>Referencias anatómicas (A ciegas)</option>
+          <option>Combinada (Ultrasonografía + Neuroestimulación)</option>
+        </select>
+      </div>
+      <!-- Resultado clínico (varía) -->
+      <div class="field" id="tec-resultado-wrap" style="display:none">
+        <label>Resultado clínico</label>
+        <select class="fi" id="fj-tec-resultado" onchange="tecNivel4Check()">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Campo oculto que guarda el valor final -->
+    <input type="hidden" id="fj-tec" value="">
+
+    <!-- Resumen de lo seleccionado -->
+    <div id="tec-resumen" style="display:none;background:var(--bg3);border:1px solid var(--green);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);margin-top:6px">
+      <span id="tec-resumen-txt"></span>
+      <button onclick="tecLimpiar()" style="background:none;border:none;color:var(--text3);cursor:pointer;float:right;font-size:16px">&times;</button>
+    </div>
+
+    <div class="g2" style="margin-top:10px">
+      <div class="field"><label>ASA</label>
+        <select class="fi" id="fj-asa"><option value="">&mdash;</option><option>I</option><option>II</option><option>III</option><option>IV</option><option>V</option></select>
+      </div>
+      <div class="field"><label>Mallampati</label>
+        <select class="fi" id="fj-mallampati" onchange="actualizarExamenFisico()"><option value="">&mdash;</option><option>I</option><option>II</option><option>III</option><option>IV</option></select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>Aparato respiratorio</label>
+        <select class="fi" id="fj-ausc-resp" onchange="actualizarExamenFisico()">
+          <option value="MV conservado bilateral, sin agregados">Normal</option>
+          <option value="Rales/sibilancias presentes">Patológico</option>
+        </select>
+      </div>
+      <div class="field"><label>Aparato cardiovascular</label>
+        <select class="fi" id="fj-ausc-cv" onchange="actualizarExamenFisico()">
+          <option value="Ruidos cardíacos normofonéticos, sin soplos">Normal</option>
+          <option value="Soplo/arritmia presente">Patológico</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Examen Físico</label>
+      <div class="fr" style="align-items:flex-start">
+        <textarea class="fi" id="fj-examen-fisico" placeholder="Se completa automáticamente con Mallampati y auscultación..."></textarea>
+        <button class="mic" id="m-examen-fisico" onclick="mic('fj-examen-fisico','m-examen-fisico')">&#127897;</button>
+      </div>
+    </div>
+    <div id="examen-regional-wrap" style="display:none">
+      <div class="ct" style="font-size:13px;margin-bottom:8px">Examen Regional</div>
+      <div id="examen-regional-selects"></div>
+    </div>
+    <div class="g2" style="margin-top:10px">
+      <div class="field"><label>V&iacute;a a&eacute;rea</label>
+        <select class="fi" id="fj-via" onchange="actualizarMetodos()"><option value="">&mdash;</option><option>IOT</option><option>M&aacute;scara lar&iacute;ngea</option><option>Mascarilla facial</option><option>Traqueostom&iacute;a</option><option>Sin dispositivo</option></select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>Inducci&oacute;n</label>
+        <select class="fi" id="fj-ind"><option value="">&mdash;</option><option>Satisfactoria</option><option>Prolongada</option><option>Tormentosa</option></select>
+      </div>
+      <!-- Hora fin oculta - se muestra en card Tiempos para Aeronáutico -->
+      <div style="display:none"><input type="time" id="fj-fin"><input type="time" id="fj-hint"><input type="time" id="fj-hext"></div>
+    </div>
+    <div class="field"><label>Premedicaci&oacute;n</label>
+      <div class="ac-wrap">
+        <div class="fr">
+          <input class="fi" type="text" id="fj-premed" placeholder="Midazolam 2mg EV" autocomplete="off" oninput="acDrugField('fj-premed','ac-premed')" onkeydown="acKey(event,'ac-premed')">
+          <button class="mic" id="m-premed" onclick="mic('fj-premed','m-premed')">&#127897;</button>
+        </div>
+        <div class="ac-list" id="ac-premed"></div>
+      </div>
+      <div id="premed-selects"></div>
+      <div style="margin-top:6px">
+        <button class="btn btn-s" style="font-size:12px;background:rgba(29,185,84,.15);border:1px solid var(--green);color:var(--green)" onclick="calcPremed()">&#9889; Sugerir por peso / anestesia</button>
+      </div>
+      <div id="premed-smart-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      <div id="premed-alert" style="display:none;margin-top:6px;padding:6px 10px;border-radius:8px;background:rgba(255,180,0,.13);border:1px solid #ffb400;color:#ffb400;font-size:12px"></div>
+    </div>
+    <div class="field" style="margin-top:8px"><label>Antibioticoprofilaxis</label>
+      <div class="fr">
+        <input class="fi" type="text" id="fj-atb" placeholder="Cefazolina 2g EV" autocomplete="off">
+        <button class="mic" onclick="mic('fj-atb','m-atb')" id="m-atb">&#127897;</button>
+      </div>
+      <div id="atb-alert" style="display:none;margin-top:6px;padding:6px 10px;border-radius:8px;background:rgba(255,80,80,.13);border:1px solid #ff5050;color:#ff5050;font-size:12px"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Medicación / Agentes anestésicos</div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:10px">Primeras letras → sugerencias. Dosis calculadas por peso del paciente.</p>
+    <div id="drogas-sugeridas" style="display:none;margin-bottom:12px"></div>
+    <div id="drogas-list"></div>
+    <div class="brow" style="margin-top:8px;gap:6px">
+      <button class="btn btn-s" style="font-size:13px" onclick="addDroga()">+ Agregar fármaco</button>
+      <button class="mic" style="flex-shrink:0;width:42px;height:42px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text2)" id="m-droga-new" onclick="micNewDrug()">&#127897;</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Métodos anestésicos</div>
+    <div style="margin-bottom:10px" id="metodos-chips">
+      <select class="fi" id="metodos-tipo-sel" onchange="if(this.value)setMetodos(this.value)">
+        <option value="">— Seleccionar método anestésico —</option>
+        <option value="raquidea">Raquídea</option>
+        <option value="general">A. General</option>
+        <option value="tiva">TIVA</option>
+        <option value="peridural">Peridural</option>
+        <option value="localasistida">Local asistida</option>
+        <option value="sedacion">Sedación</option>
+        <option value="bloqueo">Bloqueo nervioso periférico</option>
+      </select>
+    </div>
+    <div id="metodos-extra" style="display:none;margin-bottom:8px"></div>
+    <div class="fr" style="align-items:flex-start">
+      <textarea class="fi" id="fj-metodos" placeholder="Observaciones adicionales..."></textarea>
+      <button class="mic" id="m-metodos" onclick="mic('fj-metodos','m-metodos')">&#127897;</button>
+    </div>
+    <div class="field" style="margin-top:10px">
+      <label>Materiales descartables</label>
+      <div class="fr">
+        <input class="fi" type="text" id="fj-materiales" placeholder="Tubo endotraqueal N&ordm; 7 / Aguja raqu&iacute;dea AR 25 PL" autocomplete="off">
+        <button class="mic" id="m-materiales" onclick="mic('fj-materiales','m-materiales')">&#127897;</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+  <!-- Mayo GECLISA helper - shown only for Mayo -->
+  <div id="mayo-hora-fin-wrap" style="display:none">
+  <div class="card" style="border-color:rgba(56,139,253,.4);background:rgba(56,139,253,.06)">
+    <div class="ct">&#9200; Tiempos quir&#250;rgicos</div>
+    <div class="g2">
+      <div class="field"><label>Hora inicio cirug&#237;a</label><input class="fi" type="time" id="mayo-hora-inicio" onchange="document.getElementById('f-hora').value=this.value"></div>
+      <div class="field"><label>Hora fin cirug&#237;a</label><input class="fi" type="time" id="mayo-hora-fin" onchange="document.getElementById('fj-fin').value=this.value"></div>
+    </div>
+  </div>
+</div>
+<div id="mayo-foja-helper" style="display:none">
+    <div class="card" style="border-color:rgba(56,139,253,.4);background:rgba(56,139,253,.06)">
+      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleMayoHelper()">
+        <div class="ct" style="color:var(--blue);margin:0">&#127973; Sanatorio Mayo — Datos para GECLISA</div>
+        <span id="mayo-helper-arrow" style="font-size:18px;color:var(--blue);transition:transform .2s">&#8964;</span>
+      </div>
+      <div id="mayo-helper-body" style="display:block;margin-top:12px">
+
+      <div class="field">
+        <label>Antecedentes del paciente</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px" id="antec-chips">
+          <button class="chip" onclick="toggleAntec(this,'HTA')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">HTA</button>
+          <button class="chip" onclick="toggleAntec(this,'DBT')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">DBT</button>
+          <button class="chip" onclick="toggleAntec(this,'IRC s/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC s/diálisis</button>
+          <button class="chip" onclick="toggleAntec(this,'IRC c/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC c/diálisis</button>
+          <button class="chip" onclick="toggleAntec(this,'IC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IC</button>
+          <button class="chip" onclick="toggleAntec(this,'Obesidad')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Obesidad</button>
+          <button class="chip" onclick="toggleAntec(this,'EPOC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">EPOC</button>
+          <button class="chip" onclick="toggleAntec(this,'Asma')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Asma</button>
+          <button class="chip" onclick="toggleAntec(this,'Coronario')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Coronario</button>
+          <button class="chip" onclick="toggleAntec(this,'ACV previo')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">ACV previo</button>
+          <button class="chip" onclick="toggleAntec(this,'Fumador')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Fumador</button>
+          <button class="chip" onclick="toggleAntec(this,'Anticoagulado')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Anticoagulado</button>
+        </div>
+        <div class="fr" style="align-items:flex-start">
+          <textarea class="fi" id="fj-obs-geclisa" placeholder="Otros antecedentes..." rows="2"></textarea>
+          <button class="mic" id="m-obs-geclisa" onclick="mic('fj-obs-geclisa','m-obs-geclisa')">&#127897;</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px">Monitoreo intraoperatorio:</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-etco2" checked> EtCO2</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-pam" checked> PAM</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-ecg" checked> ECG</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-sato2" checked> SAT O2</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-pani" checked> PANI</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-decub"> PROT.DECUB.</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-emerg"> EMERGENCIA</label>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:14px">
+        <label>Signos vitales intraoperatorios — Generación por curva</label>
+        <p style="font-size:11px;color:var(--text3);margin-bottom:10px">Ingresá los valores base y la evolución. El sistema genera la tabla completa según la duración de la cirugía.</p>
+        <div class="g2" style="margin-bottom:8px">
+          <div class="field"><label>TA Sist. base</label><input class="fi" type="number" id="sv-sist" placeholder="120" min="60" max="250"></div>
+          <div class="field"><label>TA Diast. base</label><input class="fi" type="number" id="sv-diast" placeholder="75" min="40" max="150"></div>
+        </div>
+        <div class="g2" style="margin-bottom:8px">
+          <div class="field"><label>FC base</label><input class="fi" type="number" id="sv-fc" placeholder="75" min="40" max="180"></div>
+          <div class="field"><label>SAT O2 base (%)</label><input class="fi" type="number" id="sv-sat" placeholder="98" min="85" max="100"></div>
+        </div>
+        <div class="g2" style="margin-bottom:10px">
+          <div class="field"><label>EtCO2 base</label><input class="fi" type="number" id="sv-eco2" placeholder="35" min="20" max="60"></div>
+          <div class="field"><label>PAM base</label><input class="fi" type="number" id="sv-pam" placeholder="90" min="40" max="160"></div>
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <label>Evolución durante la cirugía</label>
+          <select class="fi" id="sv-evol">
+            <option value="estable">Estable (variación mínima ±5%)</option>
+            <option value="leve_descenso">Leve descenso inicial y recuperación</option>
+            <option value="descenso_mod">Descenso moderado sostenido (~15%)</option>
+            <option value="leve_aumento">Leve aumento (cirugía dolorosa/stress)</option>
+            <option value="variable">Variable (oscilante)</option>
+          </select>
+        </div>
+        <button class="btn btn-g" onclick="generarCurvaVitales()" style="margin-bottom:10px">&#9685; Generar curva de signos vitales</button>
+        <div id="mayo-vitals-preview" style="display:none">
+          <div style="font-size:11px;color:var(--green);margin-bottom:6px" id="mayo-vitals-info"></div>
+          <div style="overflow-x:auto">
+            <table style="border-collapse:collapse;font-size:11px;min-width:400px" id="mayo-vitals-table">
+              <thead>
+                <tr style="background:var(--bg3)">
+                  <th style="border:1px solid var(--border);padding:4px 6px">MIN</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">SIST</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">DIAST</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">SAT</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">CO2</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">FC</th>
+                  <th style="border:1px solid var(--border);padding:4px 6px">PAM</th>
+                </tr>
+              </thead>
+              <tbody id="mayo-vitals-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Campos ocultos — datos guardados desde card Fluidos -->
+      <div style="display:none">
+        <input type="text" id="fj-fluido1">
+        <input type="text" id="fj-fluido2">
+      </div>
+      <button class="btn btn-b" style="margin-top:10px;width:100%" onclick="go('geclisa')">&#127973; Ver Guía GECLISA completa</button>
+      </div><!-- /mayo-helper-body -->
+      <!-- Botón Enviar a GECLISA siempre visible -->
+      <button class="btn btn-b" style="width:100%;margin-top:10px;font-size:14px;padding:12px" onclick="abrirGeclisa()">&#127973; Enviar a GECLISA</button>
+    </div>
+  </div>
+  <div class="card" id="aero-tiempos-wrap" style="display:none">
+    <div class="ct">&#9200; Tiempos quir&#250;rgicos</div>
+    <div class="g2" style="margin-bottom:6px">
+      <div class="field"><label>Hora inicio cirug&#237;a</label><input class="fi" type="time" id="vg-inicio"></div>
+      <div class="field"><label>Hora fin cirug&#237;a</label><input class="fi" type="time" id="vg-fin" onchange="document.getElementById('fj-fin').value=this.value"></div>
+    </div>
+    <div class="g2" style="margin-bottom:6px">
+      <div class="field"><label>Hora inicio anestesia / intubaci&#243;n</label><input class="fi" type="time" id="fj-hint-vis" onchange="document.getElementById('fj-hint').value=this.value"></div>
+      <div class="field"><label>Hora fin anestesia / extubaci&#243;n</label><input class="fi" type="time" id="fj-hext-vis" onchange="document.getElementById('fj-hext').value=this.value"></div>
+    </div>
+  </div>
+  <div class="card" id="vitals-card">
+    <div class="ct">Gr&#225;fico intraoperatorio</div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:8px">Cada cuadrado = 12.5 unidades &middot; Y: 0&ndash;200 &middot; X: tiempo c/5 min</p>
+    <div id="aero-prediccion-wrap">
+      <p style="font-size:11px;color:var(--text3);margin-bottom:8px">Ingresá los valores base y el sistema predice el gráfico automáticamente.</p>
+      <div class="g2" style="margin-bottom:6px">
+        <div class="field"><label>TA Sist. base</label><input class="fi" type="number" id="aero-sist" placeholder="120" min="60" max="250"></div>
+        <div class="field"><label>TA Diast. base</label><input class="fi" type="number" id="aero-diast" placeholder="75" min="40" max="150"></div>
+      </div>
+      <div class="g2" style="margin-bottom:6px">
+        <div class="field"><label>FC base</label><input class="fi" type="number" id="aero-fc" placeholder="75" min="40" max="180"></div>
+        <div class="field"><label>SAT O2 base (%)</label><input class="fi" type="number" id="aero-sat" placeholder="98" min="85" max="100"></div>
+      </div>
+      <div class="g2" style="margin-bottom:6px">
+        <div class="field"><label>EtCO2 base</label><input class="fi" type="number" id="aero-eco2" placeholder="35" min="20" max="60"></div>
+        <div class="field"><label>Resp. base</label><input class="fi" type="number" id="aero-resp" placeholder="14" min="8" max="40"></div>
+      </div>
+      <div class="field" style="margin-bottom:10px">
+        <label>Evolución durante la cirugía</label>
+        <select class="fi" id="aero-evol">
+          <option value="estable">Estable (variación mínima ±5%)</option>
+          <option value="leve_descenso">Leve descenso inicial y recuperación</option>
+          <option value="descenso_mod">Descenso moderado sostenido (~15%)</option>
+          <option value="leve_aumento">Leve aumento (cirugía dolorosa/stress)</option>
+          <option value="variable">Variable (oscilante)</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-g" style="margin-bottom:8px;font-size:13px" onclick="generarColumnas()">&#9200; Generar y predecir gráfico</button>
+    <div style="margin-bottom:10px">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:6px;font-weight:500">Par&#225;metro activo:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px" id="param-selector">
+        <button class="param-btn active" data-p="resp" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--green);color:var(--green);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Resp &#9675;</button>
+        <button class="param-btn" data-p="pulso" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Pulso &#9679;</button>
+        <button class="param-btn" data-p="ta" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">T.A. )(</button>
+        <button class="param-btn" data-p="oximet" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">OXIMET &mdash;</button>
+        <button class="param-btn" data-p="co2" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">CO&#8322; &#9633;</button>
+        <button class="param-btn" data-p="operac" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Operac &#9632;</button>
+        <button class="param-btn" data-p="anest" onclick="selParam(this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Anestes &#215;</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <div id="vitals-grid-wrap"><p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Gener&#225; las columnas para empezar</p></div>
+    </div>
+    <button class="btn btn-s" style="margin-top:8px;font-size:12px" onclick="limpiarGrafico()">&#128465; Limpiar</button>
+  </div>
+  <div class="card">
+    <div class="ct">Fluidos</div>
+    <div class="g2">
+      <div class="field"><label>Suero</label>
+        <select class="fi" id="fj-suero"><option value="">—</option><option>250 ml</option><option>500 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option></select>
+      </div>
+      <div class="field"><label>Sangre (Glóbulos rojos)</label>
+        <select class="fi" id="fj-sangre"><option value="">—</option><option>0 ml</option><option>250 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option><option>1 unidad (~275 ml)</option><option>2 unidades (~550 ml)</option><option>3 unidades (~825 ml)</option><option>4 unidades (~1100 ml)</option><option>5 unidades (~1375 ml)</option><option>6 unidades (~1650 ml)</option><option>7 unidades (~1925 ml)</option><option>8 unidades (~2200 ml)</option><option>9 unidades (~2475 ml)</option><option>10 unidades (~2750 ml)</option></select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>Plasma Fresco Congelado</label>
+        <select class="fi" id="fj-plasma"><option value="">—</option><option>0 ml</option><option>200 ml</option><option>400 ml</option><option>600 ml</option><option>800 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>1 unidad (~225 ml)</option><option>2 unidades (~450 ml)</option><option>3 unidades (~675 ml)</option><option>4 unidades (~900 ml)</option><option>5 unidades (~1125 ml)</option><option>6 unidades (~1350 ml)</option><option>7 unidades (~1575 ml)</option><option>8 unidades (~1800 ml)</option><option>9 unidades (~2025 ml)</option><option>10 unidades (~2250 ml)</option></select>
+      </div>
+      <div class="field"><label>Orina / Diuresis</label>
+        <select class="fi" id="fj-orina"><option value="">—</option><option>0 ml</option><option>100 ml</option><option>200 ml</option><option>300 ml</option><option>400 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option><option>4000 ml</option><option>5000 ml</option><option>6000 ml</option></select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>Sangrado intraoperatorio</label>
+        <select class="fi" id="fj-sangrado"><option value="">—</option><option>0 ml</option><option>50 ml</option><option>100 ml</option><option>200 ml</option><option>300 ml</option><option>500 ml</option><option>750 ml</option><option>1000 ml</option><option>1500 ml</option><option>2000 ml</option><option>2500 ml</option><option>3000 ml</option><option>4000 ml</option><option>5000 ml</option></select>
+      </div>
+      <div class="field"><label>Otro (especificar)</label>
+        <input class="fi" type="text" id="fj-otro" placeholder="ej: Coloides 500ml, Plaquetas 1u">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Recuperación</div>
+    <div class="field" style="margin-bottom:10px">
+      <label>Escala de Aldrete</label>
+      <div id="aldrete-chips">
+        <select class="fi" onchange="if(this.value)setAldrete(this.value)">
+          <option value="">— Puntaje Aldrete —</option>
+          <option value="1">1/10</option><option value="2">2/10</option>
+          <option value="3">3/10</option><option value="4">4/10</option>
+          <option value="5">5/10</option><option value="6">6/10</option>
+          <option value="7">7/10</option><option value="8">8/10</option>
+          <option value="9">9/10</option><option value="10">10/10</option>
+        </select>
+      </div>
+      <input class="fi" type="text" id="fj-aldrete" placeholder="Aldrete .../10" style="margin-top:8px" readonly>
+    </div>
+    <div id="recup-selects" style="margin-bottom:10px"></div>
+    <div class="chips" id="recup-chips" style="margin-bottom:8px"></div>
+    <div class="fr" style="align-items:flex-start">
+      <textarea class="fi" id="fj-recup" placeholder="Observaciones adicionales de recuperación..."></textarea>
+      <button class="mic" id="m-recup" onclick="mic('fj-recup','m-recup')">&#127897;</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Observaciones</div>
+    <div class="fr" style="align-items:flex-start">
+      <textarea class="fi" id="fj-obs" placeholder="Inducción satisfactoria..."></textarea>
+      <button class="mic" id="m-obs" onclick="mic('fj-obs','m-obs')">&#127897;</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Firma digital (opcional)</div>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:8px">Firmá con el dedo — aparece en negro en la foja imprimible</p>
+    <canvas id="sign-canvas"></canvas>
+    <div class="brow" style="margin-top:8px">
+      <button class="btn btn-s" style="font-size:13px" onclick="clearSign()">✕ Borrar</button>
+      <button class="btn btn-g" style="font-size:13px" onclick="saveSign()">💾 Guardar firma</button>
+    </div>
+  </div>
+
+  <div class="brow" style="margin-bottom:24px">
+    <button class="btn btn-s" id="btn-imprimir-foja" onclick="imprimirFoja()">&#128424; Imprimir foja</button>
+    <button class="btn btn-g" onclick="guardarFoja()">&#128190; Guardar foja</button>
+  </div>
+</div>
+</div>
+
