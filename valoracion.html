@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Valoración preanestésica — AnesFact</title>
 <meta name="theme-color" content="#0284c7">
-<link rel="stylesheet" href="styles.css?v=8.8">
+<link rel="stylesheet" href="styles.css?v=8.9">
 <style>
 .chip.sel{background:rgba(29,185,84,.15);border-color:var(--green);color:var(--green)}
 #val-ok{display:none;text-align:center;padding:40px 16px}
@@ -20,7 +20,15 @@
 .est-btn.has-file{border-style:solid;border-color:var(--green);color:var(--green)}
 .est-btn input{display:none}
 .est-list{font-size:12px;color:var(--text2);margin-top:10px}
-.est-item{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
+.org-block{margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.org-block:last-child{border-bottom:none}
+.org-q{font-size:14px;font-weight:500;margin-bottom:6px}
+.org-yesno{display:flex;gap:8px;margin:8px 0 4px}
+.org-yesno .chip{min-width:64px;text-align:center}
+.org-yesno .chip.sel-no{background:rgba(248,81,73,.12);border-color:var(--red);color:var(--red)}
+.org-yesno .chip.sel-yes{background:rgba(29,185,84,.15);border-color:var(--green);color:var(--green)}
+.org-items{margin-top:8px;display:none}
+.org-items.open{display:block}
 </style>
 </head>
 <body>
@@ -76,17 +84,24 @@
           <div class="field"><label>Altura (cm)</label><input class="fi" type="number" id="v-talla" step="1" min="0" placeholder="Ej. 170"></div>
         </div>
         <div class="field"><label>Peso / altura (IMC)</label><input class="fi" id="v-imc" readonly placeholder="Se calcula solo"></div>
-        <div class="field ac-wrap"><label>Obra social o prepaga</label>
-          <input class="fi" id="v-obra" placeholder="Empezá a escribir: OSDE, PAMI, IOSFA..." autocomplete="off">
+        <div class="field"><label>Provincia donde vive o tiene la cobertura</label>
+          <select class="fi" id="v-prov-obra"></select>
+        </div>
+        <div class="field ac-wrap"><label>Obra social, mutual o prepaga</label>
+          <input class="fi" id="v-obra" placeholder="Escriba: OSDE, PAMI, IOMA, APROSS..." autocomplete="off">
           <div class="ac-list" id="ac-v-obra"></div>
+          <p class="val-hint">Primero elija provincia. Después escriba y elija de la lista.</p>
         </div>
         <div class="field"><label>N° de afiliado / credencial</label><input class="fi" id="v-afil"></div>
       </div>
 
       <div class="card">
-        <div class="ct">Enfermedades que tengo (tocá las que correspondan)</div>
-        <p class="val-hint">No hace falta saber siglas médicas. Elegí lo que le dijeron alguna vez a un médico.</p>
-        <div class="chips" id="v-ant-chips"></div>
+        <div class="ct">Sus enfermedades (por partes del cuerpo)</div>
+        <p class="val-hint">Para cada parte del cuerpo: tocá <strong>No</strong> o <strong>Sí</strong>. Si es Sí, elegí lo que le dijo un médico.</p>
+        <div id="v-organos"></div>
+        <div class="field" style="margin-top:10px"><label>Otra enfermedad que no esté en la lista</label>
+          <input class="fi" id="v-enf-otra" placeholder="Ej. lupus, artritis">
+        </div>
         <hr class="hr">
         <div class="field ac-wrap"><label>¿Toma algo para <strong>fluidificar la sangre</strong>? (aspirina, Plavix, Sintrom, etc.)</label>
           <input class="fi" id="v-anticoag-farm" placeholder="Ej. aspirina 100, Plavix, Xarelto..." autocomplete="off">
@@ -99,7 +114,7 @@
 
       <div class="card">
         <div class="ct">Medicamentos que toma todos los días</div>
-        <p class="val-hint">Escriba las primeras letras y elija de la lista. Si no aparece, escriba el nombre como figure en la caja.</p>
+        <p class="val-hint">Escriba el nombre comercial (Plavix, Enertiv) o la droga (clopidogrel). Elija de la lista.</p>
         <div id="v-meds"></div>
         <button type="button" class="btn btn-s" style="margin-top:6px;font-size:13px;padding:10px" id="v-med-add">+ Agregar otro medicamento</button>
       </div>
@@ -157,9 +172,10 @@
   </div>
 </div>
 <script src="js/supabase-keepalive.js?v=8.0"></script>
-<script src="js/00-env.js?v=8.8"></script>
-<script src="data/obras-sociales.js?v=8.8"></script>
-<script src="data/medicacion-habitual.js?v=8.8"></script>
-<script src="js/valoracion-form.js?v=8.8"></script>
+<script src="js/00-env.js?v=8.9"></script>
+<script src="data/obras-sociales-ar.js?v=8.9"></script>
+<script src="data/organos-enfermedades.js?v=8.9"></script>
+<script src="data/medicacion-habitual.js?v=8.9"></script>
+<script src="js/valoracion-form.js?v=8.9"></script>
 </body>
 </html>

@@ -1,18 +1,6 @@
 (function () {
   var TOKEN = '';
-  var ANT_CHIPS = [
-    { k: 'HTA', label: 'Presión alta' },
-    { k: 'DBT2', label: 'Diabetes' },
-    { k: 'Cardiopatía', label: 'Problemas del corazón' },
-    { k: 'MCP', label: 'Marcapasos o desfibrilador' },
-    { k: 'IRC', label: 'Riñones (insuficiencia renal)' },
-    { k: 'EPOC', label: 'Pulmones / EPOC (falta de aire crónica)' },
-    { k: 'Asma', label: 'Asma' },
-    { k: 'SAOS', label: 'Ronca mucho / apnea del sueño' },
-    { k: 'Obesidad', label: 'Sobrepeso u obesidad' },
-    { k: 'Embarazo', label: 'Embarazo' },
-  ];
-  var antSel = {};
+  var organState = {};
   var estudiosFiles = [];
   var MAX_ESTUDIOS = 3;
   var MAX_KB = 600;
@@ -46,22 +34,34 @@
         t = t.parentNode;
       }
       if (!t || !t.classList.contains('ac-item')) return;
-      var idx = parseInt(t.getAttribute('data-i'), 10);
-      if (!isNaN(idx)) onPick(items[idx]);
+      onPick(items[parseInt(t.getAttribute('data-i'), 10)]);
       closeAllAc();
     };
     el.style.display = 'block';
   }
 
+  function initProvincias() {
+    var sel = $('v-prov-obra');
+    if (!sel || typeof OBRAS_PROVINCIAS === 'undefined') return;
+    sel.innerHTML = OBRAS_PROVINCIAS.map(function (p) {
+      return '<option value="' + p.id + '">' + esc(p.label) + '</option>';
+    }).join('');
+    sel.value = 'nacional';
+  }
+
   function wireObraAc() {
     var inp = $('v-obra');
-    if (!inp || typeof OBRAS_SOCIALES === 'undefined') return;
-    inp.addEventListener('input', function () {
+    var prov = $('v-prov-obra');
+    if (!inp || typeof obrasListaProvincia !== 'function') return;
+    function buscar() {
       var q = inp.value.toLowerCase();
       if (q.length < 1) { closeAllAc(); return; }
-      var hits = OBRAS_SOCIALES.filter(function (x) { return x.toLowerCase().indexOf(q) >= 0; }).slice(0, 10);
+      var lista = obrasListaProvincia(prov ? prov.value : 'nacional');
+      var hits = lista.filter(function (x) { return x.toLowerCase().indexOf(q) >= 0; }).slice(0, 12);
       renderAc('ac-v-obra', hits, function (x) { return x; }, null, function (x) { inp.value = x; });
-    });
+    }
+    inp.addEventListener('input', buscar);
+    if (prov) prov.addEventListener('change', function () { inp.value = ''; closeAllAc(); });
     inp.addEventListener('blur', function () { setTimeout(closeAllAc, 150); });
   }
 
@@ -77,6 +77,91 @@
     inp.addEventListener('blur', function () { setTimeout(closeAllAc, 150); });
   }
 
+  function renderOrganos() {
+    var box = $('v-organos');
+    if (!box || typeof ORGANOS_ENF === 'undefined') return;
+    box.innerHTML = '';
+    ORGANOS_ENF.forEach(function (org) {
+      organState[org.id] = { answer: null, selected: {} };
+      var block = document.createElement('div');
+      block.className = 'org-block';
+      block.innerHTML =
+        '<div class="org-q">' + esc(org.pregunta) + '</div>' +
+        '<div class="org-yesno">' +
+        '<button type="button" class="chip" data-org="' + org.id + '" data-ans="no">No</button>' +
+        '<button type="button" class="chip" data-org="' + org.id + '" data-ans="si">Sí</button>' +
+        '</div>' +
+        '<div class="org-items" id="org-items-' + org.id + '"><div class="chips"></div></div>';
+      var chipsBox = block.querySelector('.org-items .chips');
+      org.items.forEach(function (it, idx) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip';
+        b.textContent = it.label;
+        b.setAttribute('data-org', org.id);
+        b.setAttribute('data-idx', String(idx));
+        b.onclick = function () {
+          var st = organState[org.id];
+          var key = org.id + '-' + idx;
+          if (st.selected[key]) { delete st.selected[key]; b.classList.remove('sel'); }
+          else { st.selected[key] = it; b.classList.add('sel'); }
+        };
+        chipsBox.appendChild(b);
+      });
+      block.querySelectorAll('.org-yesno .chip').forEach(function (btn) {
+        btn.onclick = function () {
+          var oid = btn.getAttribute('data-org');
+          var ans = btn.getAttribute('data-ans');
+          organState[oid].answer = ans;
+          block.querySelectorAll('.org-yesno .chip').forEach(function (b) {
+            b.classList.remove('sel-no', 'sel-yes');
+          });
+          btn.classList.add(ans === 'si' ? 'sel-yes' : 'sel-no');
+          var itemsEl = $('org-items-' + oid);
+          if (itemsEl) {
+            if (ans === 'si') itemsEl.classList.add('open');
+            else {
+              itemsEl.classList.remove('open');
+              organState[oid].selected = {};
+              itemsEl.querySelectorAll('.chip.sel').forEach(function (c) { c.classList.remove('sel'); });
+            }
+          }
+        };
+      });
+      box.appendChild(block);
+    });
+  }
+
+  function collectOrganos() {
+    var organos = {};
+    var chips = [];
+    var detalle = [];
+    ORGANOS_ENF.forEach(function (org) {
+      var st = organState[org.id] || { answer: null, selected: {} };
+      var itemsP = [];
+      var itemsM = [];
+      Object.keys(st.selected).forEach(function (k) {
+        var it = st.selected[k];
+        itemsP.push(it.label);
+        if (it.chip && chips.indexOf(it.chip) < 0) chips.push(it.chip);
+        itemsM.push(it.chip);
+        detalle.push({ organo: org.id, organo_label: org.label, paciente: it.label, medico: it.chip });
+      });
+      organos[org.id] = {
+        pregunta: org.pregunta,
+        tiene_problema: st.answer === 'si',
+        respondio: st.answer === 'si' || st.answer === 'no',
+        items_paciente: itemsP,
+        items_medico: itemsM,
+      };
+    });
+    var otra = ($('v-enf-otra') && $('v-enf-otra').value.trim()) || '';
+    if (otra) {
+      detalle.push({ organo: 'otra', paciente: otra, medico: 'Otra' });
+    }
+    return { organos: organos, chips: chips, chips_detalle: detalle, otra_texto: otra || null };
+  }
+
   function calcImc() {
     var p = parseFloat($('v-peso').value);
     var t = parseFloat($('v-talla').value);
@@ -86,44 +171,29 @@
     else out.value = '';
   }
 
-  function renderAntChips() {
-    var box = $('v-ant-chips');
-    if (!box) return;
-    box.innerHTML = '';
-    ANT_CHIPS.forEach(function (c) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'chip' + (antSel[c.k] ? ' sel' : '');
-      b.textContent = c.label;
-      b.onclick = function () {
-        antSel[c.k] = !antSel[c.k];
-        b.classList.toggle('sel', !!antSel[c.k]);
-      };
-      box.appendChild(b);
-    });
-  }
-
   function medRow(data) {
     var wrap = document.createElement('div');
     wrap.className = 'med-row';
     var uid = 'med-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
     wrap.innerHTML =
-      '<div class="ac-wrap" style="grid-column:1/-1"><input class="fi med-n" placeholder="Nombre del medicamento" value="' + esc(data && data.nombre) + '" autocomplete="off">' +
+      '<div class="ac-wrap" style="grid-column:1/-1"><input class="fi med-n" placeholder="Nombre comercial o droga" value="' + esc(data && data.nombre) + '" autocomplete="off">' +
       '<div class="ac-list" id="ac-' + uid + '"></div></div>' +
       '<input class="fi med-d" placeholder="Dosis (ej. 10 mg)" value="' + esc(data && data.dosis) + '">' +
-      '<input class="fi med-h" placeholder="Horario (ej. mañana)" value="' + esc(data && data.horario) + '">' +
-      '<input class="fi med-v" placeholder="Cómo lo toma (pastilla, inyección)" value="' + esc(data && data.via) + '" style="grid-column:1/-1">';
+      '<input class="fi med-h" placeholder="Horario" value="' + esc(data && data.horario) + '">' +
+      '<input class="fi med-v" placeholder="Pastilla / inyección" value="' + esc(data && data.via) + '" style="grid-column:1/-1">';
+    if (data && data.nombre_comercial) {
+      wrap.dataset.comercial = data.nombre_comercial;
+    }
     var nInp = wrap.querySelector('.med-n');
     var acId = 'ac-' + uid;
     nInp.addEventListener('input', function () {
-      if (typeof MED_HABITUAL === 'undefined') return;
-      var q = nInp.value.toLowerCase();
-      if (q.length < 2) { $(acId).style.display = 'none'; return; }
-      var hits = MED_HABITUAL.filter(function (d) {
-        return d.n.toLowerCase().indexOf(q) >= 0 || d.cat.toLowerCase().indexOf(q) >= 0;
-      }).slice(0, 8);
-      renderAc(acId, hits, function (d) { return d.n; }, function (d) { return d.cat; }, function (d) {
+      if (typeof medHabitualMatch !== 'function') return;
+      var q = nInp.value;
+      if (q.length < 2) { var el = $(acId); if (el) el.style.display = 'none'; return; }
+      var hits = MED_HABITUAL.filter(function (d) { return medHabitualMatch(d, q); }).slice(0, 10);
+      renderAc(acId, hits, function (d) { return medHabitualLabel(d); }, function (d) { return d.cat; }, function (d) {
         nInp.value = d.n;
+        wrap.dataset.comercial = (d.comercial && d.comercial[0]) || '';
         wrap.querySelector('.med-d').value = d.doses[0] || '';
         wrap.querySelector('.med-h').value = d.horario || '';
         wrap.querySelector('.med-v').value = d.via || 'VO';
@@ -141,16 +211,13 @@
       if (!n) return;
       out.push({
         nombre: n,
+        nombre_comercial: r.dataset.comercial || null,
         dosis: r.querySelector('.med-d').value.trim(),
         horario: r.querySelector('.med-h').value.trim(),
         via: r.querySelector('.med-v').value.trim(),
       });
     });
     return out;
-  }
-
-  function chipList() {
-    return ANT_CHIPS.filter(function (c) { return antSel[c.k]; }).map(function (c) { return c.k; });
   }
 
   function renderEstList() {
@@ -163,8 +230,7 @@
     }).join('');
     box.querySelectorAll('button[data-i]').forEach(function (btn) {
       btn.onclick = function () {
-        var idx = parseInt(btn.getAttribute('data-i'), 10);
-        estudiosFiles.splice(idx, 1);
+        estudiosFiles.splice(parseInt(btn.getAttribute('data-i'), 10), 1);
         renderEstList();
         document.querySelectorAll('.est-btn').forEach(function (b) { b.classList.remove('has-file'); });
       };
@@ -176,28 +242,13 @@
       inp.addEventListener('change', function () {
         var file = inp.files && inp.files[0];
         if (!file) return;
-        if (estudiosFiles.length >= MAX_ESTUDIOS) {
-          showErr('Máximo ' + MAX_ESTUDIOS + ' fotos de estudios.');
-          inp.value = '';
-          return;
-        }
-        if (file.size > MAX_KB * 1024) {
-          showErr('La foto es muy pesada. Acercate más o saque otra más chica (máx. ' + MAX_KB + ' KB).');
-          inp.value = '';
-          return;
-        }
+        if (estudiosFiles.length >= MAX_ESTUDIOS) { showErr('Máximo ' + MAX_ESTUDIOS + ' fotos.'); inp.value = ''; return; }
+        if (file.size > MAX_KB * 1024) { showErr('Foto muy pesada (máx. ' + MAX_KB + ' KB).'); inp.value = ''; return; }
         var tipo = inp.getAttribute('data-tipo') || 'otro';
         var labels = { laboratorio: 'Laboratorio', ecg: 'Electrocardiograma', ecocardiograma: 'Ecocardiograma', espirometria: 'Espirometría', otro: 'Otro estudio' };
         var reader = new FileReader();
         reader.onload = function () {
-          estudiosFiles.push({
-            tipo: tipo,
-            label: labels[tipo] || tipo,
-            nombre: file.name,
-            mime: file.type || 'image/jpeg',
-            kb: Math.round(file.size / 1024),
-            data_b64: String(reader.result).split(',')[1] || '',
-          });
+          estudiosFiles.push({ tipo: tipo, label: labels[tipo] || tipo, nombre: file.name, mime: file.type || 'image/jpeg', kb: Math.round(file.size / 1024), data_b64: String(reader.result).split(',')[1] || '' });
           inp.closest('.est-btn').classList.add('has-file');
           renderEstList();
           hideErr();
@@ -208,17 +259,10 @@
     });
   }
 
-  function readEstudiosPayload() {
-    return {
-      archivos: estudiosFiles.map(function (f) {
-        return { tipo: f.tipo, nombre: f.nombre, mime: f.mime, kb: f.kb, data_b64: f.data_b64 };
-      }),
-      cantidad: estudiosFiles.length,
-    };
-  }
-
   function buildPayload() {
     var urg = $('v-urgencia').checked;
+    var org = collectOrganos();
+    var provEl = $('v-prov-obra');
     return {
       token: TOKEN,
       nombre: $('v-nombre').value.trim(),
@@ -233,10 +277,14 @@
         talla_cm: numOrNull($('v-talla').value),
         imc: numOrNull($('v-imc').value),
         obra_social: $('v-obra').value.trim() || null,
+        obra_social_provincia: provEl ? provEl.value : null,
         afiliado: $('v-afil').value.trim() || null,
       },
       antecedentes: {
-        chips: chipList(),
+        organos: org.organos,
+        chips: org.chips,
+        chips_detalle: org.chips_detalle,
+        otra_enfermedad: org.otra_texto,
         anticoag: {
           farmaco: $('v-anticoag-farm').value.trim() || null,
           ultima_dosis: $('v-anticoag-dosis').value.trim() || null,
@@ -249,13 +297,10 @@
         anestesias_previas: $('v-an-prev').value.trim() || null,
         problemas: $('v-prob-an').value.trim() || null,
       },
-      estudios_extraidos: readEstudiosPayload(),
+      estudios_extraidos: { archivos: estudiosFiles.map(function (f) { return { tipo: f.tipo, nombre: f.nombre, mime: f.mime, kb: f.kb, data_b64: f.data_b64 }; }), cantidad: estudiosFiles.length },
       extras: {
         es_urgencia: urg,
-        ayuno: urg ? {
-          solido: $('v-ayuno-solido').value || null,
-          liquido_claro: $('v-ayuno-liq').value || null,
-        } : null,
+        ayuno: urg ? { solido: $('v-ayuno-solido').value || null, liquido_claro: $('v-ayuno-liq').value || null } : null,
         funcional_escaleras: $('v-func-escalera').checked,
         tabaco: $('v-tabaco').value.trim() || null,
         alcohol: $('v-alcohol').value.trim() || null,
@@ -272,14 +317,8 @@
     return isNaN(n) ? null : n;
   }
 
-  function showErr(msg) {
-    $('val-err-msg').textContent = msg;
-    $('val-err').classList.add('on');
-  }
-
-  function hideErr() {
-    $('val-err').classList.remove('on');
-  }
+  function showErr(msg) { $('val-err-msg').textContent = msg; $('val-err').classList.add('on'); }
+  function hideErr() { $('val-err').classList.remove('on'); }
 
   function submitForm(e) {
     e.preventDefault();
@@ -292,7 +331,6 @@
     var btn = $('val-submit');
     btn.disabled = true;
     btn.textContent = 'Enviando…';
-
     fetch(afSupabaseUrl() + '/functions/v1/af-qr-submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: AF_SUPABASE_KEY },
@@ -303,9 +341,7 @@
         if (!res.ok || !res.j.ok) throw new Error((res.j && res.j.error) || 'No se pudo enviar');
         $('val-form-wrap').style.display = 'none';
         $('val-ok').style.display = 'block';
-        if (res.j.asa_sugerido) {
-          $('val-asa').textContent = 'Clasificación sugerida (orientativa): ASA ' + res.j.asa_sugerido;
-        }
+        if (res.j.asa_sugerido) $('val-asa').textContent = 'Clasificación sugerida (orientativa): ASA ' + res.j.asa_sugerido;
         window.scrollTo(0, 0);
       })
       .catch(function (err) {
@@ -320,7 +356,8 @@
     if (!TOKEN) return;
     $('val-invalid').classList.remove('on');
     $('val-form-wrap').style.display = 'block';
-    renderAntChips();
+    initProvincias();
+    renderOrganos();
     wireObraAc();
     wireAnticoagAc();
     wireEstudios();
@@ -328,13 +365,9 @@
     $('v-med-add').onclick = function () { $('v-meds').appendChild(medRow(null)); };
     $('v-peso').addEventListener('input', calcImc);
     $('v-talla').addEventListener('input', calcImc);
-    $('v-urgencia').addEventListener('change', function () {
-      $('v-ayuno-card').style.display = this.checked ? 'block' : 'none';
-    });
+    $('v-urgencia').addEventListener('change', function () { $('v-ayuno-card').style.display = this.checked ? 'block' : 'none'; });
     $('val-form').addEventListener('submit', submitForm);
-    document.addEventListener('click', function (e) {
-      if (!e.target.closest('.ac-wrap')) closeAllAc();
-    });
+    document.addEventListener('click', function (e) { if (!e.target.closest('.ac-wrap')) closeAllAc(); });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
