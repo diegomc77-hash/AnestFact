@@ -1,0 +1,6 @@
+# AnesFact — Edge Functions
+[functions.af-qr-create]
+verify_jwt = true
+
+[functions.af-qr-submit]
+verify_jwt = false
