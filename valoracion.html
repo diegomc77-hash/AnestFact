@@ -130,18 +130,10 @@
       </div>
 
       <div class="card">
-        <div class="ct">Estudios (foto o archivo)</div>
-        <p class="val-hint">Sacá foto, elegí de la galería o subí PDF. <strong>No guardamos el archivo</strong> — solo leemos si está normal o qué valores están alterados.</p>
-        <div class="est-grid">
-          <label class="est-btn" id="est-lab"><span style="font-size:22px">&#128203;</span><span>Laboratorio</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="laboratorio"></label>
-          <label class="est-btn" id="est-ecg"><span style="font-size:22px">&#128147;</span><span>Electrocardiograma</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="ecg"></label>
-          <label class="est-btn" id="est-eco"><span style="font-size:22px">&#128266;</span><span>Ecocardiograma</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="ecocardiograma"></label>
-          <label class="est-btn" id="est-espi"><span style="font-size:22px">&#127788;</span><span>Espirometría</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="espirometria"></label>
-        </div>
-        <label class="est-btn" style="margin-top:8px;width:100%" id="est-otro"><span style="font-size:22px">&#128247;</span><span>Otro estudio</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="otro"></label>
-        <div class="est-list" id="v-est-list"></div>
-        <details style="margin-top:14px">
-          <summary style="font-size:13px;color:var(--text2);cursor:pointer;padding:6px 0">No puedo sacar foto — cargar resultado a mano</summary>
+        <div class="ct">Estudios (laboratorio, electro, etc.)</div>
+        <p class="val-hint"><strong>Recomendado:</strong> escriba abajo si el informe está normal o qué está alterado. La foto automática es opcional (depende del servicio del médico).</p>
+        <details open style="margin-top:8px">
+          <summary style="font-size:14px;font-weight:600;color:var(--text);cursor:pointer;padding:6px 0">1. Cargar resultado (siempre funciona)</summary>
           <div style="margin-top:10px">
             <div class="field"><label>Tipo de estudio</label>
               <select class="fi" id="est-man-tipo">
@@ -160,11 +152,25 @@
               </select>
             </div>
             <div class="field"><label>Detalle (si sabe algo)</label>
-              <textarea class="fi" id="est-man-txt" placeholder="Ej. hemoglobina baja, ritmo sinusal normal, etc."></textarea>
+              <textarea class="fi" id="est-man-txt" placeholder="Ej. hemoglobina 10, creatinina normal, electro sin cambios"></textarea>
             </div>
-            <button type="button" class="btn btn-s" style="font-size:13px;padding:10px" id="est-man-save">Guardar estudio manual</button>
+            <button type="button" class="btn btn-g" style="font-size:13px;padding:10px" id="est-man-save">Guardar estudio</button>
+            <p class="val-hint" id="est-man-hint" style="display:none;color:var(--green);margin-top:8px"></p>
           </div>
         </details>
+        <details style="margin-top:14px">
+          <summary style="font-size:13px;color:var(--text2);cursor:pointer;padding:6px 0">2. Opcional — subir foto o PDF (lectura automática)</summary>
+          <p class="val-hint" style="margin-top:8px">Si no funciona, use el paso 1 de arriba. No se guarda la imagen.</p>
+        <div class="est-grid" style="margin-top:8px">
+          <label class="est-btn" id="est-lab"><span style="font-size:22px">&#128203;</span><span>Laboratorio</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="laboratorio"></label>
+          <label class="est-btn" id="est-ecg"><span style="font-size:22px">&#128147;</span><span>Electrocardiograma</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="ecg"></label>
+          <label class="est-btn" id="est-eco"><span style="font-size:22px">&#128266;</span><span>Ecocardiograma</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="ecocardiograma"></label>
+          <label class="est-btn" id="est-espi"><span style="font-size:22px">&#127788;</span><span>Espirometría</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="espirometria"></label>
+        </div>
+        <label class="est-btn" style="margin-top:8px;width:100%" id="est-otro"><span style="font-size:22px">&#128247;</span><span>Otro estudio</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="otro"></label>
+        </details>
+        <div class="est-list" id="v-est-list"></div>
+        <p class="val-hint" id="est-resumen-count" style="display:none;margin-top:8px;color:var(--green);font-weight:600"></p>
       </div>
 
       <div class="card">
@@ -211,6 +217,6 @@
 <script src="data/obras-sociales-ar.js?v=9.0"></script>
 <script src="data/organos-enfermedades.js?v=9.0"></script>
 <script src="data/medicacion-habitual.js?v=9.0"></script>
-<script src="js/valoracion-form.js?v=9.2"></script>
+<script src="js/valoracion-form.js?v=9.3"></script>
 </body>
 </html>

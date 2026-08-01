@@ -324,7 +324,7 @@
     }
     estudiosExtraidos[tipo] = { extracted: extracted, leido_at: new Date().toISOString(), fuente: 'manual' };
     renderEstList();
-    hideErr();
+    showEstSaved(tipo, 'escrito por usted');
     if ($('est-man-txt')) $('est-man-txt').value = '';
   }
 
@@ -358,11 +358,13 @@
     if (!box) return;
     var keys = Object.keys(estudiosExtraidos);
     if (!keys.length) { box.innerHTML = ''; return; }
-    var labels = { laboratorio: 'Laboratorio', ecg: 'Electrocardiograma', ecocardiograma: 'Ecocardiograma', espirometria: 'Espirometría', otro: 'Otro estudio' };
+    var labels = EST_LABELS;
     box.innerHTML = keys.map(function (tipo) {
       var item = estudiosExtraidos[tipo];
       var ex = item.extracted || {};
-      return '<div class="est-res ' + estResClass(ex) + '"><strong>' + esc(labels[tipo] || tipo) + '</strong><br>' +
+      var via = item.fuente === 'manual' ? ' · usted escribió' : (item.fuente === 'ia' ? ' · leído de foto' : '');
+      return '<div class="est-res ' + estResClass(ex) + '"><strong>✓ ' + esc(labels[tipo] || tipo) + ' guardado</strong>' +
+        '<span style="font-size:11px;color:var(--text3)">' + esc(via) + '</span><br>' +
         esc(estResText(ex)) +
         ' <button type="button" class="btn btn-s" style="width:auto;padding:3px 8px;font-size:11px;margin-top:6px" data-t="' + tipo + '">Quitar</button></div>';
     }).join('');
@@ -371,8 +373,10 @@
         delete estudiosExtraidos[btn.getAttribute('data-t')];
         document.querySelectorAll('.est-btn').forEach(function (b) { b.classList.remove('has-file'); });
         renderEstList();
+        updateEstCount();
       };
     });
+    updateEstCount();
   }
 
   function extractEstudio(tipo, mime, dataB64, btnEl) {
@@ -386,11 +390,11 @@
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (res) {
         if (!res.ok || !res.j.ok) throw new Error((res.j && res.j.error) || 'No se pudo leer');
-        estudiosExtraidos[tipo] = { extracted: res.j.extracted, leido_at: new Date().toISOString() };
+        estudiosExtraidos[tipo] = { extracted: res.j.extracted, leido_at: new Date().toISOString(), fuente: 'ia' };
         if (btnEl) btnEl.classList.add('has-file');
         if (slot) slot.innerHTML = '';
         renderEstList();
-        hideErr();
+        showEstSaved(tipo, 'leído de foto');
       })
       .catch(function (err) {
         if (slot) slot.innerHTML = '';
@@ -491,6 +495,32 @@
     return isNaN(n) ? null : n;
   }
 
+  var EST_LABELS = { laboratorio: 'Laboratorio', ecg: 'Electrocardiograma', ecocardiograma: 'Ecocardiograma', espirometria: 'Espirometría', otro: 'Otro estudio' };
+
+  function updateEstCount() {
+    var n = Object.keys(estudiosExtraidos).length;
+    var el = $('est-resumen-count');
+    if (!el) return;
+    if (n > 0) {
+      el.style.display = 'block';
+      el.textContent = '✓ ' + n + ' estudio(s) guardado(s) — puede enviar el formulario.';
+    } else {
+      el.style.display = 'none';
+    }
+  }
+
+  function showEstSaved(tipo, via) {
+    var labels = EST_LABELS;
+    var hint = $('est-man-hint');
+    if (hint) {
+      hint.style.display = 'block';
+      hint.textContent = '✓ ' + (labels[tipo] || tipo) + ' guardado (' + via + ').';
+    }
+    updateEstCount();
+    hideErr();
+    var list = $('v-est-list');
+    if (list) list.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
   function openManualEstudios(tipo) {
     var details = document.querySelector('#val-form details');
     if (details) details.open = true;
@@ -501,10 +531,10 @@
   function friendlyEstudioErr(msg) {
     var m = (msg || '').toLowerCase();
     if (m.indexOf('quota') >= 0 || m.indexOf('límite') >= 0 || m.indexOf('limit') >= 0 || m.indexOf('carga manual') >= 0) {
-      return 'No pudimos leer la foto automáticamente (límite del servicio). Abrí "cargar a mano" abajo y escriba si está normal o qué está alterado.';
+      return 'Lectura automática no disponible ahora. Use el paso 1 (arriba): escriba si está normal o qué está alterado.';
     }
     if (m.indexOf('comprimir') >= 0) return msg;
-    return 'No se pudo leer la foto. Use "cargar a mano" más abajo.';
+    return 'No se pudo leer la foto. Use el paso 1 de arriba (escribir resultado).';
   }
 
   function showErr(msg) { $('val-err-msg').textContent = msg; $('val-err').classList.add('on'); }
