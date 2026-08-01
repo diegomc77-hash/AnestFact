@@ -2,8 +2,8 @@
   var TOKEN = '';
   var organState = {};
   var estudiosExtraidos = {};
-  var MAX_ESTUDIOS = 3;
-  var MAX_KB = 800;
+  var MAX_ESTUDIOS = 5;
+  var MAX_SEND_KB = 1200;
 
   function $(id) { return document.getElementById(id); }
 
@@ -241,6 +241,98 @@
     return out;
   }
 
+  function prepareFileForExtract(file) {
+    return new Promise(function (resolve, reject) {
+      if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
+        if (file.size > 5 * 1024 * 1024) {
+          reject(new Error('PDF muy grande. Use carga manual abajo.'));
+          return;
+        }
+        var r = new FileReader();
+        r.onload = function () {
+          resolve({ mime: 'application/pdf', b64: String(r.result).split(',')[1] || '' });
+        };
+        r.onerror = function () { reject(new Error('No se pudo leer el PDF')); };
+        r.readAsDataURL(file);
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        reject(new Error('Use foto (JPG/PNG) o PDF.'));
+        return;
+      }
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var maxW = 1600;
+        var w = img.width;
+        var h = img.height;
+        if (w > maxW) {
+          h = Math.round(h * maxW / w);
+          w = maxW;
+        }
+        var canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        var q = 0.85;
+        function tryExport() {
+          var dataUrl = canvas.toDataURL('image/jpeg', q);
+          var b64 = dataUrl.split(',')[1] || '';
+          var kb = Math.round(b64.length * 0.75 / 1024);
+          if (kb > MAX_SEND_KB && q > 0.4) {
+            q -= 0.08;
+            tryExport();
+            return;
+          }
+          if (kb > MAX_SEND_KB) {
+            reject(new Error('No se pudo comprimir la foto. Use “cargar a mano” abajo.'));
+            return;
+          }
+          resolve({ mime: 'image/jpeg', b64: b64, kb: kb });
+        }
+        tryExport();
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        reject(new Error('No se pudo abrir la imagen'));
+      };
+      img.src = url;
+    });
+  }
+
+  function saveManualEstudio() {
+    var tipo = ($('est-man-tipo') && $('est-man-tipo').value) || 'otro';
+    var res = ($('est-man-res') && $('est-man-res').value) || 'desconocido';
+    var txt = ($('est-man-txt') && $('est-man-txt').value.trim()) || '';
+    var labels = { laboratorio: 'Laboratorio', ecg: 'Electrocardiograma', ecocardiograma: 'Ecocardiograma', espirometria: 'Espirometría', otro: 'Otro estudio' };
+    var general = res === 'normal' ? 'normal' : (res === 'alterado' ? 'alterado' : 'no_legible');
+    var resumen = res === 'normal'
+      ? (labels[tipo] || tipo) + ': informado como normal por el paciente'
+      : (txt || (labels[tipo] || tipo) + ': sin detalle — revisar en consulta');
+    var extracted = {
+      tipo: tipo,
+      resultado_general: general,
+      resumen_paciente: resumen,
+      fuente: 'manual_paciente',
+      confianza: 'baja',
+    };
+    if (res === 'alterado' && txt) {
+      extracted.valores_alterados = [{ nombre: 'Detalle paciente', valor: txt, unidad: '', referencia: '', flag: 'alterado' }];
+      extracted.hallazgos = [txt];
+    }
+    estudiosExtraidos[tipo] = { extracted: extracted, leido_at: new Date().toISOString(), fuente: 'manual' };
+    renderEstList();
+    hideErr();
+    if ($('est-man-txt')) $('est-man-txt').value = '';
+  }
+
+  function wireManualEstudios() {
+    var btn = $('est-man-save');
+    if (btn) btn.onclick = saveManualEstudio;
+  }
+
   function estResClass(ex) {
     var g = ex && ex.resultado_general;
     if (g === 'normal') return 'ok';
@@ -285,7 +377,7 @@
 
   function extractEstudio(tipo, mime, dataB64, btnEl) {
     var slot = $('est-slot-' + tipo);
-    if (slot) slot.innerHTML = '<div class="est-spin">Leyendo informe…</div>';
+    if (slot) slot.innerHTML = '<div class="est-spin">Comprimiendo y leyendo informe…</div>';
     return fetch(afSupabaseUrl() + '/functions/v1/af-estudio-extract', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: AF_SUPABASE_KEY },
@@ -322,16 +414,15 @@
           showErr('Máximo ' + MAX_ESTUDIOS + ' estudios.');
           return;
         }
-        if (file.size > MAX_KB * 1024) {
-          showErr('Foto muy pesada (máx. ' + MAX_KB + ' KB). Acercate más.');
-          return;
-        }
-        var reader = new FileReader();
-        reader.onload = function () {
-          var b64 = String(reader.result).split(',')[1] || '';
-          extractEstudio(tipo, file.type || 'image/jpeg', b64, lbl);
-        };
-        reader.readAsDataURL(file);
+        if (slot) slot.innerHTML = '<div class="est-spin">Preparando archivo…</div>';
+        prepareFileForExtract(file)
+          .then(function (prep) {
+            return extractEstudio(tipo, prep.mime, prep.b64, lbl);
+          })
+          .catch(function (err) {
+            if (slot) slot.innerHTML = '';
+            showErr(err.message || 'Error con el archivo');
+          });
       });
     });
   }
@@ -442,6 +533,7 @@
     wireObraAc();
     wireAnticoagAc();
     wireEstudios();
+    wireManualEstudios();
     $('v-meds').appendChild(medRow(null));
     $('v-med-add').onclick = function () { $('v-meds').appendChild(medRow(null)); };
     $('v-peso').addEventListener('input', calcImc);

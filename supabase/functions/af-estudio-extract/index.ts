@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
   const mime = (body.mime || 'image/jpeg').trim();
 
   if (!token || !dataB64) return jsonResponse({ error: 'Faltan token o imagen' }, 400);
-  if (dataB64.length > 900_000) return jsonResponse({ error: 'Imagen muy grande' }, 400);
+  if (dataB64.length > 2_000_000) return jsonResponse({ error: 'Archivo muy grande tras comprimir' }, 400);
 
   const valid = await verifyQrToken(token);
   if (!valid.ok) return jsonResponse({ error: valid.error }, 403);
