@@ -2,6 +2,12 @@ const BASE = `Sos asistente médico. Leé la imagen del informe. Respondé SOLO 
 No inventes datos. Si no se lee bien: resultado_general="no_legible".
 Para el paciente usá palabras simples en resumen_paciente.`;
 
+const GEMINI_MODELS = [
+  'gemini-2.0-flash',
+  'gemini-1.5-flash',
+  'gemini-2.0-flash-lite',
+];
+
 export function promptForTipo(tipo: string): string {
   switch (tipo) {
     case 'laboratorio':
@@ -39,17 +45,26 @@ JSON:
   }
 }
 
-export async function extractFromImage(
-  tipo: string,
+function friendlyGeminiError(msg: string, status: number): string {
+  const m = (msg || '').toLowerCase();
+  if (status === 429 || m.includes('quota') || m.includes('rate limit') || m.includes('resource_exhausted')) {
+    return 'Límite de lectura automática alcanzado. Use "cargar a mano" más abajo.';
+  }
+  if (m.includes('api key') || m.includes('permission')) {
+    return 'Lectura automática no disponible. Use carga manual más abajo.';
+  }
+  return 'No se pudo leer el informe. Use carga manual más abajo.';
+}
+
+async function callGemini(
+  key: string,
+  model: string,
+  prompt: string,
   mime: string,
   dataB64: string,
-): Promise<Record<string, unknown>> {
-  const key = Deno.env.get('GEMINI_API_KEY');
-  if (!key) throw new Error('GEMINI_API_KEY no configurada en Supabase');
-
-  const prompt = promptForTipo(tipo);
+): Promise<{ ok: true; data: Record<string, unknown> } | { ok: false; status: number; msg: string }> {
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${key}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -66,14 +81,38 @@ export async function extractFromImage(
 
   const raw = await res.text();
   if (!res.ok) {
-    let msg = `Gemini HTTP ${res.status}`;
+    let msg = `HTTP ${res.status}`;
     try { msg = JSON.parse(raw).error?.message || msg; } catch { /* ignore */ }
-    throw new Error(msg);
+    return { ok: false, status: res.status, msg };
   }
 
   const api = JSON.parse(raw);
   const txt = api?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  if (!txt) throw new Error('No se pudo leer el estudio');
+  if (!txt) return { ok: false, status: 502, msg: 'Respuesta vacía' };
   const clean = txt.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
-  return JSON.parse(clean) as Record<string, unknown>;
+  return { ok: true, data: JSON.parse(clean) as Record<string, unknown> };
+}
+
+export async function extractFromImage(
+  tipo: string,
+  mime: string,
+  dataB64: string,
+): Promise<Record<string, unknown>> {
+  const key = Deno.env.get('GEMINI_API_KEY');
+  if (!key) throw new Error('Lectura automática no configurada. Use carga manual.');
+
+  const prompt = promptForTipo(tipo);
+  let lastStatus = 502;
+  let lastMsg = 'No se pudo leer';
+
+  for (const model of GEMINI_MODELS) {
+    const result = await callGemini(key, model, prompt, mime, dataB64);
+    if (result.ok) return result.data;
+    lastStatus = result.status;
+    lastMsg = result.msg;
+    const retryable = result.status === 429 || result.msg.toLowerCase().includes('quota');
+    if (!retryable) break;
+  }
+
+  throw new Error(friendlyGeminiError(lastMsg, lastStatus));
 }

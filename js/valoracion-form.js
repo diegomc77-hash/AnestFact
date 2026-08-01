@@ -394,7 +394,8 @@
       })
       .catch(function (err) {
         if (slot) slot.innerHTML = '';
-        showErr(err.message || 'Error al leer estudio');
+        openManualEstudios(tipo);
+        showErr(friendlyEstudioErr(err.message));
       });
   }
 
@@ -421,7 +422,8 @@
           })
           .catch(function (err) {
             if (slot) slot.innerHTML = '';
-            showErr(err.message || 'Error con el archivo');
+            openManualEstudios(tipo);
+            showErr(friendlyEstudioErr(err.message));
           });
       });
     });
@@ -487,6 +489,22 @@
   function numOrNull(v) {
     var n = parseFloat(v);
     return isNaN(n) ? null : n;
+  }
+
+  function openManualEstudios(tipo) {
+    var details = document.querySelector('#val-form details');
+    if (details) details.open = true;
+    if (tipo && $('est-man-tipo')) $('est-man-tipo').value = tipo;
+    if (details) details.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function friendlyEstudioErr(msg) {
+    var m = (msg || '').toLowerCase();
+    if (m.indexOf('quota') >= 0 || m.indexOf('límite') >= 0 || m.indexOf('limit') >= 0 || m.indexOf('carga manual') >= 0) {
+      return 'No pudimos leer la foto automáticamente (límite del servicio). Abrí "cargar a mano" abajo y escriba si está normal o qué está alterado.';
+    }
+    if (m.indexOf('comprimir') >= 0) return msg;
+    return 'No se pudo leer la foto. Use "cargar a mano" más abajo.';
   }
 
   function showErr(msg) { $('val-err-msg').textContent = msg; $('val-err').classList.add('on'); }
