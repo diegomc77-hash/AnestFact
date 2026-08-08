@@ -62,9 +62,35 @@ function mostrarModalQrValoracion(data) {
   var url = afPublicBaseUrl() + 'valoracion.html?t=' + encodeURIComponent(data.token);
   _qrModalEl().style.display = 'block';
   _qr$('qr-val-url').value = url;
-  _qr$('qr-val-img').src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(url);
+  var img = _qr$('qr-val-img');
+  function setQrSrc(dataUrl) {
+    if (dataUrl) {
+      img.src = dataUrl;
+      img.style.display = 'inline-block';
+    } else {
+      img.style.display = 'none';
+    }
+  }
+  function paint() {
+    if (typeof QRCode !== 'undefined' && typeof QRCode.toDataURL === 'function') {
+      QRCode.toDataURL(url, { width: 200, margin: 1, errorCorrectionLevel: 'M' }, function (err, dataUrl) {
+        setQrSrc(err ? null : dataUrl);
+      });
+      return;
+    }
+    setQrSrc(null);
+  }
+  if (typeof QRCode === 'undefined' || typeof QRCode.toDataURL !== 'function') {
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js';
+    s.onload = paint;
+    s.onerror = function () { setQrSrc(null); };
+    document.head.appendChild(s);
+  } else {
+    paint();
+  }
   var exp = data.expires_at ? new Date(data.expires_at).toLocaleDateString('es-AR') : '';
-  _qr$('qr-val-exp').textContent = exp ? 'Vence el ' + exp : '';
+  _qr$('qr-val-exp').textContent = exp ? 'Vence el ' + exp + ' · QR de consultorio (multi-paciente)' : 'QR de consultorio (multi-paciente)';
 }
 
 function crearQrValoracion() {

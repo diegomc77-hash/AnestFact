@@ -3,7 +3,6 @@
   var organState = {};
   var estudiosExtraidos = {};
   var MAX_ESTUDIOS = 5;
-  var MAX_SEND_KB = 1200;
 
   function $(id) { return document.getElementById(id); }
 
@@ -243,62 +242,20 @@
 
   function prepareFileForExtract(file) {
     return new Promise(function (resolve, reject) {
+      // Lectura automática: solo PDF de texto (PDF.js + parsers locales). Sin IA de pago.
       if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
-        if (file.size > 5 * 1024 * 1024) {
+        if (file.size > 8 * 1024 * 1024) {
           reject(new Error('PDF muy grande. Use carga manual abajo.'));
           return;
         }
-        var r = new FileReader();
-        r.onload = function () {
-          resolve({ mime: 'application/pdf', b64: String(r.result).split(',')[1] || '' });
-        };
-        r.onerror = function () { reject(new Error('No se pudo leer el PDF')); };
-        r.readAsDataURL(file);
+        resolve({ mime: 'application/pdf', file: file, name: file.name });
         return;
       }
-      if (!file.type.startsWith('image/')) {
-        reject(new Error('Use foto (JPG/PNG) o PDF.'));
+      if (file.type.startsWith('image/')) {
+        reject(new Error('La foto no se lee sola (sin IA). Escriba el resultado a mano o suba el PDF de texto.'));
         return;
       }
-      var url = URL.createObjectURL(file);
-      var img = new Image();
-      img.onload = function () {
-        URL.revokeObjectURL(url);
-        var maxW = 1600;
-        var w = img.width;
-        var h = img.height;
-        if (w > maxW) {
-          h = Math.round(h * maxW / w);
-          w = maxW;
-        }
-        var canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        var ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        var q = 0.85;
-        function tryExport() {
-          var dataUrl = canvas.toDataURL('image/jpeg', q);
-          var b64 = dataUrl.split(',')[1] || '';
-          var kb = Math.round(b64.length * 0.75 / 1024);
-          if (kb > MAX_SEND_KB && q > 0.4) {
-            q -= 0.08;
-            tryExport();
-            return;
-          }
-          if (kb > MAX_SEND_KB) {
-            reject(new Error('No se pudo comprimir la foto. Use “cargar a mano” abajo.'));
-            return;
-          }
-          resolve({ mime: 'image/jpeg', b64: b64, kb: kb });
-        }
-        tryExport();
-      };
-      img.onerror = function () {
-        URL.revokeObjectURL(url);
-        reject(new Error('No se pudo abrir la imagen'));
-      };
-      img.src = url;
+      reject(new Error('Use un PDF de texto del informe, o cargue a mano.'));
     });
   }
 
@@ -317,6 +274,11 @@
       resumen_paciente: resumen,
       fuente: 'manual_paciente',
       confianza: 'baja',
+      valoracion_cardiovascular: '',
+      etiquetas: { valoracion_cardiovascular: 'completar manualmente' },
+      campos_pendientes: [
+        { campo: 'valoracion_cardiovascular', nombre: 'Valoración cardiovascular', etiqueta: 'completar manualmente' }
+      ]
     };
     if (res === 'alterado' && txt) {
       extracted.valores_alterados = [{ nombre: 'Detalle paciente', valor: txt, unidad: '', referencia: '', flag: 'alterado' }];
@@ -353,6 +315,23 @@
     return 'Ver detalle con el médico';
   }
 
+  function estPendientesHtml(ex) {
+    var pend = (ex && ex.campos_pendientes) || [];
+    if (!pend.length && !(ex && ex.etiquetas && ex.etiquetas.valoracion_cardiovascular)) return '';
+    var bits = [];
+    // Siempre mostrar valoración CV como manual
+    bits.push('<span class="est-manual-tag">Valoración cardiovascular: completar manualmente</span>');
+    var otros = pend.filter(function (p) {
+      return p.campo !== 'valoracion_cardiovascular';
+    }).slice(0, 6);
+    if (otros.length) {
+      bits.push('<span style="font-size:11px;color:var(--text3);display:block;margin-top:4px">Sin leer del PDF: '
+        + esc(otros.map(function (p) { return p.nombre; }).join(', '))
+        + ' — <em>completar manualmente</em></span>');
+    }
+    return '<div style="margin-top:6px">' + bits.join('') + '</div>';
+  }
+
   function renderEstList() {
     var box = $('v-est-list');
     if (!box) return;
@@ -362,10 +341,13 @@
     box.innerHTML = keys.map(function (tipo) {
       var item = estudiosExtraidos[tipo];
       var ex = item.extracted || {};
-      var via = item.fuente === 'manual' ? ' · usted escribió' : (item.fuente === 'ia' ? ' · leído de foto' : '');
+      var via = item.fuente === 'manual' ? ' · usted escribió'
+        : (item.fuente === 'pdf_parser' ? ' · PDF (parser local)'
+          : (item.fuente === 'manual_requerido' ? ' · requiere carga manual' : ''));
       return '<div class="est-res ' + estResClass(ex) + '"><strong>✓ ' + esc(labels[tipo] || tipo) + ' guardado</strong>' +
         '<span style="font-size:11px;color:var(--text3)">' + esc(via) + '</span><br>' +
         esc(estResText(ex)) +
+        estPendientesHtml(ex) +
         ' <button type="button" class="btn btn-s" style="width:auto;padding:3px 8px;font-size:11px;margin-top:6px" data-t="' + tipo + '">Quitar</button></div>';
     }).join('');
     box.querySelectorAll('button[data-t]').forEach(function (btn) {
@@ -379,28 +361,38 @@
     updateEstCount();
   }
 
-  function extractEstudio(tipo, mime, dataB64, btnEl) {
+  function extractEstudio(tipo, prep, btnEl) {
     var slot = $('est-slot-' + tipo);
-    if (slot) slot.innerHTML = '<div class="est-spin">Comprimiendo y leyendo informe…</div>';
-    return fetch(afSupabaseUrl() + '/functions/v1/af-estudio-extract', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', apikey: AF_SUPABASE_KEY },
-      body: JSON.stringify({ token: TOKEN, tipo: tipo, mime: mime, data_b64: dataB64 }),
-    })
-      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-      .then(function (res) {
-        if (!res.ok || !res.j.ok) throw new Error((res.j && res.j.error) || 'No se pudo leer');
-        estudiosExtraidos[tipo] = { extracted: res.j.extracted, leido_at: new Date().toISOString(), fuente: 'ia' };
-        if (btnEl) btnEl.classList.add('has-file');
-        if (slot) slot.innerHTML = '';
-        renderEstList();
-        showEstSaved(tipo, 'leído de foto');
-      })
-      .catch(function (err) {
-        if (slot) slot.innerHTML = '';
+    if (slot) slot.innerHTML = '<div class="est-spin">Leyendo PDF (sin IA)…</div>';
+    if (typeof AfEstudioExtractLocal === 'undefined' || !AfEstudioExtractLocal.extract) {
+      return Promise.reject(new Error('Parsers locales no cargados. Recargue la página.'));
+    }
+    return AfEstudioExtractLocal.extract({
+      tipo: tipo,
+      file: prep.file,
+      mime: prep.mime,
+      name: prep.name,
+      b64: prep.b64
+    }).then(function (extracted) {
+      var fuente = (extracted && extracted.fuente) || 'pdf_parser';
+      estudiosExtraidos[tipo] = {
+        extracted: extracted,
+        leido_at: new Date().toISOString(),
+        fuente: fuente
+      };
+      if (btnEl) btnEl.classList.add('has-file');
+      if (slot) slot.innerHTML = '';
+      renderEstList();
+      var via = fuente === 'pdf_parser' ? 'leído del PDF' : 'pendiente manual';
+      showEstSaved(tipo, via);
+      if (fuente === 'manual_requerido' || (extracted && extracted.resultado_general === 'no_legible' && !(extracted.valores && extracted.valores.length))) {
         openManualEstudios(tipo);
-        showErr(friendlyEstudioErr(err.message));
-      });
+      }
+    }).catch(function (err) {
+      if (slot) slot.innerHTML = '';
+      openManualEstudios(tipo);
+      showErr(friendlyEstudioErr(err.message));
+    });
   }
 
   function wireEstudios() {
@@ -419,10 +411,18 @@
           showErr('Máximo ' + MAX_ESTUDIOS + ' estudios.');
           return;
         }
-        if (slot) slot.innerHTML = '<div class="est-spin">Preparando archivo…</div>';
+        // Eco / otro: directo a manual (sin IA)
+        if (tipo === 'ecocardiograma' || tipo === 'otro') {
+          openManualEstudios(tipo);
+          showErr(tipo === 'ecocardiograma'
+            ? 'Ecocardiograma: complete a mano (sin lectura por IA). Valoración cardiovascular: completar manualmente.'
+            : 'Este estudio se carga a mano.');
+          return;
+        }
+        if (slot) slot.innerHTML = '<div class="est-spin">Preparando PDF…</div>';
         prepareFileForExtract(file)
           .then(function (prep) {
-            return extractEstudio(tipo, prep.mime, prep.b64, lbl);
+            return extractEstudio(tipo, prep, lbl);
           })
           .catch(function (err) {
             if (slot) slot.innerHTML = '';
@@ -530,11 +530,12 @@
 
   function friendlyEstudioErr(msg) {
     var m = (msg || '').toLowerCase();
-    if (m.indexOf('quota') >= 0 || m.indexOf('límite') >= 0 || m.indexOf('limit') >= 0 || m.indexOf('carga manual') >= 0) {
-      return 'Lectura automática no disponible ahora. Use el paso 1 (arriba): escriba si está normal o qué está alterado.';
+    if (m.indexOf('foto') >= 0 || m.indexOf('imagen') >= 0 || m.indexOf('pdf') >= 0) return msg;
+    if (m.indexOf('ia') >= 0 || m.indexOf('gemini') >= 0 || m.indexOf('claude') >= 0) {
+      return 'Lectura por IA deshabilitada. Use PDF de texto o el paso 1 (escribir resultado).';
     }
-    if (m.indexOf('comprimir') >= 0) return msg;
-    return 'No se pudo leer la foto. Use el paso 1 de arriba (escribir resultado).';
+    if (m.indexOf('parser') >= 0 || m.indexOf('pdf.js') >= 0) return msg;
+    return msg || 'No se pudo leer el PDF. Use el paso 1 de arriba (escribir resultado).';
   }
 
   function showErr(msg) { $('val-err-msg').textContent = msg; $('val-err').classList.add('on'); }

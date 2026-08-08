@@ -118,6 +118,10 @@ function onPesoEdadChange(){
   // Update dose hint bar if visible
   var bar=document.getElementById('dose-info-bar');
   if(bar&&bar.style.display!=='none')bar.style.display='none';
+  if(typeof renderTivaCalcPanel==='function'){
+    var p=document.getElementById('tiva-calc-panel');
+    if(p&&p.style.display!=='none')renderTivaResults();
+  }
 }
 
 // Recovery autocomplete

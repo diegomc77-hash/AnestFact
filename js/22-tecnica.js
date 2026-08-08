@@ -2,7 +2,12 @@ function getMetodoTipoDesdeTecnica(){
   var tipo=document.getElementById('fj-tec-tipo')?document.getElementById('fj-tec-tipo').value:'';
   var sub=(document.getElementById('fj-tec-subtipo')?document.getElementById('fj-tec-subtipo').value:'')||'';
   if(tipo==='general')return /TIVA/i.test(sub)?'tiva':'general';
-  if(tipo==='neuroaxial')return /pidural|at[eé]ter|ombinada|CSE/i.test(sub)?'peridural':'raquidea';
+  if(tipo==='neuroaxial'){
+    if(!sub)return '';
+    if(/ombinada|CSE/i.test(sub))return 'combinada';
+    if(/pidural|at[eé]ter/i.test(sub))return 'peridural';
+    return 'raquidea';
+  }
   if(tipo==='bloqueo')return 'bloqueo';
   if(tipo==='sedacion')return 'sedacion';
   if(tipo==='local')return 'localasistida';
@@ -17,7 +22,10 @@ function formatMaterialDescartable(){
   if(tipoTec==='sedacion'||tipoTec==='local')return '';
   if(tipoTec!=='neuroaxial'&&tipoTec!=='bloqueo')return null;
   if(!aguja)return '';
-  var esPeri=/pidural|at[eé]ter|ombinada|CSE/i.test(sub);
+  var esCSE=/ombinada|CSE/i.test(sub);
+  if(esCSE){
+    return 'Kit CSE (needle-through-needle): aguja '+aguja+' '+(calibre||'')+' + aguja raquídea. Catéter peridural.';
+  }
   if(aguja==='Punta de Lápiz'){
     if(!calibre)return 'Aguja raquídea AR (calibre por seleccionar) PL';
     return 'Aguja raquídea AR '+calibre.replace(/G/i,'')+' PL';
@@ -56,19 +64,32 @@ function syncMetodosExtraUI(tipo){
 }
 
 function setMetodos(tipo){
-  if(tipo&&typeof sugerirDrogas==='function')sugerirDrogas(tipo);
+  // Drogas según subtipo real (TIVA ≠ balanceada). Nunca forzar 'general' a ciegas.
+  if(typeof _sugerirDrogasPorTec==='function')_sugerirDrogasPorTec();
+  else if(tipo&&typeof sugerirDrogas==='function'){
+    var t=typeof getMetodoTipoDesdeTecnica==='function'?getMetodoTipoDesdeTecnica():tipo;
+    if(t)sugerirDrogas(t);
+  }
   actualizarMetodos();
 }
 
-function actualizarMetodos(){
+function actualizarMetodos(soloMateriales){
   var tipo=getMetodoTipoDesdeTecnica();
   syncMetodosExtraUI(tipo);
   actualizarMetodosResumen();
   var ta=document.getElementById('fj-metodos');
-  var esRegional=(tipo==='raquidea'||tipo==='peridural'||tipo==='bloqueo');
+  var esRegional=(tipo==='raquidea'||tipo==='peridural'||tipo==='combinada'||tipo==='bloqueo');
   var fn=tipo?METODOS_TEXTOS[tipo]:null;
-  if(ta&&fn){
-    if(!esRegional||!ta.value||ta.value.length<80)ta.value=fn();
+  if(!soloMateriales&&ta&&fn){
+    if(esRegional){
+      // Relato largo lo arma tecNivel4Check (con fármacos). Solo seed corto si está vacío.
+      if(!ta.value||ta.value.length<40)ta.value=fn();
+    } else {
+      var texto=fn();
+      var anexo=typeof formatDrogasMetodosAnexo==='function'?formatDrogasMetodosAnexo():'';
+      if(anexo)texto=(texto?texto.replace(/\s+$/,'')+' ':'')+anexo;
+      ta.value=texto;
+    }
   }
   var mat=document.getElementById('fj-materiales');
   if(!mat)return;
@@ -235,8 +256,7 @@ var TEC_OPCIONES = {
     label: 'Tipo de anestesia general',
     opciones: [
       {val:'Anestesia General Balanceada', txt:'Anestesia General Balanceada (inducci\u00f3n EV + mantenimiento inhalatorio)'},
-      {val:'Anestesia General TIVA', txt:'Anestesia General TIVA (Total Intravenosa)'},
-      {val:'Anestesia General Inhalatoria', txt:'Anestesia General Inhalatoria'}
+      {val:'Anestesia General TIVA', txt:'Anestesia General TIVA (Total Intravenosa)'}
     ],
     nivel3: false
   },
@@ -313,6 +333,7 @@ var TEC_OPCIONES = {
 
 function tecNivel1(){
   var tipo = document.getElementById('fj-tec-tipo').value;
+  if(typeof onTecnicaCambioDetectar==='function')onTecnicaCambioDetectar();
   var n2wrap = document.getElementById('tec-nivel2-wrap');
   var n3wrap = document.getElementById('tec-nivel3-wrap');
   var resumen = document.getElementById('tec-resumen');
@@ -320,6 +341,11 @@ function tecNivel1(){
   document.getElementById('tec-resumen-txt').textContent = '';
   resumen.style.display = 'none';
   n3wrap.style.display = 'none';
+  // Al cambiar tipo, vaciar relato previo (se regenera al completar técnica/drogas)
+  if(typeof _tecRestaurando==='undefined'||!_tecRestaurando){
+    var met=document.getElementById('fj-metodos');
+    if(met)met.value='';
+  }
 
   if(!tipo){ n2wrap.style.display='none'; return; }
 
@@ -336,11 +362,15 @@ function tecNivel1(){
     sel2.appendChild(o);
   });
   n2wrap.style.display = 'block';
+  if(typeof _tecSubPrev!=='undefined')_tecSubPrev='';
   if(typeof actualizarViaAerea==='function')actualizarViaAerea();
   else if(typeof actualizarMonitoreoMayo==='function')actualizarMonitoreoMayo();
-  // Activar selector de tubo automáticamente para general/tiva
+  // Tubo + drogas: setMetodos ya resuelve TIVA vs gases según subtipo
   if(tipo==='general'||tipo==='tiva')setMetodos(tipo);
-  else actualizarMetodos();
+  else{
+    actualizarMetodos();
+    if(typeof _sugerirDrogasPorTec==='function')_sugerirDrogasPorTec();
+  }
   renderExamenRegional(tipo);
 }
 
@@ -352,10 +382,14 @@ function tecNivel2(){
   document.getElementById('fj-tec').value = '';
   resumen.style.display = 'none';
 
-  if(!subtipo){ n3wrap.style.display='none'; return; }
+  if(!subtipo){
+    n3wrap.style.display='none';
+    if(typeof _sugerirDrogasPorTec==='function')_sugerirDrogasPorTec();
+    return;
+  }
 
   var cfg = TEC_OPCIONES[tipo];
-  // Check if this subtipo needs a nivel3
+  // Check if this subtipo needs a nivel3 (bloqueos por región)
   if(cfg && cfg.nivel3 && cfg.nivel3[subtipo]){
     var n3cfg = cfg.nivel3[subtipo];
     document.getElementById('tec-nivel3-label').textContent = n3cfg.label;
@@ -367,8 +401,13 @@ function tecNivel2(){
       sel3.appendChild(o);
     });
     n3wrap.style.display = 'block';
+    // Región elegida: medicación de esa región (aún sin bloqueo específico)
+    if(typeof onTecnicaCambioDetectar==='function')onTecnicaCambioDetectar();
+    if(typeof actualizarViaAerea==='function')actualizarViaAerea();
+    if(typeof _sugerirDrogasPorTec==='function')_sugerirDrogasPorTec(subtipo);
+    if(typeof actualizarMetodos==='function')actualizarMetodos();
   } else {
-    // No nivel3 needed - set the value directly
+    // No nivel3 needed - set the value directly (local, sedación, general, neuroaxial)
     n3wrap.style.display = 'none';
     tecSetFinal(subtipo);
   }
@@ -380,21 +419,26 @@ function tecNivel3(){
 }
 
 function tecSetFinal(val){
+  if(typeof onTecnicaCambioDetectar==='function')onTecnicaCambioDetectar();
   document.getElementById('fj-tec').value = val;
   var res = document.getElementById('tec-resumen');
   document.getElementById('tec-resumen-txt').textContent = '✓ ' + val;
   res.style.display = 'block';
-  // Activar nivel4 si es bloqueo regional
   var tipo = document.getElementById('fj-tec-tipo').value;
+  // Activar nivel4 si es bloqueo regional
   if(tipo==='neuroaxial'||tipo==='bloqueo'){
     tecNivel4Activar(tipo);
-    actualizarMetodos();
   } else {
     document.getElementById('tec-nivel4-wrap').style.display='none';
-    // Auto-fill metodos si no es regional
-    var metodos = document.getElementById('fj-metodos');
-    if(metodos && !metodos.value) metodos.value = val;
   }
+  // Refrescar vía/oxígeno + agentes (con tick para que el DOM del subtipo esté estable)
+  if(typeof actualizarViaAerea==='function')actualizarViaAerea();
+  if(typeof _sugerirDrogasPorTec==='function')_sugerirDrogasPorTec(val);
+  setTimeout(function(){
+    if(typeof actualizarViaAerea==='function')actualizarViaAerea();
+    if(typeof _sugerirDrogasPorTec==='function')_sugerirDrogasPorTec(val);
+    if(typeof actualizarMetodos==='function')actualizarMetodos();
+  },30);
 }
 
 function tecNivel4Activar(tipo){
@@ -512,6 +556,11 @@ function tecActualizarDermatomas(){
 
 function getDescTecnica(aguja, calibre){
   var c=calibre||'';
+  var sub=(document.getElementById('fj-tec-subtipo')?document.getElementById('fj-tec-subtipo').value:'')||'';
+  var esCSE=/ombinada|CSE/i.test(sub);
+  if(esCSE&&(aguja==='Tuohy'||aguja==='Crawford')){
+    return 'se realiza punción con aguja de tipo '+aguja+' número '+c+', identificando el espacio epidural mediante pérdida de resistencia; a través de su lumen se avanza aguja raquídea (técnica needle-through-needle), constatando flujo de líquido cefalorraquídeo libre, límpido y filante; tras la inyección intratecal se retira la aguja raquídea y se coloca catéter epidural avanzado sin dificultad';
+  }
   if(aguja==='Tuohy'||aguja==='Crawford'){
     return 'se realiza punción con aguja de tipo '+aguja+' número '+c+', identificando el espacio epidural mediante la técnica de pérdida de resistencia con solución salina/aire, procediendo a la colocación de catéter epidural avanzado sin dificultad';
   } else if(aguja==='Punta de Lápiz'){
@@ -543,30 +592,41 @@ function tecNivel4Check(){
   var calibre=document.getElementById('fj-tec-calibre')?document.getElementById('fj-tec-calibre').value:'';
   if(!aguja||!calibre)return;
   var descTec=getDescTecnica(aguja,calibre);
-  // Generar texto narrativo con seguridad médico-legal
   var subtipo=document.getElementById('fj-tec-subtipo').value||document.getElementById('fj-tec').value||'';
   var bloqueo=document.getElementById('fj-tec-bloqueo')?document.getElementById('fj-tec-bloqueo').value:'';
+  var farmacos=typeof formatFarmacosTecRegional==='function'?formatFarmacosTecRegional():'';
+  var esCSE=/ombinada|CSE/i.test(subtipo);
   var txt='';
   if(esNeuroaxial){
+    var adminTxt;
+    if(esCSE&&typeof formatFarmacosCSE==='function'){
+      adminTxt=formatFarmacosCSE();
+    } else if(farmacos){
+      adminTxt='Tras realizar aspiración manual negativa para sangre, se procede a la administración de '+farmacos+' de forma segura';
+    } else {
+      adminTxt='Tras realizar aspiración manual negativa para sangre, se procede a la administración del fármaco de forma segura';
+    }
     txt='Bajo estrictas medidas de asepsia y antisepsia, se realiza preparación del campo quirúrgico. '
       +'Se realiza procedimiento bajo anestesia regional de tipo '+subtipo+'. '
       +'Mediante guía por '+guia+' en el espacio intervertebral '+espacio+', '+descTec+'. '
-      +'Tras realizar aspiración manual negativa para sangre, '
-      +'se procede a la administración del fármaco de forma segura, comprobando posteriormente '
+      +adminTxt+', comprobando posteriormente '
       +'un nivel sensitivo máximo alcanzado en el dermatoma '+resultado+' con éxito.';
   } else {
     var nombre=bloqueo||subtipo||'bloqueo nervioso periférico';
+    var depositoTxt=farmacos
+      ?('se efectúa el depósito de '+farmacos+' sin incidentes')
+      :'se efectúa el depósito del anestésico local sin incidentes';
     txt='Bajo estrictas medidas de asepsia y antisepsia, se realiza preparación del campo quirúrgico. '
       +'Se realiza procedimiento bajo anestesia regional de tipo Bloqueo de Nervio Periférico. '
       +'Mediante el uso de '+guia+', se procede al abordaje del '+nombre+' de localización '+lateral+'; '
       +descTec+'. '
       +'Tras comprobar el correcto posicionamiento y realizar aspiración manual negativa '
-      +'para descartar inyección intravascular, se efectúa el depósito del anestésico local sin incidentes, '
+      +'para descartar inyección intravascular, '+depositoTxt+', '
       +'constatando un '+resultado+' previo al inicio de la cirugía.';
   }
   var metodos=document.getElementById('fj-metodos');
   if(metodos)metodos.value=txt;
-  actualizarMetodos();
+  actualizarMetodos(true);
 }
 
 function tecLimpiar(){

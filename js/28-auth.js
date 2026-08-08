@@ -134,8 +134,7 @@ var AF_AUTH = (function(){
         nombre: nombre,
         matricula: mp,
         matricula_especial: me || '',
-        plan: 'demo',
-        rol: 'user',
+        // plan/rol los fuerza el trigger servidor (demo/user) — no confiar en el cliente
         fojas_semana: 0,
         activo: true
       })
@@ -181,6 +180,7 @@ var AF_AUTH = (function(){
       if(!s) { ready = true; return false; }
       return afterAuthProfileLoad().then(function(){
         ready = true;
+        if(typeof AfSesiones!=='undefined'&&AfSesiones.onAuthReady)AfSesiones.onAuthReady();
         return true;
       });
     });
@@ -209,7 +209,10 @@ var AF_AUTH = (function(){
           expires_at: data.expires_at || (Math.floor(Date.now()/1000) + (data.expires_in||3600)),
           user: data.user
         });
-        return afterAuthProfileLoad().then(function(){ return true; });
+        return afterAuthProfileLoad().then(function(){
+          if(typeof AfSesiones!=='undefined'&&AfSesiones.onAuthReady)AfSesiones.onAuthReady();
+          return true;
+        });
       });
     });
   }
@@ -285,6 +288,7 @@ var AF_AUTH = (function(){
 
   function signOut(){
     var tok = getAccessToken();
+    if(typeof AfSesiones!=='undefined'&&AfSesiones.onSignOut)AfSesiones.onSignOut();
     clearSession();
     if(tok){
       fetch(authUrl('/logout'), {

@@ -84,49 +84,68 @@ function verificarPaciente(d){
   return true;
 }
 
-// XHR compatible con HTTP (sin bloqueo Mixed Content)
-function xhrGet(url,ok,fail){
+// RPC consume token (008) — anon + apikey
+function xhrPost(url, body, ok, fail){
   var x=new XMLHttpRequest();
-  x.open('GET',url,true);
+  x.open('POST',url,true);
   x.setRequestHeader('apikey',SKEY);
   x.setRequestHeader('Authorization','Bearer '+SKEY);
   x.setRequestHeader('Content-Type','application/json');
   x.onload=function(){
-    if(x.status===200||x.status===206){
-      try{ok(JSON.parse(x.responseText));}
+    if(x.status>=200&&x.status<300){
+      try{ok(JSON.parse(x.responseText||'{}'));}
       catch(e){fail('Respuesta invalida: '+e.message);}
     }else{
-      fail('Error HTTP '+x.status+': '+x.responseText.slice(0,120));
+      fail('Error HTTP '+x.status+': '+(x.responseText||'').slice(0,160));
     }
   };
   x.onerror=function(){fail('Sin conexion a Supabase.');};
-  x.send();
+  x.send(JSON.stringify(body||{}));
 }
 
-function cargarDatos(k){
-  if(!k){
+function errTokenMsg(code){
+  if(code==='token_invalido')return 'Token inválido.';
+  if(code==='token_desconocido')return 'Token desconocido.';
+  if(code==='token_ya_usado')return 'Este token ya se usó (un solo uso). Generá otro en AnesFact.';
+  if(code==='token_expirado')return 'Token expirado (válido 2 h). Generá otro en AnesFact.';
+  return code||'Error desconocido';
+}
+
+function cargarPorToken(token){
+  token=String(token||'').trim();
+  if(!token||token.length<32){
     rmToast();
-    alert('No se pudo identificar al paciente en la foja.\nVerificá DNI o apellido/nombre y volvé a intentar.');
+    alert('Pegá el token completo que te mostró AnesFact al tocar «Enviar a GECLISA» (mín. 32 caracteres).');
     return;
   }
-  var url=SURL+'/rest/v1/anesfact_datos?clave=eq.'+encodeURIComponent(k)+'&select=datos&limit=1';
-  xhrGet(url,function(rows){
-    if(!rows||!rows.length){
+  toast.textContent='\u23f3 Validando token...';
+  xhrPost(SURL+'/rest/v1/rpc/af_geclisa_consume_token',{p_token:token},function(res){
+    if(!res||res.ok===false){
       rmToast();
-      alert('Sin datos para este paciente.\nAbrí AnesFact, cargá el paciente y tocá "Enviar a GECLISA" primero.');
+      alert('No se pudo cargar: '+errTokenMsg(res&&res.error));
       return;
     }
-    try{
-      var d=JSON.parse(rows[0].datos);
-      if(!verificarPaciente(d)){rmToast();return;}
-      toast.textContent='\u2705 Rellenando foja...';
-      setTimeout(rmToast,2500);
-      rellenar(d);
-    }catch(e){rmToast();alert('Error procesando datos: '+e.message);}
-  },function(err){rmToast();alert('Error: '+err);});
+    var d=res.payload;
+    if(typeof d==='string'){
+      try{d=JSON.parse(d);}catch(e){rmToast();alert('Payload inválido');return;}
+    }
+    if(!d||typeof d!=='object'){rmToast();alert('Sin datos en el token');return;}
+    if(!verificarPaciente(d)){rmToast();return;}
+    toast.textContent='\u2705 Rellenando foja...';
+    setTimeout(rmToast,2500);
+    rellenar(d);
+  },function(err){
+    rmToast();
+    if(String(err).indexOf('404')>=0||String(err).indexOf('af_geclisa_consume_token')>=0){
+      alert('Falta el SQL 008 en Supabase (af_geclisa_consume_token).');
+    }else alert('Error: '+err);
+  });
 }
 
-cargarDatos(getClave());
+var tok=prompt('AnesFact — pegá el TOKEN GECLISA (un solo uso):');
+if(tok===null){rmToast();return void(0);}
+cargarPorToken(tok);
+
 
 // ── Helpers ───────────────────────────────────────────────────────────
 function setVal(el,val){

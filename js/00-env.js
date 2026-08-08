@@ -12,7 +12,7 @@ var AF_ENV={
 // Ver: https://supabase.com/docs/guides/auth/row-level-security
 var AF_SUPABASE_URL=(window.AF_SUPABASE&&window.AF_SUPABASE.url)||'https://xntvibfsuubedplptvzs.supabase.co';
 var AF_SUPABASE_KEY=(window.AF_SUPABASE&&window.AF_SUPABASE.anon)||'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhudHZpYmZzdXViZWRwbHB0dnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNDk2MjgsImV4cCI6MjA5NTkyNTYyOH0.9SaZdO7knkzSREyaUfoOX8nanid9AQwlNbY5VudWcws';
-var AF_DEFAULT_SYNC_URL='https://script.google.com/macros/s/AKfycbwE1UTrka9Njvq2VhtWR6iSZ7iAnK-dQ5qe-6kQ9KHnP0zVP0s9z_Ib4uw7SxT7nfqwgg/exec';
+var AF_DEFAULT_SYNC_URL=''; // Apps Script compartido desactivado (fuga entre usuarios). Usar solo Supabase.
 var AF_OWNER_EMAILS=['diegomc77@gmail.com'];
 
 function afSupabaseHeaders(extra){

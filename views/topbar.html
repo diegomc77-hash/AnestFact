@@ -2,17 +2,25 @@
   <button id="back-btn" onclick="goBack()">&#8249;</button>
   <div style="flex:1"><div class="logo" id="t-title">AnesFact <span>v8</span></div>
   <div style="font-size:11px;color:var(--text3)" id="header-anest-info">Dra. Huerta &middot; M.P.32393 &middot; ADAARC</div>
-  <div style="font-size:10px;color:var(--text3)" id="plan-badge"></div></div>
-  <button id="admin-btn" onclick="goAdminGuarded()" title="Panel admin" aria-label="Panel admin" style="display:none;font-size:16px;margin-right:4px;background:none;border:none;color:var(--yellow);cursor:pointer;padding:4px 6px">&#9733;</button>
+  <div style="font-size:10px;color:var(--text3)" id="plan-badge" onclick="pedirCambioPlan()" role="button" tabindex="0"></div></div>
+  <button id="admin-btn" onclick="goAdminGuarded()" title="Panel admin" aria-label="Panel admin" style="display:none;position:relative;font-size:16px;margin-right:4px;background:none;border:none;color:var(--yellow);cursor:pointer;padding:4px 6px">&#9733;<span id="admin-btn-badge" style="display:none;position:absolute;top:-2px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:var(--red);color:#fff;font-size:10px;font-weight:700;line-height:16px;text-align:center"></span></button>
   <button class="btn btn-s" style="font-size:11px;padding:6px 10px;margin-right:4px" onclick="authLogout()" title="Cerrar sesi&oacute;n">Salir</button>
   <button id="help-btn" onclick="go('ayuda')" title="Ayuda" aria-label="Ayuda" style="font-size:18px;margin-right:4px">&#128736;</button>
   <button id="cfg-btn" onclick="irConfig()" title="Configuraci&oacute;n" aria-label="Configuraci&oacute;n">&#9881;</button>
 </div>
+<div id="admin-view-banner" style="display:none;background:#b45309;color:#fff;text-align:center;font-size:12px;padding:6px 10px"></div>
 <div id="plan-modal" class="plan-modal" style="display:none">
   <div class="plan-modal-inner card">
     <div class="ct" id="plan-modal-title">Funci&oacute;n no disponible</div>
     <p id="plan-modal-msg" style="font-size:13px;color:var(--text2);line-height:1.45"></p>
-    <a class="btn btn-g" style="display:block;text-align:center;margin-top:12px;text-decoration:none" href="mailto:anesfact@gmail.com?subject=Activar%20plan%20AnesFact">Contactar para activar</a>
+    <label style="display:block;font-size:12px;margin-top:10px;color:var(--text2)">Plan que necesit&aacute;s</label>
+    <select id="plan-modal-want" class="fi" style="width:100%;margin-top:4px;font-size:13px">
+      <option value="basico">B&aacute;sico — Aeron&aacute;utico + Mayo</option>
+      <option value="pro">Pro — m&aacute;s sanatorios</option>
+      <option value="consultar">No s&eacute; — que me contacten</option>
+    </select>
+    <p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.4">El pedido llega al administrador en el panel. La facturaci&oacute;n se coordina despu&eacute;s (no se cobra autom&aacute;tico).</p>
+    <button type="button" class="btn btn-g" style="width:100%;margin-top:10px" id="plan-modal-ask" onclick="solicitarActivacionPlan()">Solicitar activaci&oacute;n</button>
     <button class="btn btn-s" style="width:100%;margin-top:8px" onclick="closePlanModal()">Cerrar</button>
   </div>
 </div>

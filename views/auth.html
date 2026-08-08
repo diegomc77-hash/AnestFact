@@ -52,7 +52,14 @@
   <div class="plan-modal-inner card">
     <div class="ct" id="plan-modal-title">Función no disponible</div>
     <p id="plan-modal-msg" style="font-size:13px;color:var(--text2);line-height:1.45"></p>
-    <a class="btn btn-g" style="display:block;text-align:center;margin-top:12px;text-decoration:none" id="plan-modal-mail" href="mailto:anesfact@gmail.com?subject=Activar%20plan%20AnesFact">Contactar para activar</a>
+    <label style="display:block;font-size:12px;margin-top:10px;color:var(--text2)">Plan que necesitás</label>
+    <select id="plan-modal-want" class="fi" style="width:100%;margin-top:4px;font-size:13px">
+      <option value="basico">Básico — Aeronáutico + Mayo</option>
+      <option value="pro">Pro — más sanatorios</option>
+      <option value="consultar">No sé — que me contacten</option>
+    </select>
+    <p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.4">El pedido llega al administrador en el panel. La facturación se coordina después (no se cobra automático).</p>
+    <button type="button" class="btn btn-g" style="width:100%;margin-top:10px" id="plan-modal-ask" onclick="solicitarActivacionPlan()">Solicitar activación</button>
     <button class="btn btn-s" style="width:100%;margin-top:8px" onclick="closePlanModal()">Cerrar</button>
   </div>
 </div>

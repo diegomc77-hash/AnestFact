@@ -3,7 +3,7 @@
 
     <div class="field">
       <label>Tipo de anestesia</label>
-      <select class="fi" id="fj-tec-tipo" onchange="tecNivel1();_sugerirDrogasPorTec(this.value);calcPremed(true);actualizarViaAerea()">
+      <select class="fi" id="fj-tec-tipo" onchange="tecNivel1();calcPremed(true)">
         <option value="">Seleccionar...</option>
         <option value="general">Anestesia General</option>
         <option value="neuroaxial">Anestesia Regional Neuroaxial</option>
@@ -15,7 +15,7 @@
 
     <div class="field" id="tec-nivel2-wrap" style="display:none">
       <label id="tec-nivel2-label">Subtipo</label>
-      <select class="fi" id="fj-tec-subtipo" onchange="tecNivel2();_sugerirDrogasPorTec(this.value||document.getElementById('fj-tec-tipo').value);calcPremed(true);actualizarMetodos()">
+      <select class="fi" id="fj-tec-subtipo" onchange="tecNivel2();calcPremed(true)">
         <option value="">Seleccionar...</option>
       </select>
     </div>
@@ -145,8 +145,8 @@
       <div id="examen-regional-selects"></div>
     </div>
     <div class="g2" style="margin-top:10px">
-      <div class="field"><label>V&iacute;a a&eacute;rea</label>
-        <select class="fi" id="fj-via" onchange="actualizarMetodos()"><option value="">&mdash;</option><option>IOT</option><option>M&aacute;scara lar&iacute;ngea</option><option>Mascarilla facial</option><option>Traqueostom&iacute;a</option><option>Sin dispositivo</option></select>
+      <div class="field"><label id="fj-via-label">V&iacute;a a&eacute;rea / Ox&iacute;geno</label>
+        <select class="fi" id="fj-via" onchange="actualizarMetodos()"><option value="">&mdash;</option></select>
       </div>
     </div>
     <div class="g2">

@@ -64,8 +64,10 @@ function _splitObsContinuation(text, chunkSize){
 }
 
 function _buildSignBlock(signImg){
+  var firma=(typeof AfIdentidad!=='undefined'&&AfIdentidad.firmaHtml)?AfIdentidad.firmaHtml()
+    :('<b>'+((localStorage.getItem('af_anest_nombre')||'ANESTESISTA').replace(/</g,''))+'</b><br>Anestesiólogo/a · ADAARC');
   return '<div style="flex:0 0 138px;display:flex;flex-direction:column;justify-content:flex-end;text-align:center">'+signImg
-    +'<div style="border-top:1.5px solid #000;padding-top:3px;font-size:8px"><b>MARIA SOLEDAD HUERTA</b><br>M.P. 32393 &nbsp; M.E. 15518<br>Anest&#243;loga &middot; ADAARC</div></div>';
+    +'<div style="border-top:1.5px solid #000;padding-top:3px;font-size:8px">'+firma+'</div></div>';
 }
 
 function _buildObsSignRow(obsText, obsFs, signImg, boxStyle, obsLabel){
@@ -264,16 +266,21 @@ function _buildObsAdicionalSheet(i,obsText,signImg,pageNum){
     +'<div style="border:1px solid #ccc;padding:6px;font-size:9px;line-height:1.45;word-wrap:break-word">'+_printEsc(obsText)+'</div>'
     +'<div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">'
     +'<div style="width:180px;text-align:center">'+signImg
-    +'<div style="border-top:1.5px solid #000;padding-top:3px;font-size:8px"><b>MARIA SOLEDAD HUERTA</b><br>M.P. 32393 &nbsp; M.E. 15518<br>Anest&#243;loga &middot; ADAARC</div></div></div>'
+    +'<div style="border-top:1.5px solid #000;padding-top:3px;font-size:8px">'
+    +((typeof AfIdentidad!=='undefined'&&AfIdentidad.firmaHtml)?AfIdentidad.firmaHtml():'')
+    +'</div></div></div>'
     +'</div>';
 }
 
 function imprimirFoja(){
+  // Defensa en profundidad: no confiar solo en el botón guarded
+  if(typeof checkPlan==='function' && !checkPlan('imprimir')) return;
   if(document.getElementById('f-pac'))guardar();
   if(document.getElementById('fj-tec'))guardarFoja();
   var i=S.cur;if(!i){toast('Complet\u00e1 los datos primero');return;}
   var f=i.foja||{};
-  var signSrc=f.sign||S.signData||'';
+  // La ventana de impresión NO incluye overlay de secreto médico (solo pantalla app)
+  var signSrc=(typeof AfFirma!=='undefined'&&AfFirma.getPng&&AfFirma.getPng())||f.sign||S.signData||'';
   var signImg=signSrc?('<img src="'+signSrc+'" style="max-height:46px;max-width:130px;display:block;margin:0 auto 3px;filter:grayscale(1) brightness(0) contrast(2)">'):('<div style="height:46px"></div>');
   var drogaLines=(f.drogas||[]).map(function(d){return(d.n||'')+' '+(d.d||'')+' '+(d.v||'');}).filter(function(x){return x.trim();}).join(' \u00b7 ');
   var vgCols=(VG.cols&&VG.cols.length)?VG.cols:(f.vg_cols&&f.vg_cols.length?f.vg_cols:[]);

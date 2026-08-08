@@ -1,12 +1,20 @@
 <div id="view-config" class="view">
   <div class="card cfg-admin-only" id="cfg-admin-card">
     <div class="ct">&#9733; Panel admin</div>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Usuarios, planes y backups legacy.</p>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Usuarios y planes.</p>
     <button class="btn btn-g" onclick="goAdminGuarded()">Abrir panel admin</button>
   </div>
+  <div class="card" id="cfg-plan-card">
+    <div class="ct">Tu plan</div>
+    <p id="cfg-plan-actual" style="font-size:14px;font-weight:600;margin:0 0 6px">—</p>
+    <p id="cfg-plan-detail" style="font-size:12px;color:var(--text2);line-height:1.45;margin:0 0 10px"></p>
+    <button type="button" class="btn btn-g" id="cfg-plan-ask-btn" style="width:100%" onclick="pedirCambioPlan()">Pedir o cambiar plan</button>
+    <p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.4">Pod&eacute;s pedir cuando quieras (no es solo una vez). El admin ve el pedido y activa el plan; la facturaci&oacute;n se coordina afuera.</p>
+  </div>
   <div class="card">
-    <div class="ct">&#128100; Datos del Anestesista</div>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Estos datos se usan en la guía GECLISA y en la firma de la foja.</p>
+    <div class="ct">&#128100; Datos del Anestesista (titular del plan)</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:6px">Un plan es personal: estos datos salen en la foja impresa y GECLISA. No se presta la cuenta a otro profesional.</p>
+    <p id="anest-plan-hint" style="font-size:11px;color:var(--text3);margin-bottom:10px"></p>
     <div class="field"><label>Nombre completo</label>
       <input class="fi" type="text" id="cfg-anest-nombre" placeholder="APELLIDO Nombre">
     </div>
@@ -20,6 +28,23 @@
     </div>
     <button class="btn btn-g" style="margin-top:10px" onclick="guardarAnestesista()">&#128190; Guardar datos</button>
     <div id="anest-status" style="font-size:12px;margin-top:8px;color:var(--green)"></div>
+  </div>
+  <div class="card" id="cfg-firma-card">
+    <div class="ct">Firma profesional certificada</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:8px">
+      Una sola firma por cuenta, ligada a tu matrícula. Se usa en todas las fojas impresas. No se puede cambiar después de certificar.
+    </p>
+    <div id="cfg-firma-locked" style="display:none">
+      <img id="cfg-firma-preview" alt="Firma certificada" style="max-width:100%;max-height:110px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px;filter:grayscale(1)">
+    </div>
+    <div id="cfg-firma-edit">
+      <canvas id="cfg-sign-canvas" style="width:100%;height:120px;background:#fff;border:1px solid var(--border);border-radius:8px;touch-action:none"></canvas>
+      <div class="brow" style="margin-top:8px">
+        <button type="button" class="btn btn-s" id="cfg-firma-clear-btn" style="font-size:13px" onclick="clearCfgFirma()">Borrar</button>
+        <button type="button" class="btn btn-g" id="cfg-firma-cert-btn" style="font-size:13px" onclick="certificarFirma()">Certificar firma</button>
+      </div>
+    </div>
+    <div id="cfg-firma-status" style="font-size:12px;margin-top:8px;color:var(--text3)"></div>
   </div>
   <div class="card cfg-admin-only" id="cfg-gemini-card">
     <div class="ct">API Key Gemini (Gratis)</div>

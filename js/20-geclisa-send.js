@@ -40,6 +40,18 @@ function getMayoMonitoreoFlags(cur){
 
 function abrirGeclisa(){
   if(typeof checkPlan==='function'&&!checkPlan('geclisa'))return;
+  var run=function(){ _abrirGeclisaCore(); };
+  if(typeof assertPlanServer==='function'){
+    assertPlanServer('geclisa').then(function(res){
+      if(typeof handleAssertFail==='function'&&!handleAssertFail(res,'geclisa'))return;
+      run();
+    });
+    return;
+  }
+  run();
+}
+
+function _abrirGeclisaCore(){
   var i=S.cur;
   var f=(i&&i.foja)||{};
   if(!i){toast('Carg\u00e1 un paciente primero');return;}
@@ -60,9 +72,12 @@ function abrirGeclisa(){
     if(!dr.n||!dr.n.trim())return;
     var txt=(dr.n||'')+' '+(dr.d||'')+' '+(dr.v||'');
     var g=(dr.grupo||'').toLowerCase();
-    if(g.indexOf('mantenimiento')>=0||g.indexOf('inotr')>=0){
+    if(g.indexOf('inotr')>=0){
+      // Inotrópicos: van a mantenimiento GECLISA; la causa queda en métodos/obs Aero
+      _drogasMant.push(txt+(dr.causa?' ('+dr.causa+')':''));
+    } else if(g.indexOf('mantenimiento')>=0||g.indexOf('tiva total')>=0||g.indexOf('gas mac')>=0){
       _drogasMant.push(txt);
-    } else if(g.indexOf('inductor')>=0||g.indexOf('relajante')>=0||g.indexOf('analg')>=0){
+    } else if(g.indexOf('inducc')>=0||g.indexOf('inductor')>=0||g.indexOf('relajante')>=0||g.indexOf('analg')>=0||g.indexOf('sedac')>=0){
       _drogasInd.push(txt);
     } else if(g.indexOf('intratecal')>=0||g.indexOf('peridural')>=0||g.indexOf('local')>=0||g.indexOf('coadyuv')>=0){
       _drogasMant.push(txt);
@@ -94,7 +109,8 @@ function abrirGeclisa(){
     tipoCirugia:i.mayo_tipociru||'PROGRAMADA',
     posicion:i.mayo_posicion||'',
     diagnostico:i.diag||'',
-    anestesista:(localStorage.getItem('af_anest_nombre')||'HUERTA MARIA SOLEDAD'),matricula:(localStorage.getItem('af_anest_mp')||'32393'),
+    anestesista:(typeof AfIdentidad!=='undefined'?AfIdentidad.get().nombre:(localStorage.getItem('af_anest_nombre')||'')),
+    matricula:(typeof AfIdentidad!=='undefined'?AfIdentidad.get().mp:(localStorage.getItem('af_anest_mp')||'')),
     horaFin:f.fin||'',cirujano:i.ciru||'',especialidad:i.serv||'',
     fechaGestion:_gest.fechaGestion||i.fecha||'',
     horaGestion:_gest.horaGestion||'',
@@ -124,30 +140,58 @@ function abrirGeclisa(){
     timestamp:new Date().toISOString()
   };
 
-  var SURL='https://xntvibfsuubedplptvzs.supabase.co';
-  var SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhudHZpYmZzdXViZWRwbHB0dnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNDk2MjgsImV4cCI6MjA5NTkyNTYyOH0.9SaZdO7knkzSREyaUfoOX8nanid9AQwlNbY5VudWcws';
-
-  // Upsert en Supabase
-  fetch(SURL+'/rest/v1/anesfact_datos',{
+  // Token de un solo uso (RPC 008) — el DNI va solo dentro del payload clínico
+  if(typeof AF_AUTH==='undefined'||!AF_AUTH.isLoggedIn||!AF_AUTH.isLoggedIn()){
+    toast('Iniciá sesión para enviar a GECLISA');
+    return;
+  }
+  toast('Generando token GECLISA…');
+  fetch(afSupabaseUrl()+'/rest/v1/rpc/af_geclisa_create_token',{
     method:'POST',
-    headers:{
-      'apikey':SKEY,
-      'Authorization':'Bearer '+SKEY,
-      'Content-Type':'application/json',
-      'Prefer':'resolution=merge-duplicates,return=minimal'
-    },
-    body:JSON.stringify({clave:clave,datos:JSON.stringify(payload)})
+    headers:afSupabaseHeaders({'Content-Type':'application/json'}),
+    body:JSON.stringify({ p_paciente_ref: clave, p_payload: payload })
   })
   .then(function(r){
-    if(r.ok||r.status===201||r.status===200||r.status===204){
-      toast('Datos guardados \u2713 Abr\u00ed GECLISA y us\u00e1 el marcador'+(typeof AF_ENV!=='undefined'&&AF_ENV.dev?' (DEV)':''));
-      setTimeout(function(){window.open('http://sanatoriomayo.myvnc.com:84','_blank');},500);
-    } else {
-      r.text().then(function(t){toast('Error guardando: '+t.slice(0,60));});
+    return r.text().then(function(t){
+      var data=null;
+      try{ data=t?JSON.parse(t):null; }catch(e){ data=null; }
+      if(!r.ok){
+        // Solo tratar como "RPC ausente" códigos PostgREST de schema cache / not found.
+        // Antes: cualquier body con el nombre de la función se etiquetaba mal (p.ej. no_auth).
+        var code=(data&&(data.code||data.error))||'';
+        var msg=(data&&(data.message||data.error_description))||t.slice(0,160)||('HTTP '+r.status);
+        if(r.status===404||code==='PGRST202'||code==='42883'||/Could not find the function/i.test(msg)){
+          throw new Error('Falta ejecutar el SQL 008a/008 en Supabase (token GECLISA) o recargar schema PostgREST. Detalle: '+msg.slice(0,100));
+        }
+        throw new Error(msg);
+      }
+      return data;
+    });
+  })
+  .then(function(res){
+    if(!res||res.ok===false){
+      var err=(res&&res.error)||'no_ok';
+      if(err==='upgrade'||err==='bloqueado'){toast('Plan no permite GECLISA');return;}
+      toast('No se pudo crear token: '+err);
+      return;
     }
+    var token=res.token||'';
+    if(!token||token.length<32){toast('Token inválido del servidor');return;}
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(token);
+    }catch(e){}
+    window._afLastGeclisaToken=token;
+    alert(
+      'TOKEN GECLISA (un solo uso · 2 horas)\n\n'+
+      token+
+      '\n\nYa está en el portapapeles si el navegador lo permitió.\n'+
+      'Abrí GECLISA → ejecutá el marcador → pegá este token cuando te lo pida.'
+    );
+    toast('Token listo ✓ Abrí GECLISA y usá el marcador');
+    setTimeout(function(){window.open('http://sanatoriomayo.myvnc.com:84','_blank');},400);
   })
   .catch(function(e){
-    toast('Error de red: '+e.message);
+    toast('Error GECLISA: '+(e.message||e));
   });
 }
 

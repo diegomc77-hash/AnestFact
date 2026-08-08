@@ -1,0 +1,1 @@
+javascript:void(fetch('https://diegomc77-hash.github.io/AnestFact/fill.js?t='+Date.now()).then(function(r){return r.text();}).then(function(code){try{(new Function(code))();}catch(e){alert('Error: '+e.message);}}).catch(function(e){alert('Error cargando script: '+e.message);}));

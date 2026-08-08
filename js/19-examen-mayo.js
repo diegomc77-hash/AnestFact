@@ -209,28 +209,31 @@ function actualizarViaAerea(){
   var tipo=document.getElementById('fj-tec-tipo')?document.getElementById('fj-tec-tipo').value:'';
   var sel=document.getElementById('fj-via');
   var viaWrap=sel?sel.closest('.field'):null;
+  var viaLabel=viaWrap?viaWrap.querySelector('label'):null;
   if(!sel)return;
   var prevVal=sel.value;
+  if(prevVal==='Puntas nasales')prevVal='C\u00e1nula nasal';
   sel.innerHTML='<option value="">&mdash;</option>';
   if(tipo==='general'){
-    // Anestesia General — dispositivos de vía aérea
-    [['IOT','Intubación Orotraqueal'],
-     ['INT_NASO','Intubación Nasotraqueal'],
-     ['TRAQUEO','Traqueostomía'],
-     ['ML','Máscara Laríngea (Dispositivo Supraglótico)']
+    if(viaLabel)viaLabel.textContent='V\u00eda a\u00e9rea';
+    [['IOT','Intubaci\u00f3n Orotraqueal'],
+     ['INT_NASO','Intubaci\u00f3n Nasotraqueal'],
+     ['TRAQUEO','Traqueostom\u00eda'],
+     ['ML','M\u00e1scara Lar\u00edngea (Dispositivo Supragl\u00f3tico)']
     ].forEach(function(op){
       var o=document.createElement('option');o.value=op[0];o.textContent=op[1];sel.appendChild(o);
     });
     if(viaWrap)viaWrap.style.display='block';
   } else if(tipo==='sedacion'){
-    // Sedación — soporte de oxígeno
-    ['Puntas nasales','Máscara simple','Máscara con reservorio','Ventilación espontánea al aire ambiente'
+    // Sedación — soporte de oxígeno (no dispositivos de AG)
+    if(viaLabel)viaLabel.textContent='Soporte de ox\u00edgeno';
+    ['C\u00e1nula nasal','M\u00e1scara simple','M\u00e1scara con reservorio','Ventilaci\u00f3n espont\u00e1nea al aire ambiente'
     ].forEach(function(op){
       var o=document.createElement('option');o.value=op;o.textContent=op;sel.appendChild(o);
     });
     if(viaWrap)viaWrap.style.display='block';
   } else {
-    // Regional / Bloqueo / Local — no aplica vía aérea
+    if(viaLabel)viaLabel.textContent='V\u00eda a\u00e9rea';
     var o=document.createElement('option');o.value='no_aplica';o.textContent='No aplica';sel.appendChild(o);
     sel.value='no_aplica';
     if(viaWrap)viaWrap.style.display='none';
@@ -239,8 +242,12 @@ function actualizarViaAerea(){
     return;
   }
   actualizarMonitoreoMayo({force:true});
-  // Restaurar valor previo si sigue siendo válido
-  if(prevVal)sel.value=prevVal;
+  // Restaurar solo si la opción existe en el select actual
+  if(prevVal){
+    var ok=false;
+    for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===prevVal){ok=true;break;}}
+    sel.value=ok?prevVal:'';
+  }
   actualizarMetodos();
 }
 

@@ -55,7 +55,15 @@ function go(id,addH){
   }
   if(id==='resumen')renderResumen();
   if(id==='foja'){
-    cargarFojaUI();
+    // Evitar resetear la foja si ya está cargada la misma intervención (pisa sedación/vía/drogas a medias)
+    var cid=S.cur?S.cur.id:null;
+    if(typeof _fojaUiCurId==='undefined'||_fojaUiCurId!==cid){
+      if(typeof cargarFojaUI==='function')cargarFojaUI();
+    } else {
+      if(typeof actualizarViaAerea==='function')actualizarViaAerea();
+      if(typeof _sugerirDrogasPorTec==='function')_sugerirDrogasPorTec();
+      if(typeof refrescarMetodosDesdeDrogas==='function')refrescarMetodosDesdeDrogas();
+    }
     renderRecupSelects();
     setTimeout(function(){if(typeof initExamenAuscUI==='function')initExamenAuscUI();},120);
     setTimeout(initSign,80);
@@ -68,6 +76,7 @@ function go(id,addH){
   if(id==='config'){
     document.getElementById('cfg-key').value=S.key;actualizarKeyStatus();
     if(typeof refreshCfgUi==='function')refreshCfgUi();
+    if(typeof cargarAnestesista==='function')cargarAnestesista();
   }
   if(id==='facturacion'){
     if(typeof refreshFacturacionHeader==='function')refreshFacturacionHeader();
@@ -96,32 +105,62 @@ function guardarAnestesista(){
   var nombre=document.getElementById('cfg-anest-nombre').value.trim().toUpperCase();
   var mp=document.getElementById('cfg-anest-mp').value.trim();
   var me=document.getElementById('cfg-anest-me').value.trim();
-  if(!nombre){alert('Ingresá el nombre del anestesista');return;}
-  localStorage.setItem('af_anest_nombre',nombre);
-  localStorage.setItem('af_anest_mp',mp);
-  localStorage.setItem('af_anest_me',me);
-  document.getElementById('anest-status').textContent='✓ Guardado: '+nombre+' M.P.'+mp;
-  // Actualizar header
-  var h=document.getElementById('header-anest-info');
-  if(h)h.textContent=nombre+' · M.P.'+mp+' · ADAARC';
-  toast('Datos del anestesista guardados ✓');
-  if(typeof syncAutoPull==='function'){
-    syncAutoPull(true).then(function(){
-      if(typeof syncAutoPush==='function')return syncAutoPush(true);
-    });
+  if(!nombre){alert('Ingresá el nombre del anestesista titular de ESTA cuenta');return;}
+  var uid=(typeof AF_AUTH!=='undefined'&&AF_AUTH.getUserId)?AF_AUTH.getUserId():'';
+  if(!uid){
+    toast('Iniciá sesión para vincular nombre y matrícula a tu plan');
+    return;
   }
+  // Si el servidor ya tiene identidad, no permitir "cambiar de anestesista" (prestarse la app)
+  var serverNom=(typeof USER_PROFILE!=='undefined'&&USER_PROFILE&&USER_PROFILE.nombre)?String(USER_PROFILE.nombre).toUpperCase().trim():'';
+  var serverMp=(USER_PROFILE&&USER_PROFILE.matricula)?String(USER_PROFILE.matricula).trim():'';
+  if(serverNom&&serverNom!==nombre){
+    if(!confirm('Tu cuenta ya está registrada a nombre de:\n'+serverNom+'\n\nUn plan es personal: no se puede usar para firmar como otro anestesista.\n¿Solo corregir un error de tipeo en TU nombre?'))return;
+  }
+  if(serverMp&&mp&&serverMp!==mp){
+    if(!confirm('La matrícula provincial de tu cuenta es '+serverMp+'.\n¿Confirmás el cambio a '+mp+' (corrección, no otro profesional)?'))return;
+  }
+  fetch(afSupabaseUrl()+'/rest/v1/anesfact_usuarios?id=eq.'+encodeURIComponent(uid),{
+    method:'PATCH',
+    headers:afSupabaseHeaders({'Content-Type':'application/json','Prefer':'return=minimal'}),
+    body:JSON.stringify({nombre:nombre,matricula:mp,matricula_especial:me||''})
+  }).then(function(r){
+    if(!r.ok)return r.text().then(function(t){throw new Error(t.slice(0,80)||('HTTP '+r.status));});
+    if(typeof USER_PROFILE==='object'&&USER_PROFILE){
+      USER_PROFILE.nombre=nombre;USER_PROFILE.matricula=mp;USER_PROFILE.matricula_especial=me;
+    }
+    if(typeof AfIdentidad!=='undefined')AfIdentidad.syncLocal({nombre:nombre,mp:mp,me:me});
+    else{
+      localStorage.setItem('af_anest_nombre',nombre);
+      localStorage.setItem('af_anest_mp',mp);
+      localStorage.setItem('af_anest_me',me);
+    }
+    var st=document.getElementById('anest-status');
+    if(st)st.textContent='✓ Identidad de cuenta: '+nombre+' M.P.'+mp;
+    var h=document.getElementById('header-anest-info');
+    if(h)h.textContent=nombre+' · M.P.'+mp+' · ADAARC';
+    toast('Identidad profesional guardada en tu plan ✓');
+  }).catch(function(e){
+    toast('No se pudo guardar en servidor: '+(e.message||e));
+  });
 }
 
 function cargarAnestesista(){
-  var nombre=localStorage.getItem('af_anest_nombre')||'';
-  var mp=localStorage.getItem('af_anest_mp')||'';
-  var me=localStorage.getItem('af_anest_me')||'';
-  var el=document.getElementById('cfg-anest-nombre');if(el)el.value=nombre;
-  var el2=document.getElementById('cfg-anest-mp');if(el2)el2.value=mp;
-  var el3=document.getElementById('cfg-anest-me');if(el3)el3.value=me;
+  var id=(typeof AfIdentidad!=='undefined')?AfIdentidad.get():null;
+  var nombre=id?id.nombre:(localStorage.getItem('af_anest_nombre')||'');
+  var mp=id?id.mp:(localStorage.getItem('af_anest_mp')||'');
+  var me=id?id.me:(localStorage.getItem('af_anest_me')||'');
+  var el=document.getElementById('cfg-anest-nombre');if(el){el.value=nombre;el.readOnly=false;}
+  var el2=document.getElementById('cfg-anest-mp');if(el2){el2.value=mp;el2.readOnly=false;}
+  var el3=document.getElementById('cfg-anest-me');if(el3){el3.value=me;el3.readOnly=false;}
   var h=document.getElementById('header-anest-info');
   if(h&&nombre)h.textContent=nombre+' · M.P.'+mp+' · ADAARC';
-  // Primera vez: redirigir a config
+  var hint=document.getElementById('anest-plan-hint');
+  if(hint){
+    hint.textContent='Un plan = un anestesista. Nombre y matrícula quedan ligados a tu cuenta (no prestar la app).';
+  }
+  if(typeof AfFirma!=='undefined'&&AfFirma.boot)AfFirma.boot();
+  if(typeof refreshPlanCardUi==='function')refreshPlanCardUi();
   if(!nombre&&!localStorage.getItem('af_anest_visto')){
     localStorage.setItem('af_anest_visto','1');
     setTimeout(function(){go('config');toast('Configurá tus datos de anestesista → Ajustes');},800);
@@ -178,13 +217,22 @@ function copyVal(text,label){
 function saveKey(){S.key=document.getElementById('cfg-key').value.trim();localStorage.setItem('af_k',S.key);actualizarKeyStatus();toast('API Key guardada');}
 function actualizarKeyStatus(){var el=document.getElementById('key-status');if(!el)return;el.textContent=S.key?'Key: '+S.key.slice(0,8)+'...':'Sin key';el.style.color=S.key?'var(--green)':'var(--yellow)';}
 function onSanChange(){
-  var s=document.getElementById('f-san').value;
+  var sanEl=document.getElementById('f-san');
+  if(!sanEl)return;
+  if(typeof AfSanatoriosPlan!=='undefined'&&!AfSanatoriosPlan.assertCurrent()){
+    return;
+  }
+  var s=sanEl.value;
   // Also update foja view if visible
   setTimeout(renderFojaPorSanatorio,50);
-  document.getElementById('f-aero-wrap').style.display=s==='Hospital Aeronáutico'?'block':'none';
+  var aw=document.getElementById('f-aero-wrap');
+  if(aw)aw.style.display=s==='Hospital Aeronáutico'?'block':'none';
   var mw=document.getElementById('f-mayo-wrap');if(mw)mw.style.display=s==='Sanatorio Mayo'?'block':'none';
   var mb=document.getElementById('btn-mayo-wrap');if(mb)mb.style.display=s==='Sanatorio Mayo'?'block':'none';
   if(s==='Sanatorio Mayo')updateMayoCamas();
+  // Recargar sugerencias de cirujano según el lugar
+  if(typeof actualizarHintCirujano==='function')actualizarHintCirujano();
+  if(typeof acCirujano==='function')acCirujano();
 }
 function updateMayoCamas(){
   var sec=document.getElementById('f-mayo-sector');var cam=document.getElementById('f-mayo-cama');

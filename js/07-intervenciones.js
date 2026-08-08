@@ -26,12 +26,16 @@ function filterIntervs(list){
   });
 }
 function renderHome(){
+  if(typeof refreshAdminPlanAlerts==='function'&&typeof isAdmin==='function'&&isAdmin()){
+    refreshAdminPlanAlerts();
+  }
   var total=(S.intervs||[]).length;
   var filtradas=filterIntervs(S.intervs||[]);
   var n=filtradas.length;
   var countTxt=n+' de '+total+' intervención'+(total!==1?'es':'');
   if(n!==total)countTxt+=' (filtradas)';
-  document.getElementById('home-count').textContent=countTxt;
+  var hc=document.getElementById('home-count');
+  if(hc)hc.textContent=countTxt;
   var lst=document.getElementById('inter-list');
   if(!total){lst.innerHTML='<div style="text-align:center;padding:48px 16px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px">🏥</div><div>Sin intervenciones</div><div style="font-size:12px;margin-top:6px">Tocá + Nueva para empezar</div></div>';return;}
   if(!n){lst.innerHTML='<div style="text-align:center;padding:32px 16px;color:var(--text3)"><div style="font-size:14px">Ninguna foja coincide con el filtro</div><button class="btn btn-s" style="width:auto;margin-top:12px;padding:8px 14px;font-size:12px" onclick="limpiarFiltrosHome()">Limpiar filtros</button></div>';return;}
@@ -102,6 +106,7 @@ function refreshFacturacionHeader(){
 }
 function guardar(extra){
   if(!S.cur)return;
+  if(document.getElementById('f-san')&&typeof AfSanatoriosPlan!=='undefined'&&!AfSanatoriosPlan.assertCurrent())return;
   if(document.getElementById('f-fecha')){
     S.cur.fecha=gv('f-fecha');S.cur.pac=gv('f-pac');
     S.cur.edad=gv('f-edad');S.cur.sexo=gv('f-sexo');S.cur.dni=gv('f-dni');
@@ -119,6 +124,7 @@ function guardar(extra){
   if(idx>=0)S.intervs[idx]=S.cur;else S.intervs.push(S.cur);
   S.cur._ts=Date.now();
   saveIntervsToStorage();
+  if(typeof maybeBumpDemoFojaOnSave==='function')maybeBumpDemoFojaOnSave();
   // Learn cirujano
   if(S.cur.ciru&&S.cur.ciru.trim()){var c=S.cur.ciru.trim();if(cirujanos.indexOf(c)<0){cirujanos.push(c);localStorage.setItem('af_ciru',JSON.stringify(cirujanos));}}
   if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();

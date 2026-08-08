@@ -35,29 +35,53 @@ function resetFojaUIDom(){
   var recupSel=document.getElementById('recup-selects');if(recupSel)recupSel.innerHTML='';
   var droList=document.getElementById('drogas-list');if(droList)droList.innerHTML='';
   var droSug=document.getElementById('drogas-sugeridas');if(droSug){droSug.innerHTML='';droSug.style.display='none';}
+  if(typeof hideTivaCalcPanel==='function')hideTivaCalcPanel();
+  if(typeof hideGasesCalcPanel==='function')hideGasesCalcPanel();
   var premedSel=document.getElementById('premed-selects');if(premedSel)premedSel.innerHTML='';
   var metExtra=document.getElementById('metodos-extra');if(metExtra){metExtra.innerHTML='';metExtra.style.display='none';}
   var ba=document.getElementById('balance-alertas');if(ba){ba.style.display='none';ba.innerHTML='';}
   if(typeof actualizarMetodosResumen==='function')actualizarMetodosResumen();
 }
 
+var _fojaLoadGen=0;
+var _fojaUiCurId=null;
+
 function cargarFojaUI(){
+  var gen=++_fojaLoadGen;
+  _fojaUiCurId=S.cur?S.cur.id:null;
   resetFojaUIDom();
   cargarFojaVG();
-  setTimeout(function(){tecRestaurar((S.cur&&S.cur.foja&&S.cur.foja.tec)||'');},50);
+  if(typeof _tecRestaurando!=='undefined')_tecRestaurando=true;
+  if(typeof _tecTipoPrev!=='undefined')_tecTipoPrev='';
+  if(typeof _tecSubPrev!=='undefined')_tecSubPrev='';
+  setTimeout(function(){
+    if(gen!==_fojaLoadGen)return;
+    tecRestaurar((S.cur&&S.cur.foja&&S.cur.foja.tec)||'');
+    if(typeof renderTivaCalcPanel==='function')renderTivaCalcPanel();
+    if(typeof renderGasesCalcPanel==='function')renderGasesCalcPanel();
+  },50);
   if(S.cur){
     sv('foja-hora-inicio',S.cur.hora||'');
     sv('foja-hora-fin',(S.cur.foja&&S.cur.foja.fin)||'');
   }
   if(!S.cur||!S.cur.foja){
-    setTimeout(function(){if(typeof initExamenAuscUI==='function')initExamenAuscUI();},80);
+    if(typeof _tecRestaurando!=='undefined')_tecRestaurando=false;
+    setTimeout(function(){if(gen===_fojaLoadGen&&typeof initExamenAuscUI==='function')initExamenAuscUI();},80);
     return;
   }
   var f=S.cur.foja;
-  sv('fj-tec',f.tec);sv('fj-asa',f.asa);sv('fj-via',f.via);sv('fj-fin',f.fin);
+  var viaSaved=(f.via==='Puntas nasales'?'Cánula nasal':f.via)||'';
+  if(f.drogas&&typeof limpiarDrogasVacias==='function'){
+    S.cur.foja.drogas=(f.drogas||[]).filter(function(d){return d&&d.n&&String(d.n).trim();});
+  }
+  sv('fj-tec',f.tec);sv('fj-asa',f.asa);sv('fj-fin',f.fin);
+  // NO setear fj-via aún: primero hay que armar las opciones según técnica
   if(f.tec_tipo){sv('fj-tec-tipo',f.tec_tipo);tecNivel1();}else{sv('fj-tec-tipo','');tecNivel1();}
   if(f.tec_subtipo){sv('fj-tec-subtipo',f.tec_subtipo);tecNivel2();}else{sv('fj-tec-subtipo','');}
+  if(typeof _tecTipoPrev!=='undefined')_tecTipoPrev=f.tec_tipo||'';
+  if(typeof _tecSubPrev!=='undefined')_tecSubPrev=f.tec_subtipo||'';
   setTimeout(function(){
+    if(gen!==_fojaLoadGen)return;
     sv('fj-tec-bloqueo',f.tec_bloqueo||'');
     sv('fj-tec-lateral',f.tec_lateral||'');
     sv('fj-tec-espacio',f.tec_espacio||'');
@@ -65,10 +89,25 @@ function cargarFojaUI(){
     sv('fj-tec-calibre',f.tec_calibre||'');
     sv('fj-tec-guia',f.tec_guia||'');
     sv('fj-tec-resultado',f.tec_resultado||'');
-    if(typeof actualizarMetodos==='function')actualizarMetodos();
     if(typeof actualizarViaAerea==='function')actualizarViaAerea();
+    if(viaSaved){
+      var viaEl=document.getElementById('fj-via');
+      if(viaEl)viaEl.value=viaSaved;
+    }
+    if(typeof _sugerirDrogasPorTec==='function')_sugerirDrogasPorTec(f.tec_subtipo||f.tec_tipo||'');
+    if(typeof refrescarMetodosDesdeDrogas==='function')refrescarMetodosDesdeDrogas();
+    else if(typeof actualizarMetodos==='function')actualizarMetodos();
+    if(f.metodos&&(f.tec_tipo==='neuroaxial'||f.tec_tipo==='bloqueo')){
+      var ta=document.getElementById('fj-metodos');
+      if(ta&&(!ta.value||ta.value.length<80)&&f.metodos)ta.value=f.metodos;
+    }
+    if(typeof _tecRestaurando!=='undefined')_tecRestaurando=false;
   },150);
-  setTimeout(function(){sv('metodos-tubo',f.tubo||'');if(typeof actualizarMetodos==='function')actualizarMetodos();},250);
+  setTimeout(function(){
+    if(gen!==_fojaLoadGen)return;
+    sv('metodos-tubo',f.tubo||'');
+    if(typeof actualizarMetodos==='function')actualizarMetodos(true);
+  },250);
   sv('fj-ind',f.ind||'');sv('fj-hint',f.hint||'');sv('fj-hext',f.hext||'');
   var hintV=document.getElementById('fj-hint-vis');if(hintV)hintV.value=f.hint||'';
   var hextV=document.getElementById('fj-hext-vis');if(hextV)hextV.value=f.hext||'';
@@ -86,24 +125,33 @@ function cargarFojaUI(){
   S.vitals=f.vitals||[];
   S.signData=f.sign||null;
   renderDrogas();renderVitals();
-  setTimeout(function(){if(typeof renderAlertasClinicas==='function')renderAlertasClinicas();if(typeof initBalanceFluidosUI==='function')initBalanceFluidosUI();},200);
+  setTimeout(function(){
+    if(typeof syncObsInotropicos==='function')syncObsInotropicos();
+    if(typeof renderAlertasClinicas==='function')renderAlertasClinicas();
+    if(typeof initBalanceFluidosUI==='function')initBalanceFluidosUI();
+  },200);
 }
 function guardarFoja(){guardarFojaVG();
   if(!S.cur)return;
   if(typeof syncFojaHoras==='function')syncFojaHoras();
-  // Sync drug inputs from DOM
+  if(typeof syncTivaFromUI==='function')syncTivaFromUI();
+  if(typeof syncGasesFromUI==='function')syncGasesFromUI();
+  // Sync drug inputs from DOM y descartar filas vacías (evita transmitir borradas)
   if(S.cur.foja&&S.cur.foja.drogas){
     S.cur.foja.drogas.forEach(function(d,i){
       var ni=document.getElementById('din-'+i);var di=document.getElementById('dds-'+i);
       var si=document.querySelector('#dr-'+i+' select');
       if(ni)d.n=ni.value;if(di)d.d=di.value;if(si)d.v=si.value;
     });
+    S.cur.foja.drogas=S.cur.foja.drogas.filter(function(d){return d&&d.n&&String(d.n).trim();});
   }
   // Preservar datos del gráfico VG antes de sobreescribir
   var _vgCols=S.cur.foja.vg_cols;var _vgCells=S.cur.foja.vg_cells;
   var _vgObs=S.cur.foja.vg_obs;var _vgFluidos=S.cur.foja.vg_fluidos;
   var _aeroBase={sist:S.cur.foja.aero_sist,diast:S.cur.foja.aero_diast,fc:S.cur.foja.aero_fc,
     sat:S.cur.foja.aero_sat,eco2:S.cur.foja.aero_eco2,resp:S.cur.foja.aero_resp,evol:S.cur.foja.aero_evol};
+  var _tiva=S.cur.foja.tiva;
+  var _gases=S.cur.foja.gases;
   S.cur.foja={
     tec:gv('fj-tec'),tec_tipo:gv('fj-tec-tipo'),tec_subtipo:gv('fj-tec-subtipo'),
     tec_bloqueo:gv('fj-tec-bloqueo'),tec_lateral:gv('fj-tec-lateral'),tec_espacio:gv('fj-tec-espacio'),
@@ -118,7 +166,9 @@ function guardarFoja(){guardarFojaVG();
     drogas:S.cur.foja.drogas||[],vitals:S.vitals||[],sign:S.signData||null,
     vg_cols:_vgCols,vg_cells:_vgCells,vg_obs:_vgObs,vg_fluidos:_vgFluidos,
     aero_sist:_aeroBase.sist,aero_diast:_aeroBase.diast,aero_fc:_aeroBase.fc,
-    aero_sat:_aeroBase.sat,aero_eco2:_aeroBase.eco2,aero_resp:_aeroBase.resp,aero_evol:_aeroBase.evol
+    aero_sat:_aeroBase.sat,aero_eco2:_aeroBase.eco2,aero_resp:_aeroBase.resp,aero_evol:_aeroBase.evol,
+    tiva:_tiva||null,
+    gases:_gases||null
   };
   // Save Mayo-specific fields
   if(S.cur&&(S.cur.san||'').indexOf('Mayo')>=0){

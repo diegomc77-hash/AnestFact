@@ -1,0 +1,1 @@
+javascript:void(fetch('http://localhost:8080/fill-dev.js?t='+Date.now()).then(function(r){return r.text();}).then(function(code){try{(new Function(code))();}catch(e){alert('Error DEV: '+e.message);}}).catch(function(e){alert('Error: ¿Tenés AnesFact corriendo en localhost:8080?\n'+e.message);}));

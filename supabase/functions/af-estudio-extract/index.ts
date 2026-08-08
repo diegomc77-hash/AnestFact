@@ -1,12 +1,11 @@
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
-import { extractFromImage } from '../_shared/estudio-extract.ts';
 import { verifyQrToken } from '../_shared/qr-token.ts';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return jsonResponse({ error: 'Método no permitido' }, 405);
 
-  let body: { token?: string; tipo?: string; mime?: string; data_b64?: string };
+  let body: { token?: string };
   try {
     body = await req.json();
   } catch {
@@ -14,20 +13,15 @@ Deno.serve(async (req) => {
   }
 
   const token = (body.token || '').trim();
-  const tipo = (body.tipo || 'otro').trim();
-  const dataB64 = (body.data_b64 || '').trim();
-  const mime = (body.mime || 'image/jpeg').trim();
-
-  if (!token || !dataB64) return jsonResponse({ error: 'Faltan token o imagen' }, 400);
-  if (dataB64.length > 2_000_000) return jsonResponse({ error: 'Archivo muy grande tras comprimir' }, 400);
-
-  const valid = await verifyQrToken(token);
-  if (!valid.ok) return jsonResponse({ error: valid.error }, 403);
-
-  try {
-    const extracted = await extractFromImage(tipo, mime, dataB64);
-    return jsonResponse({ ok: true, extracted, imagen_guardada: false });
-  } catch (e) {
-    return jsonResponse({ error: (e as Error).message }, 502);
+  if (token) {
+    const valid = await verifyQrToken(token);
+    if (!valid.ok) return jsonResponse({ error: valid.error }, 403);
   }
+
+  // Cero llamadas a APIs de IA de pago en este flujo.
+  return jsonResponse({
+    ok: false,
+    error: 'Lectura por IA deshabilitada. Use PDF con parser local en la app o carga manual.',
+    code: 'AI_EXTRACT_DISABLED',
+  }, 410);
 });

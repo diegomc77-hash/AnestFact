@@ -1,7 +1,24 @@
   <div class="card">
     <div class="ct">Medicación / Agentes anestésicos</div>
     <div id="alertas-clinicas" style="display:none;margin-bottom:10px;padding:10px 12px;border-radius:8px;background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.35)"></div>
-    <p style="font-size:11px;color:var(--text3);margin-bottom:10px">Primeras letras → sugerencias. Dosis calculadas por peso del paciente.</p>
+    <p id="drogas-hint" style="font-size:11px;color:var(--text3);margin-bottom:10px">Primeras letras → sugerencias. Dosis por peso (y duración en TIVA / MAC en gases).</p>
+
+    <div id="tiva-calc-panel" style="display:none;margin-bottom:8px">
+      <p class="tiva-mini-note">TIVA: dosis por kg + duración (Tiempos). Elegí en Inducción y Mantenimiento.</p>
+      <div class="tiva-mini-row">
+        <div class="field" style="margin:0"><label>Talla cm (opcional)</label><input class="fi" type="text" inputmode="decimal" id="tiva-talla" placeholder="170" autocomplete="off" oninput="onTivaInputChange()"></div>
+        <div class="field" style="margin:0"><label>Estímulo remi</label>
+          <select class="fi" id="tiva-estimulo" onchange="onTivaInputChange()">
+            <option value="bajo">Bajo 0.1</option>
+            <option value="medio" selected>Medio 0.2</option>
+            <option value="alto">Alto 0.5</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel MAC grande eliminado: el cálculo va en el desplegable Mantenimiento -->
+
     <div id="drogas-sugeridas" style="display:none;margin-bottom:12px"></div>
     <div id="drogas-list"></div>
     <div class="brow" style="margin-top:8px;gap:6px">

@@ -1,5 +1,5 @@
 var AF_HELP_PREFIX='anesfact_help_';
-var HELP_CAT_LABELS={sync:'Sync',geclisa:'GECLISA',foja:'Foja',scan:'Escaneo IA',nom:'Nomenclador',datos:'Datos',otro:'Otro'};
+var HELP_CAT_LABELS={plan:'Plan',sync:'Sync',geclisa:'GECLISA',foja:'Foja',scan:'Escaneo IA',nom:'Nomenclador',datos:'Datos',otro:'Otro'};
 
 function helpStatus(msg,color){
   var el=document.getElementById('help-status');if(!el)return;
@@ -23,10 +23,13 @@ function buildHelpTicket(cat,msg,pasos,includeCtx){
 }
 
 function postHelpTicket(ticket){
+  var oid=(typeof AF_AUTH!=='undefined'&&AF_AUTH.getUserId)?AF_AUTH.getUserId():null;
+  var row={clave:AF_HELP_PREFIX+ticket.id,datos:JSON.stringify(ticket)};
+  if(oid)row.owner_id=oid;
   return fetch(afSupabaseUrl()+'/rest/v1/anesfact_datos',{
     method:'POST',
     headers:afSupabaseHeaders({'Content-Type':'application/json','Prefer':'return=minimal'}),
-    body:JSON.stringify({clave:AF_HELP_PREFIX+ticket.id,datos:JSON.stringify(ticket)})
+    body:JSON.stringify(row)
   });
 }
 
@@ -103,6 +106,10 @@ function renderAyudaList(){
 
 function cargarReportesNube(){
   var box=document.getElementById('help-cloud-list');if(!box)return;
+  if(typeof USER_IS_ADMIN==='undefined'||!USER_IS_ADMIN){
+    box.innerHTML='<p style="font-size:12px;color:var(--text3)">Solo el administrador puede ver reportes de todos los usuarios.</p>';
+    return;
+  }
   box.innerHTML='<p style="font-size:12px;color:var(--text3)">Cargando...</p>';
   fetch(afSupabaseUrl()+'/rest/v1/anesfact_datos?clave=like.'+encodeURIComponent(AF_HELP_PREFIX)+'*&select=clave,datos&order=clave.desc&limit=40',{
     headers:afSupabaseHeaders()
@@ -116,13 +123,14 @@ function cargarReportesNube(){
       var cat=HELP_CAT_LABELS[t.categoria||'otro']||t.categoria||'?';
       var fecha=t.fecha?new Date(t.fecha).toLocaleString():'';
       var who=t.anestesista||'';
+      var ctxPac=(t.contexto&&t.contexto.pac)?' · [contexto paciente oculto en listado]':'';
       return '<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:12px">'
-        +'<div style="font-weight:600;color:var(--blue)">'+cat+(who?' · '+who:'')+'</div>'
+        +'<div style="font-weight:600;color:var(--blue)">'+cat+(who?' · '+who:'')+ctxPac+'</div>'
         +'<div style="color:var(--text3);font-size:11px">'+fecha+'</div>'
         +'<div style="margin-top:4px">'+String(t.mensaje||'').replace(/</g,'&lt;')+'</div></div>';
     }).join('');
   }).catch(function(e){
-    box.innerHTML='<p style="font-size:12px;color:var(--red)">No se pudieron cargar ('+e.message+'). Revisá en Supabase.</p>';
+    box.innerHTML='<p style="font-size:12px;color:var(--red)">No se pudieron cargar ('+e.message+').</p>';
   });
 }
 

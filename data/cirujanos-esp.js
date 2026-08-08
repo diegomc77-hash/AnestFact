@@ -1,2 +1,47 @@
-var CIRUJANOS_ESP={'Cirug\u00eda Cardiovascular':['BOCHINFUSO MATIAS','GUEVARA JORGE ALEJANDRO'],'Cardiocirug\u00eda':['BOCHINFUSO MATIAS','GUEVARA JORGE ALEJANDRO'],'Cirug\u00eda de Cabeza y Cuello':['CORBALL ALBERTO GUSTAVO','FLORES GABRIEL ALEJANDRO','MENSO NICOLAS'],'Cirug\u00eda Tor\u00e1cica':['REPETTI JOSE LUIS'],'Cirug\u00eda General':['COOKE JOSE ALBERTO','COPPARI BRIAN','MATUS GUSTAVO NICOLAS','ZURITA GONZALO'],'Cirug\u00eda Laparosc\u00f3pica':['COOKE JOSE ALBERTO','COPPARI BRIAN','MATUS GUSTAVO NICOLAS','ZURITA GONZALO'],'Cirug\u00eda Hep\u00e1tica':['ALVAREZ FERNANDO ANDRES'],'Cirug\u00eda Pl\u00e1stica y Reparadora':['PAOLETTI JAVIER ALBERTO','ROMERO ARENA FEDERICO'],'Cirug\u00eda Vascular':['FONTAINE CRISTIAN','PELAEZ RODRIGO'],'Endoscop\u00eda Digestiva':['BONAPARTE FERNANDO AGUSTIN','IRIARTE HORACIO FERNANDO','STRUMIA SILVINA DEL VALLE'],'Gastroenterolog\u00eda':['BONAPARTE FERNANDO AGUSTIN','IRIARTE HORACIO FERNANDO','STRUMIA SILVINA DEL VALLE'],'Ginecolog\u00eda y Obstetricia':['GIL ANA MARIA IRENE','ARRECHEA MARIANA','CANAVESIO CAROLA ALEJANDRA','CAPOVILLA CLAUDIA PATRICIA','PIOVANO MARIA PATRICIA'],'Hemodinamia':['LEONARDI CARLOS RAUL','CHIARINI FERNANDO','FONTAINE CRISTIAN','MIARA JONATHAN','PESSAH GUSTAVO'],'Neurocirug\u00eda':['BERRA MATIAS SEBASTIAN','SANCHEZ JAVIER ANTONIO'],'Oftalmolog\u00eda':['GONZALEZ CASTELLANOS JERONIMO','ALVAREZ MARIA ALEJANDRA','GONZALEZ CASTELLANOS MARIA S','LAURIA LUIS FRANCISCO'],'ORL (Otorrinolaringolog\u00eda)':['FREIRE BUTELER IGNACIO'],'Traumatolog\u00eda y Ortopedia':['BENINGAZZA GABRIEL','AROCENA MARIANO','CEREZO RIZZI EMANUEL','FERREYRA PABLO','GORGAS ALBERTO','GUZMAN NICOLAS','JAIS JAIS JOSE FARID','VILLAFA\u00d1E GONZALO DARIO'],'Obesolog\u00eda / Bari\u00e1trica':['CLARIA JORGE','PIVA EUGENIO','ZURITA GONZALO'],'Urolog\u00eda':['PINTO GABRIEL FERNANDO','SONZINI CRISTIAN','MEINCKE SOFIA MARIA','PASTRANA RODRIGO EMANUEL']};
+// Cirujanos por lugar + especialidad (predictivo en Datos de la intervención).
+// Hospital Aeronáutico: pendiente de cargar (lo aporta el usuario).
+// Otras clínicas: sin catálogo fijo → solo aprendidos de intervenciones previas del mismo lugar.
 
+var CIRUJANOS_POR_LUGAR = {
+  'Sanatorio Mayo': {
+    'Cirugía Cardiovascular': ['BOCHINFUSO MATIAS', 'GUEVARA JORGE ALEJANDRO'],
+    'Cardiocirugía': ['BOCHINFUSO MATIAS', 'GUEVARA JORGE ALEJANDRO'],
+    'Cirugía de Cabeza y Cuello': ['CORBALL ALBERTO GUSTAVO', 'FLORES GABRIEL ALEJANDRO', 'MENSO NICOLAS'],
+    'Cirugía Torácica': ['REPETTI JOSE LUIS'],
+    'Cirugía General': ['COOKE JOSE ALBERTO', 'COPPARI BRIAN', 'MATUS GUSTAVO NICOLAS', 'ZURITA GONZALO'],
+    'Cirugía Laparoscópica': ['COOKE JOSE ALBERTO', 'COPPARI BRIAN', 'MATUS GUSTAVO NICOLAS', 'ZURITA GONZALO'],
+    'Cirugía Hepática': ['ALVAREZ FERNANDO ANDRES'],
+    'Cirugía Plástica y Reparadora': ['PAOLETTI JAVIER ALBERTO', 'ROMERO ARENA FEDERICO'],
+    'Cirugía Vascular': ['FONTAINE CRISTIAN', 'PELAEZ RODRIGO'],
+    'Endoscopía Digestiva': ['BONAPARTE FERNANDO AGUSTIN', 'IRIARTE HORACIO FERNANDO', 'STRUMIA SILVINA DEL VALLE'],
+    'Gastroenterología': ['BONAPARTE FERNANDO AGUSTIN', 'IRIARTE HORACIO FERNANDO', 'STRUMIA SILVINA DEL VALLE'],
+    'Ginecología y Obstetricia': ['GIL ANA MARIA IRENE', 'ARRECHEA MARIANA', 'CANAVESIO CAROLA ALEJANDRA', 'CAPOVILLA CLAUDIA PATRICIA', 'PIOVANO MARIA PATRICIA'],
+    'Hemodinamia': ['LEONARDI CARLOS RAUL', 'CHIARINI FERNANDO', 'FONTAINE CRISTIAN', 'MIARA JONATHAN', 'PESSAH GUSTAVO'],
+    'Neurocirugía': ['BERRA MATIAS SEBASTIAN', 'SANCHEZ JAVIER ANTONIO'],
+    'Oftalmología': ['GONZALEZ CASTELLANOS JERONIMO', 'ALVAREZ MARIA ALEJANDRA', 'GONZALEZ CASTELLANOS MARIA S', 'LAURIA LUIS FRANCISCO'],
+    'ORL (Otorrinolaringología)': ['FREIRE BUTELER IGNACIO'],
+    'Traumatología y Ortopedia': ['BENINGAZZA GABRIEL', 'AROCENA MARIANO', 'CEREZO RIZZI EMANUEL', 'FERREYRA PABLO', 'GORGAS ALBERTO', 'GUZMAN NICOLAS', 'JAIS JAIS JOSE FARID', 'VILLAFAÑE GONZALO DARIO'],
+    'Obesología / Bariátrica': ['CLARIA JORGE', 'PIVA EUGENIO', 'ZURITA GONZALO'],
+    'Urología': ['PINTO GABRIEL FERNANDO', 'SONZINI CRISTIAN', 'MEINCKE SOFIA MARIA', 'PASTRANA RODRIGO EMANUEL'],
+    // Especialidades del select aún sin nómina completa en Mayo:
+    'Proctología': [],
+    'Mastología': [],
+    'Cirugía Pediátrica': [],
+    'Radiología Intervencionista': [],
+    'Odontología': []
+  },
+  'Hospital Aeronáutico': {
+    // Pendiente: cargar especialistas del Aeronáutico
+  }
+};
+
+// Compat: mapa Mayo (scripts viejos que lean CIRUJANOS_ESP)
+var CIRUJANOS_ESP = CIRUJANOS_POR_LUGAR['Sanatorio Mayo'];
+
+function getCirujanosMapForLugar(san) {
+  san = (san || '').trim();
+  if (typeof CIRUJANOS_POR_LUGAR !== 'undefined' && CIRUJANOS_POR_LUGAR[san]) {
+    return CIRUJANOS_POR_LUGAR[san];
+  }
+  return {};
+}

@@ -10,9 +10,51 @@ function acKey(e,lid){
 }
 function closeAllAC(){document.querySelectorAll('.ac-list').forEach(function(el){el.style.display='none';});}
 document.addEventListener('click',function(e){if(!e.target.closest||!e.target.closest('.ac-wrap'))closeAllAC();});
-// === CIRUJANOS POR ESPECIALIDAD ===
-var CIRUJANOS_ESP={'Cirug\u00eda Cardiovascular':['BOCHINFUSO MATIAS','GUEVARA JORGE ALEJANDRO'],'Cardiocirug\u00eda':['BOCHINFUSO MATIAS','GUEVARA JORGE ALEJANDRO'],'Cirug\u00eda de Cabeza y Cuello':['CORBALL ALBERTO GUSTAVO','FLORES GABRIEL ALEJANDRO','MENSO NICOLAS'],'Cirug\u00eda Tor\u00e1cica':['REPETTI JOSE LUIS'],'Cirug\u00eda General':['COOKE JOSE ALBERTO','COPPARI BRIAN','MATUS GUSTAVO NICOLAS','ZURITA GONZALO'],'Cirug\u00eda Laparosc\u00f3pica':['COOKE JOSE ALBERTO','COPPARI BRIAN','MATUS GUSTAVO NICOLAS','ZURITA GONZALO'],'Cirug\u00eda Hep\u00e1tica':['ALVAREZ FERNANDO ANDRES'],'Cirug\u00eda Pl\u00e1stica y Reparadora':['PAOLETTI JAVIER ALBERTO','ROMERO ARENA FEDERICO'],'Cirug\u00eda Vascular':['FONTAINE CRISTIAN','PELAEZ RODRIGO'],'Endoscop\u00eda Digestiva':['BONAPARTE FERNANDO AGUSTIN','IRIARTE HORACIO FERNANDO','STRUMIA SILVINA DEL VALLE'],'Gastroenterolog\u00eda':['BONAPARTE FERNANDO AGUSTIN','IRIARTE HORACIO FERNANDO','STRUMIA SILVINA DEL VALLE'],'Ginecolog\u00eda y Obstetricia':['GIL ANA MARIA IRENE','ARRECHEA MARIANA','CANAVESIO CAROLA ALEJANDRA','CAPOVILLA CLAUDIA PATRICIA','PIOVANO MARIA PATRICIA'],'Hemodinamia':['LEONARDI CARLOS RAUL','CHIARINI FERNANDO','FONTAINE CRISTIAN','MIARA JONATHAN','PESSAH GUSTAVO'],'Neurocirug\u00eda':['BERRA MATIAS SEBASTIAN','SANCHEZ JAVIER ANTONIO'],'Oftalmolog\u00eda':['GONZALEZ CASTELLANOS JERONIMO','ALVAREZ MARIA ALEJANDRA','GONZALEZ CASTELLANOS MARIA S','LAURIA LUIS FRANCISCO'],'ORL (Otorrinolaringolog\u00eda)':['FREIRE BUTELER IGNACIO'],'Traumatolog\u00eda y Ortopedia':['BENINGAZZA GABRIEL','AROCENA MARIANO','CEREZO RIZZI EMANUEL','FERREYRA PABLO','GORGAS ALBERTO','GUZMAN NICOLAS','JAIS JAIS JOSE FARID','VILLAFA\u00d1E GONZALO DARIO'],'Obesolog\u00eda / Bari\u00e1trica':['CLARIA JORGE','PIVA EUGENIO','ZURITA GONZALO'],'Urolog\u00eda':['PINTO GABRIEL FERNANDO','SONZINI CRISTIAN','MEINCKE SOFIA MARIA','PASTRANA RODRIGO EMANUEL']};
-function getCirujanosByEsp(){var esp=(document.getElementById('f-serv')||{value:''}).value;var fromEsp=(esp&&CIRUJANOS_ESP[esp])?CIRUJANOS_ESP[esp]:[];var learned=(typeof cirujanos!=='undefined')?cirujanos:[];var all=fromEsp.slice();learned.forEach(function(c){if(all.indexOf(c)<0)all.push(c);});return all;}
+// === CIRUJANOS POR LUGAR + ESPECIALIDAD (catálogo en data/cirujanos-esp.js) ===
+function actualizarHintCirujano(){
+  var hint=document.getElementById('ciru-hint');
+  if(!hint)return;
+  var san=(document.getElementById('f-san')||{value:''}).value||'';
+  var esp=(document.getElementById('f-serv')||{value:''}).value||'';
+  if(!esp){hint.textContent='Elegí servicio/especialidad para ver cirujanos del lugar.';return;}
+  var map=typeof getCirujanosMapForLugar==='function'?getCirujanosMapForLugar(san):{};
+  var tieneCatalogo=Object.keys(map).length>0;
+  var n=(map[esp]||[]).length;
+  if(san==='Hospital Aeronáutico'&&!n){
+    hint.textContent='Aeronáutico: listado pendiente de cargar. Podés escribir el nombre a mano.';
+    return;
+  }
+  if(!tieneCatalogo){
+    hint.textContent='Sin catálogo fijo para este lugar. Se sugieren nombres ya usados ahí.';
+    return;
+  }
+  if(!n){
+    hint.textContent='Mayo: aún no hay nómina cargada para esta especialidad. Escribí a mano o avisá para completarla.';
+    return;
+  }
+  hint.textContent=n+' cirujano'+(n===1?'':'s')+' de '+esp+' en '+san+'.';
+}
+function getCirujanosByEsp(){
+  var esp=(document.getElementById('f-serv')||{value:''}).value||'';
+  var san=(document.getElementById('f-san')||{value:''}).value||'';
+  var map=typeof getCirujanosMapForLugar==='function'?getCirujanosMapForLugar(san):{};
+  var all=(esp&&map[esp])?map[esp].slice():[];
+  var seen={};
+  all.forEach(function(c){seen[String(c).toUpperCase()]=true;});
+  // Solo aprendidos del mismo lugar + misma especialidad (no mezclar Mayo/Aero ni otras esp.)
+  if(typeof S!=='undefined'&&S.intervs){
+    S.intervs.forEach(function(i){
+      if(!i||!i.ciru)return;
+      if(san&&i.san&&i.san!==san)return;
+      if(esp&&i.serv&&i.serv!==esp)return;
+      var c=String(i.ciru).trim();
+      if(!c)return;
+      var k=c.toUpperCase();
+      if(!seen[k]){all.push(c);seen[k]=true;}
+    });
+  }
+  return all;
+}
 function acGeneric(fieldId,listId,getListFn){
   var q=document.getElementById(fieldId).value;
   var items=getListFn().filter(function(x){return x.toLowerCase().indexOf(q.toLowerCase())>=0;}).slice(0,10);
@@ -23,13 +65,86 @@ function getCirujanos(){
   S.intervs.forEach(function(x){if(x.ciru&&x.ciru.trim()&&base.indexOf(x.ciru.trim())<0)base.push(x.ciru.trim());});
   return base.slice().reverse();
 }
-function acCirujano(){var q=document.getElementById('f-ciru').value;var src=getCirujanosByEsp();if(!q||q.length<1){var esp=(document.getElementById('f-serv')||{value:''}).value;if(esp&&CIRUJANOS_ESP[esp]){renderAC('ac-ciru',CIRUJANOS_ESP[esp],function(x){return x;},null,function(i,cap){document.getElementById('f-ciru').value=cap[i]||'';closeAllAC();});}else{document.getElementById('ac-ciru').style.display='none';}return;}var hits=src.filter(function(x){return x.toLowerCase().indexOf(q.toLowerCase())>=0;}).slice(0,10);if(!hits.length){document.getElementById('ac-ciru').style.display='none';return;}renderAC('ac-ciru',hits,function(x){return x;},null,function(i,cap){document.getElementById('f-ciru').value=cap[i]||'';closeAllAC();});}
+function onServChange(){
+  if(typeof onSanChange==='function')onSanChange();
+  actualizarHintCirujano();
+  if(typeof acCirujano==='function')acCirujano();
+}
+function acCirujano(){
+  var inp=document.getElementById('f-ciru');
+  var list=document.getElementById('ac-ciru');
+  if(!inp||!list)return;
+  actualizarHintCirujano();
+  var esp=(document.getElementById('f-serv')||{value:''}).value||'';
+  if(!esp){list.style.display='none';return;}
+  var q=inp.value||'';
+  var src=getCirujanosByEsp();
+  if(!q||q.length<1){
+    if(src.length){
+      renderAC('ac-ciru',src.slice(0,15),function(x){return x;},null,function(i,cap){
+        inp.value=cap[i]||'';closeAllAC();
+      });
+    } else {
+      list.style.display='none';
+    }
+    return;
+  }
+  var hits=src.filter(function(x){return x.toLowerCase().indexOf(q.toLowerCase())>=0;}).slice(0,12);
+  if(!hits.length){list.style.display='none';return;}
+  renderAC('ac-ciru',hits,function(x){return x;},null,function(i,cap){
+    inp.value=cap[i]||'';closeAllAC();
+  });
+}
 // === EXPORT/IMPORT ===
-function exportarDatos(){var data={intervs:S.intervs,cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),key:S.key||'',exportado:new Date().toISOString(),version:'AnesFact v6'};var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='AnesFact_backup_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);toast('Datos exportados \u2713');}
-function importarDatos(input){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);var nueva=data.intervs||[];if(!nueva.length){toast('El archivo no tiene fojas');input.value='';return;}var existentes=S.intervs||[];var ids=existentes.map(function(i){return i.id;});var agregados=0;nueva.forEach(function(i){if(ids.indexOf(i.id)<0){existentes.push(i);agregados++;}});S.intervs=existentes;saveIntervsToStorage();if(data.cirujanos&&data.cirujanos.length){var local=[];try{local=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e2){}data.cirujanos.forEach(function(c){if(local.indexOf(c)<0)local.push(c);});localStorage.setItem('af_ciru',JSON.stringify(local));}if(data.key&&!S.key){S.key=data.key;localStorage.setItem('af_k',S.key);}renderHome();if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();toast('Import OK: '+agregados+' nuevas · total '+S.intervs.length+' fojas');}catch(err){toast('Error import: '+err.message);}};reader.readAsText(file);input.value='';}
+function exportarDatos(){
+  var uid=(typeof AF_AUTH!=='undefined'&&AF_AUTH.getUserId)?AF_AUTH.getUserId():'';
+  var data={
+    intervs:S.intervs,
+    cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),
+    key:S.key||'',
+    owner_id:uid||null,
+    exportado:new Date().toISOString(),
+    version:'AnesFact v8'
+  };
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='AnesFact_backup_'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);toast('Datos exportados \u2713');
+}
+function importarDatos(input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=JSON.parse(e.target.result);
+      var nueva=data.intervs||[];
+      if(!nueva.length){toast('El archivo no tiene fojas');input.value='';return;}
+      var uid=(typeof AF_AUTH!=='undefined'&&AF_AUTH.getUserId)?AF_AUTH.getUserId():'';
+      if(data.owner_id&&uid&&data.owner_id!==uid){
+        if(!confirm('Este backup pertenece a otro usuario.\nSolo importalo si es tu pareja/cuenta autorizada.\n¿Continuar?')){
+          input.value='';return;
+        }
+      }
+      var existentes=S.intervs||[];
+      var ids=existentes.map(function(i){return i.id;});
+      var agregados=0;
+      nueva.forEach(function(i){if(ids.indexOf(i.id)<0){existentes.push(i);agregados++;}});
+      S.intervs=existentes;saveIntervsToStorage();
+      if(data.cirujanos&&data.cirujanos.length){
+        var local=[];try{local=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e2){}
+        data.cirujanos.forEach(function(c){if(local.indexOf(c)<0)local.push(c);});
+        localStorage.setItem('af_ciru',JSON.stringify(local));
+      }
+      renderHome();
+      if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+      toast('Import OK: '+agregados+' nuevas · total '+S.intervs.length+' fojas');
+    }catch(err){toast('Error import: '+err.message);}
+  };
+  reader.readAsText(file);input.value='';
+}
 // === SYNC (Supabase principal + Apps Script opcional) ===
 var AF_SYNC_LEGACY='anesfact_sync_backup';
-var AF_SYNC_HUERTA='anesfact_sync_HUERTA_MARIA_SOLEDAD';
+var AF_SYNC_HUERTA='anesfact_sync_HUERTA_MARIA_SOLEDAD'; // solo admin / migración manual — no usar en sync automático
 var _syncPushTimer=null;
 var _syncBusy=false;
 var _lastSyncPull=0;
@@ -38,14 +153,15 @@ var _lastSyncErr='';
 
 function getSyncUserSlug(){
   var n=(localStorage.getItem('af_anest_nombre')||'').trim().toUpperCase();
-  if(!n)return 'HUERTA_MARIA_SOLEDAD';
+  if(!n)return 'SIN_NOMBRE';
   var s=n.replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,48);
-  return s||'HUERTA_MARIA_SOLEDAD';
+  return s||'SIN_NOMBRE';
 }
 function getSyncClave(){
   var uid=(typeof AF_AUTH!=='undefined'&&AF_AUTH.getUserId)?AF_AUTH.getUserId():'';
   if(uid)return 'anesfact_sync_'+uid;
-  return 'anesfact_sync_'+getSyncUserSlug();
+  // Sin login no hay sync multi-usuario seguro
+  return 'anesfact_sync_local_'+getSyncUserSlug();
 }
 
 function syncStatus(msg,color){
@@ -74,6 +190,7 @@ function fetchSyncPayload(clave){
   var url=afSupabaseUrl()+'/rest/v1/anesfact_datos?clave=eq.'+encodeURIComponent(clave)+'&select=datos&limit=1';
   var uid=(typeof AF_AUTH!=='undefined'&&AF_AUTH.getUserId)?AF_AUTH.getUserId():'';
   var ownClave=(typeof getSyncClave==='function')?getSyncClave():'';
+  // Solo filtrar owner_id en la clave propia (no en shares — RLS del servidor decide)
   if(uid&&clave===ownClave)url+='&owner_id=eq.'+encodeURIComponent(uid);
   return fetch(url,{
     headers:afSupabaseHeaders()
@@ -83,18 +200,10 @@ function fetchSyncPayload(clave){
   }).then(function(rows){if(!rows||!rows.length)return null;try{return JSON.parse(rows[0].datos||'{}');}catch(e){return null;}});
 }
 
+/** Solo la clave del usuario autenticado — NUNCA fallback a Huerta/legacy (fuga entre usuarios). */
 function fetchSyncPayloadWithFallbacks(primaryClave){
-  var fallbacks=[primaryClave,AF_SYNC_HUERTA,AF_SYNC_LEGACY];
-  var seen={}, chain=Promise.resolve(null);
-  fallbacks.forEach(function(clave){
-    if(!clave||seen[clave])return;
-    seen[clave]=1;
-    chain=chain.then(function(data){
-      if(data&&data.intervs&&data.intervs.length)return data;
-      return fetchSyncPayload(clave);
-    });
-  });
-  return chain;
+  if(!primaryClave)return Promise.resolve(null);
+  return fetchSyncPayload(primaryClave);
 }
 
 function syncApplyMergedIntervs(merged,remoteMeta){
@@ -251,8 +360,11 @@ function syncGuardar(){
     var n=data.total;
     if(!n){toast('No hay fojas para guardar');syncAutoStatusUpdate();return;}
     return syncGuardarSupabase(data).catch(function(e){
-      syncStatus('Supabase fall\u00f3, probando Apps Script...','info');
-      syncGuardarAppsScript(data);
+      // Apps Script compartido DESHABILITADO como fallback automático (fuga entre usuarios)
+      _lastSyncErr=e.message||'error';
+      syncStatus('Error Supabase (sin fallback compartido): '+_lastSyncErr,'err');
+      toast('No se pudo guardar en la nube');
+      throw e;
     });
   }).catch(function(e){
     _lastSyncErr=e.message||'error';
@@ -264,8 +376,9 @@ function syncGuardar(){
 function syncCargar(reemplazar){
   syncStatus('Cargando desde la nube...','info');
   syncCargarSupabase(!!reemplazar).catch(function(e){
-    syncStatus('Supabase: '+e.message,'info');
-    syncCargarAppsScript(!!reemplazar);
+    _lastSyncErr=e.message||'error';
+    syncStatus('Error Supabase: '+_lastSyncErr+' (Apps Script compartido desactivado)','err');
+    toast('No se pudo cargar desde la nube');
   });
 }
 

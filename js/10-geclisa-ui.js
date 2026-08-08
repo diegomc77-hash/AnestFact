@@ -25,8 +25,8 @@ function renderGeclisa(){
     +cpRow('Tipo de Cirugía',(i.mayo_tipociru||'PROGRAMADA').toUpperCase()+(i.ob?' - Obesidad Mórbida':''))
     +cpRow('Diagnóstico/cx realizada',i.diag||'')
     +secT('2 — Equipo y Procedimiento')
-    +cpRow('Anestesista',localStorage.getItem('af_anest_nombre')||'HUERTA MARIA SOLEDAD')
-    +cpRow('Matrícula',localStorage.getItem('af_anest_mp')||'32393')
+    +cpRow('Anestesista',(typeof AfIdentidad!=='undefined'?AfIdentidad.get().nombre:(localStorage.getItem('af_anest_nombre')||'')))
+    +cpRow('Matrícula',(typeof AfIdentidad!=='undefined'?AfIdentidad.get().mp:(localStorage.getItem('af_anest_mp')||'')))
     +cpRow('Hora Inicio',i.hora||'')+cpRow('Hora Fin',f.fin||'')
     +cpRow('Cirujano',i.ciru||'')+cpRow('Especialidad',i.serv||'')
     +cpRow('Observaciones generales',f.obs_geclisa||f.obs||'')
@@ -51,7 +51,7 @@ function renderGeclisa(){
       var drogas=(f.drogas||[]).filter(function(d){
         if(!d.n||!d.n.trim())return false;
         var g=(d.grupo||'').toLowerCase();
-        return g.indexOf('inductor')>=0||g.indexOf('relajante')>=0||g.indexOf('analg')>=0;
+        return g.indexOf('inducc')>=0||g.indexOf('inductor')>=0||g.indexOf('relajante')>=0||g.indexOf('analg')>=0;
       }).map(function(d){return d.n+' '+d.d+' '+d.v;}).join(', ');
       return base+(drogas?(base?'. ':'')+drogas:'');
     })())

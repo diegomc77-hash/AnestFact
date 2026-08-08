@@ -100,6 +100,8 @@ function syncFojaHoras(source){
       S.cur.foja.hext=hextH.value;
     }
   }
+  if(typeof renderTivaResults==='function')renderTivaResults();
+  if(typeof renderGasesResults==='function')renderGasesResults();
 }
 function syncMayoHoras(){syncFojaHoras();}
 

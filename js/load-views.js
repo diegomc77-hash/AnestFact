@@ -47,6 +47,14 @@
     if (typeof refreshCfgUi === 'function') refreshCfgUi();
     afRepairNuevaDom();
     if (typeof afShowView === 'function') afShowView('home');
+    if (typeof AfSesiones !== 'undefined' && AfSesiones.onAuthReady) {
+      AfSesiones.onAuthReady();
+    }
+    if (typeof AfFirma !== 'undefined' && AfFirma.refresh) {
+      AfFirma.refresh().then(function () {
+        if (typeof AfFirma.applyFojaPreview === 'function') AfFirma.applyFojaPreview();
+      });
+    }
   }
 
   function showLoadError(msg) {
@@ -55,7 +63,7 @@
   }
 
   function fetchHtml(url) {
-    var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=8.6';
+      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=11.5';
     return fetch(bust).then(function (r) {
       if (!r.ok) throw new Error(url + ' HTTP ' + r.status);
       return r.text();

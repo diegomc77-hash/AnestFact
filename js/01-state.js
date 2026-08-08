@@ -9,13 +9,22 @@ function afUserSuffix(){
     return(s.user&&s.user.id)?('_'+s.user.id):'';
   }catch(e){return '';}
 }
-function afIntervsKey(){return 'af_i'+afUserSuffix();}
+function afIntervsKey(){
+  return 'af_i'+afUserSuffix();
+}
 function loadIntervsFromStorage(){
   try{S.intervs=JSON.parse(localStorage.getItem(afIntervsKey())||'[]');}catch(e){S.intervs=[];}
+  // Migración legacy af_i → af_i_<uid>: solo con confirmación (evitar heredar pacientes de otro en PC compartida)
   if(!S.intervs.length&&afUserSuffix()){
     try{
       var leg=JSON.parse(localStorage.getItem('af_i')||'[]');
-      if(leg.length){S.intervs=leg;saveIntervsToStorage();}
+      if(leg.length){
+        var ok=false;
+        try{
+          ok=confirm('Hay '+leg.length+' foja(s) guardadas de una versión anterior en este dispositivo.\n¿Importarlas a TU cuenta?\n(Cancelá si no son tuyas — secreto médico / aislamiento entre usuarios)');
+        }catch(e3){ok=false;}
+        if(ok){S.intervs=leg;saveIntervsToStorage();}
+      }
     }catch(e2){}
   }
 }

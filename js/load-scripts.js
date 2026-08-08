@@ -37,14 +37,24 @@
     'js/29-plans.js',
     'js/30-admin.js',
     'js/31-valoracion-qr.js',
+    'js/32-tiva-calc.js',
+    'js/33-gases-calc.js',
+    'js/34-capture-guard.js',
+    'js/35-sanatorios-plan.js',
+    'js/36-identidad-anestesista.js',
+    'js/37-firma-certificada.js',
+    'js/38-sesiones.js',
     'js/load-views.js',
     'js/24-sw-register.js'
   ];
 
+  var CACHE_V = '11.5';
+
   function loadNext(i) {
     if (i >= SCRIPTS.length) return;
     var s = document.createElement('script');
-    s.src = SCRIPTS[i] + (SCRIPTS[i].indexOf('00-env') >= 0 || SCRIPTS[i].indexOf('17-sync-export') >= 0 || SCRIPTS[i].indexOf('06-nav-core') >= 0 || SCRIPTS[i].indexOf('07-intervenciones') >= 0 || SCRIPTS[i].indexOf('13-scan-ia') >= 0 || SCRIPTS[i].indexOf('28-auth') >= 0 || SCRIPTS[i].indexOf('29-plans') >= 0 || SCRIPTS[i].indexOf('30-admin') >= 0 || SCRIPTS[i].indexOf('31-valoracion') >= 0 || SCRIPTS[i].indexOf('15-utils') >= 0 || SCRIPTS[i].indexOf('20-geclisa') >= 0 || SCRIPTS[i].indexOf('12-imprimir-aero') >= 0 || SCRIPTS[i].indexOf('reglas-clinicas') >= 0 || SCRIPTS[i].indexOf('23-reglas') >= 0 || SCRIPTS[i].indexOf('25-examen-ausc') >= 0 || SCRIPTS[i].indexOf('02-premed') >= 0 || SCRIPTS[i].indexOf('10-geclisa') >= 0 || SCRIPTS[i].indexOf('26-balance') >= 0 || SCRIPTS[i].indexOf('22-tecnica') >= 0 || SCRIPTS[i].indexOf('19-examen-mayo') >= 0 || SCRIPTS[i].indexOf('08-foja') >= 0 || SCRIPTS[i].indexOf('03-autocomplete') >= 0 || SCRIPTS[i].indexOf('27-ayuda') >= 0 || SCRIPTS[i].indexOf('load-views') >= 0 ? '?v=8.7' : '');
+    // Siempre bust de cache: evita JS viejo (ej. TIVA con "mantenimiento inhalatorio")
+    s.src = SCRIPTS[i] + (SCRIPTS[i].indexOf('?') >= 0 ? '&' : '?') + 'v=' + CACHE_V;
     s.onload = function () { loadNext(i + 1); };
     s.onerror = function () { console.error('AnesFact: no se pudo cargar', SCRIPTS[i]); };
     document.body.appendChild(s);

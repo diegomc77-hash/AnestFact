@@ -39,6 +39,7 @@
 .est-res.warn{border-color:rgba(227,179,65,.5)}
 .est-res.err{border-color:rgba(248,81,73,.4)}
 .est-spin{font-size:12px;color:var(--text3);padding:8px 0}
+.est-manual-tag{display:inline-block;font-size:11px;font-weight:600;color:#b45309;background:rgba(227,179,65,.18);border:1px solid rgba(227,179,65,.45);border-radius:6px;padding:3px 8px;margin-top:4px}
 </style>
 </head>
 <body>
@@ -131,7 +132,7 @@
 
       <div class="card">
         <div class="ct">Estudios (laboratorio, electro, etc.)</div>
-        <p class="val-hint"><strong>Recomendado:</strong> escriba abajo si el informe está normal o qué está alterado. La foto automática es opcional (depende del servicio del médico).</p>
+        <p class="val-hint"><strong>Recomendado:</strong> escriba el resultado a mano. Opcional: PDF de texto de lab / ECG / espirometría (lectura local, sin IA de pago). La valoración cardiovascular narrativa siempre queda para completar manualmente.</p>
         <details open style="margin-top:8px">
           <summary style="font-size:14px;font-weight:600;color:var(--text);cursor:pointer;padding:6px 0">1. Cargar resultado (siempre funciona)</summary>
           <div style="margin-top:10px">
@@ -159,15 +160,15 @@
           </div>
         </details>
         <details style="margin-top:14px">
-          <summary style="font-size:13px;color:var(--text2);cursor:pointer;padding:6px 0">2. Opcional — subir foto o PDF (lectura automática)</summary>
-          <p class="val-hint" style="margin-top:8px">Si no funciona, use el paso 1 de arriba. No se guarda la imagen.</p>
+          <summary style="font-size:13px;color:var(--text2);cursor:pointer;padding:6px 0">2. Opcional — PDF de texto (parser local, sin IA)</summary>
+          <p class="val-hint" style="margin-top:8px">Solo PDF con texto seleccionable (laboratorio, ECG del equipo, espirometría). Fotos y ecocardiograma: use el paso 1. No se llama a Gemini/Claude ni a ninguna IA de pago.</p>
         <div class="est-grid" style="margin-top:8px">
-          <label class="est-btn" id="est-lab"><span style="font-size:22px">&#128203;</span><span>Laboratorio</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="laboratorio"></label>
-          <label class="est-btn" id="est-ecg"><span style="font-size:22px">&#128147;</span><span>Electrocardiograma</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="ecg"></label>
-          <label class="est-btn" id="est-eco"><span style="font-size:22px">&#128266;</span><span>Ecocardiograma</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="ecocardiograma"></label>
-          <label class="est-btn" id="est-espi"><span style="font-size:22px">&#127788;</span><span>Espirometría</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="espirometria"></label>
+          <label class="est-btn" id="est-lab"><span style="font-size:22px">&#128203;</span><span>Laboratorio</span><input type="file" accept="application/pdf,.pdf" data-tipo="laboratorio"></label>
+          <label class="est-btn" id="est-ecg"><span style="font-size:22px">&#128147;</span><span>ECG (PDF equipo)</span><input type="file" accept="application/pdf,.pdf" data-tipo="ecg"></label>
+          <label class="est-btn" id="est-eco"><span style="font-size:22px">&#128266;</span><span>Eco (manual)</span><input type="file" accept="application/pdf,.pdf" data-tipo="ecocardiograma"></label>
+          <label class="est-btn" id="est-espi"><span style="font-size:22px">&#127788;</span><span>Espirometría</span><input type="file" accept="application/pdf,.pdf" data-tipo="espirometria"></label>
         </div>
-        <label class="est-btn" style="margin-top:8px;width:100%" id="est-otro"><span style="font-size:22px">&#128247;</span><span>Otro estudio</span><input type="file" accept="image/*,application/pdf,.pdf" data-tipo="otro"></label>
+        <label class="est-btn" style="margin-top:8px;width:100%" id="est-otro"><span style="font-size:22px">&#128247;</span><span>Otro (solo manual)</span><input type="file" accept="application/pdf,.pdf" data-tipo="otro"></label>
         </details>
         <div class="est-list" id="v-est-list"></div>
         <p class="val-hint" id="est-resumen-count" style="display:none;margin-top:8px;color:var(--green);font-weight:600"></p>
@@ -212,11 +213,22 @@
     </form>
   </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+if (typeof pdfjsLib !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+</script>
 <script src="js/supabase-keepalive.js?v=8.0"></script>
 <script src="js/00-env.js?v=9.0"></script>
 <script src="data/obras-sociales-ar.js?v=9.0"></script>
 <script src="data/organos-enfermedades.js?v=9.0"></script>
 <script src="data/medicacion-habitual.js?v=9.0"></script>
-<script src="js/valoracion-form.js?v=9.3"></script>
+<script src="js/estudios/pdf-text.js?v=10.8"></script>
+<script src="js/estudios/lab_parser.js?v=10.8"></script>
+<script src="js/estudios/ecg_parser.js?v=10.8"></script>
+<script src="js/estudios/espirometria_parser.js?v=10.8"></script>
+<script src="js/estudios/estudio-extract-local.js?v=10.8"></script>
+<script src="js/valoracion-form.js?v=10.8"></script>
 </body>
 </html>

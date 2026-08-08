@@ -19,9 +19,12 @@ var DRUGS=[
   {n:'Naloxona',cat:'Antagonista opioides',mgKg:null,doses:['0.1mg','0.2mg','0.4mg'],via:'EV'},
   {n:'Bupivacaína',cat:'Anest. local',mgKg:null,doses:['5mg','7.5mg','10mg','12.5mg','15mg','20mg'],via:'IT'},
   {n:'Bupivacaína hiperbárica',cat:'Anest. local raquídea',mgKg:null,doses:['7.5mg','10mg','12.5mg','15mg'],via:'IT'},
+  {n:'Bupivacaína isobárica',cat:'Anest. local raquídea',mgKg:null,doses:['10mg','12.5mg','15mg'],via:'IT'},
   {n:'Lidocaína',cat:'Anest. local',mgKg:4,rangoMgKg:[3,7],doses:['40mg','60mg','80mg','100mg','200mg'],via:'Peridural'},
   {n:'Ropivacaína',cat:'Anest. local',mgKg:null,doses:['37.5mg','50mg','75mg','100mg','150mg'],via:'Peridural'},
-  {n:'Levobupivacaína',cat:'Anest. local',mgKg:null,doses:['12.5mg','25mg','50mg'],via:'IT'},
+  {n:'Levobupivacaína',cat:'Anest. local',mgKg:null,doses:['10mg','12.5mg','15mg','25mg','50mg'],via:'IT'},
+  {n:'Prilocaína hiperbárica',cat:'Anest. local raquídea',mgKg:null,doses:['40mg','60mg','80mg'],via:'IT'},
+  {n:'Sufentanilo',cat:'Opioide',mgKg:null,doses:['2.5mcg','5mcg','10mcg'],via:'IT'},
   {n:'Sevoflurano',cat:'Volátil',mgKg:null,doses:['1%','2%','2.5%','3%'],via:'INH'},
   {n:'Isoflurano',cat:'Volátil',mgKg:null,doses:['1%','1.5%','2%'],via:'INH'},
   {n:'Desflurano',cat:'Volátil',mgKg:null,doses:['4%','6%','8%'],via:'INH'},
@@ -37,9 +40,10 @@ var DRUGS=[
   {n:'Ketorolac',cat:'AINE',mgKg:null,doses:['15mg','30mg'],via:'EV'},
   {n:'Diclofenac',cat:'AINE',mgKg:null,doses:['75mg'],via:'EV'},
   {n:'Paracetamol',cat:'Analgésico',mgKg:15,rangoMgKg:[10,20],doses:['500mg','1000mg'],via:'EV'},
-  {n:'Morfina intratecal',cat:'Aditivo raquídeo',mgKg:null,doses:['0.1mg','0.2mg'],via:'IT'},
+  {n:'Morfina intratecal',cat:'Aditivo raquídeo',mgKg:null,doses:['50mcg','100mcg','150mcg'],via:'IT'},
   {n:'Adrenalina c/local',cat:'Aditivo vasoconstrictor',mgKg:null,doses:['10mcg','25mcg'],via:'IT'},
-  {n:'Clonidina intratecal',cat:'Aditivo raquídeo',mgKg:null,doses:['75mcg','150mcg'],via:'IT'},
+  {n:'Clonidina intratecal',cat:'Aditivo raquídeo',mgKg:null,doses:['15mcg','30mcg','45mcg'],via:'IT'},
+  {n:'Dexmedetomidina intratecal',cat:'Aditivo raquídeo',mgKg:null,doses:['3mcg','5mcg'],via:'IT'},
   {n:'Cefazolina',cat:'Antibiótico profiláctico',mgKg:null,doses:['1g','2g'],via:'EV'},
   {n:'Ampicilina/Sulbactam',cat:'Antibiótico profiláctico',mgKg:null,doses:['1.5g','3g'],via:'EV'},
   {n:'Oxitocina',cat:'Uterotónico',mgKg:null,doses:['5UI','10UI','20UI'],via:'EV'},
@@ -49,7 +53,7 @@ var DRUGS=[
   {n:'Ranitidina',cat:'Anti-H2',mgKg:null,doses:['50mg'],via:'EV'},
   {n:'Omeprazol',cat:'IBP',mgKg:null,doses:['40mg'],via:'EV'},
 ];
-var VIAS=['mg EV','mcg EV','ml EV','mg IM','mcg/kg/min inf','% CAM','mg intratecal','mcg intratecal','ml peridural','mg peridural','EV','IM','IT','Peridural','INH','SC','SL','Tópica'];
+var VIAS=['mg EV','mcg EV','ml EV','mg IM','mcg/kg/min inf','mg/kg/h inf','mcg/kg/h inf','% CAM','mg intratecal','mcg intratecal','ml peridural','mg peridural','EV','IM','IT','Peridural','INH','SC','SL','Tópica','ml tópico','puff tópico','aplicación tópica','mg','ml','mcg'];
 
 var PREMED_CHIPS=['Midazolam 2mg EV','Midazolam 1mg EV','Atropina 0.5mg EV','Cefalotina 2g EV','Ketorolac 30mg EV','Diclofenac 75mg EV','Ondansetrón 8mg EV','Dexametasona 8mg EV','Metoclopramida 10mg EV','Ranitidina 50mg EV'];
 

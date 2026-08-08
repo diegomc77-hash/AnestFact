@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AnesFact — Bookmarklets GECLISA (token)</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:640px;margin:24px auto;padding:0 16px;line-height:1.45;color:#222}
+    h1{font-size:1.25rem}
+    .card{border:1px solid #ddd;border-radius:10px;padding:14px 16px;margin:14px 0;background:#fafafa}
+    .bk{display:inline-block;background:#1a73e8;color:#fff;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:600;margin:8px 0}
+    .bk.dev{background:#c47a00}
+    .bk.inline{background:#0b7a3e}
+    code,pre{font-size:12px;background:#eee;padding:2px 6px;border-radius:4px;word-break:break-all}
+    pre{padding:10px;overflow:auto}
+    .muted{color:#666;font-size:13px}
+    .warn{background:#fff3cd;border:1px solid #e6d089;border-radius:8px;padding:10px 12px;font-size:13px;margin:10px 0}
+    ol{padding-left:1.2rem}
+    .status{font-size:12px;color:#0b7a3e;margin-top:6px}
+    .status.err{color:#b00020}
+  </style>
+</head>
+<body>
+  <h1>Bookmarklets GECLISA — flujo por token</h1>
+  <p class="muted">
+    El marcador <b>no lleva el DNI</b>. Pide pegar el token que genera AnesFact y consume
+    <code>af_geclisa_consume_token</code> en Supabase (HTTPS).
+  </p>
+
+  <div class="card">
+    <h2 style="font-size:1rem;margin:0 0 8px">Producción (GitHub Pages)</h2>
+    <p class="muted">Arrastrá este link a la barra de favoritos:</p>
+    <a class="bk" id="bk-prod" href="#">Rellenar GECLISA (token)</a>
+    <p class="muted">Carga <code>fill.js</code> desde Pages (HTTPS) — no choca con Private Network Access.</p>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size:1rem;margin:0 0 8px">DEV — inline (recomendado para GECLISA http://)</h2>
+    <div class="warn">
+      Chrome bloquea <code>http://GECLISA → http://localhost</code> (Private Network Access).
+      Este marcador lleva <code>fill-dev.js</code> <b>embebido</b>: no hace fetch a localhost al ejecutarlo.
+      Solo habla con Supabase por HTTPS.
+    </div>
+    <p class="muted">Abrí esta página desde <code>http://localhost:8080/geclisa-bookmarklets.html</code>, esperá “listo” y arrastrá:</p>
+    <a class="bk inline" id="bk-dev-inline" href="#">Rellenar GECLISA DEV inline</a>
+    <p id="inline-status" class="status">Cargando fill-dev.js…</p>
+    <p class="muted">Si cambiás <code>fill-dev.js</code>, recargá esta página y <b>re-arrastrá</b> el favorito (el código queda congelado en el marcador).</p>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size:1rem;margin:0 0 8px">DEV — fetch localhost (no usar desde GECLISA http)</h2>
+    <p class="muted">Solo útil si el origen fuera HTTPS o mismo host. En Mayo (<code>http://…:84</code>) Chrome lo bloquea.</p>
+    <a class="bk dev" id="bk-dev" href="#">Rellenar GECLISA DEV (fetch)</a>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size:1rem;margin:0 0 8px">Alternativa one-shot (consola)</h2>
+    <ol>
+      <li>Abrí <code>http://localhost:8080/fill-dev.js</code>, copiá todo el archivo.</li>
+      <li>En la foja GECLISA: F12 → Console → pegá → Enter.</li>
+      <li>Pegá el token cuando lo pida.</li>
+    </ol>
+    <p class="muted">Misma lógica que el inline; no hace falta favorito.</p>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size:1rem;margin:0 0 8px">Prueba 008a</h2>
+    <ol>
+      <li>AnesFact local → foja Mayo → <b>Enviar a GECLISA</b> → copiar token.</li>
+      <li>GECLISA → foja paciente → clic <b>DEV inline</b> → pegar token.</li>
+      <li>Confirmar relleno; el token no se reusa.</li>
+    </ol>
+  </div>
+
+  <script>
+    var prod = "javascript:void(fetch('https://diegomc77-hash.github.io/AnestFact/fill.js?t='+Date.now()).then(function(r){return r.text();}).then(function(code){try{(new Function(code))();}catch(e){alert('Error: '+e.message);}}).catch(function(e){alert('Error cargando script: '+e.message);}));";
+    var devFetch = "javascript:void(fetch('http://localhost:8080/fill-dev.js?t='+Date.now()).then(function(r){return r.text();}).then(function(code){try{(new Function(code))();}catch(e){alert('Error DEV: '+e.message);}}).catch(function(e){alert('Error: ¿Tenés AnesFact corriendo en localhost:8080?\\n'+e.message);}));";
+    document.getElementById('bk-prod').setAttribute('href', prod);
+    document.getElementById('bk-dev').setAttribute('href', devFetch);
+
+    var st = document.getElementById('inline-status');
+    var a = document.getElementById('bk-dev-inline');
+    fetch('fill-dev.js?t=' + Date.now())
+      .then(function(r){
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      })
+      .then(function(code){
+        // Código embebido: al hacer clic en GECLISA no hay fetch a localhost
+        var href = 'javascript:void((function(){try{(new Function(' + JSON.stringify(code) + '))();}catch(e){alert("Error DEV inline: "+e.message);}})())';
+        a.setAttribute('href', href);
+        st.textContent = 'Listo — arrastrá el link verde a favoritos (' + Math.round(code.length / 1024) + ' KB embebidos).';
+      })
+      .catch(function(e){
+        st.className = 'status err';
+        st.textContent = 'No pude cargar fill-dev.js. Abrí esta página desde http://localhost:8080/geclisa-bookmarklets.html — ' + e.message;
+        a.removeAttribute('href');
+        a.style.opacity = '0.5';
+      });
+  </script>
+</body>
+</html>

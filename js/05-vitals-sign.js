@@ -36,6 +36,15 @@ function delV(i){S.vitals.splice(i,1);renderVitals();}
 // ═══════════════════════════════════════════════════
 var _sD=false,_sCtx=null,_sEl=null;
 function initSign(){
+  // Preferir firma certificada de cuenta (Ajustes); sin canvas por foja
+  if(typeof AfFirma!=='undefined'){
+    if(AfFirma.isCertificada&&AfFirma.isCertificada()){
+      S.signData=AfFirma.getPng();
+      if(typeof AfFirma.applyFojaPreview==='function')AfFirma.applyFojaPreview();
+      return;
+    }
+    if(typeof AfFirma.applyFojaPreview==='function')AfFirma.applyFojaPreview();
+  }
   var c=document.getElementById('sign-canvas');if(!c)return;_sEl=c;
   c.width=c.offsetWidth||380;c.height=110;
   _sCtx=c.getContext('2d');

@@ -26,9 +26,24 @@ function editD(i,k,v){
   if(S.cur&&S.cur.foja&&S.cur.foja.drogas&&S.cur.foja.drogas[i]){
     S.cur.foja.drogas[i][k]=v;
     if(k==='n'&&typeof showReglaDroga==='function'&&v.length>2)showReglaDroga(v);
+    if(k==='n'||k==='d'||k==='v'){
+      clearTimeout(window._metodosDrugTimer);
+      window._metodosDrugTimer=setTimeout(function(){
+        if(typeof refrescarMetodosDesdeDrogas==='function')refrescarMetodosDesdeDrogas();
+        else if(typeof actualizarMetodos==='function')actualizarMetodos();
+      },400);
+    }
   }
 }
-function delD(i){if(S.cur&&S.cur.foja&&S.cur.foja.drogas){S.cur.foja.drogas.splice(i,1);renderDrogas();}}
+function delD(i){
+  if(S.cur&&S.cur.foja&&S.cur.foja.drogas){
+    S.cur.foja.drogas.splice(i,1);
+    if(typeof limpiarDrogasVacias==='function')limpiarDrogasVacias(true);
+    renderDrogas();
+    if(typeof refrescarMetodosDesdeDrogas==='function')refrescarMetodosDesdeDrogas();
+    else if(typeof actualizarMetodos==='function')actualizarMetodos();
+  }
+}
 function micNewDrug(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('Voz requiere Chrome');return;}
   if(S.recog)S.recog.stop();

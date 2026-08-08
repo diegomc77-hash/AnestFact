@@ -26,34 +26,22 @@ function adminRpc(name, body){
   });
 }
 
-function adminUpsertUser(uid, patch){
-  var cached = (window._adminUsersCache || []).find(function(u){ return u.id === uid; });
-  var row = {
-    id: uid,
-    email: (cached && cached.email) || '',
-    nombre: (cached && cached.nombre) || '',
-    matricula: (cached && cached.matricula) || null,
-    rol: (cached && cached.rol) || 'user',
-    activo: cached && cached.activo === false ? false : true,
-    fojas_semana: (cached && cached.fojas_semana != null) ? cached.fojas_semana : 0,
-    plan: (cached && cached.plan) || 'demo'
-  };
-  Object.keys(patch || {}).forEach(function(k){ row[k] = patch[k]; });
-  return fetch(afSupabaseUrl() + '/rest/v1/anesfact_usuarios', {
-    method: 'POST',
+function adminPatchUser(uid, patch){
+  // Preferir RPC (bypassa RLS de INSERT ajeno). Fallback PATCH directo.
+  if(patch && patch.plan){
+    return adminRpc('af_admin_set_plan', { p_user_id: uid, p_plan: patch.plan }).then(function(){ return true; });
+  }
+  return fetch(afSupabaseUrl() + '/rest/v1/anesfact_usuarios?id=eq.' + encodeURIComponent(uid), {
+    method: 'PATCH',
     headers: afSupabaseHeaders({
       'Content-Type': 'application/json',
-      'Prefer': 'return=minimal,resolution=merge-duplicates'
+      'Prefer': 'return=minimal'
     }),
-    body: JSON.stringify(row)
+    body: JSON.stringify(patch || {})
   }).then(function(r){
-    if(r.ok || r.status === 201 || r.status === 204) return true;
+    if(r.ok || r.status === 204) return true;
     return r.text().then(function(t){ throw new Error(t || ('HTTP ' + r.status)); });
   });
-}
-
-function adminPatchUser(uid, patch){
-  return adminUpsertUser(uid, patch);
 }
 
 function adminEscape(s){
@@ -91,7 +79,7 @@ function renderAdminUsers(rows){
       +'<td>'+(u.activo === false ? '<span class="admin-badge admin-badge-off">off</span>' : '<span class="admin-badge admin-badge-on">ok</span>')
       +(u.rol === 'admin' ? ' <span class="admin-badge admin-badge-admin">admin</span>' : '')+'</td>'
       +'<td class="admin-actions">'
-      +'<button type="button" class="btn btn-g admin-save" data-uid="'+adminEscape(uid)+'" style="width:auto;padding:6px 10px;font-size:11px">Guardar</button>'
+      +'<button type="button" class="btn btn-g admin-save" data-uid="'+adminEscape(uid)+'" style="width:auto;padding:6px 10px;font-size:11px">Guardar plan</button>'
       +'</td></tr>';
   });
   html += '</tbody></table></div>';
@@ -103,39 +91,157 @@ function renderAdminUsers(rows){
   });
 }
 
-function renderAdminLegacy(rows, users){
-  var box = document.getElementById('admin-legacy-list');
+var _adminPlanFetch = null;
+var _adminPlanCache = [];
+
+function adminPlanSeenMap(){
+  try{ return JSON.parse(localStorage.getItem('af_admin_plan_seen')||'{}'); }catch(e){ return {}; }
+}
+function adminPlanIsNew(clave){
+  var m = adminPlanSeenMap();
+  return !m[clave];
+}
+function adminMarkPlanRequestSeen(clave){
+  if(!clave) return;
+  var m = adminPlanSeenMap();
+  m[clave] = Date.now();
+  try{ localStorage.setItem('af_admin_plan_seen', JSON.stringify(m)); }catch(e){}
+  renderAdminPlanRequestsList(_adminPlanCache);
+  refreshAdminPlanAlertsFromCache();
+}
+function adminMarkAllPlanRequestsSeen(){
+  var m = adminPlanSeenMap();
+  (_adminPlanCache||[]).forEach(function(it){ if(it.clave) m[it.clave] = Date.now(); });
+  try{ localStorage.setItem('af_admin_plan_seen', JSON.stringify(m)); }catch(e){}
+  toast('Solicitudes marcadas como vistas');
+  renderAdminPlanRequestsList(_adminPlanCache);
+  refreshAdminPlanAlertsFromCache();
+}
+
+function fetchAdminPlanRequests(){
+  if(!isAdmin()) return Promise.resolve([]);
+  if(_adminPlanFetch && (Date.now() - _adminPlanFetch.t) < 8000){
+    return Promise.resolve(_adminPlanFetch.items);
+  }
+  return fetch(afSupabaseUrl()+'/rest/v1/anesfact_datos?clave=like.anesfact_help_*&select=clave,datos,owner_id&order=clave.desc&limit=80',{
+    headers: afSupabaseHeaders()
+  }).then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+  }).then(function(rows){
+    var items = [];
+    (rows||[]).forEach(function(row){
+      var t; try{ t=JSON.parse(row.datos||'{}'); }catch(e){ t=null; }
+      if(!t || t.categoria !== 'plan') return;
+      var ts = t.fecha ? Date.parse(t.fecha) : 0;
+      if(!ts || isNaN(ts)){
+        var m = String(row.clave||'').match(/anesfact_help_(\d+)/);
+        ts = m ? parseInt(m[1],10) : 0;
+      }
+      items.push({ clave: row.clave, owner_id: row.owner_id, t: t, ts: ts||0 });
+    });
+    items.sort(function(a,b){ return b.ts - a.ts; });
+    _adminPlanCache = items;
+    _adminPlanFetch = { t: Date.now(), items: items };
+    return items;
+  });
+}
+
+function renderAdminPlanRequestsList(items){
+  var box = document.getElementById('admin-plan-requests');
+  var countEl = document.getElementById('admin-plan-new-count');
   if(!box) return;
-  if(!rows || !rows.length){
-    box.innerHTML = '<p class="admin-muted">No hay backups legacy sin vincular.</p>';
+  items = items || [];
+  var nNew = items.filter(function(it){ return adminPlanIsNew(it.clave); }).length;
+  if(countEl){
+    if(nNew > 0){
+      countEl.style.display = 'inline-block';
+      countEl.textContent = nNew + ' nueva' + (nNew===1?'':'s');
+    } else {
+      countEl.style.display = 'none';
+    }
+  }
+  if(!items.length){
+    box.innerHTML = '<p class="admin-muted">Sin solicitudes de plan por ahora.</p>';
     return;
   }
-  var opts = (users || []).map(function(u){
-    var lab = (u.email || u.nombre || u.id.slice(0,8));
-    return '<option value="'+adminEscape(u.id)+'">'+adminEscape(lab)+'</option>';
+  box.innerHTML = items.map(function(it){
+    var t = it.t;
+    var isNew = adminPlanIsNew(it.clave);
+    var fecha = it.ts ? new Date(it.ts).toLocaleString() : '';
+    var who = adminEscape(t.email || t.anestesista || it.owner_id || '?');
+    var actual = adminEscape(t.plan_actual || 'demo');
+    var pedido = adminEscape(t.plan_pedido || 'consultar');
+    var msg = adminEscape(t.mensaje || '');
+    var border = isNew ? 'rgba(248,81,73,.55)' : 'var(--border)';
+    var bg = isNew ? 'rgba(248,81,73,.08)' : 'transparent';
+    var titleColor = isNew ? 'var(--red)' : 'var(--yellow)';
+    return '<div style="padding:10px;margin:0 0 8px;border:1px solid '+border+';border-radius:8px;background:'+bg+'">'
+      +'<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">'
+      +'<div style="font-size:13px;font-weight:700;color:'+titleColor+'">'+(isNew?'NUEVO · ':'')+who+'</div>'
+      +(isNew?'<button type="button" class="btn btn-s" style="width:auto;padding:4px 8px;font-size:11px;flex-shrink:0" data-clave="'+adminEscape(it.clave)+'">Visto</button>':'')
+      +'</div>'
+      +'<div style="font-size:12px;margin-top:2px">Actual: <b>'+actual+'</b> → pide: <b>'+pedido+'</b></div>'
+      +'<div style="font-size:11px;color:var(--text3)">'+adminEscape(fecha)+' · facturación manual afuera</div>'
+      +'<div style="font-size:12px;margin-top:4px;color:var(--text2)">'+msg+'</div>'
+      +'</div>';
   }).join('');
-  var html = '<div class="admin-table-wrap"><table class="admin-table"><thead><tr>'
-    +'<th>Clave</th><th>Fojas</th><th>Owner</th><th>Vincular a</th><th></th>'
-    +'</tr></thead><tbody>';
-  rows.forEach(function(r){
-    html += '<tr>'
-      +'<td><code class="admin-code">'+adminEscape(r.clave)+'</code></td>'
-      +'<td>'+(r.sync_fojas != null ? r.sync_fojas : '—')+'</td>'
-      +'<td>'+(r.owner_id ? adminEscape(String(r.owner_id).slice(0,8))+'…' : '—')+'</td>'
-      +'<td><select class="fi admin-link-user" data-clave="'+adminEscape(r.clave)+'" style="font-size:11px;padding:6px">'
-      +'<option value="">— usuario —</option>'+opts+'</select></td>'
-      +'<td><button type="button" class="btn btn-s admin-link-btn" data-clave="'+adminEscape(r.clave)+'" style="width:auto;padding:6px 10px;font-size:11px">Vincular</button></td>'
-      +'</tr>';
-  });
-  html += '</tbody></table></div>';
-  box.innerHTML = html;
-  box.querySelectorAll('.admin-link-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var row = btn.closest('tr');
-      var sel = row ? row.querySelector('.admin-link-user') : null;
-      if(!sel || !sel.value){ toast('Elegí un usuario'); return; }
-      adminLinkLegacy(btn.getAttribute('data-clave'), sel.value);
+  box.querySelectorAll('button[data-clave]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      adminMarkPlanRequestSeen(btn.getAttribute('data-clave'));
     });
+  });
+}
+
+function refreshAdminPlanAlertsFromCache(){
+  var items = _adminPlanCache || [];
+  var nNew = items.filter(function(it){ return adminPlanIsNew(it.clave); }).length;
+  var alert = document.getElementById('admin-plan-alert');
+  var title = document.getElementById('admin-plan-alert-title');
+  var badge = document.getElementById('admin-btn-badge');
+  if(alert){
+    if(isAdmin() && nNew > 0){
+      alert.style.display = 'block';
+      if(title) title.textContent = nNew + ' pedido' + (nNew===1?'':'s') + ' de plan nuevo' + (nNew===1?'':'s');
+    } else {
+      alert.style.display = 'none';
+    }
+  }
+  if(badge){
+    if(isAdmin() && nNew > 0){
+      badge.style.display = 'inline-block';
+      badge.textContent = String(nNew);
+    } else {
+      badge.style.display = 'none';
+      badge.textContent = '';
+    }
+  }
+}
+
+function refreshAdminPlanAlerts(){
+  if(!isAdmin()){
+    _adminPlanCache = [];
+    refreshAdminPlanAlertsFromCache();
+    return Promise.resolve([]);
+  }
+  return fetchAdminPlanRequests().then(function(items){
+    refreshAdminPlanAlertsFromCache();
+    return items;
+  }).catch(function(){
+    return [];
+  });
+}
+
+function loadAdminPlanRequests(){
+  var box = document.getElementById('admin-plan-requests');
+  if(!box) return refreshAdminPlanAlerts();
+  box.innerHTML = '<p class="admin-muted">Cargando solicitudes…</p>';
+  return fetchAdminPlanRequests().then(function(items){
+    renderAdminPlanRequestsList(items);
+    refreshAdminPlanAlertsFromCache();
+  }).catch(function(e){
+    box.innerHTML = '<p class="admin-muted" style="color:var(--red)">No se pudieron cargar: '+adminEscape(e.message||e)+'</p>';
   });
 }
 
@@ -145,20 +251,20 @@ function loadAdminPanel(){
     return;
   }
   adminSetStatus('Cargando…', null);
-  Promise.all([
-    adminRpc('af_admin_list_users'),
-    adminRpc('af_admin_legacy_backups')
-  ]).then(function(res){
-    var users = res[0] || [];
-    renderAdminUsers(users);
-    renderAdminLegacy(res[1] || [], users);
-    adminSetStatus('Actualizado · '+users.length+' usuario(s)', true);
-    window._adminUsersCache = users;
-  }).catch(function(e){
-    adminSetStatus((e.status === 401 || String(e.message).indexOf('42501') >= 0 || String(e.message).indexOf('forbidden') >= 0)
-      ? 'Sin permisos admin en Supabase (¿ejecutaste 002_admin_panel.sql?)'
-      : ('Error: ' + (e.message || e)), false);
-  });
+  _adminPlanFetch = null; // forzar lista fresca al abrir panel
+  loadAdminPlanRequests();
+  adminRpc('af_admin_list_users')
+    .then(function(users){
+      users = users || [];
+      renderAdminUsers(users);
+      adminSetStatus('Actualizado · '+users.length+' usuario(s)', true);
+      window._adminUsersCache = users;
+    })
+    .catch(function(e){
+      adminSetStatus((e.status === 401 || String(e.message).indexOf('42501') >= 0 || String(e.message).indexOf('forbidden') >= 0)
+        ? 'Sin permisos admin en Supabase (¿ejecutaste 002_admin_panel.sql?)'
+        : ('Error: ' + (e.message || e)), false);
+    });
 }
 
 function adminSaveUserPlan(uid){
@@ -172,26 +278,16 @@ function adminSaveUserPlan(uid){
   adminPatchUser(uid, patch)
     .then(function(){
       toast('Plan actualizado ✓');
-      adminSetStatus('Plan guardado', true);
+      adminSetStatus('Plan guardado: ' + plan, true);
       loadAdminPanel();
     })
     .catch(function(e){
-      adminSetStatus('No se pudo guardar: ' + (e.message || e), false);
-    });
-}
-
-function adminLinkLegacy(clave, userId){
-  if(!isAdmin()) return;
-  if(!confirm('¿Vincular "'+clave+'" al usuario seleccionado? No se borran fojas.')) return;
-  adminSetStatus('Vinculando backup…', null);
-  adminRpc('af_admin_link_backup', { p_clave: clave, p_user_id: userId })
-    .then(function(){
-      toast('Backup vinculado ✓');
-      adminSetStatus('Backup legacy vinculado', true);
-      loadAdminPanel();
-    })
-    .catch(function(e){
-      adminSetStatus('Error al vincular: ' + (e.message || e), false);
+      var msg = e.message || String(e);
+      if(String(msg).indexOf('af_admin_set_plan') >= 0 || String(msg).indexOf('42883') >= 0 || String(msg).indexOf('PGRST202') >= 0 || String(msg).indexOf('Could not find') >= 0){
+        adminSetStatus('Falta ejecutar en Supabase el SQL: 006_admin_set_plan_view_fojas.sql', false);
+      } else {
+        adminSetStatus('No se pudo guardar: ' + msg, false);
+      }
     });
 }
 
@@ -209,6 +305,7 @@ function refreshAdminUi(){
   var btn = document.getElementById('admin-btn');
   if(btn) btn.style.display = isAdmin() ? 'flex' : 'none';
   refreshCfgUi();
+  if(typeof refreshAdminPlanAlerts === 'function') refreshAdminPlanAlerts();
 }
 
 function refreshCfgUi(){
@@ -223,4 +320,8 @@ function refreshCfgUi(){
     ab.style.display = admin ? 'flex' : 'none';
     ab.style.visibility = admin ? 'visible' : 'hidden';
   }
+  var ban = document.getElementById('admin-view-banner');
+  if(ban){ ban.style.display = 'none'; ban.innerHTML = ''; }
+  try{ localStorage.removeItem('af_admin_follow'); }catch(e){}
+  if(typeof S !== 'undefined') S._adminViewAs = null;
 }

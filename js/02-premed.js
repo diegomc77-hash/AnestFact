@@ -112,7 +112,7 @@ function calcPremed(silencioso){
     extras.push('Ketorolac 30mg EV');
     extras.push('Diclofenac 75mg EV');
   }else if(esRegional){
-    lineas.push('Midazolam '+midazLow+'mg EV (dosis reducida – regional)');
+    lineas.push('Midazolam '+midazLow+'mg EV');
     lineas.push('Ketorolac 30mg EV');
     lineas.push('Dexametasona 8mg EV');
     lineas.push('Metoclopramida 10mg EV');

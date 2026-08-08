@@ -37,40 +37,60 @@ function sugerirObsHemo(silencioso){
   var sueroRaw=document.getElementById('fj-suero')?document.getElementById('fj-suero').value:'';
   var sangreRaw=document.getElementById('fj-sangre')?document.getElementById('fj-sangre').value:'';
   var plasmaRaw=document.getElementById('fj-plasma')?document.getElementById('fj-plasma').value:'';
+  var orinaRaw=document.getElementById('fj-orina')?document.getElementById('fj-orina').value:'';
   var otroRaw=document.getElementById('fj-otro')?document.getElementById('fj-otro').value:'';
   var suero=_balParseMl(sueroRaw);
   var sangre=_balParseMl(sangreRaw);
   var plasma=_balParseMl(plasmaRaw);
+  var orina=_balParseMl(orinaRaw);
   var sangrado=_balParseMl(document.getElementById('fj-sangrado')?document.getElementById('fj-sangrado').value:'');
-  var cardio=_balEsCardio();
   var hipo=_balHipotensionDetectada();
   var partes=[];
 
+  // 1) Pérdida sanguínea una sola vez (no repetir "por sangrado" en cada aporte)
+  if(sangrado>0){
+    partes.push('Pérdida sanguínea estimada '+sangrado+' ml');
+  }
+
+  // 2) Hemoderivados: una frase de transfusión
+  var hemo=[];
   if(sangre>0){
     var uMatch=String(sangreRaw).match(/(\d+)\s*unidad/i);
-    if(uMatch)partes.push(uMatch[1]+' CH por sangrado intraoperatorio / anemia');
-    else partes.push('Glóbulos rojos '+_balFmtVol(sangreRaw,sangre)+' por sangrado intraoperatorio');
+    if(uMatch)hemo.push(uMatch[1]+' CH');
+    else hemo.push('glóbulos rojos '+_balFmtVol(sangreRaw,sangre));
   }
   if(plasma>0){
     var puMatch=String(plasmaRaw).match(/(\d+)\s*unidad/i);
-    if(puMatch)partes.push(puMatch[1]+' PFC por coagulopatía / sangrado');
-    else partes.push('Plasma '+_balFmtVol(plasmaRaw,plasma)+' por sangrado o coagulopatía');
+    if(puMatch)hemo.push(puMatch[1]+' PFC');
+    else hemo.push('plasma '+_balFmtVol(plasmaRaw,plasma));
   }
+  if(hemo.length){
+    var hemoTxt=hemo.length===1?hemo[0]:hemo.slice(0,-1).join(', ')+' y '+hemo[hemo.length-1];
+    partes.push('Se transfunden '+hemoTxt);
+  }
+
+  // 3) Aporte endovenoso
   if(suero>0){
     var stxt=balSueroTexto()||_balFmtVol(sueroRaw,suero);
     if(!_balSueroTipo()&&!silencioso&&typeof toast==='function')toast('Eleg\u00ed tipo de suero (SF, Dextrosa 5%, etc.)');
-    if(cardio)partes.push(stxt+' titulado (cardiopat\u00eda — evitar sobrecarga)');
-    else if(hipo)partes.push(stxt+' por hipotensi\u00f3n intraoperatoria');
-    else if(sangrado>=500)partes.push(stxt+' por sangrado estimado '+sangrado+' ml');
-    else partes.push(stxt);
-  }else if(sangrado>=500&&!sangre){
-    partes.push('Sangrado estimado '+sangrado+' ml — reposici\u00f3n vol\u00e9mica en evaluaci\u00f3n');
+    if(hipo)partes.push('Se administran '+stxt+', ante hipotensión intraoperatoria');
+    else partes.push('Se administran '+stxt);
   }
+
   if(otroRaw&&String(otroRaw).trim())partes.push(String(otroRaw).trim());
-  if(hipo&&suero===0&&sangrado<500&&!sangre)partes.push('Hipotensi\u00f3n — considerar bolus 250–500 ml SF 0.9% o Ringer lactato');
+
+  // 4) Diuresis + cierre de balance (ingresos / egresos)
+  if(orina>0){
+    partes.push('Diuresis '+_balFmtVol(orinaRaw,orina));
+  }
+  var hayIngresos=(suero>0||sangre>0||plasma>0||(otroRaw&&String(otroRaw).trim()));
+  var hayEgresos=(sangrado>0||orina>0);
+  if(hayIngresos&&hayEgresos){
+    partes.push('Ingresos y egresos controlados');
+  }
 
   if(!partes.length)return;
-  var sug=partes.join('. ').replace(/\.\s*\./g,'.')+(partes.length?'.':'');
+  var sug=partes.join('. ').replace(/\.\s*\./g,'.')+'.';
   var cur=String(oh.value||'').trim();
   if(cur&&!_obsHemoManual&&cur!==_obsHemoLastSuger)return;
   if(!cur||cur===_obsHemoLastSuger||!_obsHemoManual){
