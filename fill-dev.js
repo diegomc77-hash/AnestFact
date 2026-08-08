@@ -167,6 +167,16 @@ function findGeclisaEl(id){
 function setId(id,val){return setVal(byId(id),val);}
 function setGestionId(id,val){return setVal(findGeclisaEl(id),val);}
 
+// GECLISA exige HH:MM:SS para poder GRABAR; AnesFact solo tiene HH:MM
+function fmtHoraGeclisa(h){
+  if(h===undefined||h===null)return '';
+  var s=String(h).trim();
+  if(!s)return '';
+  if(/^\d{1,2}:\d{2}:\d{2}$/.test(s))return s;
+  if(/^\d{1,2}:\d{2}$/.test(s))return s+':00';
+  return s;
+}
+
 // Normalizar — quita tildes, DR./DRA., espacios extra
 function norm(s){
   return String(s||'').toLowerCase()
@@ -253,10 +263,10 @@ function rellenar(d){
   if(d.quirofano&&setSelect('8049',d.quirofano))ok++;          // Quirófano
   if(d.tipoCirugia&&setSelect('8050',d.tipoCirugia))ok++;      // Tipo cirugía
   if(d.fechaCirugia&&setId('8058',fmtFecha(d.fechaCirugia)))ok++;
-  if(d.horaInicio&&setId('8061',d.horaInicio))ok++;
-  if(d.horaFin&&setId('8063',d.horaFin))ok++;
+  if(d.horaInicio&&setId('8061',fmtHoraGeclisa(d.horaInicio)))ok++;
+  if(d.horaFin&&setId('8063',fmtHoraGeclisa(d.horaFin)))ok++;
   if(d.fechaGestion&&setGestionId('txtFechaGestion',fmtFecha(d.fechaGestion)))ok++;
-  if(d.horaGestion&&setGestionId('txtHoraGestion',d.horaGestion))ok++;
+  if(d.horaGestion&&setGestionId('txtHoraGestion',fmtHoraGeclisa(d.horaGestion)))ok++;
 
   // BLOQUE 2 — Staff y posición
   if(setSelect('8057',d.anestesista||'HUERTA'))ok++;           // Anestesista
