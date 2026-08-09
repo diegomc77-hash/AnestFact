@@ -101,6 +101,19 @@ function goBack(){
   var dest=S.hist[S.hist.length-1]||'home';
   go(dest,false);
 }
+
+/** Salto directo al menú principal (guarda foja/intervención abierta). */
+function irInicio(){
+  try{
+    var cur=(S.hist&&S.hist.length)?S.hist[S.hist.length-1]:'';
+    if(cur==='foja'&&S.cur&&typeof guardarFoja==='function')guardarFoja();
+    else if(S.cur&&typeof guardar==='function')guardar();
+  }catch(e){}
+  S.hist=['home'];
+  var bb=document.getElementById('back-btn');
+  if(bb)bb.style.display='none';
+  go('home',false);
+}
 function guardarAnestesista(){
   var nombre=document.getElementById('cfg-anest-nombre').value.trim().toUpperCase();
   var mp=document.getElementById('cfg-anest-mp').value.trim();

@@ -1,4 +1,17 @@
-  <div class="brow" style="margin-bottom:24px">
+  <div class="brow" style="margin-bottom:12px">
     <button class="btn btn-s" id="btn-imprimir-foja" onclick="imprimirFojaGuarded()">&#128424; Imprimir foja</button>
     <button class="btn btn-g" onclick="guardarFoja()">&#128190; Guardar foja</button>
   </div>
+
+  <div id="mayo-geclisa-actions" style="display:none;margin-bottom:16px">
+    <div class="card" style="border-color:rgba(56,139,253,.4);background:rgba(56,139,253,.06);padding:12px 14px">
+      <div class="ct" style="color:var(--blue);margin:0 0 8px">&#127973; GECLISA (final de foja)</div>
+      <button class="btn btn-b" style="width:100%;margin-top:4px" onclick="go('geclisa')">&#127973; Ver Gu&iacute;a GECLISA completa</button>
+      <button class="btn btn-b" style="width:100%;margin-top:10px;font-size:14px;padding:12px" onclick="abrirGeclisa()">&#127973; Enviar a GECLISA</button>
+      <p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.4">
+        Genera un token de un solo uso (2 h). En GECLISA, el marcador te pedir&aacute; pegar ese token.
+      </p>
+    </div>
+  </div>
+
+  <button type="button" class="btn btn-s" style="width:100%;margin-bottom:24px" onclick="irInicio()">&#127968; Volver al inicio</button>

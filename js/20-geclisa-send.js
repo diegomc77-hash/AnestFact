@@ -188,7 +188,11 @@ function _abrirGeclisaCore(){
       'Abrí GECLISA → ejecutá el marcador → pegá este token cuando te lo pida.'
     );
     toast('Token listo ✓ Abrí GECLISA y usá el marcador');
-    setTimeout(function(){window.open('http://sanatoriomayo.myvnc.com:84','_blank');},400);
+    // Misma ventana nombrada: no abre una pestaña nueva por cada foja
+    setTimeout(function(){
+      var w=window.open('http://sanatoriomayo.myvnc.com:84','geclisa_mayo');
+      try{ if(w) w.focus(); }catch(e){}
+    },400);
   })
   .catch(function(e){
     toast('Error GECLISA: '+(e.message||e));

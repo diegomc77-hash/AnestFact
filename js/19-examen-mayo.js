@@ -297,6 +297,9 @@ function renderFojaPorSanatorio(){
   // Mayo helper - show for Mayo
   var mh=document.getElementById('mayo-foja-helper');
   if(mh)mh.style.display=esMayo?'block':'none';
+  // Acciones GECLISA al final de la foja (no a mitad de pantalla)
+  var mga=document.getElementById('mayo-geclisa-actions');
+  if(mga)mga.style.display=esMayo?'block':'none';
   // Imprimir button - hide for Mayo (they use GECLISA)
   var bi=document.getElementById('btn-imprimir-foja');
   if(bi)bi.style.display=esMayo?'none':'block';
