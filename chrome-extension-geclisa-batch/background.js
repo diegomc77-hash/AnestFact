@@ -380,6 +380,33 @@ async function resolvePaciente(partial) {
       paciente: merged
     };
   }
+  if (!merged.fechaCirugia) {
+    return {
+      ok: false,
+      paused: true,
+      reason: 'missing_fechaCirugia',
+      message: 'PAUSA: falta fechaCirugia (fecha del panel).',
+      paciente: merged
+    };
+  }
+  if (!merged.hora) {
+    return {
+      ok: false,
+      paused: true,
+      reason: 'missing_horaInicio',
+      message: 'PAUSA: falta horaInicio de cirugía (hora del panel).',
+      paciente: merged
+    };
+  }
+  if (!merged.sector) {
+    return {
+      ok: false,
+      paused: true,
+      reason: 'missing_sector',
+      message: 'PAUSA: falta Sector (#f-mayo-sector). Elegí PRE-QUIRÚRGICO u otro en AnesFact.',
+      paciente: merged
+    };
+  }
 
   return { ok: true, source: source || 'unknown', paciente: merged };
 }
@@ -567,6 +594,16 @@ async function runTop12WithDebugger(tabId) {
 }
 
 async function run111(paciente) {
+  try {
+    console.log('[AFG] run111 panel filtros', {
+      apellido: paciente && paciente.apellido,
+      nombre: paciente && paciente.nombre,
+      fechaCirugia: paciente && paciente.fechaCirugia,
+      hora: paciente && (paciente.hora || paciente.horaInicio),
+      sector: paciente && paciente.sector,
+      locate: 'locateByFechaSectorRetries'
+    });
+  } catch (e) {}
   var tab = await findGeclisaTab();
   var tabId = tab.id;
   var attached = false;

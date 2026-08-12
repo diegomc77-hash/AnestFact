@@ -18,11 +18,12 @@
     .warn strong,.okmsg strong{display:block;margin-bottom:4px}
     #dbg-first{display:none}
     #foja-status{margin-top:8px;font-size:12px;color:#333;line-height:1.35}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   </style>
 </head>
 <body>
   <h1>GECLISA Batch — pasos 1–12</h1>
-  <p class="muted">Actualizar lee la <b>pestaña AnesFact</b> (no GECLISA). <b>No Guardar</b>.</p>
+  <p class="muted">Panel = <b>fecha cirugía + sector + hora</b>. Extensión <b>0.4.5</b>. <b>No Guardar</b>.</p>
 
   <div class="warn" id="dbg-first">
     <strong>Aviso (primera vez)</strong>
@@ -30,9 +31,9 @@
   </div>
   <div class="warn" id="dbg-always">
     <strong>Flujo</strong>
-    1) Recargá esta extensión + Ctrl+F5 en AnesFact.<br>
-    2) Foja → Enviar a GECLISA.<br>
-    3) Abrí este popup (o Actualizar): debe mostrar ese paciente.
+    1) ↻ extensión 0.4.5 + Enviar a GECLISA (con Sector).<br>
+    2) Actualizar: debe verse sector / fecha / hora.<br>
+    3) Ejecutar 1–12.
   </div>
   <div class="okmsg" id="ok-banner">
     <strong>Foja completada, revisá y guardá manualmente</strong>
@@ -42,15 +43,26 @@
   <div id="foja-status" class="muted">Cargando foja…</div>
 
   <label>Apellido
-    <input id="apellido" value="" placeholder="(desde AnesFact / portapapeles)">
+    <input id="apellido" value="" placeholder="(desde AnesFact)">
   </label>
   <label>Nombre
-    <input id="nombre" value="" placeholder="(desde AnesFact / portapapeles)">
+    <input id="nombre" value="" placeholder="(desde AnesFact)">
   </label>
+  <label>Sector (GECLISA #ddlSector)
+    <input id="sector" value="" placeholder="ej. PRE-QUIRÚRGICO">
+  </label>
+  <div class="g2">
+    <label>Fecha cirugía
+      <input id="fechaCirugia" value="" placeholder="DD/MM/AAAA o ISO">
+    </label>
+    <label>Hora inicio
+      <input id="horaInicio" value="" placeholder="HH:mm">
+    </label>
+  </div>
   <label>Token GECLISA (un solo uso)
-    <textarea id="token" placeholder="AFG1|… o token"></textarea>
+    <textarea id="token" placeholder="token"></textarea>
   </label>
-  <button id="btn-refresh" type="button" class="secondary">Actualizar (storage + portapapeles)</button>
+  <button id="btn-refresh" type="button" class="secondary">Actualizar (pestaña AnesFact)</button>
   <button id="btn-run" type="button">Ejecutar 1–12 (nav + fill)</button>
   <button id="btn-ping" type="button" class="secondary">Probar ping a pestaña GECLISA</button>
   <button id="btn-diag" type="button" class="secondary">Diagnóstico storage</button>

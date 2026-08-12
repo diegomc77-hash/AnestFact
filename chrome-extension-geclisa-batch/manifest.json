@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AnesFact GECLISA Batch (pasos 1–12)",
-  "version": "0.4.4",
-  "description": "GECLISA Mayo: panel por fechaCirugia+sector+horaInicio; foja desde AnesFact.",
+  "version": "0.4.5",
+  "description": "GECLISA Mayo: panel fechaCirugia+sector+horaInicio (locateByFechaSectorRetries). Foja desde AnesFact.",
   "permissions": ["storage", "tabs", "scripting", "debugger", "clipboardRead"],
   "host_permissions": [
     "http://sanatoriomayo.myvnc.com:84/*",
