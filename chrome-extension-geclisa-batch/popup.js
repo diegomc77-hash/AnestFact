@@ -6,7 +6,7 @@ function show(x) {
 function fillFromFoja(foja, source) {
   var st = document.getElementById('foja-status');
   if (!foja || !foja.token) {
-    st.textContent = 'Sin foja en cola. En AnesFact: Enviar a GECLISA → después Actualizar (lee storage o portapapeles AFG1|…).';
+    st.textContent = 'Sin foja en cola. En AnesFact: Enviar a GECLISA → Actualizar (lee la pestaña AnesFact).';
     return false;
   }
   document.getElementById('apellido').value = foja.apellido || '';
@@ -36,20 +36,40 @@ function parseClipboardEnvelope(text) {
       updatedAt: Date.now()
     };
   }
-  // Token crudo (legado): no trae apellido/nombre
   if (text.length >= 32 && text.indexOf('|') < 0 && text.indexOf(' ') < 0) {
     return { token: text, apellido: '', nombre: '', updatedAt: Date.now() };
   }
   return null;
 }
 
+/**
+ * Orden:
+ * 1) Pedir al background que lea localStorage de la pestaña AnesFact (origen correcto)
+ * 2) chrome.storage.session / local (si el bridge ya escribió)
+ * 3) portapapeles AFG1|
+ */
 function loadFoja(done) {
+  chrome.runtime.sendMessage({ type: 'AFG_PULL_ANESFACT_FOJA' }, function (pulled) {
+    if (chrome.runtime.lastError) {
+      // seguir con storage/clipboard
+      pulled = { ok: false, error: chrome.runtime.lastError.message };
+    }
+    if (pulled && pulled.ok && pulled.foja && pulled.foja.token && pulled.foja.apellido) {
+      fillFromFoja(pulled.foja, 'anesfact_tab');
+      if (done) done({ ok: true, source: 'anesfact_tab', foja: pulled.foja, meta: pulled.meta || null, pull: pulled });
+      return;
+    }
+    loadFojaFromStorageAndClipboard(pulled, done);
+  });
+}
+
+function loadFojaFromStorageAndClipboard(pullInfo, done) {
   chrome.storage.session.get(['afg_current_foja', 'afg_geclisa_token', 'afg_bridge_meta'], function (sess) {
     var foja = sess.afg_current_foja || null;
     if (foja && !foja.token && sess.afg_geclisa_token) foja.token = sess.afg_geclisa_token;
     if (foja && foja.token && foja.apellido) {
       fillFromFoja(foja, 'session' + (sess.afg_bridge_meta && sess.afg_bridge_meta.via ? '/' + sess.afg_bridge_meta.via : ''));
-      if (done) done({ ok: true, source: 'session', foja: foja, meta: sess.afg_bridge_meta || null });
+      if (done) done({ ok: true, source: 'session', foja: foja, meta: sess.afg_bridge_meta || null, pull: pullInfo || null });
       return;
     }
     chrome.storage.local.get(['afg_current_foja', 'afg_geclisa_token', 'afg_bridge_meta'], function (loc) {
@@ -57,37 +77,43 @@ function loadFoja(done) {
       if (foja && !foja.token && loc.afg_geclisa_token) foja.token = loc.afg_geclisa_token;
       if (foja && foja.token && foja.apellido) {
         fillFromFoja(foja, 'local' + (loc.afg_bridge_meta && loc.afg_bridge_meta.via ? '/' + loc.afg_bridge_meta.via : ''));
-        if (done) done({ ok: true, source: 'local', foja: foja, meta: loc.afg_bridge_meta || null });
+        if (done) done({ ok: true, source: 'local', foja: foja, meta: loc.afg_bridge_meta || null, pull: pullInfo || null });
         return;
       }
-      // Fallback: portapapeles AFG1|… (no depende del content script)
       if (navigator.clipboard && navigator.clipboard.readText) {
         navigator.clipboard.readText().then(function (text) {
           var parsed = parseClipboardEnvelope(text);
           if (parsed && parsed.token && parsed.apellido) {
-            chrome.storage.session.set({ afg_current_foja: parsed, afg_geclisa_token: parsed.token });
             chrome.storage.local.set({ afg_current_foja: parsed, afg_geclisa_token: parsed.token });
+            try { chrome.storage.session.set({ afg_current_foja: parsed, afg_geclisa_token: parsed.token }); } catch (e) {}
             fillFromFoja(parsed, 'clipboard');
-            if (done) done({ ok: true, source: 'clipboard', foja: parsed });
+            if (done) done({ ok: true, source: 'clipboard', foja: parsed, pull: pullInfo || null });
             return;
           }
           if (parsed && parsed.token && !parsed.apellido) {
             document.getElementById('token').value = parsed.token;
             document.getElementById('foja-status').textContent =
-              'Hay token en portapapeles pero sin apellido/nombre (formato viejo). Regenerá el token en AnesFact (v11.8+) para copiar AFG1|…';
-            if (done) done({ ok: false, source: 'clipboard_token_only', foja: parsed });
+              'Hay token en portapapeles pero sin apellido/nombre. Regenerá token en AnesFact.';
+            if (done) done({ ok: false, source: 'clipboard_token_only', foja: parsed, pull: pullInfo || null });
             return;
           }
           fillFromFoja(null);
-          if (done) done({ ok: false, source: 'none', session: sess, local: loc });
+          if (done) done({
+            ok: false,
+            source: 'none',
+            pull: pullInfo || null,
+            session: sess,
+            local: loc,
+            hint: 'Popup no lee localStorage de AnesFact directo; usa pull de pestaña / chrome.storage / clipboard'
+          });
         }).catch(function (err) {
           fillFromFoja(foja && foja.token ? foja : null);
-          if (done) done({ ok: false, source: 'clipboard_err', error: String(err) });
+          if (done) done({ ok: false, source: 'clipboard_err', error: String(err), pull: pullInfo || null });
         });
         return;
       }
       fillFromFoja(null);
-      if (done) done({ ok: false, source: 'none' });
+      if (done) done({ ok: false, source: 'none', pull: pullInfo || null });
     });
   });
 }
@@ -132,14 +158,17 @@ document.getElementById('btn-ping').addEventListener('click', async function () 
 });
 
 document.getElementById('btn-diag').addEventListener('click', function () {
-  chrome.storage.session.get(null, function (sess) {
-    chrome.storage.local.get(['afg_current_foja', 'afg_geclisa_token', 'afg_bridge_meta'], function (loc) {
-      show({
-        sessionKeys: Object.keys(sess || {}),
-        sessionFoja: sess && sess.afg_current_foja,
-        sessionMeta: sess && sess.afg_bridge_meta,
-        localFoja: loc && loc.afg_current_foja,
-        localMeta: loc && loc.afg_bridge_meta
+  chrome.runtime.sendMessage({ type: 'AFG_PULL_ANESFACT_FOJA' }, function (pulled) {
+    chrome.storage.session.get(null, function (sess) {
+      chrome.storage.local.get(['afg_current_foja', 'afg_geclisa_token', 'afg_bridge_meta'], function (loc) {
+        show({
+          pull: pulled,
+          sessionKeys: Object.keys(sess || {}),
+          sessionFoja: sess && sess.afg_current_foja,
+          sessionMeta: sess && sess.afg_bridge_meta,
+          localFoja: loc && loc.afg_current_foja,
+          localMeta: loc && loc.afg_bridge_meta
+        });
       });
     });
   });

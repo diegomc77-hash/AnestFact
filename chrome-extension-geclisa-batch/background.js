@@ -52,6 +52,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     return false;
   }
 
+  // Popup/Actualizar: leer localStorage de la pestaña AnesFact (origen correcto) → chrome.storage
+  if (msg && msg.type === 'AFG_PULL_ANESFACT_FOJA') {
+    pullFojaFromAnesFactTabs()
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+
   // Reusar pestaña GECLISA existente; solo crear si no hay ninguna
   if (msg && msg.type === 'AFG_OPEN_GECLISA') {
     focusOrOpenGeclisaTab()
@@ -60,6 +68,92 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     return true;
   }
 });
+
+var ANESFACT_TAB_URLS = [
+  'https://diegomc77-hash.github.io/*',
+  'http://localhost/*',
+  'http://127.0.0.1/*'
+];
+
+/**
+ * El popup NO puede leer localStorage de AnesFact (otro origen / no es una pestaña).
+ * Acá: buscar pestañas AnesFact → executeScript lee afg_pending_batch → chrome.storage.
+ */
+async function pullFojaFromAnesFactTabs() {
+  var tabs = await chrome.tabs.query({ url: ANESFACT_TAB_URLS });
+  if (!tabs || !tabs.length) {
+    return {
+      ok: false,
+      error: 'no_anesfact_tab',
+      message: 'No hay pestaña AnesFact abierta (GitHub Pages o localhost).'
+    };
+  }
+  var best = null;
+  var inspected = [];
+  for (var i = 0; i < tabs.length; i++) {
+    var tab = tabs[i];
+    try {
+      var results = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: function () {
+          try {
+            var raw = localStorage.getItem('afg_pending_batch');
+            if (!raw) return { href: location.href, raw: null };
+            return { href: location.href, raw: raw, parsed: JSON.parse(raw) };
+          } catch (e) {
+            return { href: location.href, error: String(e && e.message || e) };
+          }
+        }
+      });
+      var row = results && results[0] && results[0].result;
+      inspected.push({ tabId: tab.id, url: tab.url, row: row });
+      if (row && row.parsed && row.parsed.token) {
+        var cand = row.parsed;
+        if (!best || (cand.updatedAt || 0) >= (best.updatedAt || 0)) {
+          best = cand;
+          best._fromTabId = tab.id;
+          best._fromHref = row.href || tab.url;
+        }
+      }
+    } catch (eTab) {
+      inspected.push({ tabId: tab.id, url: tab.url, error: String(eTab.message || eTab) });
+    }
+  }
+  if (!best) {
+    return {
+      ok: false,
+      error: 'no_pending_batch',
+      message: 'Pestaña AnesFact abierta pero sin afg_pending_batch (tocá Enviar a GECLISA).',
+      inspected: inspected
+    };
+  }
+  var foja = {
+    token: String(best.token),
+    apellido: String(best.apellido || '').trim(),
+    nombre: String(best.nombre || '').trim(),
+    dni: String(best.dni || '').trim(),
+    fechaCirugia: best.fechaCirugia || '',
+    horaInicio: best.horaInicio || best.hora || '',
+    horaFin: best.horaFin || '',
+    pac: best.pac || '',
+    clave: best.clave || '',
+    updatedAt: best.updatedAt || Date.now()
+  };
+  var meta = {
+    via: 'pull_tab_localStorage',
+    href: best._fromHref || '',
+    tabId: best._fromTabId,
+    at: Date.now()
+  };
+  var payload = {
+    afg_current_foja: foja,
+    afg_geclisa_token: foja.token,
+    afg_bridge_meta: meta
+  };
+  try { await chrome.storage.local.set(payload); } catch (eL) {}
+  try { await chrome.storage.session.set(payload); } catch (eS) {}
+  return { ok: true, source: 'anesfact_tab', foja: foja, meta: meta, inspected: inspected };
+}
 
 /** Enfoca pestaña GECLISA abierta; si no hay, crea una sola. Evita N ventanas nuevas. */
 async function focusOrOpenGeclisaTab() {

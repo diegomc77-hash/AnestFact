@@ -251,11 +251,14 @@ function updateMayoCamas(){
   var sec=document.getElementById('f-mayo-sector');var cam=document.getElementById('f-mayo-cama');
   if(!sec||!cam)return;var sector=sec.value;
   var opts=['<option value="">—</option>'];
+  // Sectores GECLISA #ddlSector (Mayo). PRE-QUIRÚRGICO / HEMODINAMIA: sin cama asignada.
   if(sector==='PISO'){for(var hab=1;hab<=15;hab++){var c1=200+hab*2-1;var c2=200+hab*2;opts.push('<option>Hab.'+hab+' — Cama '+c1+'</option><option>Hab.'+hab+' — Cama '+c2+'</option>');}}
   else if(sector==='VIP'){opts.push('<option>VIP 1</option><option>VIP 2</option>');}
   else if(sector==='UCI'){for(var j=1;j<=16;j++)opts.push('<option>UCI '+j+'</option>');}
-  else if(sector==='UTI'){for(var j=1;j<=16;j++)opts.push('<option>UTI1-'+j+'</option>');for(var j=1;j<=16;j++)opts.push('<option>UTI2-'+j+'</option>');}
+  else if(sector==='UTI'){for(var j=1;j<=16;j++)opts.push('<option>UTI1-'+j+'</option>');}
+  else if(sector==='UTI2'){for(var j=1;j<=16;j++)opts.push('<option>UTI2-'+j+'</option>');}
   else if(sector==='HOSPITAL DE DIA'){for(var j=1;j<=10;j++)opts.push('<option>HD '+j+'</option>');}
   else if(sector==='GUARDIA'){for(var j=1;j<=8;j++)opts.push('<option>G '+j+'</option>');}
+  // PRE-QUIRÚRGICO y HEMODINAMIA VIRTUAL: solo "—" (paciente sin cama / virtual)
   cam.innerHTML=opts.join('');
 }

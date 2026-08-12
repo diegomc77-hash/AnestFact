@@ -1,14 +1,14 @@
 /**
  * Bridge AnesFact (page world) → extensión.
  *
- * El page script NO comparte variables con este content script (isolated world).
- * Por eso leemos:
- *  - localStorage['afg_pending_batch']  (compartido por origen)
- *  - window.postMessage { source:'AFG_ANESFACT' }
- *  - CustomEvent 'afg-geclisa-token' (DOM compartido)
+ * El popup NO lee localStorage de AnesFact (otro contexto/origen).
+ * Este content script sí puede (mismo origen de la pestaña) y copia a chrome.storage.*.
+ *
+ * Bug que había: si chrome.storage.session.set fallaba, lastSig ya quedaba seteado
+ * y nunca reintentaba escribir chrome.storage.local → popup vacío.
  */
 (function () {
-  var lastSig = '';
+  var lastOkSig = '';
 
   function normalize(detail) {
     if (!detail || !detail.token) return null;
@@ -32,12 +32,29 @@
     return foja;
   }
 
+  function storageSet(area, payload) {
+    return new Promise(function (resolve) {
+      try {
+        if (!chrome.storage || !chrome.storage[area]) {
+          resolve({ ok: false, error: 'no_' + area });
+          return;
+        }
+        chrome.storage[area].set(payload, function () {
+          var err = chrome.runtime.lastError && chrome.runtime.lastError.message;
+          resolve({ ok: !err, error: err || null });
+        });
+      } catch (e) {
+        resolve({ ok: false, error: String(e && e.message || e) });
+      }
+    });
+  }
+
   function publish(detail, via) {
     var foja = normalize(detail);
-    if (!foja) return;
+    if (!foja) return Promise.resolve({ ok: false, error: 'normalize_null' });
     var sig = foja.token + '|' + (foja.updatedAt || '');
-    if (sig === lastSig) return;
-    lastSig = sig;
+    // Solo saltear si YA se escribió OK esta misma foja
+    if (sig === lastOkSig) return Promise.resolve({ ok: true, skipped: true });
 
     var payload = {
       afg_current_foja: foja,
@@ -49,27 +66,33 @@
       }
     };
 
-    // session (cola viva) + local (por si session no está disponible)
-    chrome.storage.session.set(payload, function () {
-      var errS = chrome.runtime.lastError && chrome.runtime.lastError.message;
-      chrome.storage.local.set(payload, function () {
-        var errL = chrome.runtime.lastError && chrome.runtime.lastError.message;
+    // local PRIMERO (más compatible desde content script); session best-effort
+    return storageSet('local', payload).then(function (rLocal) {
+      return storageSet('session', payload).then(function (rSess) {
+        if (rLocal.ok || rSess.ok) lastOkSig = sig;
         try {
           console.log(
-            '[AFG bridge] storage OK via=' + (via || '?'),
+            '[AFG bridge] storage via=' + (via || '?'),
             foja.apellido,
             foja.nombre,
             'tokenLen',
             foja.token.length,
-            errS ? ('sessionErr=' + errS) : '',
-            errL ? ('localErr=' + errL) : ''
+            'local=' + (rLocal.ok ? 'ok' : rLocal.error),
+            'session=' + (rSess.ok ? 'ok' : rSess.error)
           );
         } catch (e) {}
+        try {
+          chrome.runtime.sendMessage({ type: 'AFG_FOJA_READY', foja: foja }, function () {
+            void chrome.runtime.lastError;
+          });
+        } catch (e2) {}
+        return {
+          ok: !!(rLocal.ok || rSess.ok),
+          local: rLocal,
+          session: rSess,
+          foja: foja
+        };
       });
-    });
-
-    chrome.runtime.sendMessage({ type: 'AFG_FOJA_READY', foja: foja }, function () {
-      void chrome.runtime.lastError;
     });
   }
 
@@ -104,15 +127,16 @@
     publish(ev && ev.detail, 'CustomEvent');
   });
 
-  // Poll localStorage (sí cruza isolated world). window.__AFG_PENDING_BATCH NO.
-  setInterval(function () {
+  // Inmediato + poll (localStorage sí es del origen AnesFact)
+  function tick() {
     var p = readLocalStorageBatch();
     if (p) publish(p, 'localStorage');
-  }, 600);
+  }
+  tick();
+  setInterval(tick, 600);
 
-  // Anuncio: la página puede saber que el bridge está vivo
   try {
-    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.4.2' }, '*');
+    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.4.3' }, '*');
   } catch (e) {}
   try {
     console.log('[AFG bridge] inyectado en', location.href);
