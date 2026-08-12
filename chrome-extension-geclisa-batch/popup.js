@@ -15,7 +15,9 @@ function fillFromFoja(foja, source) {
   var when = foja.updatedAt ? new Date(foja.updatedAt).toLocaleString() : '—';
   st.textContent = 'Foja (' + (source || '?') + '): ' + (foja.apellido || '?') + ', ' + (foja.nombre || '?') +
     (foja.dni ? (' · DNI ' + foja.dni) : '') +
+    (foja.sector ? (' · ' + foja.sector) : '') +
     (foja.fechaCirugia ? (' · cirugía ' + foja.fechaCirugia) : '') +
+    (foja.horaInicio ? (' ' + foja.horaInicio) : '') +
     ' · token ' + String(foja.token).length + ' chars · ' + when;
   return true;
 }

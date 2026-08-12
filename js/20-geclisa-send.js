@@ -50,6 +50,28 @@ function afBatchClipboardEnvelope(p){
 }
 
 /**
+ * Separa apellido/nombre desde i.pac.
+ * "BESCOS, DANIEL ALFREDO" → BESCOS / DANIEL ALFREDO
+ * "BESCOS DANIEL ALFREDO" (sin coma) → BESCOS / DANIEL ALFREDO  (evita apellido="BESCOS DANIEL")
+ */
+function afSplitPacienteNombre(pac){
+  var raw=String(pac||'').trim();
+  if(!raw)return{apellido:'',nombre:''};
+  if(raw.indexOf(',')>=0){
+    var parts=raw.split(',');
+    return{
+      apellido:(parts[0]||'').trim().toUpperCase(),
+      nombre:parts.slice(1).join(',').replace(/\s+/g,' ').trim().toUpperCase()
+    };
+  }
+  var words=raw.split(/\s+/).filter(Boolean);
+  return{
+    apellido:(words[0]||'').toUpperCase(),
+    nombre:words.slice(1).join(' ').toUpperCase()
+  };
+}
+
+/**
  * Publica foja+token para la extensión.
  * CRÍTICO: no alcanza con window.__AFG_* — el content script vive en otro JS world.
  * localStorage + postMessage sí cruzan; CustomEvent también.
@@ -125,7 +147,7 @@ function _abrirGeclisaCore(){
   if(document.getElementById('fj-tec'))guardarFoja();
   else if(document.getElementById('f-pac'))guardar();
   i=S.cur;f=(i&&i.foja)||{};
-  var parts=(i.pac||'').split(',');
+  var splitNom=afSplitPacienteNombre(i.pac||'');
   // Clave: DNI sin ceros, sino nombre+fecha, nunca 'ultimo'
   var _dni=(i.dni||'').trim().replace(/^0+/,'').replace(/\s+/g,'');
   var _nom=(i.pac||'').trim().replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'').slice(0,20);
@@ -166,11 +188,13 @@ function _abrirGeclisaCore(){
   var _mon=getMayoMonitoreoFlags(i);
   var _gest=typeof calcGestionFoja==='function'?calcGestionFoja(f,i):{};
   var payload={
-    apellido:(parts[0]||'').trim().toUpperCase(),
-    nombre:(parts[1]||'').trim().toUpperCase(),
+    apellido:splitNom.apellido,
+    nombre:splitNom.nombre,
     dni:i.dni||'',edad:i.edad||'',
     obraSocial:i.obra||'',nroAfiliado:i.afil||'',
     fechaCirugia:i.fecha||'',horaInicio:i.hora||'',
+    sector:(i.mayo_sector||'').trim(),
+    mayo_cama:i.mayo_cama||'',
     quirofano:i.mayo_quir||i.sala||'',
     tipoCirugia:i.mayo_tipociru||'PROGRAMADA',
     posicion:i.mayo_posicion||'',
@@ -252,10 +276,15 @@ function _abrirGeclisaCore(){
       fechaCirugia:payload.fechaCirugia||i.fecha||'',
       horaInicio:payload.horaInicio||i.hora||'',
       horaFin:payload.horaFin||'',
+      sector:payload.sector||i.mayo_sector||'',
+      mayo_cama:payload.mayo_cama||i.mayo_cama||'',
       pac:i.pac||'',
       clave:clave,
       updatedAt:Date.now()
     };
+    try{
+      console.log('[AFG] apellido/nombre/sector', batchPayload.apellido, '|', batchPayload.nombre, '|', batchPayload.sector);
+    }catch(eLog){}
     // Publicar para extensión (localStorage + postMessage cruzan el isolated world; window.* no)
     try{ afPublishGeclisaBatch(batchPayload); }catch(eBatch){
       try{ console.warn('[AFG] publish batch falló', eBatch); }catch(e2){}

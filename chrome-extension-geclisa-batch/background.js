@@ -135,6 +135,8 @@ async function pullFojaFromAnesFactTabs() {
     fechaCirugia: best.fechaCirugia || '',
     horaInicio: best.horaInicio || best.hora || '',
     horaFin: best.horaFin || '',
+    sector: String(best.sector || best.mayo_sector || '').trim(),
+    mayo_cama: best.mayo_cama || '',
     pac: best.pac || '',
     clave: best.clave || '',
     updatedAt: best.updatedAt || Date.now()
@@ -228,7 +230,7 @@ function normKey(s) {
     .trim();
 }
 
-/** Mapea foja AnesFact / payload GECLISA. Panel GECLISA usa fechaIngreso, NO fechaCirugia. */
+/** Mapea foja AnesFact / payload GECLISA. Panel: fechaCirugia + sector (no fecha ingreso). */
 function fojaToPaciente(foja) {
   if (!foja || typeof foja !== 'object') return null;
   var fechaCirugia = foja.fechaCirugia || foja.fecha_cirugia || foja.fecha || '';
@@ -236,14 +238,22 @@ function fojaToPaciente(foja) {
     || foja.fechaInternacionAt || foja.ingreso || '';
   var horaIngreso = foja.horaIngreso || foja.horaInternacion || foja.hora_ingreso || '';
   var horaCirugia = foja.horaInicio || foja.hora || foja.hora_inicio || '';
+  var sector = foja.sector || foja.mayo_sector || '';
   var apellido = foja.apellido || '';
   var nombre = foja.nombre || '';
   if ((!apellido || !nombre) && foja.pac) {
-    var parts = String(foja.pac).replace(/,/g, ' ').trim().split(/\s+/).filter(Boolean);
-    if (!apellido && parts.length) apellido = parts[0];
-    if (!nombre && parts.length > 1) nombre = parts.slice(1).join(' ');
+    var pac = String(foja.pac).trim();
+    if (pac.indexOf(',') >= 0) {
+      var commaParts = pac.split(',');
+      if (!apellido) apellido = (commaParts[0] || '').trim();
+      if (!nombre) nombre = commaParts.slice(1).join(',').replace(/\s+/g, ' ').trim();
+    } else {
+      var parts = pac.split(/\s+/).filter(Boolean);
+      if (!apellido && parts.length) apellido = parts[0];
+      if (!nombre && parts.length > 1) nombre = parts.slice(1).join(' ');
+    }
   }
-  // Payload puente a veces mete "BESCOS DANIEL" en apellido y nombre vacío
+  // Defensa: "BESCOS DANIEL" en apellido y nombre vacío
   if (apellido && !nombre && /\s/.test(apellido)) {
     var apParts = apellido.trim().split(/\s+/);
     apellido = apParts[0];
@@ -256,6 +266,7 @@ function fojaToPaciente(foja) {
     fechaIngreso: fechaIngreso,
     horaIngreso: horaIngreso,
     hora: horaCirugia,
+    sector: String(sector || '').trim(),
     dni: foja.dni || '',
     plantilla: foja.plantilla || null,
     token: foja.token || ''
@@ -323,11 +334,19 @@ async function resolvePaciente(partial) {
     fechaCirugia: partial.fechaCirugia || partial.fecha || (fromFoja && fromFoja.fechaCirugia) || '',
     horaIngreso: partial.horaIngreso || partial.horaInternacion || (fromFoja && fromFoja.horaIngreso) || '',
     hora: partial.hora || partial.horaInicio || (fromFoja && fromFoja.hora) || '',
+    sector: (partial.sector || partial.mayo_sector || (fromFoja && fromFoja.sector) || '').trim(),
     plantilla: partial.plantilla || (fromFoja && fromFoja.plantilla) || null,
     token: (partial.token || (fromFoja && fromFoja.token) || sessionToken || '').trim()
   };
   if (fromFoja) source = source || 'foja';
   else if (partial.fechaIngreso || partial.fechaCirugia || partial.fecha) source = 'payload';
+
+  // Defensa apellido compuesto sin nombre
+  if (merged.apellido && !merged.nombre && /\s/.test(merged.apellido)) {
+    var apBits = merged.apellido.trim().split(/\s+/);
+    merged.apellido = apBits[0];
+    merged.nombre = apBits.slice(1).join(' ');
+  }
 
   var fix =
     TEST_FOJA_BY_KEY[normKey(merged.dni)] ||
@@ -340,6 +359,7 @@ async function resolvePaciente(partial) {
     if (!merged.hora) merged.hora = fix.hora || fix.horaInicio || '';
     if (!merged.dni && fix.dni) merged.dni = fix.dni;
     if (!merged.nombre && fix.nombre) merged.nombre = fix.nombre;
+    if (!merged.sector && fix.sector) merged.sector = fix.sector;
     source = source || 'test_fixture_anesfact';
   }
 
@@ -347,9 +367,9 @@ async function resolvePaciente(partial) {
   merged.fechaCirugia = formatFechaDDMMYYYY(merged.fechaCirugia);
   merged.horaIngreso = formatHoraHHMM(merged.horaIngreso);
   merged.hora = formatHoraHHMM(merged.hora);
-  // Alias informativo: fecha de panel = solo ingreso (nunca cirugía)
-  merged.fechaPanel = merged.fechaIngreso || null;
-  merged.panelFechaMode = merged.fechaIngreso ? 'fechaIngreso' : 'default_hoy';
+  // Panel GECLISA: fecha de cirugía + sector (ya no fecha de ingreso)
+  merged.fechaPanel = merged.fechaCirugia || null;
+  merged.panelFechaMode = merged.fechaCirugia ? 'fechaCirugia' : 'missing_fechaCirugia';
 
   if (!merged.apellido) {
     return {

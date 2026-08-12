@@ -62,6 +62,20 @@
     return dd + '/' + mm + '/' + d.getFullYear();
   }
 
+  /** Resta/suma horas a HH:mm → HH:mm (cruza medianoche). */
+  function addHoursGeclisa(hora, deltaHours) {
+    var s = formatHoraGeclisa(hora);
+    var m = s.match(/^(\d{2}):(\d{2})$/);
+    if (!m) return '';
+    var total = parseInt(m[1], 10) * 60 + parseInt(m[2], 10) + Math.round((deltaHours || 0) * 60);
+    total = ((total % (24 * 60)) + (24 * 60)) % (24 * 60);
+    var hh = String(Math.floor(total / 60));
+    var mm = String(total % 60);
+    if (hh.length === 1) hh = '0' + hh;
+    if (mm.length === 1) mm = '0' + mm;
+    return hh + ':' + mm;
+  }
+
   function waitFor(fn, opts) {
     opts = opts || {};
     var timeout = opts.timeout != null ? opts.timeout : 20000;
@@ -183,6 +197,26 @@
     sel.value = String(value);
     sel.dispatchEvent(new Event('input', { bubbles: true }));
     sel.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  /** Setea <select> por value o por texto exacto de <option> (p.ej. #ddlSector). */
+  function setSelectByValueOrText(sel, want) {
+    if (!sel) return false;
+    var target = norm(want);
+    if (!target) return false;
+    var opts = sel.options || [];
+    for (var i = 0; i < opts.length; i++) {
+      var t = norm(opts[i].textContent || opts[i].innerText || opts[i].label || '');
+      var v = norm(opts[i].value);
+      if (v === target || t === target) {
+        sel.selectedIndex = i;
+        sel.value = opts[i].value;
+        sel.dispatchEvent(new Event('input', { bubbles: true }));
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+        return true;
+      }
+    }
+    return false;
   }
 
   function nativeValueSetter(el) {
@@ -342,6 +376,7 @@
   g.AFG.centerPoint = centerPoint;
   g.AFG.findSubItemByText = findSubItemByText;
   g.AFG.setSelectValue = setSelectValue;
+  g.AFG.setSelectByValueOrText = setSelectByValueOrText;
   g.AFG.setInputValue = setInputValue;
   g.AFG.typeIntoInputAsync = typeIntoInputAsync;
   g.AFG.findByExactText = findByExactText;
@@ -352,5 +387,6 @@
   g.AFG.formatFechaGeclisa = formatFechaGeclisa;
   g.AFG.formatHoraGeclisa = formatHoraGeclisa;
   g.AFG.addDaysGeclisa = addDaysGeclisa;
+  g.AFG.addHoursGeclisa = addHoursGeclisa;
   g.AFG.todayDDMMYYYY = todayDDMMYYYY;
 })(typeof globalThis !== 'undefined' ? globalThis : window);

@@ -1,21 +1,24 @@
-# Selectores — pasos 1–12 (código v0.4.0)
+# Selectores — pasos 1–12 (código v0.4.4)
 
-Paciente prueba fill: **Lucero / Joaquín Jesús**. Sin Guardar.
+Sin Guardar. Panel internados: **fechaCirugia + sector + horaInicio** (no fecha de ingreso).
 
-## Paso 12 — fill.js
-
-1. Tras plantilla abierta, wait `#8054` en algún frame.
-2. Inyectar `globalThis.__AFG_GECLISA_TOKEN` + `__AFG_FILL_SILENT` (MAIN world, top).
-3. Ejecutar `vendor/fill.js` (copia empaquetada; mismo mapeo que prod).
-4. Poll `__AFG_FILL_RESULT` → `{ ok, camposOk, fechaCirugia, horaInicio }`.
-5. Popup: **«Foja completada, revisá y guardá manualmente»**.
-
-Token (prueba): pegar en popup el de AnesFact «Enviar a GECLISA».  
-Clínico en foja: `fechaCirugia` / `horaInicio` del **payload del token** (nunca fecha de ingreso del modal).
-
-## Separación
+## Separación de datos
 
 | Dato | Uso |
 |------|-----|
-| Fecha de ingreso (modal GECLISA) | Solo panel / Opciones |
+| N° Atención (modal búsqueda) | Ubicar fila tras filtros |
+| fechaCirugia / horaInicio / sector (AnesFact) | Filtro panel `#ddlSector` + Fecha/Hora |
 | fechaCirugia / horaInicio (token) | fill.js → campos clínicos |
+
+## Paso 7a — reintentos panel
+
+1. `fechaCirugia` + sector foja + `horaInicio`
+2. misma fecha/sector, hora −1 h
+3. misma fecha + horaInicio, otros sectores: PISO → VIP → UTI → UTI2 → UCI → GUARDIA → HOSPITAL DE DIA → HEMODINAMIA VIRTUAL → PRE-QUIRÚRGICO (sin repetir el primario)
+4. Si nada → pausa con combinaciones; sin clicks a ciegas
+
+Selector sector: `#ddlSector` (texto exacto del option).
+
+## Paso 12 — fill.js
+
+Token → `__AFG_GECLISA_TOKEN` + `vendor/fill.js`. Popup: revisá y guardá a mano.

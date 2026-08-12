@@ -111,19 +111,42 @@
   }
 
   async function runIframe311(paciente) {
-    // GECLISA no encuentra con tildes → tipamos y comparamos sin acentos
     var apellido = AFG.quitarAcentos(AFG.norm(paciente.apellido || ''));
     var nombre = AFG.quitarAcentos(AFG.norm(paciente.nombre || ''));
     var plantilla = AFG.norm(paciente.plantilla || PLANTILLA_FOJA);
-    // Clínico (fill.js más adelante): fechaCirugia/horaInicio del payload — NO usar en el panel.
     var fechaCirugia = AFG.formatFechaGeclisa(paciente.fechaCirugia || paciente.fecha || '');
     var horaCirugia = AFG.formatHoraGeclisa(paciente.hora || paciente.horaInicio || '');
+    var sector = AFG.norm(paciente.sector || paciente.mayo_sector || '');
     if (!apellido) {
       return {
         ok: false,
         paused: true,
         reason: 'missing_apellido',
         message: 'PAUSA: foja sin apellido.'
+      };
+    }
+    if (!fechaCirugia) {
+      return {
+        ok: false,
+        paused: true,
+        reason: 'missing_fechaCirugia',
+        message: 'PAUSA: falta fechaCirugia en el payload (fecha del panel).'
+      };
+    }
+    if (!horaCirugia) {
+      return {
+        ok: false,
+        paused: true,
+        reason: 'missing_horaInicio',
+        message: 'PAUSA: falta horaInicio de cirugía en el payload (hora del panel).'
+      };
+    }
+    if (!sector) {
+      return {
+        ok: false,
+        paused: true,
+        reason: 'missing_sector',
+        message: 'PAUSA: falta Sector en la foja AnesFact (#f-mayo-sector). Elegí PRE-QUIRÚRGICO u otro sector GECLISA.'
       };
     }
 
@@ -134,8 +157,7 @@
     AFG.setSelectValue(ddl, '2');
     await AFG.humanDelay();
 
-    // 4b: no forzar fecha de cirugía. El filtro de panel se setea tras el modal (Fecha de ingreso GECLISA).
-    log('Paso 4b: dejo Fecha/Hora panel en default (hoy). cirugía (solo clínica)=', fechaCirugia || '—', horaCirugia || '—');
+    log('Paso 4b: panel usará cirugía+sector tras modal', fechaCirugia, horaCirugia, sector);
     await waitGridStable(8000);
     await AFG.humanDelay();
 
@@ -226,12 +248,13 @@
     await debuggerClickEl(selPac);
     await AFG.humanDelay();
 
-    // —— Pasos 7–11: panel con fecha/hora de ingreso del modal (nav) → Opciones → … ——
+    // —— Pasos 7–11: panel fechaCirugia + sector + horaInicio → Opciones → … ——
     var steps711 = await runIframe711(
       plantilla,
       nroAtencion,
-      ingresoNav && ingresoNav.fecha,
-      ingresoNav && ingresoNav.hora
+      fechaCirugia,
+      horaCirugia,
+      sector
     );
     if (!steps711.ok) return steps711;
 
@@ -241,24 +264,24 @@
       count: 1,
       pagerText: pager.text,
       nroAtencion: nroAtencion,
-      // Solo navegación (descartable tras ubicar fila)
       fechaIngresoNav: (ingresoNav && ingresoNav.fecha) || null,
       horaIngresoNav: (ingresoNav && ingresoNav.hora) || null,
       fechaIngresoRaw: (ingresoNav && ingresoNav.raw) || null,
-      // Clínico (para fill.js: campos foja — NUNCA mezclar con ingresoNav)
       fechaCirugia: fechaCirugia || null,
       horaInicio: horaCirugia || null,
+      sector: sector || null,
       panelFecha: steps711.fechaUsada,
       panelHora: steps711.horaUsada,
+      panelSector: steps711.sectorUsado,
       filtrosProbados: steps711.filtrosProbados || null,
       plantilla: plantilla,
       steps711: steps711
     };
   }
 
-  async function runIframe711(plantilla, nroAtencion, fechaIngresoNav, horaIngresoNav) {
-    log('Paso 7a: ubicar fila por N° Atención', nroAtencion, 'filtro nav ingreso', fechaIngresoNav, horaIngresoNav);
-    var located = await locateInternadoRowWithFiltroRetries(nroAtencion, fechaIngresoNav, horaIngresoNav);
+  async function runIframe711(plantilla, nroAtencion, fechaCirugia, horaCirugia, sector) {
+    log('Paso 7a: ubicar fila por N° Atención', nroAtencion, 'filtro', fechaCirugia, horaCirugia, sector);
+    var located = await locateByFechaSectorRetries(nroAtencion, fechaCirugia, horaCirugia, sector);
     if (located.paused) return located;
 
     var matchRows = located.rows;
@@ -337,89 +360,95 @@
       nroAtencion: nroAtencion,
       fechaUsada: located.fechaUsada,
       horaUsada: located.horaUsada,
+      sectorUsado: located.sectorUsado,
       filtrosProbados: located.filtrosProbados
     };
   }
 
+  /** Textos exactos de #ddlSector (Mayo, Ubicación=2), excluyendo el sector primario al armar fallback. */
+  var GECLISA_SECTORES_FALLBACK = [
+    'PISO',
+    'VIP',
+    'UTI',
+    'UTI2',
+    'UCI',
+    'GUARDIA',
+    'HOSPITAL DE DIA',
+    'HEMODINAMIA VIRTUAL',
+    'PRE-QUIRÚRGICO'
+  ];
+
   /**
    * Busca fila por N° Atención en el panel.
-   * fecha/hora = "Fecha de ingreso" capturada del modal GECLISA (navegación, no clínica).
-   * Contención: ±1 día, horas alt., fallback default hoy. Nunca fechaCirugia.
+   * Filtro: fechaCirugia + sector (AnesFact) + horaInicio; luego −1 h mismo sector; luego otros sectores.
    */
-  async function locateInternadoRowWithFiltroRetries(nroAtencion, fechaIngresoNav, horaIngresoNav) {
-    var fechas = [];
-    function pushFecha(f, label) {
-      var key = f == null ? '__default__' : f;
-      for (var i = 0; i < fechas.length; i++) {
-        if ((fechas[i].fecha == null ? '__default__' : fechas[i].fecha) === key) return;
+  async function locateByFechaSectorRetries(nroAtencion, fechaCirugia, horaInicio, sectorPrimary) {
+    var fecha = AFG.formatFechaGeclisa(fechaCirugia);
+    var hora0 = AFG.formatHoraGeclisa(horaInicio);
+    var horaM1 = AFG.addHoursGeclisa(hora0, -1);
+    var primary = AFG.norm(sectorPrimary);
+
+    var attempts = [];
+    function pushAttempt(sec, hora, label) {
+      var tag = fecha + '|' + sec + '|' + (hora || '—') + '|' + label;
+      for (var i = 0; i < attempts.length; i++) {
+        if (attempts[i].tag === tag) return;
       }
-      fechas.push({ fecha: f, label: label });
+      attempts.push({ fecha: fecha, sector: sec, hora: hora, label: label, tag: tag });
     }
 
-    if (fechaIngresoNav) {
-      pushFecha(fechaIngresoNav, 'modal_ingreso');
-      pushFecha(AFG.addDaysGeclisa(fechaIngresoNav, -1), 'modal_ingreso-1');
-      pushFecha(AFG.addDaysGeclisa(fechaIngresoNav, 1), 'modal_ingreso+1');
-      pushFecha(null, 'default_hoy_fallback');
-    } else {
-      pushFecha(null, 'default_hoy');
+    pushAttempt(primary, hora0, 'primario');
+    if (horaM1 && horaM1 !== hora0) {
+      pushAttempt(primary, horaM1, 'primario_hora-1');
     }
-
-    var horasBase = [];
-    function pushHora(h) {
-      var v = h == null ? null : AFG.formatHoraGeclisa(h);
-      if (h != null && !v) return;
-      for (var i = 0; i < horasBase.length; i++) {
-        if (horasBase[i] === v) return;
-      }
-      horasBase.push(v);
+    for (var si = 0; si < GECLISA_SECTORES_FALLBACK.length; si++) {
+      var sec = GECLISA_SECTORES_FALLBACK[si];
+      if (sec === primary) continue;
+      pushAttempt(sec, hora0, 'fallback_sector');
     }
-    if (horaIngresoNav) pushHora(horaIngresoNav);
-    pushHora(null); // dejar hora default del panel
-    pushHora('00:23');
-    pushHora('12:00');
-    pushHora('08:00');
-    pushHora('00:00');
 
     var tried = [];
-
-    for (var fi = 0; fi < fechas.length; fi++) {
-      var fSpec = fechas[fi];
-      for (var hi = 0; hi < horasBase.length; hi++) {
-        var h = horasBase[hi];
-        var tag = (fSpec.fecha || 'DEFAULT') + '@' + (h || 'DEFAULT');
-        tried.push(tag);
-        log('Paso 7a filtro panel', fSpec.label, tag);
-        await setPanelFechaYHora(fSpec.fecha, h);
-        try {
-          var hits = await AFG.waitFor(function () {
-            var found = findInternadoRowsByAtencion(nroAtencion);
-            return found.length ? found : null;
-          }, { label: 'N° Atención ' + nroAtencion + ' ' + tag, timeout: 9000 });
-          if (hits.length > 1) {
-            return {
-              ok: false,
-              paused: true,
-              reason: 'internado_nro_ambiguous',
-              nroAtencion: nroAtencion,
-              count: hits.length,
-              fechaUsada: fSpec.fecha,
-              horaUsada: h,
-              filtrosProbados: tried,
-              message: 'PAUSA: ' + hits.length + ' filas con N° Atención ' + nroAtencion + ' (' + tag + ').'
-            };
-          }
-          log('Paso 7a encontrado con', tag);
+    for (var ai = 0; ai < attempts.length; ai++) {
+      var a = attempts[ai];
+      tried.push(a.tag);
+      log('Paso 7a filtro panel', a.label, a.tag);
+      try {
+        await setPanelFechaHoraSector(a.fecha, a.hora, a.sector);
+      } catch (eSet) {
+        log('Paso 7a no pude setear filtro', a.tag, String(eSet && eSet.message || eSet));
+        continue;
+      }
+      try {
+        var hits = await AFG.waitFor(function () {
+          var found = findInternadoRowsByAtencion(nroAtencion);
+          return found.length ? found : null;
+        }, { label: 'N° Atención ' + nroAtencion + ' ' + a.tag, timeout: 9000 });
+        if (hits.length > 1) {
           return {
-            ok: true,
-            rows: hits,
-            fechaUsada: fSpec.fecha,
-            horaUsada: h,
-            filtrosProbados: tried
+            ok: false,
+            paused: true,
+            reason: 'internado_nro_ambiguous',
+            nroAtencion: nroAtencion,
+            count: hits.length,
+            fechaUsada: a.fecha,
+            horaUsada: a.hora,
+            sectorUsado: a.sector,
+            filtrosProbados: tried,
+            message: 'PAUSA: ' + hits.length + ' filas con N° Atención ' + nroAtencion +
+              ' (' + a.tag + '). Combinaciones: ' + tried.join(' → ')
           };
-        } catch (eTry) {
-          log('Paso 7a no visible con', tag);
         }
+        log('Paso 7a encontrado con', a.tag);
+        return {
+          ok: true,
+          rows: hits,
+          fechaUsada: a.fecha,
+          horaUsada: a.hora,
+          sectorUsado: a.sector,
+          filtrosProbados: tried
+        };
+      } catch (eTry) {
+        log('Paso 7a no visible con', a.tag);
       }
     }
 
@@ -429,12 +458,30 @@
       reason: 'internado_nro_not_found',
       nroAtencion: nroAtencion,
       filtrosProbados: tried,
-      message: 'PAUSA: N° Atención ' + nroAtencion + ' no aparece. Filtros: ' + tried.join(', ')
+      message: 'PAUSA: N° Atención ' + nroAtencion +
+        ' no aparece con fechaCirugia+sector+hora. Combinaciones: ' + tried.join(' → ')
     };
   }
 
   /**
-   * Setea Fecha/Hora del panel. null = no tocar ese campo (deja default GECLISA).
+   * Setea Fecha + Hora + #ddlSector del panel. Sector por texto exacto GECLISA.
+   */
+  async function setPanelFechaHoraSector(fechaDDMMYYYY, horaHHMM, sectorText) {
+    var ddlSector = await AFG.waitFor(function () {
+      return document.getElementById('ddlSector');
+    }, { label: '#ddlSector', timeout: 15000 });
+    var okSec = AFG.setSelectByValueOrText(ddlSector, sectorText);
+    if (!okSec) {
+      throw new Error('Sector no encontrado en #ddlSector: ' + sectorText);
+    }
+    log('Sector panel →', sectorText, 'value=', ddlSector.value);
+    await AFG.sleep(300);
+
+    await setPanelFechaYHora(fechaDDMMYYYY, horaHHMM);
+  }
+
+  /**
+   * Setea Fecha/Hora del panel. null = no tocar ese campo.
    */
   async function setPanelFechaYHora(fechaDDMMYYYY, horaHHMM) {
     if (fechaDDMMYYYY) {

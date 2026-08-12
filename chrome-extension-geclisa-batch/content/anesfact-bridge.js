@@ -20,6 +20,8 @@
       fechaCirugia: detail.fechaCirugia || '',
       horaInicio: detail.horaInicio || detail.hora || '',
       horaFin: detail.horaFin || '',
+      sector: String(detail.sector || detail.mayo_sector || '').trim(),
+      mayo_cama: detail.mayo_cama || '',
       pac: detail.pac || '',
       clave: detail.clave || '',
       updatedAt: detail.updatedAt || Date.now()
