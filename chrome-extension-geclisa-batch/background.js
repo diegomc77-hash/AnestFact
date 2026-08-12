@@ -230,6 +230,38 @@ function normKey(s) {
     .trim();
 }
 
+/** Misma regla que AnesFact afSplitPacienteNombre: coma → resto; sin coma → 1er token apellido. */
+function splitPacienteNombre(pac) {
+  var raw = String(pac || '').trim();
+  if (!raw) return { apellido: '', nombre: '' };
+  if (raw.indexOf(',') >= 0) {
+    var parts = raw.split(',');
+    return {
+      apellido: (parts[0] || '').trim(),
+      nombre: parts.slice(1).join(',').replace(/\s+/g, ' ').trim()
+    };
+  }
+  var words = raw.split(/\s+/).filter(Boolean);
+  return {
+    apellido: words[0] || '',
+    nombre: words.slice(1).join(' ')
+  };
+}
+
+/** Elige el nombre más completo (mismo prefijo de tokens o vacío vs lleno). */
+function preferRicherNombre(a, b) {
+  var na = String(a || '').replace(/\s+/g, ' ').trim();
+  var nb = String(b || '').replace(/\s+/g, ' ').trim();
+  if (!na) return nb;
+  if (!nb) return na;
+  if (na.toLowerCase() === nb.toLowerCase()) return na.length >= nb.length ? na : nb;
+  var la = na.toLowerCase();
+  var lb = nb.toLowerCase();
+  if (lb.indexOf(la) === 0 && (lb.length === la.length || lb.charAt(la.length) === ' ')) return nb;
+  if (la.indexOf(lb) === 0 && (la.length === lb.length || la.charAt(lb.length) === ' ')) return na;
+  return na.length >= nb.length ? na : nb;
+}
+
 /** Mapea foja AnesFact / payload GECLISA. Panel: fechaCirugia + sector (no fecha ingreso). */
 function fojaToPaciente(foja) {
   if (!foja || typeof foja !== 'object') return null;
@@ -241,16 +273,15 @@ function fojaToPaciente(foja) {
   var sector = foja.sector || foja.mayo_sector || '';
   var apellido = foja.apellido || '';
   var nombre = foja.nombre || '';
-  if ((!apellido || !nombre) && foja.pac) {
-    var pac = String(foja.pac).trim();
-    if (pac.indexOf(',') >= 0) {
-      var commaParts = pac.split(',');
-      if (!apellido) apellido = (commaParts[0] || '').trim();
-      if (!nombre) nombre = commaParts.slice(1).join(',').replace(/\s+/g, ' ').trim();
-    } else {
-      var parts = pac.split(/\s+/).filter(Boolean);
-      if (!apellido && parts.length) apellido = parts[0];
-      if (!nombre && parts.length > 1) nombre = parts.slice(1).join(' ');
+  var pac = String(foja.pac || '').trim();
+  // pac es la fuente de verdad cuando está; puede ser más completo que apellido/nombre ya partidos
+  if (pac) {
+    var fromPac = splitPacienteNombre(pac);
+    if (fromPac.apellido) {
+      if (!apellido || apellido.replace(/\s+/g, ' ').trim().toLowerCase() === fromPac.apellido.toLowerCase()) {
+        apellido = fromPac.apellido;
+      }
+      nombre = preferRicherNombre(nombre, fromPac.nombre);
     }
   }
   // Defensa: "BESCOS DANIEL" en apellido y nombre vacío
@@ -262,6 +293,7 @@ function fojaToPaciente(foja) {
   return {
     apellido: String(apellido || '').trim(),
     nombre: String(nombre || '').trim(),
+    pac: pac,
     fechaCirugia: fechaCirugia,
     fechaIngreso: fechaIngreso,
     horaIngreso: horaIngreso,
@@ -328,7 +360,11 @@ async function resolvePaciente(partial) {
   var fromFoja = foja ? fojaToPaciente(foja) : null;
   var merged = {
     apellido: (partial.apellido || (fromFoja && fromFoja.apellido) || '').trim(),
-    nombre: (partial.nombre || (fromFoja && fromFoja.nombre) || '').trim(),
+    nombre: preferRicherNombre(
+      (partial.nombre || '').trim(),
+      (fromFoja && fromFoja.nombre) || ''
+    ),
+    pac: (partial.pac || (fromFoja && fromFoja.pac) || '').trim(),
     dni: (partial.dni || (fromFoja && fromFoja.dni) || '').trim(),
     fechaIngreso: partial.fechaIngreso || partial.fechaInternacion || (fromFoja && fromFoja.fechaIngreso) || '',
     fechaCirugia: partial.fechaCirugia || partial.fecha || (fromFoja && fromFoja.fechaCirugia) || '',
@@ -341,6 +377,12 @@ async function resolvePaciente(partial) {
   if (fromFoja) source = source || 'foja';
   else if (partial.fechaIngreso || partial.fechaCirugia || partial.fecha) source = 'payload';
 
+  // Si hay pac más completo que nombre del form/popup, enriquecer
+  if (merged.pac) {
+    var splitMerged = splitPacienteNombre(merged.pac);
+    if (splitMerged.apellido && !merged.apellido) merged.apellido = splitMerged.apellido;
+    merged.nombre = preferRicherNombre(merged.nombre, splitMerged.nombre);
+  }
   // Defensa apellido compuesto sin nombre
   if (merged.apellido && !merged.nombre && /\s/.test(merged.apellido)) {
     var apBits = merged.apellido.trim().split(/\s+/);

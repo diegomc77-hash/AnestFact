@@ -1,4 +1,4 @@
-# Selectores — pasos 1–12 (código v0.4.7)
+# Selectores — pasos 1–12 (código v0.4.8)
 
 Sin Guardar. **Sin modal** `#btnBuscarPaciente`.
 
@@ -11,8 +11,9 @@ Sin Guardar. **Sin modal** `#btnBuscarPaciente`.
 5. Ubicar fila por apellido/nombre en el grid (capa 1)
 6. Reintentos: hora −1 h → otros sectores
 7. Opciones → **Evoluciones** → leer encabezado `APELLIDO, NOMBRE - N° Atención: …`
-   - Si apellido+nombre **no** coinciden exacto con AnesFact → **PAUSA** (no toca Nuevo)
-   - Si coinciden → capturar `nroAtencion` del encabezado (dato nuevo; no se comparaba de antemano) y seguir
+   - Apellido exacto; nombre **tolerante** (esperado prefijo por tokens del real, p.ej. `DANIEL` ⊆ `DANIEL ALFREDO`)
+   - Si no coincide → **PAUSA** (no toca Nuevo)
+   - Si coincide → capturar `nroAtencion` del encabezado y seguir
 8. Nuevo → plantilla → fill.js
 
 | Dato | Uso |

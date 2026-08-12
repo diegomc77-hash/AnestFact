@@ -52,16 +52,18 @@ function afBatchClipboardEnvelope(p){
 /**
  * Separa apellido/nombre desde i.pac.
  * "BESCOS, DANIEL ALFREDO" → BESCOS / DANIEL ALFREDO
- * "BESCOS DANIEL ALFREDO" (sin coma) → BESCOS / DANIEL ALFREDO  (evita apellido="BESCOS DANIEL")
+ * "BESCOS DANIEL ALFREDO" (sin coma) → BESCOS / DANIEL ALFREDO
+ * Nunca descarta tokens del nombre: todo lo posterior a la coma (o al 1er token) se conserva.
  */
 function afSplitPacienteNombre(pac){
-  var raw=String(pac||'').trim();
+  var raw=String(pac||'').trim().replace(/\s+/g,' ');
   if(!raw)return{apellido:'',nombre:''};
   if(raw.indexOf(',')>=0){
     var parts=raw.split(',');
     return{
       apellido:(parts[0]||'').trim().toUpperCase(),
-      nombre:parts.slice(1).join(',').replace(/\s+/g,' ').trim().toUpperCase()
+      // slice(1).join: si hubiera más de una coma, no se pierde el resto
+      nombre:parts.slice(1).join(' ').replace(/\s+/g,' ').trim().toUpperCase()
     };
   }
   var words=raw.split(/\s+/).filter(Boolean);
@@ -148,6 +150,9 @@ function _abrirGeclisaCore(){
   else if(document.getElementById('f-pac'))guardar();
   i=S.cur;f=(i&&i.foja)||{};
   var splitNom=afSplitPacienteNombre(i.pac||'');
+  try{
+    console.log('[AFG] pac raw →', JSON.stringify(i.pac||''), '→ apellido=', splitNom.apellido, 'nombre=', splitNom.nombre);
+  }catch(ePacLog){}
   // Clave: DNI sin ceros, sino nombre+fecha, nunca 'ultimo'
   var _dni=(i.dni||'').trim().replace(/^0+/,'').replace(/\s+/g,'');
   var _nom=(i.pac||'').trim().replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'').slice(0,20);

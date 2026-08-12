@@ -31,6 +31,29 @@
       foja.apellido = parts[0];
       foja.nombre = parts.slice(1).join(' ');
     }
+    // Si pac trae nombre más completo que el campo nombre, enriquecer
+    if (foja.pac) {
+      var pac = String(foja.pac).trim();
+      var fromPac;
+      if (pac.indexOf(',') >= 0) {
+        var cp = pac.split(',');
+        fromPac = {
+          apellido: (cp[0] || '').trim(),
+          nombre: cp.slice(1).join(' ').replace(/\s+/g, ' ').trim()
+        };
+      } else {
+        var w = pac.split(/\s+/).filter(Boolean);
+        fromPac = { apellido: w[0] || '', nombre: w.slice(1).join(' ') };
+      }
+      if (fromPac.nombre) {
+        var cur = (foja.nombre || '').toLowerCase();
+        var richer = fromPac.nombre.toLowerCase();
+        if (!cur || (richer.indexOf(cur) === 0 && (richer.length === cur.length || richer.charAt(cur.length) === ' '))) {
+          foja.nombre = fromPac.nombre;
+        }
+        if (!foja.apellido && fromPac.apellido) foja.apellido = fromPac.apellido;
+      }
+    }
     return foja;
   }
 
@@ -138,7 +161,7 @@
   setInterval(tick, 600);
 
   try {
-    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.4.7' }, '*');
+    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.4.8' }, '*');
   } catch (e) {}
   try {
     console.log('[AFG bridge] inyectado en', location.href);

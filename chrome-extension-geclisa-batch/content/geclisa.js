@@ -349,10 +349,17 @@
     return { raw: raw, apellido: apellido, nombre: nombre, nroAtencion: nro };
   }
 
-  /** Compara apellido+nombre exactos (sin tildes / case; espacios colapsados). */
+  /**
+   * Capa 2: apellido exacto; nombre tolerante.
+   * Esperado "DANIEL" vs real "DANIEL ALFREDO" → OK (prefijo por tokens / 1er nombre).
+   * No acepta prefijo a medias de un token ("DAN" ↛ "DANIEL").
+   */
   function namesMatchExpected(headerAp, headerNom, expectedAp, expectedNom) {
     function normName(s) {
       return AFG.quitarAcentos(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+    function tokens(s) {
+      return normName(s).split(/\s+/).filter(Boolean);
     }
     var hap = normName(headerAp);
     var hnm = normName(headerNom);
@@ -360,9 +367,19 @@
     var enm = normName(expectedNom);
     if (!hap || !eap) return false;
     if (hap !== eap) return false;
-    // Sin nombre esperado: solo apellido. Con nombre: igualdad exacta del string completo.
     if (!enm) return true;
-    return hnm === enm;
+    if (hnm === enm) return true;
+    // Esperado contenido al inicio del real como secuencia de tokens
+    var et = tokens(enm);
+    var ht = tokens(hnm);
+    if (!et.length || ht.length < et.length) {
+      // Esperado más largo que real: alcanza si el 1er nombre coincide
+      return !!(ht[0] && et[0] && ht[0] === et[0]);
+    }
+    for (var i = 0; i < et.length; i++) {
+      if (ht[i] !== et[i]) return false;
+    }
+    return true;
   }
 
   /** Textos exactos de #ddlSector (Mayo, Ubicacion=2). */

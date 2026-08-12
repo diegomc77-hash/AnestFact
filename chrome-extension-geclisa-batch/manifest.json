@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AnesFact GECLISA Batch (pasos 1–12)",
-  "version": "0.4.7",
-  "description": "GECLISA Mayo: panel+Consultar; verifica encabezado Evolucion antes de Nuevo.",
+  "version": "0.4.8",
+  "description": "GECLISA Mayo: panel+Consultar; Evolucion nombre tolerante (prefijo/1er nombre); captura N Atencion.",
   "permissions": ["storage", "tabs", "scripting", "debugger", "clipboardRead"],
   "host_permissions": [
     "http://sanatoriomayo.myvnc.com:84/*",

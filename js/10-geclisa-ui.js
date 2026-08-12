@@ -2,7 +2,15 @@ function renderGeclisa(){
   var i=S.cur;var campos=document.getElementById('geclisa-campos');var steps=document.getElementById('geclisa-steps');var fojaqx=document.getElementById('geclisa-fojaqx');
   if(!i){campos.innerHTML='<p style="font-size:12px;color:var(--text3)">Abrí una intervención primero</p>';return;}
   var f=i.foja||{};
-  var parts=(i.pac||'').split(',');var ape=parts[0]?parts[0].trim():'';var nom=parts[1]?parts[1].trim():'';
+  var ape='',nom='';
+  if(typeof afSplitPacienteNombre==='function'){
+    var sn=afSplitPacienteNombre(i.pac||'');
+    ape=sn.apellido;nom=sn.nombre;
+  }else{
+    var parts=(i.pac||'').split(',');
+    ape=parts[0]?parts[0].trim():'';
+    nom=parts.length>1?parts.slice(1).join(',').replace(/\s+/g,' ').trim():'';
+  }
   function cpRow(label,val){
     if(!val)return'';
     return '<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--text3);margin-bottom:3px">'+label+'</div>'
