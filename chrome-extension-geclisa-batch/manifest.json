@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AnesFact GECLISA Batch (pasos 1–12)",
-  "version": "0.4.6",
-  "description": "GECLISA Mayo: panel Ubicacion+Sector+Fecha+Hora+Consultar (sin modal Buscar Paciente).",
+  "version": "0.4.7",
+  "description": "GECLISA Mayo: panel+Consultar; verifica encabezado Evolucion antes de Nuevo.",
   "permissions": ["storage", "tabs", "scripting", "debugger", "clipboardRead"],
   "host_permissions": [
     "http://sanatoriomayo.myvnc.com:84/*",

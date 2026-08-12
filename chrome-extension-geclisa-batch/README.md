@@ -1,6 +1,8 @@
-# AnesFact GECLISA Batch (v0.4.3 — pasos 1–12)
+# AnesFact GECLISA Batch (v0.4.7 — pasos 1–12)
 
 Navega GECLISA Mayo hasta la plantilla FOJA y corre **fill.js** con token (sin Guardar).
+
+Panel: Ubicación + Sector + Fecha + Hora + **Consultar**. Antes de Nuevo: verifica apellido+nombre en el encabezado de Evolución y captura el N° de Atención.
 
 ## Cómo llega el paciente al popup
 
@@ -14,7 +16,7 @@ GECLISA no interviene en este paso.
 
 ## Probar
 
-1. `chrome://extensions` → ↻ recargar extensión (**0.4.3**).
+1. `chrome://extensions` → ↻ recargar extensión (**0.4.7**).
 2. Dejá AnesFact abierto con foja ya enviada (o Enviar de nuevo).
 3. Abrí el popup → debe mostrar el paciente; o **Actualizar**.
 4. **Diagnóstico storage** muestra `pull.ok` + foja.

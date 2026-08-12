@@ -163,9 +163,7 @@
     if (located.paused) return located;
 
     var patientRow = located.rows[0];
-    var nroAtencion = extractNroAtencionFromRow(patientRow);
-    log('Panel fila:', {
-      nroAtencion: nroAtencion,
+    log('Panel fila (pre-Evolucion):', {
       sectorUsado: located.sectorUsado,
       fechaUsada: located.fechaUsada,
       horaUsada: located.horaUsada,
@@ -173,14 +171,16 @@
       fila: AFG.norm(patientRow.innerText || '').slice(0, 160)
     });
 
-    var steps711 = await runIframe711FromRow(plantilla, patientRow, located);
+    var steps711 = await runIframe711FromRow(plantilla, patientRow, located, apellido, nombre);
     if (!steps711.ok) return steps711;
 
     return {
       ok: true,
       step: 'iframe_3_11_done',
       count: located.rows.length,
-      nroAtencion: nroAtencion || null,
+      // N° Atención capturado en encabezado Evolución (no lo teníamos de antemano)
+      nroAtencion: steps711.nroAtencion || null,
+      evolucionHeader: steps711.evolucionHeader || null,
       fechaCirugia: fechaCirugia || null,
       horaInicio: horaCirugia || null,
       sector: sector || null,
@@ -194,8 +194,8 @@
     };
   }
 
-  /** Desde fila ya ubicada en el panel: Opciones -> Evoluciones -> Nuevo -> plantilla. */
-  async function runIframe711FromRow(plantilla, patientRow, located) {
+  /** Desde fila ya ubicada en el panel: Opciones -> Evoluciones -> verificar encabezado -> Nuevo -> plantilla. */
+  async function runIframe711FromRow(plantilla, patientRow, located, apellidoExpected, nombreExpected) {
     log('Paso 7b: Opciones en fila del paciente (debugger)');
     var opciones = findOpcionesInRow(patientRow);
     if (!opciones) {
@@ -217,7 +217,29 @@
     await AFG.clickElAsync(evol);
     await AFG.humanDelay();
 
-    log('Paso 9: #BtnNuevoPQyA (button nativo)');
+    // Capa 2 de seguridad: encabezado "APELLIDO, NOMBRE - N° Atención: XXXXXX" antes de Nuevo
+    log('Paso 8b: verificar encabezado Evolucion vs', apellidoExpected, nombreExpected);
+    var headerInfo = await AFG.waitFor(function () {
+      return readEvolucionPatientHeader();
+    }, { label: 'encabezado Evolucion (apellido + N Atencion)', timeout: 15000 });
+
+    var match = namesMatchExpected(headerInfo.apellido, headerInfo.nombre, apellidoExpected, nombreExpected);
+    log('Paso 8b encabezado:', headerInfo, 'match=', match);
+    if (!match) {
+      return {
+        ok: false,
+        paused: true,
+        reason: 'evolucion_nombre_mismatch',
+        nroAtencion: headerInfo.nroAtencion || null,
+        evolucionHeader: headerInfo,
+        expected: { apellido: apellidoExpected, nombre: nombreExpected },
+        message: 'PAUSA: encabezado Evolucion "' + (headerInfo.raw || '') +
+          '" no coincide con ' + apellidoExpected + ', ' + nombreExpected +
+          '. No toco Nuevo.'
+      };
+    }
+
+    log('Paso 9: #BtnNuevoPQyA (button nativo) — nombre OK, N Atencion capturado=', headerInfo.nroAtencion);
     var btnNuevo = await AFG.waitFor(function () {
       var b = document.getElementById('BtnNuevoPQyA');
       if (!b || b.disabled) return null;
@@ -245,6 +267,8 @@
         reason: 'template_ambiguous_or_empty',
         count: tplRows.length,
         plantilla: plantilla,
+        nroAtencion: headerInfo.nroAtencion || null,
+        evolucionHeader: headerInfo,
         message: 'PAUSA: ' + tplRows.length + ' fila(s) para plantilla "' + plantilla + '". No elijo a ciegas.'
       };
     }
@@ -264,11 +288,81 @@
       ok: true,
       step: 'iframe_7_11_done',
       plantilla: plantilla,
+      nroAtencion: headerInfo.nroAtencion || null,
+      evolucionHeader: headerInfo,
       fechaUsada: located && located.fechaUsada,
       horaUsada: located && located.horaUsada,
       sectorUsado: located && located.sectorUsado,
       filtrosProbados: located && located.filtrosProbados
     };
+  }
+
+  /**
+   * Encabezado Evolucion tipico: "BESCOS, DANIEL ALFREDO - N° Atención: 123456"
+   * Devuelve { raw, apellido, nombre, nroAtencion } o null si no se ve aun.
+   */
+  function readEvolucionPatientHeader() {
+    var candidates = [];
+    var nodes = document.querySelectorAll('h1, h2, h3, h4, .titulo, .title, legend, label, span, div, b, strong');
+    for (var i = 0; i < Math.min(nodes.length, 400); i++) {
+      var el = nodes[i];
+      if (el.querySelector && el.querySelector('h1, h2, h3, table, .ui-jqgrid')) continue;
+      var t = AFG.norm(el.innerText || el.textContent || '');
+      if (!t || t.length < 8 || t.length > 180) continue;
+      if (!/atenci/i.test(t)) continue;
+      if (!/,/.test(t) && !/-/.test(t)) continue;
+      candidates.push(t);
+    }
+    // Preferir el que matchea el patron completo
+    for (var c = 0; c < candidates.length; c++) {
+      var parsed = parseEvolucionHeaderText(candidates[c]);
+      if (parsed && parsed.apellido && parsed.nroAtencion) return parsed;
+    }
+    // Fallback: body snippet
+    var body = AFG.norm(document.body && document.body.innerText || '').slice(0, 2500);
+    var m = body.match(/([A-ZÁÉÍÓÚÑÜ][^\n]{2,80}?)\s*[-–—]\s*N(?:[°ºo.]|ro\.?)?\s*Atenci[oó]n\s*:?\s*(\d{4,})/i);
+    if (m) return parseEvolucionHeaderText(m[0]);
+    return null;
+  }
+
+  function parseEvolucionHeaderText(text) {
+    var raw = AFG.norm(text || '');
+    if (!raw) return null;
+    var m = raw.match(/^(.+?)\s*[-–—]\s*N(?:[°ºo.]|ro\.?)?\s*Atenci[oó]n\s*:?\s*(\d{4,})/i);
+    if (!m) {
+      m = raw.match(/(.+?)\s+N(?:[°ºo.]|ro\.?)?\s*Atenci[oó]n\s*:?\s*(\d{4,})/i);
+    }
+    if (!m) return null;
+    var namePart = AFG.norm(m[1]).replace(/\s*[-–—]\s*$/, '');
+    var nro = m[2];
+    var apellido = '';
+    var nombre = '';
+    if (namePart.indexOf(',') >= 0) {
+      var parts = namePart.split(',');
+      apellido = AFG.norm(parts[0] || '');
+      nombre = AFG.norm(parts.slice(1).join(','));
+    } else {
+      var words = namePart.split(/\s+/).filter(Boolean);
+      apellido = words[0] || '';
+      nombre = words.slice(1).join(' ');
+    }
+    return { raw: raw, apellido: apellido, nombre: nombre, nroAtencion: nro };
+  }
+
+  /** Compara apellido+nombre exactos (sin tildes / case; espacios colapsados). */
+  function namesMatchExpected(headerAp, headerNom, expectedAp, expectedNom) {
+    function normName(s) {
+      return AFG.quitarAcentos(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+    var hap = normName(headerAp);
+    var hnm = normName(headerNom);
+    var eap = normName(expectedAp);
+    var enm = normName(expectedNom);
+    if (!hap || !eap) return false;
+    if (hap !== eap) return false;
+    // Sin nombre esperado: solo apellido. Con nombre: igualdad exacta del string completo.
+    if (!enm) return true;
+    return hnm === enm;
   }
 
   /** Textos exactos de #ddlSector (Mayo, Ubicacion=2). */

@@ -138,7 +138,7 @@
   setInterval(tick, 600);
 
   try {
-    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.4.6' }, '*');
+    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.4.7' }, '*');
   } catch (e) {}
   try {
     console.log('[AFG bridge] inyectado en', location.href);
