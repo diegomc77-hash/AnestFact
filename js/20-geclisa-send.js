@@ -78,7 +78,8 @@ function afSplitPacienteNombre(pac){
  * CRÍTICO: no alcanza con window.__AFG_* — el content script vive en otro JS world.
  * localStorage + postMessage sí cruzan; CustomEvent también.
  */
-function afPublishGeclisaBatch(batchPayload){
+function afPublishGeclisaBatch(batchPayload, opts){
+  opts=opts||{};
   window.__AFG_PENDING_BATCH=batchPayload;
   try{
     localStorage.setItem('afg_pending_batch', JSON.stringify(batchPayload));
@@ -89,13 +90,43 @@ function afPublishGeclisaBatch(batchPayload){
   try{
     window.dispatchEvent(new CustomEvent('afg-geclisa-token',{ detail:batchPayload }));
   }catch(e){}
-  try{
-    var env=afBatchClipboardEnvelope(batchPayload);
-    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(env);
-  }catch(e){}
+  if(!opts.skipClipboard){
+    try{
+      var env=afBatchClipboardEnvelope(batchPayload);
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(env);
+    }catch(eClip){}
+  }
   try{
     console.log('[AFG] publish batch', batchPayload.apellido, batchPayload.nombre, 'tokenLen', String(batchPayload.token||'').length);
   }catch(e){}
+}
+
+/** Resuelve intervención por id o usa el objeto; prioriza S.intervs / S.cur. */
+function afResolveInterv(intervOrId){
+  if(intervOrId&&typeof intervOrId==='object'&&intervOrId.id!=null)return intervOrId;
+  var id=String(intervOrId||'');
+  if(!id)return(typeof S!=='undefined'?S.cur:null)||null;
+  if(typeof S!=='undefined'&&S.cur&&String(S.cur.id)===id)return S.cur;
+  var list=(typeof S!=='undefined'&&S.intervs)?S.intervs:[];
+  for(var k=0;k<list.length;k++){
+    if(String(list[k].id)===id)return list[k];
+  }
+  return null;
+}
+
+function afIsCurrentInterv(i){
+  return !!(typeof S!=='undefined'&&S.cur&&i&&String(S.cur.id)===String(i.id));
+}
+
+/** DOM solo si la foja está abierta; si no, i.foja. */
+function afFojaField(i, fojaKey, domId, fallback){
+  var f=(i&&i.foja)||{};
+  if(afIsCurrentInterv(i)&&domId){
+    var el=document.getElementById(domId);
+    if(el&&el.value!=null&&String(el.value).trim()!=='')return el.value;
+  }
+  if(fojaKey&&f[fojaKey]!=null&&String(f[fojaKey]).trim()!=='')return f[fojaKey];
+  return fallback!=null?fallback:'';
 }
 
 /** Pide a la extensión reusar/enfocar GECLISA (sin window.open acá — el fallback va después del alert). */
@@ -120,53 +151,29 @@ function afOpenGeclisaFallbackIfNeeded(){
   }, 200);
 }
 
-window.addEventListener('message', function(ev){
-  if(ev.source!==window)return;
-  var d=ev.data;
-  if(!d||d.source!=='AFG_EXT')return;
-  if(d.type==='OPEN_ACK') window.__AFG_EXT_OPEN_ACK=true;
-  if(d.type==='BRIDGE_ALIVE') window.__AFG_BRIDGE_ALIVE=true;
-});
-
-function abrirGeclisa(){
-  if(typeof checkPlan==='function'&&!checkPlan('geclisa'))return;
-  var run=function(){ _abrirGeclisaCore(); };
-  if(typeof assertPlanServer==='function'){
-    assertPlanServer('geclisa').then(function(res){
-      if(typeof handleAssertFail==='function'&&!handleAssertFail(res,'geclisa'))return;
-      run();
-    });
-    return;
-  }
-  run();
-}
-
-function _abrirGeclisaCore(){
-  var i=S.cur;
-  var f=(i&&i.foja)||{};
-  if(!i){toast('Carg\u00e1 un paciente primero');return;}
-  if(typeof syncFojaHoras==='function')syncFojaHoras();
-  if(document.getElementById('fj-tec'))guardarFoja();
-  else if(document.getElementById('f-pac'))guardar();
-  i=S.cur;f=(i&&i.foja)||{};
+/**
+ * Arma payload clínico + clave para af_geclisa_create_token.
+ * Usa i / i.foja; DOM solo si esa foja está abierta (cola puede mintear otra).
+ */
+function afBuildGeclisaClinicalPayload(i){
+  if(!i)return{ok:false,error:'missing_interv'};
+  var f=i.foja||{};
   var splitNom=afSplitPacienteNombre(i.pac||'');
   try{
     console.log('[AFG] pac raw →', JSON.stringify(i.pac||''), '→ apellido=', splitNom.apellido, 'nombre=', splitNom.nombre);
   }catch(ePacLog){}
-  // Clave: DNI sin ceros, sino nombre+fecha, nunca 'ultimo'
   var _dni=(i.dni||'').trim().replace(/^0+/,'').replace(/\s+/g,'');
   var _nom=(i.pac||'').trim().replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'').slice(0,20);
   var _fec=(i.fecha||new Date().toISOString().slice(0,10)).replace(/-/g,'');
   var clave=_dni||(_nom?_nom+'_'+_fec:'sin_id_'+_fec);
   if(typeof afGeclisaClave==='function')clave=afGeclisaClave(clave);
-  // Separar drogas por grupo: Inductores/Relajantes/Analgésicos -> inducción; Mantenimiento/Inotrópicos -> mantenimiento
+
   var _drogasInd=[],_drogasMant=[];
   (f.drogas||[]).forEach(function(dr){
     if(!dr.n||!dr.n.trim())return;
     var txt=(dr.n||'')+' '+(dr.d||'')+' '+(dr.v||'');
     var g=(dr.grupo||'').toLowerCase();
     if(g.indexOf('inotr')>=0){
-      // Inotrópicos: van a mantenimiento GECLISA; la causa queda en métodos/obs Aero
       _drogasMant.push(txt+(dr.causa?' ('+dr.causa+')':''));
     } else if(g.indexOf('mantenimiento')>=0||g.indexOf('tiva total')>=0||g.indexOf('gas mac')>=0){
       _drogasMant.push(txt);
@@ -175,23 +182,33 @@ function _abrirGeclisaCore(){
     } else if(g.indexOf('intratecal')>=0||g.indexOf('peridural')>=0||g.indexOf('local')>=0||g.indexOf('coadyuv')>=0){
       _drogasMant.push(txt);
     } else {
-      // Sin grupo (agregado manual) -> va a inducción por defecto
       _drogasInd.push(txt);
     }
   });
-  // Nivel regional: espacio intervertebral o bloqueo+lateralidad, solo si aplica
-  var _tipoTec=document.getElementById('fj-tec-tipo')?document.getElementById('fj-tec-tipo').value:'';
-  var _nivelRegional='';
-  if(_tipoTec==='neuroaxial'){
-    var _esp=document.getElementById('fj-tec-espacio')?document.getElementById('fj-tec-espacio').value:'';
-    if(_esp)_nivelRegional='Espacio '+_esp;
-  } else if(_tipoTec==='bloqueo'){
-    var _lat=document.getElementById('fj-tec-lateral')?document.getElementById('fj-tec-lateral').value:'';
-    var _tecVal=document.getElementById('fj-tec')?document.getElementById('fj-tec').value:'';
-    if(_tecVal)_nivelRegional=_tecVal+(_lat?' - '+_lat:'');
+
+  var _tipoTec=afFojaField(i,'tecTipo','fj-tec-tipo','')||afFojaField(i,'tec_tipo','fj-tec-tipo','');
+  var _nivelRegional=f.nivel_regional||'';
+  if(!_nivelRegional&&afIsCurrentInterv(i)){
+    if(_tipoTec==='neuroaxial'){
+      var _esp=document.getElementById('fj-tec-espacio')?document.getElementById('fj-tec-espacio').value:'';
+      if(_esp)_nivelRegional='Espacio '+_esp;
+    } else if(_tipoTec==='bloqueo'){
+      var _lat=document.getElementById('fj-tec-lateral')?document.getElementById('fj-tec-lateral').value:'';
+      var _tecVal=document.getElementById('fj-tec')?document.getElementById('fj-tec').value:'';
+      if(_tecVal)_nivelRegional=_tecVal+(_lat?' - '+_lat:'');
+    }
   }
-  var _mon=getMayoMonitoreoFlags(i);
+
+  var _mon=afIsCurrentInterv(i)
+    ? getMayoMonitoreoFlags(i)
+    : {
+        monEtco2:!!f.monEtco2, monPam:!!f.monPam, monEcg:f.monEcg!==false,
+        monSato2:f.monSato2!==false, monPani:f.monPani!==false,
+        monDecub:!!f.monDecub,
+        monEmerg:!!f.monEmerg||((i.mayo_tipociru||'').toLowerCase()==='urgencia')
+      };
   var _gest=typeof calcGestionFoja==='function'?calcGestionFoja(f,i):{};
+  var atb=afFojaField(i,'atb','fj-atb','');
   var payload={
     apellido:splitNom.apellido,
     nombre:splitNom.nombre,
@@ -213,7 +230,7 @@ function _abrirGeclisaCore(){
     observacionesFinal:((f.obs_geclisa||'')+(f.obs?(f.obs_geclisa?' | ':'')+f.obs:'')).trim(),
     examenFisico:f.examenFisico||'',
     premedicacion:f.premed||'',
-    antibioticoprofilaxis:(document.getElementById('fj-atb')?document.getElementById('fj-atb').value:'')||(f.atb||''),
+    antibioticoprofilaxis:atb,
     medicamentos:(f.drogas||[]).filter(function(d){return d.n&&d.n.trim();}).map(function(d){return(d.n||'')+' '+(d.d||'')+' '+(d.v||'');}).join(', '),
     peso:i.peso||'',asa:f.asa||'',
     monEtco2:_mon.monEtco2,
@@ -234,80 +251,188 @@ function _abrirGeclisaCore(){
     recuperacion:f.recup||'S/p',
     timestamp:new Date().toISOString()
   };
+  return{ok:true,interv:i,clave:clave,payload:payload,splitNom:splitNom};
+}
 
-  // Token de un solo uso (RPC 008) — el DNI va solo dentro del payload clínico
-  if(typeof AF_AUTH==='undefined'||!AF_AUTH.isLoggedIn||!AF_AUTH.isLoggedIn()){
-    toast('Iniciá sesión para enviar a GECLISA');
+/**
+ * Mint token on-demand (cola / Enviar ahora / bridge).
+ * opts: { publish?:true, skipClipboard?:bool, saveCurrent?:bool, toastProgress?:bool }
+ * @returns {Promise<{ok, foja?, error?, token?}>}
+ */
+function afMintGeclisaToken(intervOrId, opts){
+  opts=opts||{};
+  var publish=opts.publish!==false;
+  var skipClipboard=!!opts.skipClipboard;
+  var toastProgress=opts.toastProgress!==false;
+
+  return Promise.resolve().then(function(){
+    if(typeof checkPlan==='function'&&!checkPlan('geclisa')){
+      return{ok:false,error:'plan_geclisa'};
+    }
+    if(typeof assertPlanServer==='function'){
+      return assertPlanServer('geclisa').then(function(res){
+        if(typeof handleAssertFail==='function'&&!handleAssertFail(res,'geclisa')){
+          return{ok:false,error:'plan_assert'};
+        }
+        return null;
+      });
+    }
+    return null;
+  }).then(function(early){
+    if(early)return early;
+
+    var i=afResolveInterv(intervOrId);
+    if(!i)return{ok:false,error:'interv_not_found'};
+
+    if(opts.saveCurrent!==false&&afIsCurrentInterv(i)){
+      try{
+        if(typeof syncFojaHoras==='function')syncFojaHoras();
+        if(document.getElementById('fj-tec')&&typeof guardarFoja==='function')guardarFoja();
+        else if(document.getElementById('f-pac')&&typeof guardar==='function')guardar();
+      }catch(eSave){}
+      i=afResolveInterv(i.id)||i;
+    }
+
+    if(typeof AF_AUTH==='undefined'||!AF_AUTH.isLoggedIn||!AF_AUTH.isLoggedIn()){
+      if(toastProgress)toast('Iniciá sesión para enviar a GECLISA');
+      return{ok:false,error:'not_logged_in'};
+    }
+
+    var built=afBuildGeclisaClinicalPayload(i);
+    if(!built.ok)return built;
+    var payload=built.payload;
+    var clave=built.clave;
+
+    if(toastProgress)toast('Generando token GECLISA…');
+
+    // cache:'no-store' — evita SW/cache atascado entre fojas
+    return fetch(afSupabaseUrl()+'/rest/v1/rpc/af_geclisa_create_token',{
+      method:'POST',
+      cache:'no-store',
+      headers:afSupabaseHeaders({'Content-Type':'application/json','Cache-Control':'no-cache'}),
+      body:JSON.stringify({ p_paciente_ref: clave, p_payload: payload })
+    }).then(function(r){
+      return r.text().then(function(t){
+        var data=null;
+        try{ data=t?JSON.parse(t):null; }catch(e){ data=null; }
+        if(!r.ok){
+          var code=(data&&(data.code||data.error))||'';
+          var msg=(data&&(data.message||data.error_description))||t.slice(0,160)||('HTTP '+r.status);
+          if(r.status===404||code==='PGRST202'||code==='42883'||/Could not find the function/i.test(msg)){
+            throw new Error('Falta ejecutar el SQL 008a/008 en Supabase (token GECLISA) o recargar schema PostgREST. Detalle: '+msg.slice(0,100));
+          }
+          throw new Error(msg);
+        }
+        return data;
+      });
+    }).then(function(res){
+      if(!res||res.ok===false){
+        var err=(res&&res.error)||'no_ok';
+        if(toastProgress){
+          if(err==='upgrade'||err==='bloqueado')toast('Plan no permite GECLISA');
+          else toast('No se pudo crear token: '+err);
+        }
+        return{ok:false,error:String(err)};
+      }
+      var token=res.token||'';
+      if(!token||token.length<32){
+        if(toastProgress)toast('Token inválido del servidor');
+        return{ok:false,error:'invalid_token'};
+      }
+      window._afLastGeclisaToken=token;
+      var foja={
+        token:token,
+        intervId:String(i.id),
+        apellido:payload.apellido||'',
+        nombre:payload.nombre||'',
+        dni:payload.dni||i.dni||'',
+        fechaCirugia:payload.fechaCirugia||i.fecha||'',
+        horaInicio:payload.horaInicio||i.hora||'',
+        horaFin:payload.horaFin||'',
+        sector:payload.sector||i.mayo_sector||'',
+        mayo_cama:payload.mayo_cama||i.mayo_cama||'',
+        pac:i.pac||'',
+        clave:clave,
+        updatedAt:Date.now()
+      };
+      try{
+        console.log('[AFG] mint ok', foja.intervId, foja.apellido, '|', foja.nombre, '|', foja.sector, 'tokenLen', token.length);
+      }catch(eLog){}
+      if(publish){
+        try{ afPublishGeclisaBatch(foja,{ skipClipboard:skipClipboard }); }catch(eBatch){
+          try{ console.warn('[AFG] publish batch falló', eBatch); }catch(e2){}
+        }
+      }
+      if(toastProgress)toast('Token listo ✓');
+      return{ok:true,token:token,foja:foja,clave:clave};
+    });
+  }).catch(function(e){
+    var msg=String(e&&e.message||e);
+    if(toastProgress)toast('Error GECLISA: '+msg);
+    return{ok:false,error:msg};
+  });
+}
+
+window.addEventListener('message', function(ev){
+  if(ev.source!==window)return;
+  var d=ev.data;
+  if(!d||d.source!=='AFG_EXT')return;
+  if(d.type==='OPEN_ACK') window.__AFG_EXT_OPEN_ACK=true;
+  if(d.type==='BRIDGE_ALIVE') window.__AFG_BRIDGE_ALIVE=true;
+  // Extensión pide token para una foja de la cola (pieza 2)
+  if(d.type==='MINT_TOKEN'){
+    var reqId=d.requestId||('m'+Date.now());
+    var intervId=d.intervId||d.id||null;
+    afMintGeclisaToken(intervId,{
+      publish:true,
+      skipClipboard:true,
+      saveCurrent:true,
+      toastProgress:false
+    }).then(function(r){
+      try{
+        window.postMessage({
+          source:'AFG_ANESFACT',
+          type:'MINT_TOKEN_RESULT',
+          requestId:reqId,
+          ok:!!(r&&r.ok),
+          foja:r&&r.foja||null,
+          error:(r&&r.error)||null,
+          tokenLen:r&&r.token?String(r.token).length:0
+        },'*');
+      }catch(ePost){}
+    });
+  }
+});
+
+function abrirGeclisa(){
+  if(typeof checkPlan==='function'&&!checkPlan('geclisa'))return;
+  var run=function(){ _abrirGeclisaCore(); };
+  if(typeof assertPlanServer==='function'){
+    assertPlanServer('geclisa').then(function(res){
+      if(typeof handleAssertFail==='function'&&!handleAssertFail(res,'geclisa'))return;
+      run();
+    });
     return;
   }
-  toast('Generando token GECLISA…');
-  fetch(afSupabaseUrl()+'/rest/v1/rpc/af_geclisa_create_token',{
-    method:'POST',
-    headers:afSupabaseHeaders({'Content-Type':'application/json'}),
-    body:JSON.stringify({ p_paciente_ref: clave, p_payload: payload })
-  })
-  .then(function(r){
-    return r.text().then(function(t){
-      var data=null;
-      try{ data=t?JSON.parse(t):null; }catch(e){ data=null; }
-      if(!r.ok){
-        // Solo tratar como "RPC ausente" códigos PostgREST de schema cache / not found.
-        // Antes: cualquier body con el nombre de la función se etiquetaba mal (p.ej. no_auth).
-        var code=(data&&(data.code||data.error))||'';
-        var msg=(data&&(data.message||data.error_description))||t.slice(0,160)||('HTTP '+r.status);
-        if(r.status===404||code==='PGRST202'||code==='42883'||/Could not find the function/i.test(msg)){
-          throw new Error('Falta ejecutar el SQL 008a/008 en Supabase (token GECLISA) o recargar schema PostgREST. Detalle: '+msg.slice(0,100));
-        }
-        throw new Error(msg);
-      }
-      return data;
+  run();
+}
+
+/** Enviar ahora (1 foja): mint + alert + foco GECLISA. Nav automática = piezas 3–4. */
+function _abrirGeclisaCore(){
+  if(!S.cur){toast('Carg\u00e1 un paciente primero');return;}
+  afMintGeclisaToken(S.cur,{ publish:true, skipClipboard:false, toastProgress:true })
+    .then(function(r){
+      if(!r||!r.ok)return;
+      try{ afOpenOrFocusGeclisa(); }catch(eOpen){}
+      alert(
+        'TOKEN GECLISA (un solo uso · 2 horas)\n\n'+
+        r.token+
+        '\n\nPortapapeles: AFG1|apellido|nombre|dni|fecha|token (el popup de la extensión lo lee solo).\n'+
+        'Si usás el marcador manual: pegá solo el token cuando te lo pida.\n\n'+
+        '(Pieza 2) El disparo automático de navegación llega con el runner de cola.'
+      );
+      toast('Token listo ✓ Extensión / marcador GECLISA');
+      try{ afOpenGeclisaFallbackIfNeeded(); }catch(eFb){}
     });
-  })
-  .then(function(res){
-    if(!res||res.ok===false){
-      var err=(res&&res.error)||'no_ok';
-      if(err==='upgrade'||err==='bloqueado'){toast('Plan no permite GECLISA');return;}
-      toast('No se pudo crear token: '+err);
-      return;
-    }
-    var token=res.token||'';
-    if(!token||token.length<32){toast('Token inválido del servidor');return;}
-    window._afLastGeclisaToken=token;
-    var batchPayload={
-      token:token,
-      apellido:payload.apellido||'',
-      nombre:payload.nombre||'',
-      dni:payload.dni||i.dni||'',
-      fechaCirugia:payload.fechaCirugia||i.fecha||'',
-      horaInicio:payload.horaInicio||i.hora||'',
-      horaFin:payload.horaFin||'',
-      sector:payload.sector||i.mayo_sector||'',
-      mayo_cama:payload.mayo_cama||i.mayo_cama||'',
-      pac:i.pac||'',
-      clave:clave,
-      updatedAt:Date.now()
-    };
-    try{
-      console.log('[AFG] apellido/nombre/sector', batchPayload.apellido, '|', batchPayload.nombre, '|', batchPayload.sector);
-    }catch(eLog){}
-    // Publicar para extensión (localStorage + postMessage cruzan el isolated world; window.* no)
-    try{ afPublishGeclisaBatch(batchPayload); }catch(eBatch){
-      try{ console.warn('[AFG] publish batch falló', eBatch); }catch(e2){}
-    }
-    // Pedir a la extensión que enfoque la pestaña GECLISA existente (antes del alert)
-    try{ afOpenOrFocusGeclisa(); }catch(eOpen){}
-    alert(
-      'TOKEN GECLISA (un solo uso · 2 horas)\n\n'+
-      token+
-      '\n\nPortapapeles: AFG1|apellido|nombre|dni|fecha|token (el popup de la extensión lo lee solo).\n'+
-      'Si usás el marcador manual: pegá solo el token cuando te lo pida.'
-    );
-    toast('Token listo ✓ Extensión / marcador GECLISA');
-    // Si no hubo OPEN_ACK de la extensión, reusar ventana nombrada (no _blank)
-    try{ afOpenGeclisaFallbackIfNeeded(); }catch(eFb){}
-  })
-  .catch(function(e){
-    toast('Error GECLISA: '+(e.message||e));
-  });
 }
 

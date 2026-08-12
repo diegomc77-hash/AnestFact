@@ -1,19 +1,19 @@
 /**
- * Bridge AnesFact (page world) → extensión.
+ * Bridge AnesFact (page world) ↔ extensión.
  *
- * El popup NO lee localStorage de AnesFact (otro contexto/origen).
- * Este content script sí puede (mismo origen de la pestaña) y copia a chrome.storage.*.
- *
- * Bug que había: si chrome.storage.session.set fallaba, lastSig ya quedaba seteado
- * y nunca reintentaba escribir chrome.storage.local → popup vacío.
+ * - Copia afg_pending_batch / cola afg_geclisa_queue → chrome.storage
+ * - Relay mint on-demand: AFG_MINT_TOKEN_FOR_FOJA → postMessage MINT_TOKEN → page RPC
  */
 (function () {
   var lastOkSig = '';
+  var lastQueueSig = '';
+  var pendingMints = {};
 
   function normalize(detail) {
     if (!detail || !detail.token) return null;
     var foja = {
       token: String(detail.token),
+      intervId: detail.intervId ? String(detail.intervId) : '',
       apellido: String(detail.apellido || '').trim(),
       nombre: String(detail.nombre || '').trim(),
       dni: String(detail.dni || '').trim(),
@@ -31,7 +31,6 @@
       foja.apellido = parts[0];
       foja.nombre = parts.slice(1).join(' ');
     }
-    // Si pac trae nombre más completo que el campo nombre, enriquecer
     if (foja.pac) {
       var pac = String(foja.pac).trim();
       var fromPac;
@@ -74,12 +73,11 @@
     });
   }
 
-  function publish(detail, via) {
+  function publishFoja(detail, via) {
     var foja = normalize(detail);
     if (!foja) return Promise.resolve({ ok: false, error: 'normalize_null' });
-    var sig = foja.token + '|' + (foja.updatedAt || '');
-    // Solo saltear si YA se escribió OK esta misma foja
-    if (sig === lastOkSig) return Promise.resolve({ ok: true, skipped: true });
+    var sig = foja.token + '|' + (foja.updatedAt || '') + '|' + (foja.intervId || '');
+    if (sig === lastOkSig) return Promise.resolve({ ok: true, skipped: true, foja: foja });
 
     var payload = {
       afg_current_foja: foja,
@@ -91,15 +89,16 @@
       }
     };
 
-    // local PRIMERO (más compatible desde content script); session best-effort
     return storageSet('local', payload).then(function (rLocal) {
       return storageSet('session', payload).then(function (rSess) {
         if (rLocal.ok || rSess.ok) lastOkSig = sig;
         try {
           console.log(
-            '[AFG bridge] storage via=' + (via || '?'),
+            '[AFG bridge] foja via=' + (via || '?'),
             foja.apellido,
             foja.nombre,
+            'intervId',
+            foja.intervId || '—',
             'tokenLen',
             foja.token.length,
             'local=' + (rLocal.ok ? 'ok' : rLocal.error),
@@ -121,6 +120,43 @@
     });
   }
 
+  function normalizeQueue(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    if (!Array.isArray(raw.items)) return null;
+    return {
+      version: Number(raw.version) || 1,
+      updatedAt: raw.updatedAt || Date.now(),
+      items: raw.items
+    };
+  }
+
+  function publishQueue(raw, via) {
+    var queue = normalizeQueue(raw);
+    if (!queue) return Promise.resolve({ ok: false, error: 'bad_queue' });
+    var sig = String(queue.version) + '|' + String(queue.updatedAt) + '|' + queue.items.length;
+    if (sig === lastQueueSig) return Promise.resolve({ ok: true, skipped: true, queue: queue });
+
+    var payload = {
+      afg_geclisa_queue: queue,
+      afg_queue_meta: { via: via || '?', href: location.href, at: Date.now() }
+    };
+    return storageSet('local', payload).then(function (rLocal) {
+      return storageSet('session', payload).then(function (rSess) {
+        if (rLocal.ok || rSess.ok) lastQueueSig = sig;
+        try {
+          console.log(
+            '[AFG bridge] queue via=' + (via || '?'),
+            'v' + queue.version,
+            'items',
+            queue.items.length,
+            'local=' + (rLocal.ok ? 'ok' : rLocal.error)
+          );
+        } catch (e) {}
+        return { ok: !!(rLocal.ok || rSess.ok), queue: queue };
+      });
+    });
+  }
+
   function readLocalStorageBatch() {
     try {
       var raw = localStorage.getItem('afg_pending_batch');
@@ -131,12 +167,70 @@
     }
   }
 
+  function readLocalStorageQueue() {
+    try {
+      var raw = localStorage.getItem('afg_geclisa_queue');
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function requestMintFromPage(intervId, timeoutMs) {
+    return new Promise(function (resolve) {
+      var requestId = 'mint_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+      var timer = setTimeout(function () {
+        delete pendingMints[requestId];
+        resolve({ ok: false, error: 'mint_timeout', intervId: intervId });
+      }, timeoutMs || 45000);
+
+      pendingMints[requestId] = function (result) {
+        clearTimeout(timer);
+        delete pendingMints[requestId];
+        resolve(result);
+      };
+
+      try {
+        window.postMessage({
+          source: 'AFG_EXT',
+          type: 'MINT_TOKEN',
+          requestId: requestId,
+          intervId: String(intervId || '')
+        }, '*');
+      } catch (e) {
+        clearTimeout(timer);
+        delete pendingMints[requestId];
+        resolve({ ok: false, error: String(e && e.message || e), intervId: intervId });
+      }
+    });
+  }
+
   window.addEventListener('message', function (ev) {
     if (ev.source !== window) return;
     var d = ev.data;
     if (!d || d.source !== 'AFG_ANESFACT') return;
+
     if (d.type === 'GECLISA_TOKEN') {
-      publish(d.payload, 'postMessage');
+      publishFoja(d.payload, 'postMessage');
+    }
+    if (d.type === 'GECLISA_QUEUE') {
+      publishQueue(d.queue, 'postMessage');
+    }
+    if (d.type === 'MINT_TOKEN_RESULT') {
+      var cb = pendingMints[d.requestId];
+      if (cb) {
+        cb({
+          ok: !!d.ok,
+          foja: d.foja || null,
+          error: d.error || null,
+          tokenLen: d.tokenLen || 0,
+          requestId: d.requestId
+        });
+      }
+      if (d.ok && d.foja) {
+        publishFoja(d.foja, 'mint_result');
+      }
     }
     if (d.type === 'OPEN_GECLISA') {
       chrome.runtime.sendMessage({ type: 'AFG_OPEN_GECLISA' }, function (res) {
@@ -149,21 +243,66 @@
   });
 
   window.addEventListener('afg-geclisa-token', function (ev) {
-    publish(ev && ev.detail, 'CustomEvent');
+    publishFoja(ev && ev.detail, 'CustomEvent');
+  });
+  window.addEventListener('afg-geclisa-queue', function (ev) {
+    publishQueue(ev && ev.detail, 'CustomEvent');
   });
 
-  // Inmediato + poll (localStorage sí es del origen AnesFact)
+  chrome.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
+    if (!msg || !msg.type) return;
+
+    if (msg.type === 'AFG_BRIDGE_PING') {
+      sendResponse({
+        ok: true,
+        href: location.href,
+        version: '0.4.9',
+        hasBatch: !!readLocalStorageBatch(),
+        hasQueue: !!readLocalStorageQueue()
+      });
+      return false;
+    }
+
+    if (msg.type === 'AFG_SYNC_QUEUE_NOW') {
+      var q = readLocalStorageQueue();
+      publishQueue(q, 'sync_now').then(function (r) {
+        sendResponse(r);
+      });
+      return true;
+    }
+
+    if (msg.type === 'AFG_MINT_TOKEN_FOR_FOJA') {
+      var intervId = msg.intervId || msg.id;
+      if (!intervId) {
+        sendResponse({ ok: false, error: 'missing_intervId' });
+        return false;
+      }
+      requestMintFromPage(intervId, msg.timeoutMs || 45000).then(function (r) {
+        if (r && r.ok && r.foja) {
+          publishFoja(r.foja, 'mint_relay').then(function () {
+            sendResponse(r);
+          });
+        } else {
+          sendResponse(r || { ok: false, error: 'mint_failed' });
+        }
+      });
+      return true;
+    }
+  });
+
   function tick() {
     var p = readLocalStorageBatch();
-    if (p) publish(p, 'localStorage');
+    if (p) publishFoja(p, 'localStorage');
+    var q = readLocalStorageQueue();
+    if (q) publishQueue(q, 'localStorage');
   }
   tick();
-  setInterval(tick, 600);
+  setInterval(tick, 800);
 
   try {
-    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.4.8' }, '*');
+    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.4.9' }, '*');
   } catch (e) {}
   try {
-    console.log('[AFG bridge] inyectado en', location.href);
+    console.log('[AFG bridge] 0.4.9 inyectado en', location.href);
   } catch (e2) {}
 })();

@@ -123,14 +123,82 @@ function loadFojaFromStorageAndClipboard(pullInfo, done) {
   });
 }
 
+var lastQueue = null;
+
+function setQueueStatus(queue, source) {
+  var el = document.getElementById('queue-status');
+  if (!el) return;
+  if (!queue || !Array.isArray(queue.items)) {
+    el.textContent = 'Cola: (vacía o no leída)';
+    lastQueue = null;
+    return;
+  }
+  lastQueue = queue;
+  var pending = queue.items.filter(function (it) {
+    return it.status !== 'done';
+  });
+  var names = pending.slice(0, 3).map(function (it) {
+    return (it.pac || '?').split(',')[0];
+  });
+  el.textContent = 'Cola (' + (source || '?') + '): ' + pending.length + ' pend. · v' +
+    (queue.version || '?') + (names.length ? (' · ' + names.join(', ')) : '');
+}
+
+function loadQueue(done) {
+  chrome.runtime.sendMessage({ type: 'AFG_PULL_GECLISA_QUEUE' }, function (r) {
+    if (chrome.runtime.lastError) {
+      setQueueStatus(null);
+      if (done) done({ ok: false, error: chrome.runtime.lastError.message });
+      return;
+    }
+    if (r && r.ok && r.queue) setQueueStatus(r.queue, r.source);
+    else setQueueStatus(null);
+    if (done) done(r || { ok: false });
+  });
+}
+
 loadFoja(function (r) {
-  show({ boot: r });
+  loadQueue(function (q) {
+    show({ boot: r, queue: q });
+  });
 });
 
 document.getElementById('btn-refresh').addEventListener('click', function () {
   loadFoja(function (r) {
-    show({ refresh: r });
+    loadQueue(function (q) {
+      show({ refresh: r, queue: q });
+    });
   });
+});
+
+document.getElementById('btn-mint-test').addEventListener('click', function () {
+  function mintFirst(queueWrap) {
+    var items = (queueWrap && queueWrap.queue && queueWrap.queue.items) ||
+      (lastQueue && lastQueue.items) || [];
+    var first = null;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].status !== 'done') { first = items[i]; break; }
+    }
+    if (!first) {
+      show({ ok: false, error: 'Cola sin pendientes. En AnesFact: Agregar a cola GECLISA.' });
+      return;
+    }
+    show({ minting: true, intervId: first.id, pac: first.pac });
+    chrome.runtime.sendMessage({
+      type: 'AFG_MINT_TOKEN_FOR_FOJA',
+      intervId: first.id
+    }, function (res) {
+      if (chrome.runtime.lastError) {
+        show({ ok: false, error: chrome.runtime.lastError.message });
+        return;
+      }
+      if (res && res.ok && res.foja) {
+        fillFromFoja(res.foja, 'mint_test');
+      }
+      show({ mintTest: res || { ok: false }, note: 'Sin run111 — solo mint (pieza 2).' });
+    });
+  }
+  loadQueue(function (q) { mintFirst(q); });
 });
 
 chrome.storage.local.get(['afg_debugger_warn_seen'], function (data) {
@@ -165,14 +233,22 @@ document.getElementById('btn-ping').addEventListener('click', async function () 
 
 document.getElementById('btn-diag').addEventListener('click', function () {
   chrome.runtime.sendMessage({ type: 'AFG_PULL_ANESFACT_FOJA' }, function (pulled) {
-    chrome.storage.session.get(null, function (sess) {
-      chrome.storage.local.get(['afg_current_foja', 'afg_geclisa_token', 'afg_bridge_meta'], function (loc) {
-        show({
-          pull: pulled,
-          form: readPacienteFromForm(),
-          sessionFoja: sess && sess.afg_current_foja,
-          localFoja: loc && loc.afg_current_foja
-        });
+    chrome.runtime.sendMessage({ type: 'AFG_PULL_GECLISA_QUEUE' }, function (queuePull) {
+      chrome.storage.session.get(null, function (sess) {
+        chrome.storage.local.get(
+          ['afg_current_foja', 'afg_geclisa_token', 'afg_bridge_meta', 'afg_geclisa_queue'],
+          function (loc) {
+            show({
+              pull: pulled,
+              queuePull: queuePull,
+              form: readPacienteFromForm(),
+              sessionFoja: sess && sess.afg_current_foja,
+              sessionQueue: sess && sess.afg_geclisa_queue,
+              localFoja: loc && loc.afg_current_foja,
+              localQueue: loc && loc.afg_geclisa_queue
+            });
+          }
+        );
       });
     });
   });

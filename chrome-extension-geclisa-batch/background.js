@@ -60,6 +60,24 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     return true;
   }
 
+  if (msg && msg.type === 'AFG_PULL_GECLISA_QUEUE') {
+    pullQueueFromAnesFactTabs()
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+
+  /**
+   * Mint on-demand: background → content script AnesFact → page afMintGeclisaToken.
+   * No corre run111 (eso es pieza 3–4).
+   */
+  if (msg && msg.type === 'AFG_MINT_TOKEN_FOR_FOJA') {
+    mintTokenViaAnesFactBridge(msg.intervId || msg.id, msg.timeoutMs)
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+
   // Reusar pestaña GECLISA existente; solo crear si no hay ninguna
   if (msg && msg.type === 'AFG_OPEN_GECLISA') {
     focusOrOpenGeclisaTab()
@@ -155,6 +173,124 @@ async function pullFojaFromAnesFactTabs() {
   try { await chrome.storage.local.set(payload); } catch (eL) {}
   try { await chrome.storage.session.set(payload); } catch (eS) {}
   return { ok: true, source: 'anesfact_tab', foja: foja, meta: meta, inspected: inspected };
+}
+
+async function findAnesFactTabs() {
+  return chrome.tabs.query({ url: ANESFACT_TAB_URLS });
+}
+
+/** Lee afg_geclisa_queue desde pestaña AnesFact → chrome.storage. */
+async function pullQueueFromAnesFactTabs() {
+  var tabs = await findAnesFactTabs();
+  if (!tabs || !tabs.length) {
+    return {
+      ok: false,
+      error: 'no_anesfact_tab',
+      message: 'No hay pestaña AnesFact abierta.'
+    };
+  }
+  var best = null;
+  var inspected = [];
+  for (var i = 0; i < tabs.length; i++) {
+    var tab = tabs[i];
+    try {
+      var results = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: function () {
+          try {
+            var raw = localStorage.getItem('afg_geclisa_queue');
+            if (!raw) return { href: location.href, raw: null };
+            return { href: location.href, raw: raw, parsed: JSON.parse(raw) };
+          } catch (e) {
+            return { href: location.href, error: String(e && e.message || e) };
+          }
+        }
+      });
+      var row = results && results[0] && results[0].result;
+      inspected.push({ tabId: tab.id, url: tab.url, row: row });
+      if (row && row.parsed && Array.isArray(row.parsed.items)) {
+        var cand = row.parsed;
+        if (!best || (cand.updatedAt || 0) >= (best.updatedAt || 0) ||
+            (cand.version || 0) > (best.version || 0)) {
+          best = cand;
+          best._fromTabId = tab.id;
+        }
+      }
+    } catch (eTab) {
+      inspected.push({ tabId: tab.id, url: tab.url, error: String(eTab.message || eTab) });
+    }
+  }
+  if (!best) {
+    // fallback storage
+    try {
+      var sess = await chrome.storage.session.get(['afg_geclisa_queue']);
+      if (sess.afg_geclisa_queue && Array.isArray(sess.afg_geclisa_queue.items)) {
+        return { ok: true, source: 'session_storage', queue: sess.afg_geclisa_queue, inspected: inspected };
+      }
+    } catch (eS) {}
+    try {
+      var loc = await chrome.storage.local.get(['afg_geclisa_queue']);
+      if (loc.afg_geclisa_queue && Array.isArray(loc.afg_geclisa_queue.items)) {
+        return { ok: true, source: 'local_storage', queue: loc.afg_geclisa_queue, inspected: inspected };
+      }
+    } catch (eL) {}
+    return {
+      ok: false,
+      error: 'no_queue',
+      message: 'Sin cola en AnesFact (agregá fojas con “Agregar a cola GECLISA”).',
+      inspected: inspected
+    };
+  }
+  var queue = {
+    version: Number(best.version) || 1,
+    updatedAt: best.updatedAt || Date.now(),
+    items: best.items
+  };
+  var payload = {
+    afg_geclisa_queue: queue,
+    afg_queue_meta: { via: 'pull_tab', tabId: best._fromTabId, at: Date.now() }
+  };
+  try { await chrome.storage.local.set(payload); } catch (e1) {}
+  try { await chrome.storage.session.set(payload); } catch (e2) {}
+  return { ok: true, source: 'anesfact_tab', queue: queue, inspected: inspected };
+}
+
+/**
+ * Pide mint al content script de AnesFact (page world hace el RPC).
+ */
+async function mintTokenViaAnesFactBridge(intervId, timeoutMs) {
+  if (!intervId) return { ok: false, error: 'missing_intervId' };
+  var tabs = await findAnesFactTabs();
+  if (!tabs || !tabs.length) {
+    return {
+      ok: false,
+      error: 'no_anesfact_tab',
+      message: 'Abrí AnesFact (logueado) para mintear el token.'
+    };
+  }
+  // Preferir pestaña con cola / batch
+  var tab = tabs[0];
+  var lastErr = null;
+  for (var i = 0; i < tabs.length; i++) {
+    tab = tabs[i];
+    try {
+      var res = await chrome.tabs.sendMessage(tab.id, {
+        type: 'AFG_MINT_TOKEN_FOR_FOJA',
+        intervId: String(intervId),
+        timeoutMs: timeoutMs || 45000
+      });
+      if (res && res.ok) {
+        try {
+          console.log('[AFG bg] mint ok', intervId, res.foja && res.foja.apellido, 'tokenLen', res.tokenLen);
+        } catch (e) {}
+        return Object.assign({ tabId: tab.id }, res);
+      }
+      lastErr = res || { ok: false, error: 'empty_mint_response' };
+    } catch (eTab) {
+      lastErr = { ok: false, error: String(eTab.message || eTab) };
+    }
+  }
+  return lastErr || { ok: false, error: 'mint_failed' };
 }
 
 /** Enfoca pestaña GECLISA abierta; si no hay, crea una sola. Evita N ventanas nuevas. */

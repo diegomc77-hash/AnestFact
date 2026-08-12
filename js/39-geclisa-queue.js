@@ -351,7 +351,7 @@ function renderGeclisaQueuePanel() {
 
   html += '</div>';
   html += '<p style="font-size:11px;color:var(--text3);margin:10px 0 0;line-height:1.4">';
-  html += 'Sin token todavía: la extensión lo pedirá al procesar cada foja. Abrí el popup de la extensión → Iniciar cola (próxima pieza).';
+  html += 'Sin token al encolar. Pieza 2: en el popup de la extensión usá “Probar mint (1ª de cola)”. El runner automático es pieza 3–4.';
   html += '</p>';
   if (env.items.some(function (x) { return x.status === 'done'; })) {
     html += '<button type="button" class="btn btn-s" style="width:100%;margin-top:8px;font-size:12px" onclick="afGeclisaQueueClearDone();renderGeclisaQueuePanel();renderHome();">Limpiar completadas</button>';

@@ -23,23 +23,24 @@
 </head>
 <body>
   <h1>GECLISA Batch — pasos 1–12</h1>
-  <p class="muted">Panel = <b>Consultar</b> + verificación Evolución (nombre tolerante). Extensión <b>0.4.8</b>. <b>No Guardar</b>.</p>
+  <p class="muted">Pieza 2: cola + mint on-demand. Extensión <b>0.4.9</b>. <b>No Guardar</b>. Runner auto = piezas 3–4.</p>
 
   <div class="warn" id="dbg-first">
     <strong>Aviso (primera vez)</strong>
     Vas a ver una barra amarilla de Chrome (debugger) — es esperado. Se quita sola antes del fill.
   </div>
   <div class="warn" id="dbg-always">
-    <strong>Flujo</strong>
-    1) ↻ extensión <b>0.4.8</b> + Enviar a GECLISA (con Sector).<br>
-    2) Actualizar: sector / fecha / hora visibles.<br>
-    3) Ejecutar: panel + Consultar → Evolución (nombre parcial OK) → Nuevo.
+    <strong>Pieza 2 (probar)</strong>
+    1) ↻ extensión <b>0.4.9</b> + AnesFact con cola.<br>
+    2) <b>Actualizar cola</b> → debe listar pendientes.<br>
+    3) <b>Probar mint (1ª de cola)</b> → token sin abrir popup de Ejecutar aún.
   </div>
   <div class="okmsg" id="ok-banner">
     <strong>Foja completada, revisá y guardá manualmente</strong>
     La extensión no hace click en Guardar.
   </div>
 
+  <div id="queue-status" class="muted">Cola: —</div>
   <div id="foja-status" class="muted">Cargando foja…</div>
 
   <label>Apellido
@@ -62,7 +63,8 @@
   <label>Token GECLISA (un solo uso)
     <textarea id="token" placeholder="token"></textarea>
   </label>
-  <button id="btn-refresh" type="button" class="secondary">Actualizar (pestaña AnesFact)</button>
+  <button id="btn-refresh" type="button" class="secondary">Actualizar foja / cola</button>
+  <button id="btn-mint-test" type="button" class="secondary">Probar mint (1ª de cola)</button>
   <button id="btn-run" type="button">Ejecutar 1–12 (nav + fill)</button>
   <button id="btn-ping" type="button" class="secondary">Probar ping a pestaña GECLISA</button>
   <button id="btn-diag" type="button" class="secondary">Diagnóstico storage</button>
