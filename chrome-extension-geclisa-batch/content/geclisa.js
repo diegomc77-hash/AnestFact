@@ -150,151 +150,60 @@
       };
     }
 
-    log('Paso 4: ddlUbicacion = 2');
+    log('Paso 4: ddlUbicacion = 2 (Sanatorio Mayo)');
     var ddl = await AFG.waitFor(function () {
       return document.getElementById('ddlUbicacion');
     }, { label: '#ddlUbicacion', timeout: 20000 });
     AFG.setSelectValue(ddl, '2');
     await AFG.humanDelay();
 
-    log('Paso 4b: panel usará cirugía+sector tras modal', fechaCirugia, horaCirugia, sector);
-    await waitGridStable(8000);
-    await AFG.humanDelay();
+    // SIN modal Buscar Paciente: filtros del panel + Consultar
+    log('Paso 5-7a: panel Sector+Fecha+Hora + Consultar (no #btnBuscarPaciente)', fechaCirugia, horaCirugia, sector);
+    var located = await locateByFechaSectorRetries(apellido, nombre, fechaCirugia, horaCirugia, sector);
+    if (located.paused) return located;
 
-    log('Paso 5: #btnBuscarPaciente (enabled)');
-    var lupa = await AFG.waitFor(function () {
-      var btn = document.getElementById('btnBuscarPaciente');
-      if (!btn) return null;
-      if (btn.disabled) return null;
-      if (String(btn.getAttribute('aria-disabled') || '').toLowerCase() === 'true') return null;
-      if (/\bdisabled\b/i.test(btn.className || '')) return null;
-      return btn;
-    }, { label: '#btnBuscarPaciente enabled', timeout: 15000 });
-    log('Paso 5 click', lupa.id, 'disabled=', lupa.disabled);
-    await AFG.clickElAsync(lupa);
-    await AFG.humanDelay();
-
-    log('Paso 6a: esperar modal');
-    await AFG.waitFor(function () {
-      return AFG.findByContainsText(document, 'Búsqueda de Pacientes internados')
-        || AFG.findByContainsText(document, 'Busqueda de Pacientes internados');
-    }, { label: 'modal búsqueda', timeout: 15000 });
-
-    log('Paso 6b: Apellido / Nombre (tipeo + eventos)', apellido, nombre);
-    var inpAp = await AFG.waitFor(function () {
-      return AFG.findInputNearLabel(document, 'Apellido');
-    }, { label: 'input Apellido', timeout: 10000 });
-    var inpNom = await AFG.waitFor(function () {
-      return AFG.findInputNearLabel(document, 'Nombre');
-    }, { label: 'input Nombre', timeout: 10000 });
-    await AFG.typeIntoInputAsync(inpAp, apellido);
-    await AFG.sleep(200);
-    await AFG.typeIntoInputAsync(inpNom, nombre);
-    await AFG.sleep(400);
-    log('Paso 6b valores DOM:', inpAp.value, '/', inpNom.value);
-    await AFG.humanDelay();
-
-    log('Paso 6c: Buscar');
-    var btnBuscar = await AFG.waitFor(function () {
-      return AFG.findByExactText(document, 'Buscar', ['button', 'a', 'input', 'span', 'div']);
-    }, { label: 'botón Buscar', timeout: 10000 });
-    await AFG.clickElAsync(btnBuscar);
-
-    log('Paso 6d: esperar paginación estable');
-    var pager = await waitStablePatientPager(20000);
-    log('Paginación:', pager.text, 'total=', pager.total);
-    var count = pager.total;
-
-    if (count !== 1) {
-      return {
-        ok: false,
-        paused: true,
-        reason: 'ambiguous_or_empty',
-        count: count,
-        pagerText: pager.text,
-        message: 'PAUSA: paginación indica ' + count + ' resultado(s) ("' + pager.text + '"). No elijo a ciegas.'
-      };
-    }
-
-    log('Paso 6f: click fila paciente (debugger) + Seleccionar');
-    var row = await AFG.waitFor(function () {
-      return findPatientResultRow(apellido, nombre);
-    }, { label: 'fila paciente única', timeout: 10000 });
-
-    var nroAtencion = extractNroAtencionFromRow(row);
-    // Navegación solamente (NO clínico): Fecha de ingreso que GECLISA muestra en el modal.
-    var ingresoNav = extractFechaIngresoFromRow(row);
-    log('Modal fila:', {
+    var patientRow = located.rows[0];
+    var nroAtencion = extractNroAtencionFromRow(patientRow);
+    log('Panel fila:', {
       nroAtencion: nroAtencion,
-      fechaIngresoNav: ingresoNav && ingresoNav.fecha,
-      horaIngresoNav: ingresoNav && ingresoNav.hora,
-      rawIngreso: ingresoNav && ingresoNav.raw,
-      fila: AFG.norm(row.innerText || '').slice(0, 140)
+      sectorUsado: located.sectorUsado,
+      fechaUsada: located.fechaUsada,
+      horaUsada: located.horaUsada,
+      filtrosProbados: located.filtrosProbados,
+      fila: AFG.norm(patientRow.innerText || '').slice(0, 160)
     });
-    if (!nroAtencion) {
-      return {
-        ok: false,
-        paused: true,
-        reason: 'missing_nro_atencion',
-        message: 'PAUSA: no pude leer N° de Atención de la fila del modal. No abro Opciones a ciegas.'
-      };
-    }
 
-    await debuggerClickEl(row);
-    await AFG.humanDelay();
-    var selPac = await AFG.waitFor(function () {
-      return AFG.findByExactText(document, 'Seleccionar', ['button', 'a', 'span', 'div', 'input']);
-    }, { label: 'Seleccionar paciente', timeout: 10000 });
-    await debuggerClickEl(selPac);
-    await AFG.humanDelay();
-
-    // —— Pasos 7–11: panel fechaCirugia + sector + horaInicio → Opciones → … ——
-    var steps711 = await runIframe711(
-      plantilla,
-      nroAtencion,
-      fechaCirugia,
-      horaCirugia,
-      sector
-    );
+    var steps711 = await runIframe711FromRow(plantilla, patientRow, located);
     if (!steps711.ok) return steps711;
 
     return {
       ok: true,
       step: 'iframe_3_11_done',
-      count: 1,
-      pagerText: pager.text,
-      nroAtencion: nroAtencion,
-      fechaIngresoNav: (ingresoNav && ingresoNav.fecha) || null,
-      horaIngresoNav: (ingresoNav && ingresoNav.hora) || null,
-      fechaIngresoRaw: (ingresoNav && ingresoNav.raw) || null,
+      count: located.rows.length,
+      nroAtencion: nroAtencion || null,
       fechaCirugia: fechaCirugia || null,
       horaInicio: horaCirugia || null,
       sector: sector || null,
-      panelFecha: steps711.fechaUsada,
-      panelHora: steps711.horaUsada,
-      panelSector: steps711.sectorUsado,
-      filtrosProbados: steps711.filtrosProbados || null,
+      panelFecha: located.fechaUsada,
+      panelHora: located.horaUsada,
+      panelSector: located.sectorUsado,
+      filtrosProbados: located.filtrosProbados || null,
+      searchMode: 'panel_filtros_consultar',
       plantilla: plantilla,
       steps711: steps711
     };
   }
 
-  async function runIframe711(plantilla, nroAtencion, fechaCirugia, horaCirugia, sector) {
-    log('Paso 7a: ubicar fila por N° Atención', nroAtencion, 'filtro', fechaCirugia, horaCirugia, sector);
-    var located = await locateByFechaSectorRetries(nroAtencion, fechaCirugia, horaCirugia, sector);
-    if (located.paused) return located;
-
-    var matchRows = located.rows;
-    var patientRow = matchRows[0];
+  /** Desde fila ya ubicada en el panel: Opciones -> Evoluciones -> Nuevo -> plantilla. */
+  async function runIframe711FromRow(plantilla, patientRow, located) {
     log('Paso 7b: Opciones en fila del paciente (debugger)');
     var opciones = findOpcionesInRow(patientRow);
     if (!opciones) {
-      // Toolbar único que actúa sobre la fila seleccionada
       await debuggerClickEl(patientRow);
       await AFG.sleep(300);
       opciones = await AFG.waitFor(function () {
         return findOpcionesControl();
-      }, { label: 'Opciones (☰) tras seleccionar fila', timeout: 10000 });
+      }, { label: 'Opciones tras seleccionar fila', timeout: 10000 });
     }
     log('Paso 7 target', opciones.tagName, opciones.id || '', opciones.title || opciones.getAttribute('aria-label') || '');
     await debuggerClickEl(opciones);
@@ -311,10 +220,9 @@
     log('Paso 9: #BtnNuevoPQyA (button nativo)');
     var btnNuevo = await AFG.waitFor(function () {
       var b = document.getElementById('BtnNuevoPQyA');
-      if (!b) return null;
-      if (b.disabled) return null;
+      if (!b || b.disabled) return null;
       return b;
-    }, { label: '#BtnNuevoPQyA', timeout: 20000 });
+    }, { label: '#BtnNuevoPQyA', timeout: 15000 });
     await AFG.clickElAsync(btnNuevo);
     await AFG.humanDelay();
 
@@ -346,8 +254,7 @@
     log('Paso 11: #btnSeleccionarPopup (button nativo)');
     var selTpl = await AFG.waitFor(function () {
       var b = document.getElementById('btnSeleccionarPopup');
-      if (!b) return null;
-      if (b.disabled) return null;
+      if (!b || b.disabled) return null;
       return b;
     }, { label: '#btnSeleccionarPopup', timeout: 15000 });
     await AFG.clickElAsync(selTpl);
@@ -357,15 +264,14 @@
       ok: true,
       step: 'iframe_7_11_done',
       plantilla: plantilla,
-      nroAtencion: nroAtencion,
-      fechaUsada: located.fechaUsada,
-      horaUsada: located.horaUsada,
-      sectorUsado: located.sectorUsado,
-      filtrosProbados: located.filtrosProbados
+      fechaUsada: located && located.fechaUsada,
+      horaUsada: located && located.horaUsada,
+      sectorUsado: located && located.sectorUsado,
+      filtrosProbados: located && located.filtrosProbados
     };
   }
 
-  /** Textos exactos de #ddlSector (Mayo, Ubicación=2), excluyendo el sector primario al armar fallback. */
+  /** Textos exactos de #ddlSector (Mayo, Ubicacion=2). */
   var GECLISA_SECTORES_FALLBACK = [
     'PISO',
     'VIP',
@@ -379,10 +285,11 @@
   ];
 
   /**
-   * Busca fila por N° Atención en el panel.
-   * Filtro: fechaCirugia + sector (AnesFact) + horaInicio; luego −1 h mismo sector; luego otros sectores.
+   * Panel internados: Ubicacion ya=2, set Sector+Fecha+Hora, click Consultar,
+   * buscar fila por apellido/nombre. Reintentos: -1h mismo sector, luego otros sectores.
+   * NO usa el modal #btnBuscarPaciente.
    */
-  async function locateByFechaSectorRetries(nroAtencion, fechaCirugia, horaInicio, sectorPrimary) {
+  async function locateByFechaSectorRetries(apellido, nombre, fechaCirugia, horaInicio, sectorPrimary) {
     var fecha = AFG.formatFechaGeclisa(fechaCirugia);
     var hora0 = AFG.formatHoraGeclisa(horaInicio);
     var horaM1 = AFG.addHoursGeclisa(hora0, -1);
@@ -390,55 +297,56 @@
 
     var attempts = [];
     function pushAttempt(sec, hora, label) {
-      var tag = fecha + '|' + sec + '|' + (hora || '—') + '|' + label;
+      var tag = fecha + '|' + sec + '|' + (hora || '-') + '|' + label;
       for (var i = 0; i < attempts.length; i++) {
         if (attempts[i].tag === tag) return;
       }
       attempts.push({ fecha: fecha, sector: sec, hora: hora, label: label, tag: tag });
     }
 
-    pushAttempt(primary, hora0, 'primario');
+    pushAttempt(primary, hora0, 'primario_consultar');
     if (horaM1 && horaM1 !== hora0) {
-      pushAttempt(primary, horaM1, 'primario_hora-1');
+      pushAttempt(primary, horaM1, 'primario_hora-1_consultar');
     }
     for (var si = 0; si < GECLISA_SECTORES_FALLBACK.length; si++) {
       var sec = GECLISA_SECTORES_FALLBACK[si];
       if (sec === primary) continue;
-      pushAttempt(sec, hora0, 'fallback_sector');
+      pushAttempt(sec, hora0, 'fallback_sector_consultar');
     }
 
     var tried = [];
     for (var ai = 0; ai < attempts.length; ai++) {
       var a = attempts[ai];
       tried.push(a.tag);
-      log('Paso 7a filtro panel', a.label, a.tag);
+      log('Paso panel filtro+Consultar', a.label, a.tag);
       try {
-        await setPanelFechaHoraSector(a.fecha, a.hora, a.sector);
+        await setPanelFechaHoraSectorAndConsultar(a.fecha, a.hora, a.sector);
       } catch (eSet) {
-        log('Paso 7a no pude setear filtro', a.tag, String(eSet && eSet.message || eSet));
+        log('Paso panel no pude setear/Consultar', a.tag, String(eSet && eSet.message || eSet));
         continue;
       }
-      try {
-        var hits = await AFG.waitFor(function () {
-          var found = findInternadoRowsByAtencion(nroAtencion);
-          return found.length ? found : null;
-        }, { label: 'N° Atención ' + nroAtencion + ' ' + a.tag, timeout: 9000 });
-        if (hits.length > 1) {
-          return {
-            ok: false,
-            paused: true,
-            reason: 'internado_nro_ambiguous',
-            nroAtencion: nroAtencion,
-            count: hits.length,
-            fechaUsada: a.fecha,
-            horaUsada: a.hora,
-            sectorUsado: a.sector,
-            filtrosProbados: tried,
-            message: 'PAUSA: ' + hits.length + ' filas con N° Atención ' + nroAtencion +
-              ' (' + a.tag + '). Combinaciones: ' + tried.join(' → ')
-          };
-        }
-        log('Paso 7a encontrado con', a.tag);
+
+      await AFG.sleep(400);
+      var empty = panelShowsNoRecords();
+      var hits = findPanelPatientRows(apellido, nombre);
+      log('Paso panel resultado', a.tag, 'hits=', hits.length, 'sinRegistros=', empty);
+
+      if (hits.length > 1) {
+        return {
+          ok: false,
+          paused: true,
+          reason: 'panel_ambiguous',
+          count: hits.length,
+          fechaUsada: a.fecha,
+          horaUsada: a.hora,
+          sectorUsado: a.sector,
+          filtrosProbados: tried,
+          message: 'PAUSA: ' + hits.length + ' filas con ' + apellido + ' en panel (' + a.tag +
+            '). Combinaciones: ' + tried.join(' -> ')
+        };
+      }
+      if (hits.length === 1) {
+        log('Paso panel encontrado con', a.tag);
         return {
           ok: true,
           rows: hits,
@@ -447,26 +355,70 @@
           sectorUsado: a.sector,
           filtrosProbados: tried
         };
-      } catch (eTry) {
-        log('Paso 7a no visible con', a.tag);
       }
     }
 
     return {
       ok: false,
       paused: true,
-      reason: 'internado_nro_not_found',
-      nroAtencion: nroAtencion,
+      reason: 'panel_not_found',
+      count: 0,
       filtrosProbados: tried,
-      message: 'PAUSA: N° Atención ' + nroAtencion +
-        ' no aparece con fechaCirugia+sector+hora. Combinaciones: ' + tried.join(' → ')
+      message: 'PAUSA: no aparece ' + apellido + ' en panel con Ubicacion/Sector/Fecha/Hora+Consultar. ' +
+        'Combinaciones: ' + tried.join(' -> ')
     };
   }
 
-  /**
-   * Setea Fecha + Hora + #ddlSector del panel. Sector por texto exacto GECLISA.
-   */
-  async function setPanelFechaHoraSector(fechaDDMMYYYY, horaHHMM, sectorText) {
+  function panelShowsNoRecords() {
+    var nodes = document.querySelectorAll('.ui-jqgrid-bdiv, .ui-jqgrid, body');
+    for (var i = 0; i < nodes.length; i++) {
+      var t = AFG.norm(nodes[i].innerText || nodes[i].textContent || '');
+      if (/sin registros que mostrar/i.test(t)) return true;
+    }
+    return false;
+  }
+
+  /** Filas del grid principal de internados (no modal) que matchean apellido/nombre. */
+  function findPanelPatientRows(apellido, nombre) {
+    var ap = AFG.quitarAcentos(apellido || '').toLowerCase();
+    var nm = AFG.quitarAcentos(nombre || '').toLowerCase().split(/\s+/).filter(Boolean)[0] || '';
+    if (!ap) return [];
+    var rows = document.querySelectorAll(
+      '.ui-jqgrid-btable tbody tr.jqgrow, .ui-jqgrid-btable tbody tr'
+    );
+    var hits = [];
+    for (var i = 0; i < rows.length; i++) {
+      var tr = rows[i];
+      if (tr.style && tr.style.display === 'none') continue;
+      if (tr.closest && tr.closest('.modal, [role="dialog"], .ui-dialog')) continue;
+      var cells = tr.querySelectorAll('td');
+      if (cells.length < 2) continue;
+      var txt = AFG.quitarAcentos(AFG.norm(tr.innerText || '')).toLowerCase();
+      if (!txt || txt.indexOf(ap) < 0) continue;
+      if (/sin registros|cargando|loading|mostrando\s+\d/i.test(txt) && cells.length < 3) continue;
+      if (nm && txt.indexOf(nm) < 0) continue;
+      hits.push(tr);
+    }
+    return hits.filter(function (el, idx, arr) { return arr.indexOf(el) === idx; });
+  }
+
+  function findConsultarButton() {
+    var byId = document.getElementById('btnConsultar')
+      || document.getElementById('BtnConsultar')
+      || document.getElementById('btn-consultar');
+    if (byId) return byId;
+    var exact = AFG.findByExactText(document, 'Consultar', ['button', 'a', 'input', 'span', 'div']);
+    if (exact) return exact;
+    var inputs = document.querySelectorAll('input[type="button"], input[type="submit"], button');
+    for (var i = 0; i < inputs.length; i++) {
+      var v = AFG.norm(inputs[i].value || inputs[i].innerText || inputs[i].textContent || '');
+      if (/^consultar$/i.test(v)) return inputs[i];
+    }
+    return null;
+  }
+
+  /** Setea #ddlSector + Fecha + Hora del panel y clickea Consultar. */
+  async function setPanelFechaHoraSectorAndConsultar(fechaDDMMYYYY, horaHHMM, sectorText) {
     var ddlSector = await AFG.waitFor(function () {
       return document.getElementById('ddlSector');
     }, { label: '#ddlSector', timeout: 15000 });
@@ -474,15 +426,20 @@
     if (!okSec) {
       throw new Error('Sector no encontrado en #ddlSector: ' + sectorText);
     }
-    log('Sector panel →', sectorText, 'value=', ddlSector.value);
-    await AFG.sleep(300);
+    log('Sector panel ->', sectorText, 'value=', ddlSector.value);
+    await AFG.sleep(250);
 
     await setPanelFechaYHora(fechaDDMMYYYY, horaHHMM);
+
+    var btn = await AFG.waitFor(function () {
+      return findConsultarButton();
+    }, { label: 'boton Consultar', timeout: 10000 });
+    log('Click Consultar', btn.id || btn.tagName, btn.value || AFG.norm(btn.innerText || '').slice(0, 40));
+    await AFG.clickElAsync(btn);
+    await waitGridStable(12000);
   }
 
-  /**
-   * Setea Fecha/Hora del panel. null = no tocar ese campo.
-   */
+  /** Setea Fecha/Hora del panel. */
   async function setPanelFechaYHora(fechaDDMMYYYY, horaHHMM) {
     if (fechaDDMMYYYY) {
       var inpFecha = await AFG.waitFor(function () {
@@ -492,9 +449,7 @@
       var beforeF = AFG.norm(inpFecha.value || '');
       await AFG.typeIntoInputAsync(inpFecha, fechaDDMMYYYY);
       commitPanelFilterInput(inpFecha);
-      log('Fecha panel DOM:', beforeF, '→', inpFecha.value);
-    } else {
-      log('Fecha panel: sin forzar (default GECLISA)');
+      log('Fecha panel DOM:', beforeF, '->', inpFecha.value);
     }
 
     if (horaHHMM) {
@@ -504,16 +459,13 @@
       var beforeH = AFG.norm(inpHora.value || '');
       await AFG.typeIntoInputAsync(inpHora, horaHHMM);
       commitPanelFilterInput(inpHora);
-      log('Hora panel DOM:', beforeH, '→', inpHora.value);
-    } else {
-      log('Hora panel: sin forzar (default GECLISA)');
+      log('Hora panel DOM:', beforeH, '->', inpHora.value);
     }
 
-    await waitGridStable(fechaDDMMYYYY || horaHHMM ? 12000 : 6000);
+    await AFG.sleep(200);
   }
 
   function findPanelHoraInput() {
-    // Preferir label exacto "Hora" (no "Hora fin" de otros formularios)
     var labels = document.querySelectorAll('label');
     for (var i = 0; i < labels.length; i++) {
       var lt = AFG.norm(labels[i].innerText || labels[i].textContent || '').toLowerCase();
@@ -574,7 +526,8 @@
     }
     var pager = document.querySelector('.ui-paging-info');
     var pt = pager ? AFG.norm(pager.innerText || '') : '';
-    return n + ':' + pt + ':' + sample;
+    var empty = panelShowsNoRecords() ? 'EMPTY' : '';
+    return n + ':' + pt + ':' + empty + ':' + sample;
   }
 
   /** Lee N° de Atención de una fila del modal (columna por header o patrón). */

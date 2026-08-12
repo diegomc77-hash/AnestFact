@@ -1,24 +1,19 @@
-# Selectores — pasos 1–12 (código v0.4.4)
+# Selectores — pasos 1–12 (código v0.4.6)
 
-Sin Guardar. Panel internados: **fechaCirugia + sector + horaInicio** (no fecha de ingreso).
+Sin Guardar. **Sin modal** `#btnBuscarPaciente`.
 
-## Separación de datos
+## Búsqueda (panel internados)
+
+1. `#ddlUbicacion` = `2` (Sanatorio Mayo)
+2. `#ddlSector` = sector AnesFact (texto exacto, ej. `UTI`, `PRE-QUIRÚRGICO`)
+3. Fecha = `fechaCirugia`, Hora = `horaInicio`
+4. Click **Consultar** (no Buscar Paciente)
+5. Ubicar fila por apellido/nombre en el grid
+6. Reintentos: hora −1 h mismo sector → otros sectores
+7. Pausa con combinaciones si no hay fila; sin clicks a ciegas
+8. Opciones → Evoluciones → Nuevo → plantilla → fill.js
 
 | Dato | Uso |
 |------|-----|
-| N° Atención (modal búsqueda) | Ubicar fila tras filtros |
-| fechaCirugia / horaInicio / sector (AnesFact) | Filtro panel `#ddlSector` + Fecha/Hora |
-| fechaCirugia / horaInicio (token) | fill.js → campos clínicos |
-
-## Paso 7a — reintentos panel
-
-1. `fechaCirugia` + sector foja + `horaInicio`
-2. misma fecha/sector, hora −1 h
-3. misma fecha + horaInicio, otros sectores: PISO → VIP → UTI → UTI2 → UCI → GUARDIA → HOSPITAL DE DIA → HEMODINAMIA VIRTUAL → PRE-QUIRÚRGICO (sin repetir el primario)
-4. Si nada → pausa con combinaciones; sin clicks a ciegas
-
-Selector sector: `#ddlSector` (texto exacto del option).
-
-## Paso 12 — fill.js
-
-Token → `__AFG_GECLISA_TOKEN` + `vendor/fill.js`. Popup: revisá y guardá a mano.
+| sector / fechaCirugia / horaInicio | Filtros panel + Consultar |
+| fechaCirugia / horaInicio (token) | fill.js clínico |
