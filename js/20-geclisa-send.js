@@ -38,6 +38,72 @@ function getMayoMonitoreoFlags(cur){
   };
 }
 
+/** Envelope portapapeles: popup de la extensión lo parsea sin depender del content script. */
+function afBatchClipboardEnvelope(p){
+  return 'AFG1|'+[
+    String(p.apellido||'').replace(/\|/g,' '),
+    String(p.nombre||'').replace(/\|/g,' '),
+    String(p.dni||'').replace(/\|/g,' '),
+    String(p.fechaCirugia||'').replace(/\|/g,' '),
+    String(p.token||'')
+  ].join('|');
+}
+
+/**
+ * Publica foja+token para la extensión.
+ * CRÍTICO: no alcanza con window.__AFG_* — el content script vive en otro JS world.
+ * localStorage + postMessage sí cruzan; CustomEvent también.
+ */
+function afPublishGeclisaBatch(batchPayload){
+  window.__AFG_PENDING_BATCH=batchPayload;
+  try{
+    localStorage.setItem('afg_pending_batch', JSON.stringify(batchPayload));
+  }catch(e){}
+  try{
+    window.postMessage({ source:'AFG_ANESFACT', type:'GECLISA_TOKEN', payload:batchPayload }, '*');
+  }catch(e){}
+  try{
+    window.dispatchEvent(new CustomEvent('afg-geclisa-token',{ detail:batchPayload }));
+  }catch(e){}
+  try{
+    var env=afBatchClipboardEnvelope(batchPayload);
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(env);
+  }catch(e){}
+  try{
+    console.log('[AFG] publish batch', batchPayload.apellido, batchPayload.nombre, 'tokenLen', String(batchPayload.token||'').length);
+  }catch(e){}
+}
+
+/** Pide a la extensión reusar/enfocar GECLISA (sin window.open acá — el fallback va después del alert). */
+function afOpenOrFocusGeclisa(){
+  window.__AFG_EXT_OPEN_ACK=false;
+  try{
+    window.postMessage({ source:'AFG_ANESFACT', type:'OPEN_GECLISA' }, '*');
+  }catch(e){}
+}
+
+/** Fallback si la extensión no contestó OPEN_ACK (llamar DESPUÉS del alert). */
+function afOpenGeclisaFallbackIfNeeded(){
+  if(window.__AFG_EXT_OPEN_ACK){
+    try{ console.log('[AFG] GECLISA: extensión reusó/enfocó pestaña'); }catch(e){}
+    return;
+  }
+  setTimeout(function(){
+    if(window.__AFG_EXT_OPEN_ACK)return;
+    var w=window.open('http://sanatoriomayo.myvnc.com:84','geclisa_mayo');
+    try{ if(w) w.focus(); }catch(e2){}
+    try{ console.log('[AFG] GECLISA: fallback window.open nombre=geclisa_mayo', !!w); }catch(e3){}
+  }, 200);
+}
+
+window.addEventListener('message', function(ev){
+  if(ev.source!==window)return;
+  var d=ev.data;
+  if(!d||d.source!=='AFG_EXT')return;
+  if(d.type==='OPEN_ACK') window.__AFG_EXT_OPEN_ACK=true;
+  if(d.type==='BRIDGE_ALIVE') window.__AFG_BRIDGE_ALIVE=true;
+});
+
 function abrirGeclisa(){
   if(typeof checkPlan==='function'&&!checkPlan('geclisa'))return;
   var run=function(){ _abrirGeclisaCore(); };
@@ -177,22 +243,34 @@ function _abrirGeclisaCore(){
     }
     var token=res.token||'';
     if(!token||token.length<32){toast('Token inválido del servidor');return;}
-    try{
-      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(token);
-    }catch(e){}
     window._afLastGeclisaToken=token;
+    var batchPayload={
+      token:token,
+      apellido:payload.apellido||'',
+      nombre:payload.nombre||'',
+      dni:payload.dni||i.dni||'',
+      fechaCirugia:payload.fechaCirugia||i.fecha||'',
+      horaInicio:payload.horaInicio||i.hora||'',
+      horaFin:payload.horaFin||'',
+      pac:i.pac||'',
+      clave:clave,
+      updatedAt:Date.now()
+    };
+    // Publicar para extensión (localStorage + postMessage cruzan el isolated world; window.* no)
+    try{ afPublishGeclisaBatch(batchPayload); }catch(eBatch){
+      try{ console.warn('[AFG] publish batch falló', eBatch); }catch(e2){}
+    }
+    // Pedir a la extensión que enfoque la pestaña GECLISA existente (antes del alert)
+    try{ afOpenOrFocusGeclisa(); }catch(eOpen){}
     alert(
       'TOKEN GECLISA (un solo uso · 2 horas)\n\n'+
       token+
-      '\n\nYa está en el portapapeles si el navegador lo permitió.\n'+
-      'Abrí GECLISA → ejecutá el marcador → pegá este token cuando te lo pida.'
+      '\n\nPortapapeles: AFG1|apellido|nombre|dni|fecha|token (el popup de la extensión lo lee solo).\n'+
+      'Si usás el marcador manual: pegá solo el token cuando te lo pida.'
     );
-    toast('Token listo ✓ Abrí GECLISA y usá el marcador');
-    // Misma ventana nombrada: no abre una pestaña nueva por cada foja
-    setTimeout(function(){
-      var w=window.open('http://sanatoriomayo.myvnc.com:84','geclisa_mayo');
-      try{ if(w) w.focus(); }catch(e){}
-    },400);
+    toast('Token listo ✓ Extensión / marcador GECLISA');
+    // Si no hubo OPEN_ACK de la extensión, reusar ventana nombrada (no _blank)
+    try{ afOpenGeclisaFallbackIfNeeded(); }catch(eFb){}
   })
   .catch(function(e){
     toast('Error GECLISA: '+(e.message||e));

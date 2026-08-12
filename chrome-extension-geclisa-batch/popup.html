@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <style>
+    body{font-family:system-ui,sans-serif;width:340px;margin:12px;color:#222;font-size:13px}
+    h1{font-size:14px;margin:0 0 8px}
+    .muted{color:#666;font-size:11px;line-height:1.4}
+    label{display:block;margin-top:8px;font-size:12px}
+    input,textarea{width:100%;box-sizing:border-box;padding:6px;margin-top:3px}
+    textarea{min-height:52px;font-family:ui-monospace,monospace;font-size:11px}
+    button{width:100%;margin-top:8px;padding:8px;font-weight:600;cursor:pointer}
+    button.secondary{font-weight:500}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    #out{margin-top:10px;white-space:pre-wrap;font-size:11px;background:#f4f4f4;padding:8px;border-radius:6px;max-height:200px;overflow:auto}
+    .warn{background:#fff3cd;border:1px solid #e6d089;padding:8px;border-radius:6px;font-size:11px;margin:8px 0;line-height:1.4}
+    .okmsg{background:#e6f4ea;border:1px solid #a8d5b5;padding:8px;border-radius:6px;font-size:12px;margin:8px 0;line-height:1.4;display:none}
+    .warn strong,.okmsg strong{display:block;margin-bottom:4px}
+    #dbg-first{display:none}
+    #foja-status{margin-top:8px;font-size:12px;color:#333;line-height:1.35}
+  </style>
+</head>
+<body>
+  <h1>GECLISA Batch — pasos 1–12</h1>
+  <p class="muted">Foja = última <b>Enviar a GECLISA</b> (storage o portapapeles <code>AFG1|…</code>). <b>No Guardar</b>.</p>
+
+  <div class="warn" id="dbg-first">
+    <strong>Aviso (primera vez)</strong>
+    Vas a ver una barra amarilla de Chrome (debugger) — es esperado. Se quita sola antes del fill.
+  </div>
+  <div class="warn" id="dbg-always">
+    <strong>Flujo</strong>
+    1) Recargá esta extensión + Ctrl+F5 en AnesFact.<br>
+    2) Foja → Enviar a GECLISA.<br>
+    3) Abrí este popup (o Actualizar): debe mostrar ese paciente.
+  </div>
+  <div class="okmsg" id="ok-banner">
+    <strong>Foja completada, revisá y guardá manualmente</strong>
+    La extensión no hace click en Guardar.
+  </div>
+
+  <div id="foja-status" class="muted">Cargando foja…</div>
+
+  <label>Apellido
+    <input id="apellido" value="" placeholder="(desde AnesFact / portapapeles)">
+  </label>
+  <label>Nombre
+    <input id="nombre" value="" placeholder="(desde AnesFact / portapapeles)">
+  </label>
+  <label>Token GECLISA (un solo uso)
+    <textarea id="token" placeholder="AFG1|… o token"></textarea>
+  </label>
+  <button id="btn-refresh" type="button" class="secondary">Actualizar (storage + portapapeles)</button>
+  <button id="btn-run" type="button">Ejecutar 1–12 (nav + fill)</button>
+  <button id="btn-ping" type="button" class="secondary">Probar ping a pestaña GECLISA</button>
+  <button id="btn-diag" type="button" class="secondary">Diagnóstico storage</button>
+  <div id="out"></div>
+  <script src="popup.js"></script>
+</body>
+</html>

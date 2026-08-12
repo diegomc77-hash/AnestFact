@@ -21,8 +21,27 @@ try{
 }catch(e){}
 
 if(!D||!D.getElementById('8054')){
+  try{
+    if(document.getElementById('8054')&&document.querySelectorAll('input').length>50){
+      D=document;
+    }
+  }catch(e2){}
+}
+
+if(!D||!D.getElementById('8054')){
+  try{
+    if(typeof globalThis!=='undefined'){
+      globalThis.__AFG_FILL_RESULT={ok:false,error:'not_on_foja',camposOk:0};
+    }
+  }catch(e3){}
   alert('No estás en la Foja Anestésica.\nNavegá hasta la foja del paciente y ejecutá el marcador.');
   return void(0);
+}
+
+function afgReportFill(r){
+  try{
+    if(typeof globalThis!=='undefined') globalThis.__AFG_FILL_RESULT=r;
+  }catch(e){}
 }
 
 // Toast
@@ -115,6 +134,7 @@ function cargarPorToken(token){
   token=String(token||'').trim();
   if(!token||token.length<32){
     rmToast();
+    afgReportFill({ok:false,error:'token_corto',camposOk:0});
     alert('Pegá el token completo que te mostró AnesFact al tocar «Enviar a GECLISA» (mín. 32 caracteres).');
     return;
   }
@@ -122,28 +142,40 @@ function cargarPorToken(token){
   xhrPost(SURL+'/rest/v1/rpc/af_geclisa_consume_token',{p_token:token},function(res){
     if(!res||res.ok===false){
       rmToast();
+      afgReportFill({ok:false,error:errTokenMsg(res&&res.error),camposOk:0});
       alert('No se pudo cargar: '+errTokenMsg(res&&res.error));
       return;
     }
     var d=res.payload;
     if(typeof d==='string'){
-      try{d=JSON.parse(d);}catch(e){rmToast();alert('Payload inválido');return;}
+      try{d=JSON.parse(d);}catch(e){rmToast();afgReportFill({ok:false,error:'payload_invalido',camposOk:0});alert('Payload inválido');return;}
     }
-    if(!d||typeof d!=='object'){rmToast();alert('Sin datos en el token');return;}
-    if(!verificarPaciente(d)){rmToast();return;}
+    if(!d||typeof d!=='object'){rmToast();afgReportFill({ok:false,error:'sin_datos',camposOk:0});alert('Sin datos en el token');return;}
+    if(!verificarPaciente(d)){rmToast();afgReportFill({ok:false,error:'paciente_rechazado',camposOk:0});return;}
     toast.textContent='\u2705 Rellenando foja...';
     setTimeout(rmToast,2500);
     rellenar(d);
   },function(err){
     rmToast();
+    afgReportFill({ok:false,error:String(err),camposOk:0});
     if(String(err).indexOf('404')>=0||String(err).indexOf('af_geclisa_consume_token')>=0){
       alert('Falta el SQL 008 en Supabase (af_geclisa_consume_token).');
     }else alert('Error: '+err);
   });
 }
 
-var tok=prompt('AnesFact DEV — pegá el TOKEN GECLISA:');
-if(tok===null){rmToast();return void(0);}
+// Extensión batch: __AFG_GECLISA_TOKEN. Bookmarklet DEV: prompt.
+var tok=null;
+try{
+  if(typeof globalThis!=='undefined'&&globalThis.__AFG_GECLISA_TOKEN){
+    tok=String(globalThis.__AFG_GECLISA_TOKEN||'');
+    try{delete globalThis.__AFG_GECLISA_TOKEN;}catch(eDel){globalThis.__AFG_GECLISA_TOKEN=null;}
+  }
+}catch(eTok){}
+if(!tok){
+  tok=prompt('AnesFact DEV — pegá el TOKEN GECLISA:');
+  if(tok===null){rmToast();afgReportFill({ok:false,error:'prompt_cancelado',camposOk:0});return void(0);}
+}
 cargarPorToken(tok);
 
 
@@ -392,7 +424,17 @@ function rellenar(d){
   var obs460=(d.observacionesFinal||d.observaciones||'');
   if(obs460&&setId('8460',obs460))ok++;
 
-  alert('AnesFact DEV \u2192 GECLISA \u2713\n'+ok+' campos rellenados.\nRevisa y haz clic en GRABAR.');
+  afgReportFill({
+    ok:true,
+    camposOk:ok,
+    fechaCirugia:d.fechaCirugia||null,
+    horaInicio:d.horaInicio||null
+  });
+  var silent=false;
+  try{silent=!!(typeof globalThis!=='undefined'&&globalThis.__AFG_FILL_SILENT);}catch(eS){}
+  if(!silent){
+    alert('AnesFact DEV \u2192 GECLISA \u2713\n'+ok+' campos rellenados.\nRevisa y haz clic en GRABAR.');
+  }
 }
 
 })();void(0);

@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "AnesFact GECLISA Batch (pasos 1–12)",
+  "version": "0.4.2",
+  "description": "Navegación GECLISA Mayo + fill.js. Foja desde AnesFact (storage/localStorage/portapapeles AFG1).",
+  "permissions": ["storage", "tabs", "scripting", "debugger", "clipboardRead"],
+  "host_permissions": [
+    "http://sanatoriomayo.myvnc.com:84/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*",
+    "https://diegomc77-hash.github.io/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "AnesFact GECLISA Batch",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://sanatoriomayo.myvnc.com:84/*"],
+      "js": ["lib/human.js", "lib/dom.js", "content/geclisa.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    },
+    {
+      "matches": [
+        "http://localhost/*",
+        "http://127.0.0.1/*",
+        "https://diegomc77-hash.github.io/*"
+      ],
+      "js": ["content/anesfact-bridge.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}

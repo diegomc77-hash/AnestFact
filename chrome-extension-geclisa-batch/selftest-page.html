@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>AFG bridge self-test (page world)</title>
+  <style>
+    body{font-family:system-ui;max-width:720px;margin:24px;line-height:1.4}
+    pre{background:#f4f4f4;padding:12px;overflow:auto}
+    button{padding:10px 14px;margin:4px 0;cursor:pointer}
+    .ok{color:#0a7}
+    .bad{color:#b00}
+  </style>
+</head>
+<body>
+  <h1>Self-test: publish AnesFact → localStorage / postMessage</h1>
+  <p>Simula lo que hace <code>afPublishGeclisaBatch</code> (sin Supabase). El content script de la extensión, si está inyectado, debe loguear <code>[AFG bridge] storage OK</code>.</p>
+  <button id="btn">Publicar foja Bescos de prueba</button>
+  <button id="btn-read">Leer localStorage afg_pending_batch</button>
+  <pre id="out"></pre>
+  <script>
+    // Misma lógica que js/20-geclisa-send.js (recortada)
+    function afBatchClipboardEnvelope(p){
+      return 'AFG1|'+[p.apellido,p.nombre,p.dni||'',p.fechaCirugia||'',p.token].join('|');
+    }
+    function afPublishGeclisaBatch(batchPayload){
+      window.__AFG_PENDING_BATCH=batchPayload;
+      localStorage.setItem('afg_pending_batch', JSON.stringify(batchPayload));
+      window.postMessage({ source:'AFG_ANESFACT', type:'GECLISA_TOKEN', payload:batchPayload }, '*');
+      window.dispatchEvent(new CustomEvent('afg-geclisa-token',{ detail:batchPayload }));
+      navigator.clipboard && navigator.clipboard.writeText(afBatchClipboardEnvelope(batchPayload));
+      console.log('[AFG] publish batch', batchPayload.apellido, batchPayload.nombre);
+    }
+    var out=document.getElementById('out');
+    document.getElementById('btn').onclick=function(){
+      var p={
+        token:'TESTTOKEN_'+Date.now()+'_xxxxxxxxxxxxxxxxxxxx',
+        apellido:'BESCOS',
+        nombre:'DANIEL ALFREDO',
+        dni:'12812343',
+        fechaCirugia:'2026-08-07',
+        horaInicio:'10:00',
+        pac:'BESCOS, DANIEL ALFREDO',
+        updatedAt:Date.now()
+      };
+      afPublishGeclisaBatch(p);
+      var ls=localStorage.getItem('afg_pending_batch');
+      var ok=!!ls && ls.indexOf('BESCOS')>=0;
+      out.textContent=(ok?'OK ':'FAIL ')+'localStorage escrito.\n\n'+ls+
+        '\n\nwindow.__AFG_PENDING_BATCH apellido='+(window.__AFG_PENDING_BATCH&&window.__AFG_PENDING_BATCH.apellido)+
+        '\n\nSi la extensión está cargada, en consola debería aparecer [AFG bridge]…'+
+        '\nBridge alive flag: '+!!window.__AFG_BRIDGE_ALIVE;
+      out.className=ok?'ok':'bad';
+    };
+    document.getElementById('btn-read').onclick=function(){
+      out.textContent=localStorage.getItem('afg_pending_batch')||'(vacío)';
+    };
+    window.addEventListener('message',function(ev){
+      if(ev.data&&ev.data.source==='AFG_EXT'&&ev.data.type==='BRIDGE_ALIVE'){
+        window.__AFG_BRIDGE_ALIVE=true;
+        console.log('[self-test] bridge alive', ev.data.version);
+      }
+    });
+  </script>
+</body>
+</html>
