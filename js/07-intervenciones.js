@@ -29,6 +29,7 @@ function renderHome(){
   if(typeof refreshAdminPlanAlerts==='function'&&typeof isAdmin==='function'&&isAdmin()){
     refreshAdminPlanAlerts();
   }
+  if(typeof renderGeclisaQueuePanel==='function')renderGeclisaQueuePanel();
   var total=(S.intervs||[]).length;
   var filtradas=filterIntervs(S.intervs||[]);
   var n=filtradas.length;
@@ -44,12 +45,23 @@ function renderHome(){
   var html='';
   filtradas.slice().reverse().forEach(function(x){
     var c=EC[x.estado]||'#8B949E';var icon=x.san&&x.san.includes('Mayo')?'🏥':x.san&&x.san.includes('Aero')?'✈️':'🏨';
+    var esMayo=typeof afIsMayoInterv==='function'?afIsMayoInterv(x):(x.san&&x.san.indexOf('Mayo')>=0);
+    var inCola=typeof afGeclisaQueueIsQueued==='function'&&afGeclisaQueueIsQueued(x.id);
     html+='<div class="inter" onclick="abrirInter(\''+x.id+'\')">'
       +'<div style="width:10px;height:10px;border-radius:50%;background:'+c+';flex-shrink:0"></div>'
       +'<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(x.pac||'Sin nombre')+'</div>'
       +'<div style="font-size:12px;color:var(--text2);margin-top:2px">'+fmt(x.fecha)+' · '+icon+' '+(x.san||'—')+(x.dni?' · DNI '+x.dni:'')+'</div>'
       +(x.diag?'<div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+x.diag+'</div>':'')
-      +'</div><span class="badge" style="background:'+c+'22;color:'+c+'">'+(EL[x.estado]||'Borrador')+'</span></div>';
+      +'</div>'
+      +(esMayo
+        ?('<button type="button" class="badge" title="'+(inCola?'Sacar de cola GECLISA':'Agregar a cola GECLISA')+'" '
+          +'onclick="afToggleColaGeclisa(\''+x.id+'\',event)" '
+          +'style="border:1px solid '+(inCola?'rgba(56,139,253,.6)':'rgba(139,148,158,.4)')+';'
+          +'background:'+(inCola?'rgba(56,139,253,.22)':'transparent')+';'
+          +'color:'+(inCola?'var(--blue)':'var(--text3)')+';cursor:pointer;font-size:10px;flex-shrink:0">'
+          +(inCola?'Cola ✓':'Cola')+'</button>')
+        :'')
+      +'<span class="badge" style="background:'+c+'22;color:'+c+'">'+(EL[x.estado]||'Borrador')+'</span></div>';
   });
   lst.innerHTML=html;
 }

@@ -29,6 +29,7 @@
     'js/25-examen-ausc.js',
     'js/26-balance-fluidos.js',
     'js/20-geclisa-send.js',
+    'js/39-geclisa-queue.js',
     'js/23-reglas-clinicas.js',
     'js/21-metodos.js',
     'js/22-tecnica.js',
@@ -48,7 +49,7 @@
     'js/24-sw-register.js'
   ];
 
-  var CACHE_V = '12.1';
+  var CACHE_V = '12.2';
 
   function loadNext(i) {
     if (i >= SCRIPTS.length) return;
