@@ -14,23 +14,59 @@ function afGeclisaQueueLoad() {
     var raw = localStorage.getItem(AFG_QUEUE_KEY);
     if (!raw) return afGeclisaQueueEmpty();
     var data = JSON.parse(raw);
-    if (!data || !Array.isArray(data.items)) return afGeclisaQueueEmpty();
+    // Envelope corrupto (p.ej. "[]" o sin items[]) → reparar a estructura válida
+    if (!data || typeof data !== 'object' || Array.isArray(data) || !Array.isArray(data.items)) {
+      try { console.warn('[AFG cola] envelope inválido → reset estructura', typeof data, raw && String(raw).slice(0, 80)); } catch (eW) {}
+      return afGeclisaQueueEmpty();
+    }
     return {
       version: Number(data.version) || 1,
       updatedAt: data.updatedAt || Date.now(),
       items: data.items
     };
   } catch (e) {
+    try { console.warn('[AFG cola] load parse fail', e); } catch (e2) {}
     return afGeclisaQueueEmpty();
   }
 }
 
 function afGeclisaQueueSave(envelope) {
   envelope = envelope || afGeclisaQueueEmpty();
+  if (!Array.isArray(envelope.items)) envelope.items = [];
   envelope.version = (Number(envelope.version) || 0) + 1;
   envelope.updatedAt = Date.now();
-  localStorage.setItem(AFG_QUEUE_KEY, JSON.stringify(envelope));
+  var payload = JSON.stringify({
+    version: envelope.version,
+    updatedAt: envelope.updatedAt,
+    items: envelope.items
+  });
+  try {
+    localStorage.setItem(AFG_QUEUE_KEY, payload);
+  } catch (eSet) {
+    try { console.error('[AFG cola] localStorage.setItem FALLÓ', eSet); } catch (eC) {}
+    return { ok: false, error: 'storage_set_failed', detail: String(eSet && eSet.message || eSet), envelope: envelope };
+  }
+  // Verificar lectura inmediata (detecta quota / partición / bloqueos)
+  try {
+    var back = localStorage.getItem(AFG_QUEUE_KEY);
+    var parsed = back ? JSON.parse(back) : null;
+    if (!(parsed && Array.isArray(parsed.items) && parsed.items.length === envelope.items.length)) {
+      try {
+        console.error('[AFG cola] save verify mismatch', {
+          wrote: envelope.items.length,
+          read: parsed && parsed.items ? parsed.items.length : null,
+          back: back && String(back).slice(0, 120)
+        });
+      } catch (eV) {}
+      return { ok: false, error: 'storage_verify_failed', envelope: envelope };
+    }
+  } catch (eVer) {
+    try { console.error('[AFG cola] save verify error', eVer); } catch (eC2) {}
+  }
   afPublishGeclisaQueueSync(envelope);
+  try {
+    console.log('[AFG cola] save OK v' + envelope.version + ' items=' + envelope.items.length);
+  } catch (eL) {}
   return envelope;
 }
 
@@ -136,11 +172,42 @@ function afGeclisaQueueRefreshFromIntervs(envelope) {
   return envelope;
 }
 
+/** Completa S.cur desde inputs visibles sin pisar con vacíos (views montadas a la vez). */
+function afGeclisaQueueHydrateCurFromDom(interv) {
+  var i = interv || (typeof S !== 'undefined' ? S.cur : null);
+  if (!i) return i;
+  function take(id, prop) {
+    var el = document.getElementById(id);
+    if (el && el.value != null && String(el.value).trim()) i[prop] = String(el.value).trim();
+  }
+  take('f-pac', 'pac');
+  take('f-fecha', 'fecha');
+  take('f-dni', 'dni');
+  take('f-san', 'san');
+  take('f-mayo-sector', 'mayo_sector');
+  take('f-mayo-cama', 'mayo_cama');
+  take('foja-hora-inicio', 'hora');
+  return i;
+}
+
 function afGeclisaQueueAdd(interv) {
   var i = interv;
   if (!i && typeof S !== 'undefined') i = S.cur;
+  i = afGeclisaQueueHydrateCurFromDom(i);
   var v = afGeclisaQueueValidate(i);
-  if (!v.ok) return { ok: false, error: v.error };
+  if (!v.ok) {
+    try {
+      console.warn('[AFG cola] add rechazado:', v.error, {
+        id: i && i.id,
+        pac: i && i.pac,
+        fecha: i && i.fecha,
+        hora: i && i.hora,
+        sector: i && i.mayo_sector,
+        san: i && i.san
+      });
+    } catch (eW) {}
+    return { ok: false, error: v.error };
+  }
 
   var env = afGeclisaQueueLoad();
   var id = String(i.id);
@@ -148,7 +215,6 @@ function afGeclisaQueueAdd(interv) {
     return String(it.id) === id && it.status !== 'done';
   })[0];
   if (existing) {
-    // Actualizar snapshot y dejar en queued si estaba en error
     var snap = afGeclisaQueueSnapshotFromInterv(i);
     existing.pac = snap.pac;
     existing.dni = snap.dni;
@@ -162,12 +228,18 @@ function afGeclisaQueueAdd(interv) {
       existing.status = 'queued';
       existing.message = '';
     }
-    afGeclisaQueueSave(env);
+    var savedUp = afGeclisaQueueSave(env);
+    if (savedUp && savedUp.ok === false) {
+      return { ok: false, error: 'No se pudo guardar la cola (' + savedUp.error + ')' };
+    }
     return { ok: true, already: true, count: env.items.filter(function (x) { return x.status !== 'done'; }).length };
   }
 
   env.items.push(afGeclisaQueueSnapshotFromInterv(i));
-  afGeclisaQueueSave(env);
+  var saved = afGeclisaQueueSave(env);
+  if (saved && saved.ok === false) {
+    return { ok: false, error: 'No se pudo guardar la cola (' + saved.error + ')' };
+  }
   var pending = env.items.filter(function (x) { return x.status !== 'done'; }).length;
   return { ok: true, already: false, count: pending };
 }
@@ -208,8 +280,36 @@ function afGeclisaQueueClearDone() {
 
 /** Vacía toda la cola (pendientes + done). Útil tras pruebas. */
 function afGeclisaQueueClearAll() {
-  afGeclisaQueueSave(afGeclisaQueueEmpty());
+  var saved = afGeclisaQueueSave(afGeclisaQueueEmpty());
+  if (saved && saved.ok === false) return saved;
+  try { console.log('[AFG cola] clearAll → items=0'); } catch (e) {}
   return { ok: true };
+}
+
+/** Diagnóstico rápido en consola: afGeclisaQueueDebug() */
+function afGeclisaQueueDebug() {
+  var raw = null;
+  try { raw = localStorage.getItem(AFG_QUEUE_KEY); } catch (e) {}
+  var env = afGeclisaQueueLoad();
+  var info = {
+    href: location.href,
+    rawLen: raw ? raw.length : 0,
+    version: env.version,
+    items: env.items.length,
+    pending: env.items.filter(function (x) { return x.status !== 'done'; }).length,
+    ids: env.items.map(function (x) { return x.id + ':' + (x.status || '') + ':' + (x.pac || ''); }),
+    cur: (typeof S !== 'undefined' && S.cur) ? {
+      id: S.cur.id,
+      pac: S.cur.pac,
+      fecha: S.cur.fecha,
+      hora: S.cur.hora,
+      sector: S.cur.mayo_sector,
+      san: S.cur.san
+    } : null,
+    validateCur: (typeof S !== 'undefined' && S.cur) ? afGeclisaQueueValidate(afGeclisaQueueHydrateCurFromDom(S.cur)) : null
+  };
+  try { console.log('[AFG cola] debug', info); } catch (e2) {}
+  return info;
 }
 
 function afGeclisaQueueClearAllUi(ev) {
@@ -303,15 +403,41 @@ function afGeclisaQueueStatusLabel(st) {
 function afAgregarAColaGeclisa() {
   try {
     if (typeof syncFojaHoras === 'function') syncFojaHoras();
-    if (document.getElementById('fj-tec') && typeof guardarFoja === 'function') guardarFoja();
-    else if (document.getElementById('f-pac') && typeof guardar === 'function') guardar();
-  } catch (eSave) {}
+    // Todas las views están montadas: fj-tec casi siempre existe.
+    // No usar solo eso para elegir guardar — hidratar DOM + guardar foja si la vista foja está activa.
+    afGeclisaQueueHydrateCurFromDom();
+    var fojaActive = !!(document.getElementById('view-foja') &&
+      document.getElementById('view-foja').classList.contains('active'));
+    if (fojaActive && typeof guardarFoja === 'function') {
+      try { guardarFoja(); } catch (eFj) {
+        try { console.warn('[AFG cola] guardarFoja', eFj); } catch (e1) {}
+      }
+    } else if (document.getElementById('f-pac') && typeof guardar === 'function') {
+      try { guardar(); } catch (eG) {
+        try { console.warn('[AFG cola] guardar', eG); } catch (e2) {}
+      }
+    }
+    afGeclisaQueueHydrateCurFromDom();
+  } catch (eSave) {
+    try { console.error('[AFG cola] pre-save', eSave); } catch (e3) {}
+  }
 
-  var r = afGeclisaQueueAdd(typeof S !== 'undefined' ? S.cur : null);
-  if (!r.ok) {
-    toast(r.error || 'No se pudo encolar');
+  var r;
+  try {
+    r = afGeclisaQueueAdd(typeof S !== 'undefined' ? S.cur : null);
+  } catch (eAdd) {
+    try { console.error('[AFG cola] add exception', eAdd); } catch (e4) {}
+    toast('Error al encolar: ' + String(eAdd && eAdd.message || eAdd));
     return;
   }
+  if (!r || !r.ok) {
+    try { console.warn('[AFG cola] add failed', r); } catch (e5) {}
+    toast((r && r.error) || 'No se pudo encolar');
+    return;
+  }
+  try {
+    console.log('[AFG cola] encolada OK', r, afGeclisaQueueDebug());
+  } catch (e6) {}
   if (typeof renderGeclisaQueuePanel === 'function') renderGeclisaQueuePanel();
   if (typeof renderHome === 'function' && document.getElementById('view-home') &&
       document.getElementById('view-home').classList.contains('active')) {
