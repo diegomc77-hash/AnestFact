@@ -212,6 +212,35 @@ function afGeclisaQueuePendingCount() {
   }).length;
 }
 
+/** Actualiza status de un ítem (la extensión lo pide vía bridge). */
+function afGeclisaQueueSetStatus(intervId, status, message) {
+  var id = String(intervId || '');
+  if (!id) return { ok: false, error: 'missing_id' };
+  var env = afGeclisaQueueLoad();
+  var hit = null;
+  for (var i = 0; i < env.items.length; i++) {
+    if (String(env.items[i].id) === id) { hit = env.items[i]; break; }
+  }
+  if (!hit) return { ok: false, error: 'not_in_queue' };
+  hit.status = status || hit.status;
+  hit.message = message != null ? String(message) : (hit.message || '');
+  hit.updatedAt = Date.now();
+  afGeclisaQueueSave(env);
+  try {
+    if (typeof renderGeclisaQueuePanel === 'function') renderGeclisaQueuePanel();
+  } catch (e) {}
+  return { ok: true, item: hit };
+}
+
+window.addEventListener('message', function (ev) {
+  if (ev.source !== window) return;
+  var d = ev.data;
+  if (!d || d.source !== 'AFG_EXT') return;
+  if (d.type === 'QUEUE_ITEM_STATUS') {
+    afGeclisaQueueSetStatus(d.intervId || d.id, d.status, d.message);
+  }
+});
+
 function afGeclisaQueueStatusLabel(st) {
   var map = {
     queued: 'En cola',
@@ -351,7 +380,7 @@ function renderGeclisaQueuePanel() {
 
   html += '</div>';
   html += '<p style="font-size:11px;color:var(--text3);margin:10px 0 0;line-height:1.4">';
-  html += 'Sin token al encolar. Pieza 2: en el popup de la extensión usá “Probar mint (1ª de cola)”. El runner automático es pieza 3–4.';
+  html += 'Sin token al encolar. Abrí el popup de la extensión → <b>Iniciar cola</b> (mint + nav + fill; vos guardás; Siguiente).';
   html += '</p>';
   if (env.items.some(function (x) { return x.status === 'done'; })) {
     html += '<button type="button" class="btn btn-s" style="width:100%;margin-top:8px;font-size:12px" onclick="afGeclisaQueueClearDone();renderGeclisaQueuePanel();renderHome();">Limpiar completadas</button>';

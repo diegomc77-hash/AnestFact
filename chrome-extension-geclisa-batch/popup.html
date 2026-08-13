@@ -3,71 +3,75 @@
 <head>
   <meta charset="utf-8">
   <style>
-    body{font-family:system-ui,sans-serif;width:340px;margin:12px;color:#222;font-size:13px}
-    h1{font-size:14px;margin:0 0 8px}
+    body{font-family:system-ui,sans-serif;width:360px;margin:12px;color:#222;font-size:13px}
+    h1{font-size:14px;margin:0 0 6px}
     .muted{color:#666;font-size:11px;line-height:1.4}
-    label{display:block;margin-top:8px;font-size:12px}
-    input,textarea{width:100%;box-sizing:border-box;padding:6px;margin-top:3px}
-    textarea{min-height:52px;font-family:ui-monospace,monospace;font-size:11px}
-    button{width:100%;margin-top:8px;padding:8px;font-weight:600;cursor:pointer}
+    button{width:100%;margin-top:8px;padding:9px;font-weight:600;cursor:pointer}
     button.secondary{font-weight:500}
-    button:disabled{opacity:.5;cursor:not-allowed}
-    #out{margin-top:10px;white-space:pre-wrap;font-size:11px;background:#f4f4f4;padding:8px;border-radius:6px;max-height:200px;overflow:auto}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    #out{margin-top:10px;white-space:pre-wrap;font-size:11px;background:#f4f4f4;padding:8px;border-radius:6px;max-height:160px;overflow:auto}
     .warn{background:#fff3cd;border:1px solid #e6d089;padding:8px;border-radius:6px;font-size:11px;margin:8px 0;line-height:1.4}
     .okmsg{background:#e6f4ea;border:1px solid #a8d5b5;padding:8px;border-radius:6px;font-size:12px;margin:8px 0;line-height:1.4;display:none}
-    .warn strong,.okmsg strong{display:block;margin-bottom:4px}
-    #dbg-first{display:none}
-    #foja-status{margin-top:8px;font-size:12px;color:#333;line-height:1.35}
+    .errmsg{background:#fde8e8;border:1px solid #e8a0a0;padding:8px;border-radius:6px;font-size:12px;margin:8px 0;line-height:1.4;display:none}
+    .warn strong,.okmsg strong,.errmsg strong{display:block;margin-bottom:4px}
+    #queue-list{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+    .qitem{padding:8px 10px;border-radius:8px;background:#f6f7f9;font-size:12px;border:1px solid #e3e5e8}
+    .qitem.active{border-color:#388bfd;background:#eef5ff}
+    .qitem .row{display:flex;justify-content:space-between;gap:8px;align-items:center}
+    .qitem .st{font-size:10px;font-weight:700;flex-shrink:0}
     .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    details{margin-top:10px;font-size:11px;color:#555}
+    details summary{cursor:pointer}
+    label{display:block;margin-top:6px;font-size:11px}
+    input,textarea{width:100%;box-sizing:border-box;padding:5px;margin-top:2px;font-size:11px}
+    textarea{min-height:40px;font-family:ui-monospace,monospace}
   </style>
 </head>
 <body>
-  <h1>GECLISA Batch — pasos 1–12</h1>
-  <p class="muted">Pieza 2: cola + mint on-demand. Extensión <b>0.4.9</b>. <b>No Guardar</b>. Runner auto = piezas 3–4.</p>
+  <h1>GECLISA — runner de cola</h1>
+  <p class="muted">Extensión <b>0.5.0</b>. Mint → nav (home) → fill → <b>vos guardás</b> → Siguiente. No Guardar automático.</p>
 
-  <div class="warn" id="dbg-first">
-    <strong>Aviso (primera vez)</strong>
-    Vas a ver una barra amarilla de Chrome (debugger) — es esperado. Se quita sola antes del fill.
+  <div class="warn" id="banner-idle">
+    <strong>Listo para correr</strong>
+    AnesFact con cola Mayo + GECLISA logueado → <b>Iniciar cola</b>.
   </div>
-  <div class="warn" id="dbg-always">
-    <strong>Pieza 2 (probar)</strong>
-    1) ↻ extensión <b>0.4.9</b> + AnesFact con cola.<br>
-    2) <b>Actualizar cola</b> → debe listar pendientes.<br>
-    3) <b>Probar mint (1ª de cola)</b> → token sin abrir popup de Ejecutar aún.
+  <div class="okmsg" id="banner-await">
+    <strong>Revisá y guardá en GECLISA</strong>
+    Cuando hayas guardado a mano, tocá <b>Siguiente paciente</b>.
   </div>
-  <div class="okmsg" id="ok-banner">
-    <strong>Foja completada, revisá y guardá manualmente</strong>
-    La extensión no hace click en Guardar.
+  <div class="errmsg" id="banner-err">
+    <strong>Pausa / error</strong>
+    <span id="banner-err-text"></span>
   </div>
 
-  <div id="queue-status" class="muted">Cola: —</div>
-  <div id="foja-status" class="muted">Cargando foja…</div>
+  <div id="runner-status" class="muted">Estado: —</div>
+  <div id="queue-list"></div>
 
-  <label>Apellido
-    <input id="apellido" value="" placeholder="(desde AnesFact)">
-  </label>
-  <label>Nombre
-    <input id="nombre" value="" placeholder="(desde AnesFact)">
-  </label>
-  <label>Sector (GECLISA #ddlSector)
-    <input id="sector" value="" placeholder="ej. PRE-QUIRÚRGICO">
-  </label>
+  <button id="btn-start" type="button">Iniciar cola</button>
+  <button id="btn-next" type="button" disabled>Siguiente paciente</button>
   <div class="g2">
-    <label>Fecha cirugía
-      <input id="fechaCirugia" value="" placeholder="DD/MM/AAAA o ISO">
-    </label>
-    <label>Hora inicio
-      <input id="horaInicio" value="" placeholder="HH:mm">
-    </label>
+    <button id="btn-retry" type="button" class="secondary" disabled>Reintentar</button>
+    <button id="btn-abort" type="button" class="secondary">Abortar</button>
   </div>
-  <label>Token GECLISA (un solo uso)
-    <textarea id="token" placeholder="token"></textarea>
-  </label>
-  <button id="btn-refresh" type="button" class="secondary">Actualizar foja / cola</button>
-  <button id="btn-mint-test" type="button" class="secondary">Probar mint (1ª de cola)</button>
-  <button id="btn-run" type="button">Ejecutar 1–12 (nav + fill)</button>
-  <button id="btn-ping" type="button" class="secondary">Probar ping a pestaña GECLISA</button>
-  <button id="btn-diag" type="button" class="secondary">Diagnóstico storage</button>
+  <button id="btn-refresh" type="button" class="secondary">Actualizar cola</button>
+
+  <details>
+    <summary>Avanzado (1 foja manual / diagnóstico)</summary>
+    <div id="foja-status" class="muted" style="margin-top:8px">—</div>
+    <label>Apellido <input id="apellido"></label>
+    <label>Nombre <input id="nombre"></label>
+    <label>Sector <input id="sector"></label>
+    <div class="g2">
+      <label>Fecha <input id="fechaCirugia"></label>
+      <label>Hora <input id="horaInicio"></label>
+    </div>
+    <label>Token <textarea id="token"></textarea></label>
+    <button id="btn-run" type="button" class="secondary">Ejecutar 1–12 (manual)</button>
+    <button id="btn-mint-test" type="button" class="secondary">Probar mint (1ª)</button>
+    <button id="btn-diag" type="button" class="secondary">Diagnóstico</button>
+    <button id="btn-ping" type="button" class="secondary">Ping GECLISA</button>
+  </details>
+
   <div id="out"></div>
   <script src="popup.js"></script>
 </body>

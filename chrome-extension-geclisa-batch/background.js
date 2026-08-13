@@ -69,10 +69,41 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
   /**
    * Mint on-demand: background → content script AnesFact → page afMintGeclisaToken.
-   * No corre run111 (eso es pieza 3–4).
    */
   if (msg && msg.type === 'AFG_MINT_TOKEN_FOR_FOJA') {
     mintTokenViaAnesFactBridge(msg.intervId || msg.id, msg.timeoutMs)
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+
+  // Runner de cola (pieza 3): mint → run111 → pausa awaiting_save
+  if (msg && msg.type === 'AFG_QUEUE_GET_STATE') {
+    getRunnerState()
+      .then(function (r) { sendResponse({ ok: true, state: r }); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+  if (msg && msg.type === 'AFG_QUEUE_START') {
+    runQueueAction('start')
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+  if (msg && msg.type === 'AFG_QUEUE_NEXT') {
+    runQueueAction('next')
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+  if (msg && msg.type === 'AFG_QUEUE_RETRY') {
+    runQueueAction('retry')
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+  if (msg && msg.type === 'AFG_QUEUE_ABORT') {
+    runQueueAction('abort')
       .then(function (r) { sendResponse(r); })
       .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
     return true;
@@ -86,6 +117,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     return true;
   }
 });
+
+/** Lock para no solapar dos run111 de cola. */
+var queueRunnerBusy = false;
 
 var ANESFACT_TAB_URLS = [
   'https://diegomc77-hash.github.io/*',
@@ -958,4 +992,272 @@ async function runFillOnTab(tabId, token) {
     } catch (ePoll) {}
   }
   return { fillOk: false, error: 'timeout_fill_result', camposOk: 0 };
+}
+
+/* —— Runner de cola (pieza 3): mint → run111 (reloadedHome) → awaiting_save —— */
+
+function defaultRunnerState() {
+  return {
+    status: 'idle',
+    currentIntervId: null,
+    currentPac: '',
+    message: '',
+    lastResult: null,
+    processedIds: [],
+    startedAt: null,
+    updatedAt: Date.now()
+  };
+}
+
+async function getRunnerState() {
+  try {
+    var sess = await chrome.storage.session.get(['afg_runner_state']);
+    if (sess.afg_runner_state && sess.afg_runner_state.status) return sess.afg_runner_state;
+  } catch (e) {}
+  try {
+    var loc = await chrome.storage.local.get(['afg_runner_state']);
+    if (loc.afg_runner_state && loc.afg_runner_state.status) return loc.afg_runner_state;
+  } catch (e2) {}
+  return defaultRunnerState();
+}
+
+async function setRunnerState(state) {
+  state = state || defaultRunnerState();
+  state.updatedAt = Date.now();
+  try { await chrome.storage.session.set({ afg_runner_state: state }); } catch (e) {}
+  try { await chrome.storage.local.set({ afg_runner_state: state }); } catch (e2) {}
+  return state;
+}
+
+async function patchQueueItemStatus(intervId, status, message) {
+  var tabs = await findAnesFactTabs();
+  for (var i = 0; i < (tabs || []).length; i++) {
+    try {
+      await chrome.tabs.sendMessage(tabs[i].id, {
+        type: 'AFG_QUEUE_SET_ITEM_STATUS',
+        intervId: String(intervId),
+        status: status,
+        message: message || ''
+      });
+      return;
+    } catch (e) {}
+  }
+}
+
+function firstPendingQueueItem(queue, preferId) {
+  var items = (queue && queue.items) || [];
+  if (preferId) {
+    for (var i = 0; i < items.length; i++) {
+      if (String(items[i].id) === String(preferId) && items[i].status !== 'done') return items[i];
+    }
+  }
+  for (var j = 0; j < items.length; j++) {
+    var st = items[j].status || 'queued';
+    if (st === 'done') continue;
+    if (st === 'running' || st === 'awaiting_save' || st === 'queued' || st === 'paused_error') {
+      return items[j];
+    }
+  }
+  return null;
+}
+
+async function runQueueAction(action) {
+  if (action === 'abort') {
+    var stAbort = await getRunnerState();
+    if (stAbort.currentIntervId) {
+      await patchQueueItemStatus(stAbort.currentIntervId, 'queued', 'Abortada por el usuario');
+    }
+    queueRunnerBusy = false;
+    var idle = defaultRunnerState();
+    idle.message = 'Cola abortada';
+    await setRunnerState(idle);
+    return { ok: true, aborted: true, state: idle };
+  }
+
+  var stateGate = await getRunnerState();
+  if (action === 'start' && stateGate.status === 'awaiting_save') {
+    return {
+      ok: false,
+      error: 'awaiting_save',
+      message: 'Hay una foja esperando que guardes. Toca Siguiente paciente.',
+      state: stateGate
+    };
+  }
+  if (queueRunnerBusy || stateGate.status === 'running') {
+    return {
+      ok: false,
+      error: 'runner_busy',
+      message: 'Ya hay una foja en curso. Esperá o Abortar.',
+      state: stateGate
+    };
+  }
+
+  var state = stateGate;
+
+  if (action === 'next') {
+    if (state.status !== 'awaiting_save' || !state.currentIntervId) {
+      return {
+        ok: false,
+        error: 'not_awaiting_save',
+        message: 'No hay foja esperando “Siguiente”. Iniciá la cola o reintentá.',
+        state: state
+      };
+    }
+    await patchQueueItemStatus(state.currentIntervId, 'done', '');
+    state.processedIds = (state.processedIds || []).concat([String(state.currentIntervId)]);
+    state.currentIntervId = null;
+    state.currentPac = '';
+    state.status = 'idle';
+    state.message = 'Buscando siguiente…';
+    await setRunnerState(state);
+  }
+
+  if (action === 'retry') {
+    if (!state.currentIntervId) {
+      return {
+        ok: false,
+        error: 'nothing_to_retry',
+        message: 'No hay foja actual para reintentar.',
+        state: state
+      };
+    }
+  }
+
+  var pulled = await pullQueueFromAnesFactTabs();
+  var queue = pulled && pulled.ok ? pulled.queue : null;
+  if (!queue || !queue.items || !queue.items.length) {
+    state = await setRunnerState(Object.assign(defaultRunnerState(), {
+      status: 'done_all',
+      message: 'Cola vacía en AnesFact'
+    }));
+    return { ok: false, error: 'empty_queue', message: state.message, state: state };
+  }
+
+  var preferId = action === 'retry' ? state.currentIntervId : null;
+  // Tras next, no preferir el done
+  if (action === 'start' || action === 'next') preferId = null;
+
+  var item = firstPendingQueueItem(queue, preferId);
+  // Excluir ya procesados en esta sesión si status quedó raro
+  if (item && action === 'next') {
+    var skip = {};
+    (state.processedIds || []).forEach(function (id) { skip[String(id)] = true; });
+    if (skip[String(item.id)]) {
+      var items = queue.items;
+      item = null;
+      for (var k = 0; k < items.length; k++) {
+        if (items[k].status === 'done') continue;
+        if (skip[String(items[k].id)]) continue;
+        item = items[k];
+        break;
+      }
+    }
+  }
+
+  if (!item) {
+    state = await setRunnerState(Object.assign(state, {
+      status: 'done_all',
+      currentIntervId: null,
+      currentPac: '',
+      message: 'Cola completa — no quedan pendientes'
+    }));
+    return { ok: true, doneAll: true, state: state };
+  }
+
+  queueRunnerBusy = true;
+  state.status = 'running';
+  state.currentIntervId = String(item.id);
+  state.currentPac = item.pac || '';
+  state.message = 'Minteando token…';
+  state.lastResult = null;
+  if (!state.startedAt) state.startedAt = Date.now();
+  await setRunnerState(state);
+  await patchQueueItemStatus(item.id, 'running', '');
+
+  try {
+    console.log('[AFG runner] mint+run111', item.id, item.pac);
+  } catch (eLog) {}
+
+  var mint = await mintTokenViaAnesFactBridge(item.id);
+  if (!(mint && mint.ok && mint.foja && mint.foja.token)) {
+    queueRunnerBusy = false;
+    var mintErr = (mint && (mint.error || mint.message)) || 'mint_failed';
+    state = await setRunnerState(Object.assign(state, {
+      status: 'paused_error',
+      message: 'Mint falló: ' + mintErr,
+      lastResult: mint
+    }));
+    await patchQueueItemStatus(item.id, 'paused_error', state.message);
+    return { ok: false, error: 'mint_failed', message: state.message, mint: mint, state: state };
+  }
+
+  state.message = 'Navegando GECLISA (reload home → 1–12)…';
+  await setRunnerState(state);
+
+  var paciente = fojaToPaciente(mint.foja) || {};
+  paciente.token = mint.foja.token;
+  paciente.intervId = String(item.id);
+  // Completar sector/fecha/hora desde ítem de cola si mint vino corto
+  if (!paciente.sector) paciente.sector = item.sector || '';
+  if (!paciente.fechaCirugia) paciente.fechaCirugia = item.fecha || '';
+  if (!paciente.hora) paciente.hora = item.hora || '';
+
+  var resolved = await resolvePaciente(paciente);
+  if (!(resolved && resolved.ok)) {
+    queueRunnerBusy = false;
+    state = await setRunnerState(Object.assign(state, {
+      status: 'paused_error',
+      message: (resolved && resolved.message) || 'resolvePaciente falló',
+      lastResult: resolved
+    }));
+    await patchQueueItemStatus(item.id, 'paused_error', state.message);
+    return { ok: false, error: 'resolve_failed', resolved: resolved, state: state };
+  }
+
+  var runRes = null;
+  try {
+    runRes = await run111(resolved.paciente);
+  } catch (eRun) {
+    runRes = { ok: false, error: String(eRun.message || eRun) };
+  }
+
+  queueRunnerBusy = false;
+
+  var fillOk = !!(runRes && runRes.fillOk);
+  var paused = !!(runRes && runRes.paused);
+  var navOk = !!(runRes && (runRes.ok || runRes.phase === 'done_1_12' || runRes.phase === 'nav_ok_fill_skipped'));
+
+  if (fillOk) {
+    state = await setRunnerState(Object.assign(state, {
+      status: 'awaiting_save',
+      message: 'Foja completada — revisá GECLISA, guardá a mano, luego Siguiente paciente',
+      lastResult: runRes,
+      currentPac: (resolved.paciente.apellido || '') + ', ' + (resolved.paciente.nombre || '')
+    }));
+    await patchQueueItemStatus(item.id, 'awaiting_save', '');
+    return {
+      ok: true,
+      awaitingSave: true,
+      userMessage: state.message,
+      run: runRes,
+      foja: mint.foja,
+      state: state
+    };
+  }
+
+  var why = (runRes && (runRes.message || runRes.error || runRes.reason)) || 'error_desconocido';
+  state = await setRunnerState(Object.assign(state, {
+    status: 'paused_error',
+    message: paused ? ('PAUSA: ' + why) : ('Error: ' + why),
+    lastResult: runRes
+  }));
+  await patchQueueItemStatus(item.id, 'paused_error', state.message);
+  return {
+    ok: false,
+    paused: paused,
+    error: why,
+    message: state.message,
+    run: runRes,
+    state: state
+  };
 }

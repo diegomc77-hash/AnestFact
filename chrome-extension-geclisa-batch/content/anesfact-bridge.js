@@ -256,7 +256,7 @@
       sendResponse({
         ok: true,
         href: location.href,
-        version: '0.4.9',
+        version: '0.5.0',
         hasBatch: !!readLocalStorageBatch(),
         hasQueue: !!readLocalStorageQueue()
       });
@@ -288,6 +288,24 @@
       });
       return true;
     }
+
+    if (msg.type === 'AFG_QUEUE_SET_ITEM_STATUS') {
+      try {
+        window.postMessage({
+          source: 'AFG_EXT',
+          type: 'QUEUE_ITEM_STATUS',
+          intervId: String(msg.intervId || msg.id || ''),
+          status: msg.status || '',
+          message: msg.message || ''
+        }, '*');
+      } catch (ePost) {}
+      // La página persiste; re-leer y copiar a chrome.storage
+      setTimeout(function () {
+        publishQueue(readLocalStorageQueue(), 'status_patch');
+      }, 120);
+      sendResponse({ ok: true });
+      return false;
+    }
   });
 
   function tick() {
@@ -300,9 +318,9 @@
   setInterval(tick, 800);
 
   try {
-    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.4.9' }, '*');
+    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.5.0' }, '*');
   } catch (e) {}
   try {
-    console.log('[AFG bridge] 0.4.9 inyectado en', location.href);
+    console.log('[AFG bridge] 0.5.0 inyectado en', location.href);
   } catch (e2) {}
 })();
