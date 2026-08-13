@@ -256,7 +256,7 @@
       sendResponse({
         ok: true,
         href: location.href,
-        version: '0.5.0',
+        version: '0.5.1',
         hasBatch: !!readLocalStorageBatch(),
         hasQueue: !!readLocalStorageQueue()
       });
@@ -318,9 +318,9 @@
   setInterval(tick, 800);
 
   try {
-    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.5.0' }, '*');
+    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.5.1' }, '*');
   } catch (e) {}
   try {
-    console.log('[AFG bridge] 0.5.0 inyectado en', location.href);
+    console.log('[AFG bridge] 0.5.1 inyectado en', location.href);
   } catch (e2) {}
 })();

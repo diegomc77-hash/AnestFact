@@ -638,57 +638,174 @@ async function findGeclisaTab() {
   return active || tabs[0];
 }
 
-/** F5 + espera pantalla principal (btn Historias) — evita residual de corrida anterior. */
-async function reloadToGeclisaHome(tabId) {
-  await new Promise(function (resolve, reject) {
-    var done = false;
-    var timer = setTimeout(function () {
-      if (done) return;
-      done = true;
-      chrome.tabs.onUpdated.removeListener(onUpdated);
-      reject(new Error('Timeout recargando pestaña GECLISA'));
-    }, 45000);
-
-    function onUpdated(id, info) {
-      if (id !== tabId || info.status !== 'complete') return;
-      if (done) return;
-      done = true;
-      clearTimeout(timer);
-      chrome.tabs.onUpdated.removeListener(onUpdated);
-      resolve();
-    }
-
-    chrome.tabs.onUpdated.addListener(onUpdated);
-    chrome.tabs.reload(tabId).catch(function (e) {
-      if (done) return;
-      done = true;
-      clearTimeout(timer);
-      chrome.tabs.onUpdated.removeListener(onUpdated);
-      reject(e);
-    });
-  });
-
-  // SPA: el shell puede quedar "complete" antes del menú; poll btn principal
-  var deadline = Date.now() + 35000;
-  while (Date.now() < deadline) {
-    try {
-      var probe = await chrome.scripting.executeScript({
-        target: { tabId: tabId, allFrames: false },
-        func: function () {
-          return !!document.getElementById('btn-Historias Clínicas')
-            || !!document.querySelector('[id="btn-Historias Clínicas"]');
-        }
-      });
-      if (probe[0] && probe[0].result) {
-        await sleep(1000);
-        return;
+/**
+ * Quita handlers beforeunload (propiedad + captura) en todos los frames.
+ * El diálogo nativo «¿Abandonar el sitio?» igual puede aparecer si quedó otro listener;
+ * en ese caso CDP Page.handleJavaScriptDialog lo acepta.
+ */
+async function clearBeforeUnloadHandlers(tabId) {
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId: tabId, allFrames: true },
+      world: 'MAIN',
+      func: function () {
+        try { window.onbeforeunload = null; } catch (e0) {}
+        try {
+          Object.defineProperty(window, 'onbeforeunload', {
+            configurable: true,
+            enumerable: true,
+            get: function () { return null; },
+            set: function () { /* ignore re-assign */ }
+          });
+        } catch (e1) {}
+        try {
+          window.addEventListener('beforeunload', function (ev) {
+            try {
+              ev.stopImmediatePropagation();
+              if (ev.preventDefault) ev.preventDefault();
+              delete ev.returnValue;
+            } catch (e2) {}
+          }, true);
+        } catch (e3) {}
+        return true;
       }
-    } catch (e) {
-      // content/scripting aún no listo post-reload
-    }
-    await sleep(400);
+    });
+  } catch (eInj) {
+    try { console.warn('[AFG] clearBeforeUnload inject', eInj && eInj.message); } catch (e) {}
   }
-  throw new Error('Tras F5 no apareció btn-Historias Clínicas (¿sesión vencida?)');
+  // También vía CDP (por si scripting no alcanza algún frame)
+  try {
+    await chrome.debugger.sendCommand(dbgTarget(tabId), 'Runtime.evaluate', {
+      expression:
+        'try{window.onbeforeunload=null;}catch(e){};' +
+        'true',
+      awaitPromise: false,
+      userGesture: true
+    });
+  } catch (eCdp) {}
+}
+
+/** Auto-acepta alert/confirm/beforeunload mientras el debugger está attached. */
+function installJsDialogAutoAccept(tabId) {
+  var accepted = 0;
+  function onEvent(source, method, params) {
+    if (!source || source.tabId !== tabId) return;
+    if (method !== 'Page.javascriptDialogOpening') return;
+    accepted += 1;
+    try {
+      console.log('[AFG] CDP auto-accept dialog', params && params.type, String((params && params.message) || '').slice(0, 80));
+    } catch (e) {}
+    chrome.debugger.sendCommand(dbgTarget(tabId), 'Page.handleJavaScriptDialog', {
+      accept: true
+    }).catch(function (err) {
+      try { console.warn('[AFG] handleJavaScriptDialog', err && err.message); } catch (e2) {}
+    });
+  }
+  chrome.debugger.onEvent.addListener(onEvent);
+  return {
+    cleanup: function () { chrome.debugger.onEvent.removeListener(onEvent); },
+    getAccepted: function () { return accepted; }
+  };
+}
+
+var RELOAD_BEFOREUNLOAD_MSG =
+  'PAUSA: Chrome bloqueó el reload con «¿Abandonar el sitio?» (foja GECLISA sin guardar). ' +
+  'Aceptá el aviso del navegador o guardá/cerrá la foja, y tocá Reintentar. ' +
+  'En uso normal: guardá antes de Siguiente paciente.';
+
+/**
+ * F5 a home antes del paso 1.
+ * 1) Limpia beforeunload  2) CDP acepta diálogo nativo si aparece  3) timeout → mensaje claro
+ */
+async function reloadToGeclisaHome(tabId) {
+  var attachedHere = false;
+  var dialogGuard = null;
+  try {
+    try {
+      await debuggerAttach(tabId);
+      attachedHere = true;
+    } catch (eAtt) {
+      try { console.warn('[AFG] reload: debugger attach', eAtt && eAtt.message); } catch (e) {}
+    }
+
+    if (attachedHere) {
+      try {
+        await chrome.debugger.sendCommand(dbgTarget(tabId), 'Page.enable', {});
+      } catch (ePe) {}
+      dialogGuard = installJsDialogAutoAccept(tabId);
+    }
+
+    await clearBeforeUnloadHandlers(tabId);
+
+    await new Promise(function (resolve, reject) {
+      var done = false;
+      var timer = setTimeout(function () {
+        if (done) return;
+        done = true;
+        chrome.tabs.onUpdated.removeListener(onUpdated);
+        var n = dialogGuard ? dialogGuard.getAccepted() : 0;
+        reject(new Error(
+          RELOAD_BEFOREUNLOAD_MSG +
+          (n ? ' (CDP aceptó ' + n + ' diálogo(s); igual no completó el reload.)' : '')
+        ));
+      }, 25000);
+
+      function onUpdated(id, info) {
+        if (id !== tabId || info.status !== 'complete') return;
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        chrome.tabs.onUpdated.removeListener(onUpdated);
+        resolve();
+      }
+
+      chrome.tabs.onUpdated.addListener(onUpdated);
+
+      var reloadPromise;
+      if (attachedHere) {
+        reloadPromise = chrome.debugger.sendCommand(dbgTarget(tabId), 'Page.reload', {
+          ignoreCache: false
+        });
+      } else {
+        reloadPromise = chrome.tabs.reload(tabId);
+      }
+      reloadPromise.catch(function (e) {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        chrome.tabs.onUpdated.removeListener(onUpdated);
+        reject(e);
+      });
+    });
+
+    // SPA: el shell puede quedar "complete" antes del menú; poll btn principal
+    var deadline = Date.now() + 35000;
+    while (Date.now() < deadline) {
+      try {
+        var probe = await chrome.scripting.executeScript({
+          target: { tabId: tabId, allFrames: false },
+          func: function () {
+            return !!document.getElementById('btn-Historias Clínicas')
+              || !!document.querySelector('[id="btn-Historias Clínicas"]');
+          }
+        });
+        if (probe[0] && probe[0].result) {
+          await sleep(1000);
+          return { ok: true, dialogsAccepted: dialogGuard ? dialogGuard.getAccepted() : 0 };
+        }
+      } catch (e) {
+        // content/scripting aún no listo post-reload
+      }
+      await sleep(400);
+    }
+    throw new Error(
+      'Tras F5 no apareció btn-Historias Clínicas. ' +
+      'Si ves «¿Abandonar el sitio?», aceptalo y Reintentar. ¿Sesión vencida?'
+    );
+  } finally {
+    if (dialogGuard) dialogGuard.cleanup();
+    // Dejar debugger attached: run111 lo reutiliza (debuggerAttach tolera already attached)
+  }
 }
 
 async function findFrameId(tabId, role) {
@@ -907,14 +1024,22 @@ async function run111(paciente) {
       clickMode: 'mixed_debugger_native'
     };
   } catch (e) {
+    var errMsg = String(e && e.message || e);
+    var leaveSite = /Abandonar el sitio|beforeunload|bloqueó el reload|¿Abandonar/i.test(errMsg);
     return {
       ok: false,
-      error: String(e.message || e),
+      paused: true,
+      reason: leaveSite ? 'beforeunload_dialog' : 'run111_exception',
+      error: errMsg,
+      message: errMsg,
       top: topRes,
       iframe: iframeRes,
       fillOk: false,
       fillResult: fillRes,
-      clickMode: 'mixed_debugger_native'
+      clickMode: 'mixed_debugger_native',
+      userMessage: leaveSite
+        ? 'Chrome pidió confirmar salir (foja sin guardar). Aceptá el aviso o guardá, y Reintentar.'
+        : errMsg
     };
   } finally {
     if (attached) {
@@ -1218,7 +1343,15 @@ async function runQueueAction(action) {
   try {
     runRes = await run111(resolved.paciente);
   } catch (eRun) {
-    runRes = { ok: false, error: String(eRun.message || eRun) };
+    var em = String(eRun && eRun.message || eRun);
+    var isLeave = /Abandonar el sitio|beforeunload|bloqueó el reload|¿Abandonar/i.test(em);
+    runRes = {
+      ok: false,
+      paused: true,
+      reason: isLeave ? 'beforeunload_dialog' : 'run111_exception',
+      error: em,
+      message: em
+    };
   }
 
   queueRunnerBusy = false;

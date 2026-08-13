@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AnesFact GECLISA Batch (pasos 1–12)",
-  "version": "0.5.0",
-  "description": "GECLISA Mayo: runner de cola — mint+run111 por foja, pausa Siguiente paciente, reload home entre ítems.",
+  "version": "0.5.1",
+  "description": "GECLISA Mayo: runner de cola; bypass beforeunload al reload home; pausa clara si Chrome bloquea salir.",
   "permissions": ["storage", "tabs", "scripting", "debugger", "clipboardRead"],
   "host_permissions": [
     "http://sanatoriomayo.myvnc.com:84/*",
