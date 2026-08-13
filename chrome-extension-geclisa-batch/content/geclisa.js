@@ -275,14 +275,54 @@
     await debuggerClickEl(tplRows[0]);
     await AFG.humanDelay();
 
-    log('Paso 11: #btnSeleccionarPopup (button nativo)');
+    log('Paso 11: buscando #btnSeleccionarPopup…');
+    notifyNavProgress('step11_wait_btn', { plantilla: plantilla });
     var selTpl = await AFG.waitFor(function () {
       var b = document.getElementById('btnSeleccionarPopup');
-      if (!b || b.disabled) return null;
+      if (!b) return null;
+      if (b.disabled) {
+        log('Paso 11: botón presente pero disabled');
+        return null;
+      }
       return b;
-    }, { label: '#btnSeleccionarPopup', timeout: 15000 });
-    await AFG.clickElAsync(selTpl);
-    await AFG.humanDelay();
+    }, { label: '#btnSeleccionarPopup enabled', timeout: 15000 });
+    log('Paso 11: botón OK', selTpl.id, selTpl.tagName, 'disabled=', !!selTpl.disabled);
+
+    // Avisar al background ANTES del click: si el iframe navega, este CS puede morir
+    // y sendResponse del runIframe nunca llega — el bg igual debe pasar a fill.
+    notifyNavProgress('step11_before_click', {
+      plantilla: plantilla,
+      nroAtencion: headerInfo.nroAtencion || null
+    });
+
+    // Debugger click (trusted): más fiable que dispatchEvent si Angular no escucha el sintetico
+    try {
+      log('Paso 11: debugger click en #btnSeleccionarPopup');
+      await debuggerClickEl(selTpl);
+    } catch (eDbg) {
+      log('Paso 11: debugger click falló, fallback nativo', String(eDbg && eDbg.message || eDbg));
+      await AFG.clickElAsync(selTpl);
+    }
+    log('Paso 11: click disparado — espero foja #8054 (máx 12s) o fin de CS por navegación');
+    notifyNavProgress('step11_after_click', { plantilla: plantilla });
+
+    var fojaEl = null;
+    try {
+      fojaEl = await AFG.waitFor(function () {
+        return document.getElementById('8054') || null;
+      }, { label: '#8054 foja post-Seleccionar', timeout: 12000 });
+      log('Paso 11b: #8054 visible en este frame');
+    } catch (e8054) {
+      log('Paso 11b: #8054 no apareció en este frame (puede estar en otro / CS invalidado):',
+        String(e8054 && e8054.message || e8054));
+    }
+
+    notifyNavProgress('step11_done', {
+      plantilla: plantilla,
+      has8054: !!fojaEl,
+      nroAtencion: headerInfo.nroAtencion || null
+    });
+    log('Paso 11 done → return iframe_7_11_done (bg debe seguir a fill.js)');
 
     return {
       ok: true,
@@ -290,11 +330,25 @@
       plantilla: plantilla,
       nroAtencion: headerInfo.nroAtencion || null,
       evolucionHeader: headerInfo,
+      has8054: !!fojaEl,
       fechaUsada: located && located.fechaUsada,
       horaUsada: located && located.horaUsada,
       sectorUsado: located && located.sectorUsado,
       filtrosProbados: located && located.filtrosProbados
     };
+  }
+
+  /** Ping al background (no bloquea). Sobrevive peor si el frame navega tras Seleccionar. */
+  function notifyNavProgress(step, extra) {
+    try {
+      chrome.runtime.sendMessage({
+        type: 'AFG_IFRAME_NAV_PROGRESS',
+        step: step,
+        at: Date.now(),
+        href: String(location.href || '').slice(0, 120),
+        extra: extra || null
+      }, function () { void chrome.runtime.lastError; });
+    } catch (e) {}
   }
 
   /**

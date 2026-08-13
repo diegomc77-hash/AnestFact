@@ -52,6 +52,31 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     return false;
   }
 
+  // Content GECLISA: progreso nav (sobre todo paso 11 — el CS puede morir al abrir plantilla)
+  if (msg && msg.type === 'AFG_IFRAME_NAV_PROGRESS') {
+    lastIframeNavProgress = {
+      step: msg.step,
+      at: msg.at || Date.now(),
+      href: msg.href || '',
+      extra: msg.extra || null,
+      tabId: sender && sender.tab && sender.tab.id
+    };
+    try {
+      console.log('[AFG bg] IFRAME_NAV_PROGRESS', msg.step, msg.extra || '', msg.href || '');
+    } catch (e) {}
+    // Actualizar mensaje del runner si está en curso
+    getRunnerState().then(function (st) {
+      if (!st || st.status !== 'running') return;
+      var label = String(msg.step || '');
+      if (label.indexOf('step11') === 0) {
+        st.message = 'Paso 11 (' + label + ') — abriendo plantilla / fill…';
+        return setRunnerState(st);
+      }
+    }).catch(function () {});
+    sendResponse({ ok: true });
+    return false;
+  }
+
   // Popup/Actualizar: leer localStorage de la pestaña AnesFact (origen correcto) → chrome.storage
   if (msg && msg.type === 'AFG_PULL_ANESFACT_FOJA') {
     pullFojaFromAnesFactTabs()
@@ -120,6 +145,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
 /** Lock para no solapar dos run111 de cola. */
 var queueRunnerBusy = false;
+
+/** Último ping del content script del iframe (paso 11 puede matar el CS al navegar). */
+var lastIframeNavProgress = null;
 
 var ANESFACT_TAB_URLS = [
   'https://diegomc77-hash.github.io/*',
@@ -833,6 +861,82 @@ async function sendToRole(tabId, role, message) {
   return await chrome.tabs.sendMessage(tabId, message, { frameId: frameId });
 }
 
+/**
+ * Como sendToRole pero con timeout + recuperación tras paso 11.
+ * Si el iframe navega al abrir la plantilla, el CS muere y nunca hay sendResponse:
+ * al ver AFG_IFRAME_NAV_PROGRESS step11_* seguimos a fill.js igual.
+ */
+async function sendToRoleWithTimeout(tabId, role, message, timeoutMs) {
+  lastIframeNavProgress = null;
+  var timeout = timeoutMs || 180000;
+  var settled = null;
+  sendToRole(tabId, role, message).then(function (r) {
+    settled = { via: 'response', res: r };
+  }).catch(function (e) {
+    settled = { via: 'error', error: String(e && e.message || e) };
+  });
+
+  var t0 = Date.now();
+  var inferredAfterStep11 = false;
+  while (Date.now() - t0 < timeout) {
+    if (settled) {
+      if (settled.via === 'response') {
+        try {
+          console.log('[AFG bg] sendToRole OK', settled.res && settled.res.step, 'ok=', settled.res && settled.res.ok);
+        } catch (e) {}
+        return settled.res;
+      }
+      var err = settled.error || '';
+      var progErr = lastIframeNavProgress;
+      try { console.warn('[AFG bg] sendToRole error', err, 'progress=', progErr && progErr.step); } catch (e2) {}
+      if (/port closed|Receiving end does not exist|message channel closed/i.test(err) ||
+          (progErr && String(progErr.step || '').indexOf('step11') === 0)) {
+        return {
+          ok: true,
+          step: 'iframe_7_11_done_inferred',
+          inferred: true,
+          reason: 'port_closed',
+          portError: err,
+          lastProgress: progErr,
+          message: 'Content script cerrado tras Seleccionar. Continúo a fill.js.'
+        };
+      }
+      return { ok: false, error: err, lastProgress: progErr };
+    }
+
+    var prog = lastIframeNavProgress;
+    // Solo AFTER click / done — no step11_before_click (aún no abrió la foja)
+    if (!inferredAfterStep11 && prog &&
+        (prog.step === 'step11_after_click' || prog.step === 'step11_done')) {
+      try {
+        console.log('[AFG bg] step11 progress visto → gracia 4s por si llega sendResponse…', prog.step);
+      } catch (e3) {}
+      await sleep(4000);
+      if (settled && settled.via === 'response') return settled.res;
+      inferredAfterStep11 = true;
+      try { console.warn('[AFG bg] sin sendResponse tras step11 → inferido OK, paso a fill'); } catch (e4) {}
+      return {
+        ok: true,
+        step: 'iframe_7_11_done_inferred',
+        inferred: true,
+        reason: 'step11_progress_no_response',
+        lastProgress: lastIframeNavProgress,
+        message: 'Paso 11 ping recibido; CS no respondió (navegación). Continúo a fill.js.'
+      };
+    }
+    await sleep(400);
+  }
+
+  return {
+    ok: false,
+    paused: true,
+    reason: 'iframe_timeout',
+    message: 'PAUSA: timeout esperando pasos 3–11. lastProgress=' +
+      ((lastIframeNavProgress && lastIframeNavProgress.step) || 'ninguno'),
+    lastProgress: lastIframeNavProgress
+  };
+}
+
 async function waitForIframeUbicacion(tabId, timeoutMs) {
   var deadline = Date.now() + (timeoutMs || 25000);
   while (Date.now() < deadline) {
@@ -965,12 +1069,16 @@ async function run111(paciente) {
     await humanDelay();
 
     // 3–11 en iframe (debugger clicks vía AFG_DEBUGGER_CLICK cuando hace falta)
-    iframeRes = await sendToRole(tabId, 'iframe', {
+    try {
+      console.log('[AFG bg] run111 → AFG_RUN_IFRAME_3_11 (con timeout / step11 recovery)');
+    } catch (e0) {}
+    iframeRes = await sendToRoleWithTimeout(tabId, 'iframe', {
       type: 'AFG_RUN_IFRAME_3_11',
       paciente: paciente
-    });
+    }, 180000);
 
     if (!(iframeRes && iframeRes.ok)) {
+      try { console.warn('[AFG bg] iframe 3–11 no OK', iframeRes); } catch (e1) {}
       return {
         ok: false,
         paused: !!(iframeRes && iframeRes.paused),
@@ -983,9 +1091,15 @@ async function run111(paciente) {
       };
     }
 
+    try {
+      console.log('[AFG bg] iframe 3–11 OK', iframeRes.step, 'inferred=', !!iframeRes.inferred,
+        '→ detach debugger y runFillOnTab');
+    } catch (e2) {}
+
     // Nav OK — soltar debugger antes de fill (barra amarilla fuera)
     await debuggerDetachSafe(tabId);
     attached = false;
+    try { console.log('[AFG bg] debugger detached, preparo fill.js'); } catch (e3) {}
 
     var token = String((paciente && paciente.token) || '').trim();
     if (!token || token.length < 32) {
@@ -1004,7 +1118,9 @@ async function run111(paciente) {
       };
     }
 
+    try { console.log('[AFG bg] → runFillOnTab tokenLen=', token.length); } catch (e4) {}
     fillRes = await runFillOnTab(tabId, token);
+    try { console.log('[AFG bg] ← runFillOnTab', fillRes); } catch (e5) {}
 
     var fillOk = !!(fillRes && fillRes.fillOk);
     return {
@@ -1048,35 +1164,81 @@ async function run111(paciente) {
   }
 }
 
-/** Espera #8054 (foja), inyecta token + fill.js empaquetado, poll __AFG_FILL_RESULT. */
-async function runFillOnTab(tabId, token) {
-  var deadline = Date.now() + 45000;
-  var fojaReady = false;
-  while (Date.now() < deadline) {
-    try {
-      var probe = await chrome.scripting.executeScript({
-        target: { tabId: tabId, allFrames: true },
-        world: 'MAIN',
-        func: function () {
-          return !!document.getElementById('8054');
-        }
-      });
-      if (probe.some(function (p) { return p.result; })) {
-        fojaReady = true;
-        break;
+/** Localiza frameId donde está #8054 (la foja suele vivir en el iframe, no en top). */
+async function findFoja8054FrameId(tabId) {
+  try {
+    var probe = await chrome.scripting.executeScript({
+      target: { tabId: tabId, allFrames: true },
+      world: 'MAIN',
+      func: function () {
+        return {
+          has8054: !!document.getElementById('8054'),
+          href: String(location.href || '').slice(0, 100),
+          isTop: window === window.top
+        };
       }
-    } catch (e) {}
+    });
+    for (var i = 0; i < probe.length; i++) {
+      var row = probe[i];
+      if (row && row.result && row.result.has8054) {
+        return {
+          frameId: row.frameId,
+          href: row.result.href,
+          isTop: !!row.result.isTop
+        };
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+/** Espera #8054 (foja), inyecta token + fill.js en ESE frame, poll __AFG_FILL_RESULT. */
+async function runFillOnTab(tabId, token) {
+  try { console.log('[AFG fill] esperando #8054 en cualquier frame…'); } catch (e0) {}
+  var deadline = Date.now() + 45000;
+  var fojaFrame = null;
+  var tick = 0;
+  while (Date.now() < deadline) {
+    fojaFrame = await findFoja8054FrameId(tabId);
+    if (fojaFrame) break;
+    tick += 1;
+    if (tick % 6 === 0) {
+      try {
+        console.log('[AFG fill] aún sin #8054…', Math.round((deadline - Date.now()) / 1000), 's; lastNav=',
+          lastIframeNavProgress && lastIframeNavProgress.step);
+      } catch (e1) {}
+    }
     await sleep(500);
   }
-  if (!fojaReady) {
-    return { fillOk: false, error: 'timeout_foja_8054', camposOk: 0 };
+  if (!fojaFrame) {
+    try { console.warn('[AFG fill] timeout_foja_8054 — plantilla no abrió la foja'); } catch (e2) {}
+    return {
+      fillOk: false,
+      error: 'timeout_foja_8054',
+      message: 'PAUSA: no apareció #8054 tras Seleccionar plantilla. ¿El click de paso 11 no abrió la foja?',
+      camposOk: 0,
+      lastProgress: lastIframeNavProgress
+    };
   }
+
+  try {
+    console.log('[AFG fill] #8054 en frameId=', fojaFrame.frameId, 'isTop=', fojaFrame.isTop, fojaFrame.href);
+  } catch (e3) {}
 
   // Dar un margen a que la plantilla termine de pintar inputs
   await sleep(1500);
 
+  var target = { tabId: tabId, frameIds: [fojaFrame.frameId] };
+  // Fallback si frameIds no aplica en alguna build
+  if (fojaFrame.frameId == null) {
+    target = { tabId: tabId, allFrames: true };
+  }
+
+  try {
+    console.log('[AFG fill] inyectando token + flags en frame foja');
+  } catch (e4) {}
   await chrome.scripting.executeScript({
-    target: { tabId: tabId, allFrames: false },
+    target: target,
     world: 'MAIN',
     func: function (tok) {
       try {
@@ -1088,35 +1250,48 @@ async function runFillOnTab(tabId, token) {
     args: [token]
   });
 
+  try { console.log('[AFG fill] inyectando vendor/fill.js'); } catch (e5) {}
   await chrome.scripting.executeScript({
-    target: { tabId: tabId, allFrames: false },
+    target: target,
     world: 'MAIN',
     files: ['vendor/fill.js']
   });
+  try { console.log('[AFG fill] fill.js inyectado — poll __AFG_FILL_RESULT'); } catch (e6) {}
 
   var pollDeadline = Date.now() + 60000;
   while (Date.now() < pollDeadline) {
     await sleep(400);
     try {
       var got = await chrome.scripting.executeScript({
-        target: { tabId: tabId, allFrames: false },
+        target: target,
         world: 'MAIN',
         func: function () {
           try { return globalThis.__AFG_FILL_RESULT || null; } catch (e) { return null; }
         }
       });
-      var r = got && got[0] && got[0].result;
-      if (!r || r.pending) continue;
+      var r = null;
+      for (var gj = 0; gj < (got || []).length; gj++) {
+        var cand = got[gj] && got[gj].result;
+        if (!cand || cand.pending) continue;
+        r = cand;
+        break;
+      }
+      if (!r) continue;
+      try { console.log('[AFG fill] resultado', r); } catch (e7) {}
       return {
         fillOk: !!r.ok,
         camposOk: r.camposOk != null ? r.camposOk : null,
         error: r.error || null,
         fechaCirugia: r.fechaCirugia || null,
-        horaInicio: r.horaInicio || null
+        horaInicio: r.horaInicio || null,
+        frameId: fojaFrame.frameId
       };
-    } catch (ePoll) {}
+    } catch (ePoll) {
+      try { console.warn('[AFG fill] poll error', ePoll && ePoll.message); } catch (e8) {}
+    }
   }
-  return { fillOk: false, error: 'timeout_fill_result', camposOk: 0 };
+  try { console.warn('[AFG fill] timeout_fill_result'); } catch (e9) {}
+  return { fillOk: false, error: 'timeout_fill_result', camposOk: 0, frameId: fojaFrame.frameId };
 }
 
 /* —— Runner de cola (pieza 3): mint → run111 (reloadedHome) → awaiting_save —— */
