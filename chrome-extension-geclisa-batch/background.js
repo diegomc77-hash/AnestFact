@@ -1383,13 +1383,24 @@ async function runQueueAction(action) {
       state: stateGate
     };
   }
-  if (queueRunnerBusy || stateGate.status === 'running') {
+  // Lock en memoria: solo bloquea si hay corrida real
+  if (queueRunnerBusy) {
     return {
       ok: false,
       error: 'runner_busy',
       message: 'Ya hay una foja en curso. Esperá o Abortar.',
-      state: stateGate
+      state: stateGate,
+      busy: true
     };
+  }
+  // status=running en storage pero busy=false = hang anterior sin finally → liberar
+  if (stateGate.status === 'running') {
+    try {
+      console.warn('[AFG runner] status=running huérfano (busy=false) → paused_error para destrabar');
+    } catch (eStale) {}
+    stateGate.status = 'paused_error';
+    stateGate.message = 'Estado running huérfano liberado. Tocá Reintentar o Iniciar cola.';
+    stateGate = await setRunnerState(stateGate);
   }
 
   var state = stateGate;
@@ -1475,97 +1486,126 @@ async function runQueueAction(action) {
   await patchQueueItemStatus(item.id, 'running', '');
 
   try {
-    console.log('[AFG runner] mint+run111', item.id, item.pac);
-  } catch (eLog) {}
+    try {
+      console.log('[AFG runner] mint+run111', item.id, item.pac);
+    } catch (eLog) {}
 
-  var mint = await mintTokenViaAnesFactBridge(item.id);
-  if (!(mint && mint.ok && mint.foja && mint.foja.token)) {
-    queueRunnerBusy = false;
-    var mintErr = (mint && (mint.error || mint.message)) || 'mint_failed';
+    var mint = await mintTokenViaAnesFactBridge(item.id);
+    if (!(mint && mint.ok && mint.foja && mint.foja.token)) {
+      var mintErr = (mint && (mint.error || mint.message)) || 'mint_failed';
+      state = await setRunnerState(Object.assign(state, {
+        status: 'paused_error',
+        message: 'Mint falló: ' + mintErr,
+        lastResult: mint
+      }));
+      await patchQueueItemStatus(item.id, 'paused_error', state.message);
+      return { ok: false, error: 'mint_failed', message: state.message, mint: mint, state: state };
+    }
+
+    state.message = 'Navegando GECLISA (reload home → 1–12)…';
+    await setRunnerState(state);
+
+    var paciente = fojaToPaciente(mint.foja) || {};
+    paciente.token = mint.foja.token;
+    paciente.intervId = String(item.id);
+    if (!paciente.sector) paciente.sector = item.sector || '';
+    if (!paciente.fechaCirugia) paciente.fechaCirugia = item.fecha || '';
+    if (!paciente.hora) paciente.hora = item.hora || '';
+
+    var resolved = await resolvePaciente(paciente);
+    if (!(resolved && resolved.ok)) {
+      state = await setRunnerState(Object.assign(state, {
+        status: 'paused_error',
+        message: (resolved && resolved.message) || 'resolvePaciente falló',
+        lastResult: resolved
+      }));
+      await patchQueueItemStatus(item.id, 'paused_error', state.message);
+      return { ok: false, error: 'resolve_failed', resolved: resolved, state: state };
+    }
+
+    var runRes = null;
+    try {
+      runRes = await run111(resolved.paciente);
+    } catch (eRun) {
+      var em = String(eRun && eRun.message || eRun);
+      var isLeave = /Abandonar el sitio|beforeunload|bloqueó el reload|¿Abandonar/i.test(em);
+      runRes = {
+        ok: false,
+        paused: true,
+        reason: isLeave ? 'beforeunload_dialog' : 'run111_exception',
+        error: em,
+        message: em
+      };
+    }
+
+    var fillOk = !!(runRes && runRes.fillOk);
+    var paused = !!(runRes && runRes.paused);
+
+    if (fillOk) {
+      state = await setRunnerState(Object.assign(state, {
+        status: 'awaiting_save',
+        message: 'Foja completada — revisá GECLISA, guardá a mano, luego Siguiente paciente',
+        lastResult: runRes,
+        currentPac: (resolved.paciente.apellido || '') + ', ' + (resolved.paciente.nombre || '')
+      }));
+      await patchQueueItemStatus(item.id, 'awaiting_save', '');
+      return {
+        ok: true,
+        awaitingSave: true,
+        userMessage: state.message,
+        run: runRes,
+        foja: mint.foja,
+        state: state
+      };
+    }
+
+    var why = (runRes && (runRes.message || runRes.error || runRes.reason)) || 'error_desconocido';
     state = await setRunnerState(Object.assign(state, {
       status: 'paused_error',
-      message: 'Mint falló: ' + mintErr,
-      lastResult: mint
+      message: paused ? ('PAUSA: ' + why) : ('Error: ' + why),
+      lastResult: runRes
     }));
     await patchQueueItemStatus(item.id, 'paused_error', state.message);
-    return { ok: false, error: 'mint_failed', message: state.message, mint: mint, state: state };
-  }
-
-  state.message = 'Navegando GECLISA (reload home → 1–12)…';
-  await setRunnerState(state);
-
-  var paciente = fojaToPaciente(mint.foja) || {};
-  paciente.token = mint.foja.token;
-  paciente.intervId = String(item.id);
-  // Completar sector/fecha/hora desde ítem de cola si mint vino corto
-  if (!paciente.sector) paciente.sector = item.sector || '';
-  if (!paciente.fechaCirugia) paciente.fechaCirugia = item.fecha || '';
-  if (!paciente.hora) paciente.hora = item.hora || '';
-
-  var resolved = await resolvePaciente(paciente);
-  if (!(resolved && resolved.ok)) {
-    queueRunnerBusy = false;
-    state = await setRunnerState(Object.assign(state, {
-      status: 'paused_error',
-      message: (resolved && resolved.message) || 'resolvePaciente falló',
-      lastResult: resolved
-    }));
-    await patchQueueItemStatus(item.id, 'paused_error', state.message);
-    return { ok: false, error: 'resolve_failed', resolved: resolved, state: state };
-  }
-
-  var runRes = null;
-  try {
-    runRes = await run111(resolved.paciente);
-  } catch (eRun) {
-    var em = String(eRun && eRun.message || eRun);
-    var isLeave = /Abandonar el sitio|beforeunload|bloqueó el reload|¿Abandonar/i.test(em);
-    runRes = {
-      ok: false,
-      paused: true,
-      reason: isLeave ? 'beforeunload_dialog' : 'run111_exception',
-      error: em,
-      message: em
-    };
-  }
-
-  queueRunnerBusy = false;
-
-  var fillOk = !!(runRes && runRes.fillOk);
-  var paused = !!(runRes && runRes.paused);
-  var navOk = !!(runRes && (runRes.ok || runRes.phase === 'done_1_12' || runRes.phase === 'nav_ok_fill_skipped'));
-
-  if (fillOk) {
-    state = await setRunnerState(Object.assign(state, {
-      status: 'awaiting_save',
-      message: 'Foja completada — revisá GECLISA, guardá a mano, luego Siguiente paciente',
-      lastResult: runRes,
-      currentPac: (resolved.paciente.apellido || '') + ', ' + (resolved.paciente.nombre || '')
-    }));
-    await patchQueueItemStatus(item.id, 'awaiting_save', '');
     return {
-      ok: true,
-      awaitingSave: true,
-      userMessage: state.message,
+      ok: false,
+      paused: paused,
+      error: why,
+      message: state.message,
       run: runRes,
-      foja: mint.foja,
       state: state
     };
+  } catch (eFatal) {
+    var fatalMsg = String(eFatal && eFatal.message || eFatal);
+    try { console.error('[AFG runner] fatal', fatalMsg); } catch (eF) {}
+    state = await setRunnerState(Object.assign(state, {
+      status: 'paused_error',
+      message: 'Runner interrumpido: ' + fatalMsg,
+      lastResult: { error: fatalMsg }
+    }));
+    try {
+      await patchQueueItemStatus(item.id, 'paused_error', state.message);
+    } catch (eP) {}
+    return {
+      ok: false,
+      error: 'runner_fatal',
+      message: state.message,
+      state: state
+    };
+  } finally {
+    // Punto 1: el lock SIEMPRE se libera, aunque run111 cuelgue y luego rejectee/throw
+    queueRunnerBusy = false;
+    try {
+      var stFin = await getRunnerState();
+      if (stFin && stFin.status === 'running') {
+        stFin.status = 'paused_error';
+        stFin.message = (stFin.message || '') +
+          (stFin.message ? ' · ' : '') +
+          'Lock liberado (finally). Reintentar o Abortar.';
+        await setRunnerState(stFin);
+        try {
+          console.warn('[AFG runner] finally: status seguía running → paused_error');
+        } catch (eW) {}
+      }
+    } catch (eFinally) {}
   }
-
-  var why = (runRes && (runRes.message || runRes.error || runRes.reason)) || 'error_desconocido';
-  state = await setRunnerState(Object.assign(state, {
-    status: 'paused_error',
-    message: paused ? ('PAUSA: ' + why) : ('Error: ' + why),
-    lastResult: runRes
-  }));
-  await patchQueueItemStatus(item.id, 'paused_error', state.message);
-  return {
-    ok: false,
-    paused: paused,
-    error: why,
-    message: state.message,
-    run: runRes,
-    state: state
-  };
 }

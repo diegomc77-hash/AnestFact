@@ -206,6 +206,53 @@ function afGeclisaQueueClearDone() {
   return { ok: true };
 }
 
+/** Vacía toda la cola (pendientes + done). Útil tras pruebas. */
+function afGeclisaQueueClearAll() {
+  afGeclisaQueueSave(afGeclisaQueueEmpty());
+  return { ok: true };
+}
+
+function afGeclisaQueueClearAllUi(ev) {
+  if (ev) { try { ev.stopPropagation(); ev.preventDefault(); } catch (e) {} }
+  var n = afGeclisaQueueGetItems().length;
+  if (!n) {
+    toast('La cola ya está vacía');
+    return false;
+  }
+  if (!confirm('¿Vaciar toda la cola GECLISA (' + n + ' ítem' + (n !== 1 ? 's' : '') + ')?')) {
+    return false;
+  }
+  afGeclisaQueueClearAll();
+  renderGeclisaQueuePanel();
+  if (typeof renderHome === 'function') renderHome();
+  toast('Cola GECLISA vaciada');
+  return false;
+}
+
+/**
+ * El host puede faltar si el SW sirvió un home.html viejo (sin #geclisa-queue-panel).
+ * En ese caso lo inyectamos delante de #inter-list.
+ */
+function ensureGeclisaQueuePanelEl() {
+  var el = document.getElementById('geclisa-queue-panel');
+  if (el) return el;
+  var home = document.getElementById('view-home');
+  if (!home) return null;
+  el = document.createElement('div');
+  el.id = 'geclisa-queue-panel';
+  el.style.display = 'none';
+  var list = document.getElementById('inter-list');
+  if (list && list.parentNode === home) {
+    home.insertBefore(el, list);
+  } else {
+    home.appendChild(el);
+  }
+  try {
+    console.warn('[AFG cola] #geclisa-queue-panel faltaba (HTML cacheado?) → inyectado');
+  } catch (eW) {}
+  return el;
+}
+
 function afGeclisaQueuePendingCount() {
   return afGeclisaQueueGetItems().filter(function (it) {
     return it.status !== 'done';
@@ -319,72 +366,80 @@ function afGeclisaQueueRemoveUi(intervId, ev) {
 }
 
 function renderGeclisaQueuePanel() {
-  var el = document.getElementById('geclisa-queue-panel');
-  if (!el) return;
-
-  var env = afGeclisaQueueLoad();
-  env = afGeclisaQueueRefreshFromIntervs(env);
-  // Persistir refresh de datos sin bumpear si no cambió status — save sí bumpea version (OK para bridge)
   try {
-    localStorage.setItem(AFG_QUEUE_KEY, JSON.stringify({
-      version: env.version,
-      updatedAt: env.updatedAt,
-      items: env.items
-    }));
-  } catch (e) {}
+    var el = ensureGeclisaQueuePanelEl();
+    if (!el) return;
 
-  var pending = env.items.filter(function (it) { return it.status !== 'done'; });
-  if (!pending.length && !env.items.length) {
-    el.style.display = 'none';
-    el.innerHTML = '';
-    return;
-  }
+    var env = afGeclisaQueueLoad();
+    env = afGeclisaQueueRefreshFromIntervs(env);
+    // Persistir refresh de datos sin bumpear si no cambió status — save sí bumpea version (OK para bridge)
+    try {
+      localStorage.setItem(AFG_QUEUE_KEY, JSON.stringify({
+        version: env.version,
+        updatedAt: env.updatedAt,
+        items: env.items
+      }));
+    } catch (e) {}
 
-  // Mostrar panel si hay pendientes o done recientes
-  var show = pending.length ? pending : env.items.slice(-5);
-  el.style.display = 'block';
-
-  var html = '<div class="card" style="margin-bottom:12px;padding:12px 14px;border-color:rgba(56,139,253,.4);background:rgba(56,139,253,.06)">';
-  html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">';
-  html += '<div class="ct" style="margin:0;color:var(--blue)">Cola GECLISA Mayo</div>';
-  html += '<div style="font-size:12px;color:var(--text2)">' + pending.length + ' pendiente' + (pending.length !== 1 ? 's' : '') + '</div>';
-  html += '</div>';
-  if (!pending.length) {
-    html += '<div style="font-size:12px;color:var(--text3);margin-bottom:8px">Sin pendientes. Las fojas Mayo se agregan con “Agregar a cola” o el chip en la lista.</div>';
-  }
-  html += '<div style="display:flex;flex-direction:column;gap:6px">';
-
-  show.forEach(function (it, idx) {
-    var stColor = it.status === 'paused_error' ? 'var(--red)'
-      : it.status === 'awaiting_save' ? '#e6a800'
-      : it.status === 'running' ? 'var(--blue)'
-      : it.status === 'done' ? 'var(--green,#1DB954)' : 'var(--text2)';
-    var fechaTxt = (typeof fmt === 'function' ? fmt(it.fecha) : it.fecha) || '—';
-    html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.18);font-size:12px">';
-    html += '<div style="color:var(--text3);width:18px;flex-shrink:0">' + (idx + 1) + '</div>';
-    html += '<div style="flex:1;min-width:0">';
-    html += '<div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (it.pac || 'Sin nombre') + '</div>';
-    html += '<div style="color:var(--text3);margin-top:2px">' + fechaTxt + (it.hora ? (' · ' + it.hora) : '') + (it.sector ? (' · ' + it.sector) : '') + '</div>';
-    if (it.message) {
-      html += '<div style="color:var(--red);margin-top:2px;font-size:11px">' + String(it.message).slice(0, 120) + '</div>';
+    var pending = env.items.filter(function (it) { return it.status !== 'done'; });
+    if (!pending.length && !env.items.length) {
+      el.style.display = 'none';
+      el.innerHTML = '';
+      return;
     }
-    html += '</div>';
-    html += '<span style="font-size:10px;font-weight:700;color:' + stColor + ';flex-shrink:0">' + afGeclisaQueueStatusLabel(it.status) + '</span>';
-    if (it.status !== 'done' && it.status !== 'running') {
-      html += '<button type="button" class="btn btn-s" style="width:auto;padding:4px 8px;font-size:11px" title="Subir" onclick="afGeclisaQueueMoveUi(\'' + it.id + '\',-1,event)">↑</button>';
-      html += '<button type="button" class="btn btn-s" style="width:auto;padding:4px 8px;font-size:11px" title="Bajar" onclick="afGeclisaQueueMoveUi(\'' + it.id + '\',1,event)">↓</button>';
-      html += '<button type="button" class="btn btn-s" style="width:auto;padding:4px 8px;font-size:11px" title="Quitar" onclick="afGeclisaQueueRemoveUi(\'' + it.id + '\',event)">✕</button>';
-    }
-    html += '</div>';
-  });
 
-  html += '</div>';
-  html += '<p style="font-size:11px;color:var(--text3);margin:10px 0 0;line-height:1.4">';
-  html += 'Sin token al encolar. Abrí el popup de la extensión → <b>Iniciar cola</b> (mint + nav + fill; vos guardás; Siguiente).';
-  html += '</p>';
-  if (env.items.some(function (x) { return x.status === 'done'; })) {
-    html += '<button type="button" class="btn btn-s" style="width:100%;margin-top:8px;font-size:12px" onclick="afGeclisaQueueClearDone();renderGeclisaQueuePanel();renderHome();">Limpiar completadas</button>';
+    // Mostrar panel si hay pendientes o done recientes
+    var show = pending.length ? pending : env.items.slice(-5);
+    el.style.display = 'block';
+
+    var html = '<div class="card" style="margin-bottom:12px;padding:12px 14px;border-color:rgba(56,139,253,.4);background:rgba(56,139,253,.06)">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">';
+    html += '<div class="ct" style="margin:0;color:var(--blue)">Cola GECLISA Mayo</div>';
+    html += '<div style="font-size:12px;color:var(--text2)">' + pending.length + ' pendiente' + (pending.length !== 1 ? 's' : '') + '</div>';
+    html += '</div>';
+    if (!pending.length) {
+      html += '<div style="font-size:12px;color:var(--text3);margin-bottom:8px">Sin pendientes. Las fojas Mayo se agregan con “Agregar a cola” o el chip en la lista.</div>';
+    }
+    html += '<div style="display:flex;flex-direction:column;gap:6px">';
+
+    show.forEach(function (it, idx) {
+      var stColor = it.status === 'paused_error' ? 'var(--red)'
+        : it.status === 'awaiting_save' ? '#e6a800'
+        : it.status === 'running' ? 'var(--blue)'
+        : it.status === 'done' ? 'var(--green,#1DB954)' : 'var(--text2)';
+      var fechaTxt = (typeof fmt === 'function' ? fmt(it.fecha) : it.fecha) || '—';
+      var safeId = String(it.id || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.18);font-size:12px">';
+      html += '<div style="color:var(--text3);width:18px;flex-shrink:0">' + (idx + 1) + '</div>';
+      html += '<div style="flex:1;min-width:0">';
+      html += '<div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (it.pac || 'Sin nombre') + '</div>';
+      html += '<div style="color:var(--text3);margin-top:2px">' + fechaTxt + (it.hora ? (' · ' + it.hora) : '') + (it.sector ? (' · ' + it.sector) : '') + '</div>';
+      if (it.message) {
+        html += '<div style="color:var(--red);margin-top:2px;font-size:11px">' + String(it.message).slice(0, 120) + '</div>';
+      }
+      html += '</div>';
+      html += '<span style="font-size:10px;font-weight:700;color:' + stColor + ';flex-shrink:0">' + afGeclisaQueueStatusLabel(it.status) + '</span>';
+      if (it.status !== 'done' && it.status !== 'running') {
+        html += '<button type="button" class="btn btn-s" style="width:auto;padding:4px 8px;font-size:11px" title="Subir" onclick="afGeclisaQueueMoveUi(\'' + safeId + '\',-1,event)">↑</button>';
+        html += '<button type="button" class="btn btn-s" style="width:auto;padding:4px 8px;font-size:11px" title="Bajar" onclick="afGeclisaQueueMoveUi(\'' + safeId + '\',1,event)">↓</button>';
+        html += '<button type="button" class="btn btn-s" style="width:auto;padding:4px 8px;font-size:11px" title="Quitar" onclick="afGeclisaQueueRemoveUi(\'' + safeId + '\',event)">✕</button>';
+      }
+      html += '</div>';
+    });
+
+    html += '</div>';
+    html += '<p style="font-size:11px;color:var(--text3);margin:10px 0 0;line-height:1.4">';
+    html += 'Sin token al encolar. Abrí el popup de la extensión → <b>Iniciar cola</b> (mint + nav + fill; vos guardás; Siguiente).';
+    html += '</p>';
+    html += '<div style="display:flex;gap:8px;margin-top:8px">';
+    if (env.items.some(function (x) { return x.status === 'done'; })) {
+      html += '<button type="button" class="btn btn-s" style="flex:1;font-size:12px" onclick="afGeclisaQueueClearDone();renderGeclisaQueuePanel();renderHome();">Limpiar completadas</button>';
+    }
+    html += '<button type="button" class="btn btn-s" style="flex:1;font-size:12px;color:var(--red);border-color:rgba(248,81,73,.45)" onclick="afGeclisaQueueClearAllUi(event)">Vaciar cola</button>';
+    html += '</div>';
+    html += '</div>';
+    el.innerHTML = html;
+  } catch (eRender) {
+    try { console.error('[AFG cola] renderGeclisaQueuePanel', eRender); } catch (eC) {}
   }
-  html += '</div>';
-  el.innerHTML = html;
 }
