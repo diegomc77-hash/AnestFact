@@ -19,7 +19,8 @@ function renderResumen(){
     +pracsHtml+modsHtml
     +'<div class="brow" style="margin-bottom:8px"><button class="btn btn-s" onclick="go(\'foja\')">📋 Foja</button>'+(i.san&&i.san.includes('Mayo')?'<button class="btn btn-b" onclick="go(\'geclisa\')">🏥 GECLISA</button>':'')+'</div>'
     +'<button class="btn btn-g" style="margin-bottom:8px" onclick="copiarTodo()">📋 Copiar resumen</button>'
-    +'<button class="btn btn-s" style="margin-bottom:24px" onclick="marcarEnviado()">✅ Marcar enviado</button>';
+    +'<button class="btn btn-s" style="margin-bottom:8px" onclick="marcarEnviado()">✅ Marcar enviado</button>'
+    +'<button class="btn btn-s" style="margin-bottom:24px;color:var(--red);border-color:rgba(248,81,73,.45)" onclick="borrarIntervencion(S.cur&&S.cur.id)">🗑 Borrar foja</button>';
 }
 function toggleChk(id){var b=document.getElementById(id);if(!b)return;var d=b.classList.contains('checked');b.classList.toggle('checked',!d);b.textContent=d?'':'✓';}
 function calcMods(i){
@@ -40,8 +41,22 @@ function copiarTodo(){
   copyVal(txt,'Resumen');
 }
 function marcarEnviado(){
-  if(!S.cur)return;S.cur.estado='enviado';
+  if(!S.cur)return;
+  var dest=(typeof afDestinoEnviadoPorSan==='function')?afDestinoEnviadoPorSan(S.cur):null;
+  if(!dest){
+    // Sanatorio no Mayo/Aero: pedir confirmación y dejar genérico legado solo si hace falta
+    if(!confirm('Sanatorio no es Mayo ni Aeronáutico.\n¿Marcar como Enviado genérico?'))return;
+    S.cur.estado='enviado';
+  }else{
+    S.cur.estado=dest;
+    S.cur.enviadoDestino=dest==='enviado_geclisa'?'geclisa':'evweb';
+  }
+  S.cur.enviadoAt=new Date().toISOString();
+  S.cur.enviadoVia='manual_resumen';
   var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});if(idx>=0)S.intervs[idx]=S.cur;
-  saveIntervsToStorage();toast('Marcado como enviado ✓✓');setTimeout(function(){go('home');},1400);
+  saveIntervsToStorage();
+  var msg=dest==='enviado_geclisa'?'Marcada Enviado a GECLISA ✓✓'
+    :(dest==='enviado_evweb'?'Marcada Enviado a evweb ✓✓':'Marcado como enviado ✓✓');
+  toast(msg);setTimeout(function(){go('home');},1400);
 }
 

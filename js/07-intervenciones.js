@@ -25,6 +25,81 @@ function filterIntervs(list){
     return blob.indexOf(q)>=0;
   });
 }
+function afSanatorioCssClass(san){
+  var s=String(san||'').toLowerCase();
+  if(s.indexOf('mayo')>=0)return 'inter-san-mayo';
+  if(s.indexOf('aero')>=0||s.indexOf('aeron')>=0)return 'inter-san-aero';
+  if(s.trim())return 'inter-san-otro';
+  return '';
+}
+
+function afDestinoEnviadoPorSan(i){
+  var s=String((i&&i.san)||'').toLowerCase();
+  if(s.indexOf('mayo')>=0)return 'enviado_geclisa';
+  if(s.indexOf('aero')>=0||s.indexOf('aeron')>=0)return 'enviado_evweb';
+  return null;
+}
+
+/**
+ * Migra estado legado "enviado" → enviado_geclisa / enviado_evweb.
+ * No migra DNI inválidos (prueba) ni ids en la lista de skip.
+ */
+function afMigrateEnviadoLegado(){
+  var SKIP_IDS={'1782999661173':true}; // Gracias Juan — no migrar
+  var changed=0;
+  var list=S.intervs||[];
+  for(var i=0;i<list.length;i++){
+    var it=list[i];
+    if(!it||it.estado!=='enviado')continue;
+    if(SKIP_IDS[String(it.id)])continue;
+    if(typeof afCheckDni==='function'){
+      var chk=afCheckDni(it.dni);
+      if(!chk.ok)continue; // DNI dudoso: no migrar
+    }
+    var dest=afDestinoEnviadoPorSan(it);
+    if(!dest)continue;
+    it.estado=dest;
+    it.enviadoDestino=dest==='enviado_geclisa'?'geclisa':'evweb';
+    it.enviadoVia=it.enviadoVia||'migration_estado_legado';
+    if(!it.enviadoAt)it.enviadoAt=it._ts?new Date(it._ts).toISOString():new Date().toISOString();
+    changed++;
+  }
+  if(changed){
+    try{saveIntervsToStorage();}catch(e){}
+    try{console.log('[AFG] migrados enviado→destino:',changed);}catch(e2){}
+  }
+  return changed;
+}
+
+function borrarIntervencion(intervId,ev){
+  if(ev){try{ev.stopPropagation();ev.preventDefault();}catch(e){}}
+  var id=String(intervId||'');
+  if(!id)return false;
+  var it=null;
+  for(var i=0;i<(S.intervs||[]).length;i++){
+    if(String(S.intervs[i].id)===id){it=S.intervs[i];break;}
+  }
+  if(!it){toast('No encontré esa foja');return false;}
+  var label=(it.pac||'Sin nombre')+' · '+(typeof fmt==='function'?fmt(it.fecha):it.fecha||'—');
+  if(!confirm('¿Borrar esta intervención?\n\n'+label+'\n\nNo se puede deshacer.'))return false;
+  var wasCurrent=!!(S.cur&&String(S.cur.id)===id);
+  S.intervs=S.intervs.filter(function(x){return String(x.id)!==id;});
+  if(wasCurrent)S.cur=null;
+  if(typeof afGeclisaQueueRemove==='function'){
+    try{afGeclisaQueueRemove(id);}catch(eQ){}
+  }
+  saveIntervsToStorage();
+  if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+  toast('Foja borrada');
+  if(wasCurrent&&typeof go==='function'){
+    try{S.hist=['home'];go('home',false);}catch(eGo){}
+  }else if(typeof renderHome==='function'){
+    renderHome();
+  }
+  if(typeof renderGeclisaQueuePanel==='function')renderGeclisaQueuePanel();
+  return false;
+}
+
 function renderHome(){
   if(typeof refreshAdminPlanAlerts==='function'&&typeof isAdmin==='function'&&isAdmin()){
     refreshAdminPlanAlerts();
@@ -40,14 +115,17 @@ function renderHome(){
   var lst=document.getElementById('inter-list');
   if(!total){lst.innerHTML='<div style="text-align:center;padding:48px 16px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px">🏥</div><div>Sin intervenciones</div><div style="font-size:12px;margin-top:6px">Tocá + Nueva para empezar</div></div>';return;}
   if(!n){lst.innerHTML='<div style="text-align:center;padding:32px 16px;color:var(--text3)"><div style="font-size:14px">Ninguna foja coincide con el filtro</div><button class="btn btn-s" style="width:auto;margin-top:12px;padding:8px 14px;font-size:12px" onclick="limpiarFiltrosHome()">Limpiar filtros</button></div>';return;}
-  var EC={borrador:'#E3B341',listo:'#1DB954',enviado:'#388BFD',enviado_geclisa:'#388BFD',enviado_evweb:'#388BFD'};
+  // Estado: GECLISA azul, evweb teal (distintos a simple vista)
+  var EC={borrador:'#E3B341',listo:'#1DB954',enviado:'#388BFD',enviado_geclisa:'#388BFD',enviado_evweb:'#14B8A6'};
   var EL={borrador:'Borrador',listo:'Listo ✓',enviado:'Enviado ✓✓',enviado_geclisa:'Enviado a GECLISA ✓✓',enviado_evweb:'Enviado a evweb ✓✓'};
   var html='';
   filtradas.slice().reverse().forEach(function(x){
     var c=EC[x.estado]||'#8B949E';var icon=x.san&&x.san.includes('Mayo')?'🏥':x.san&&x.san.includes('Aero')?'✈️':'🏨';
     var esMayo=typeof afIsMayoInterv==='function'?afIsMayoInterv(x):(x.san&&x.san.indexOf('Mayo')>=0);
     var inCola=typeof afGeclisaQueueIsQueued==='function'&&afGeclisaQueueIsQueued(x.id);
-    html+='<div class="inter" onclick="abrirInter(\''+x.id+'\')">'
+    var sanCls=afSanatorioCssClass(x.san);
+    var safeId=String(x.id||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    html+='<div class="inter '+(sanCls||'')+'" onclick="abrirInter(\''+safeId+'\')">'
       +'<div style="width:10px;height:10px;border-radius:50%;background:'+c+';flex-shrink:0"></div>'
       +'<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(x.pac||'Sin nombre')+'</div>'
       +'<div style="font-size:12px;color:var(--text2);margin-top:2px">'+fmt(x.fecha)+' · '+icon+' '+(x.san||'—')+(x.dni?' · DNI '+x.dni:'')+'</div>'
@@ -55,13 +133,16 @@ function renderHome(){
       +'</div>'
       +(esMayo
         ?('<button type="button" class="badge" title="'+(inCola?'Sacar de cola GECLISA':'Agregar a cola GECLISA')+'" '
-          +'onclick="afToggleColaGeclisa(\''+x.id+'\',event)" '
+          +'onclick="afToggleColaGeclisa(\''+safeId+'\',event)" '
           +'style="border:1px solid '+(inCola?'rgba(56,139,253,.6)':'rgba(139,148,158,.4)')+';'
           +'background:'+(inCola?'rgba(56,139,253,.22)':'transparent')+';'
           +'color:'+(inCola?'var(--blue)':'var(--text3)')+';cursor:pointer;font-size:10px;flex-shrink:0">'
           +(inCola?'Cola ✓':'Cola')+'</button>')
         :'')
-      +'<span class="badge" style="background:'+c+'22;color:'+c+'">'+(EL[x.estado]||'Borrador')+'</span></div>';
+      +'<span class="badge" style="background:'+c+'22;color:'+c+'">'+(EL[x.estado]||'Borrador')+'</span>'
+      +'<button type="button" class="badge" title="Borrar foja" onclick="borrarIntervencion(\''+safeId+'\',event)" '
+      +'style="border:1px solid rgba(248,81,73,.45);background:transparent;color:var(--red);cursor:pointer;font-size:10px;flex-shrink:0">Borrar</button>'
+      +'</div>';
   });
   lst.innerHTML=html;
 }

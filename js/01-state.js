@@ -27,6 +27,10 @@ function loadIntervsFromStorage(){
       }
     }catch(e2){}
   }
+  // Estado legado "enviado" → destino (Mayo/Aero); saltea Gracias Juan / DNI inválido
+  try{
+    if(typeof afMigrateEnviadoLegado==='function')afMigrateEnviadoLegado();
+  }catch(eMig){}
 }
 function saveIntervsToStorage(){
   localStorage.setItem(afIntervsKey(),JSON.stringify(S.intervs||[]));
