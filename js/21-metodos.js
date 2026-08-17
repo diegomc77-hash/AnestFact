@@ -339,6 +339,7 @@ function _sugerirDrogasPorTec(tec){
   if(tipoTec==='sedacion'){
     if(!sub){sugerirDrogas('');return;}
     sugerirDrogas('sedacion');
+    setTimeout(autoPremedRegional,100);
     return;
   }
   if(tipoTec==='local'){

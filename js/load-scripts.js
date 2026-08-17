@@ -49,7 +49,7 @@
     'js/24-sw-register.js'
   ];
 
-  var CACHE_V = '12.12';
+  var CACHE_V = '12.13';
 
   function loadNext(i) {
     if (i >= SCRIPTS.length) return;

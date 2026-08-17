@@ -87,8 +87,8 @@ function calcPremed(silencioso){
   if(!peso||peso<=0){if(!silencioso)alert('Ingresá el peso del paciente primero (premed). El ATB ya se sugirió.');return;}
 
   var esGeneral=tecTipo==='general';
-  var esRegional=tecTipo==='neuroaxial'||tecTipo==='bloqueo'||tecTipo==='local';
-  var esSedacion=/sedaci/i.test(tecTipo);
+  // Sedación/CAM: misma premed que regional/raquídea (sin frase "a demanda")
+  var esRegional=tecTipo==='neuroaxial'||tecTipo==='bloqueo'||tecTipo==='local'||/sedaci/i.test(tecTipo);
   var rnd=_premedRnd;
   var midazFull=rnd(0.03*peso,2);
   var midazLow=rnd(0.02*peso,2);
@@ -119,12 +119,6 @@ function calcPremed(silencioso){
     if(reflujo)lineas.push('Ranitidina '+rani+'mg EV');
     extras.push('Atropina '+atro+'mg EV');
     extras.push('Ondansetrón '+ondan+'mg EV');
-  }else if(esSedacion){
-    lineas.push('Ondansetrón '+ondan+'mg EV');
-    lineas.push('Sedación: a demanda intraoperatoria');
-    if(ondan===4)alerta+='Ondansetrón limitado a techo 4mg. ';
-    extras.push('Midazolam '+midazLow+'mg EV');
-    extras.push('Dexametasona 8mg EV');
   }else{
     lineas.push('Midazolam '+midazFull+'mg EV');
     lineas.push('Ondansetrón '+ondan+'mg EV');
