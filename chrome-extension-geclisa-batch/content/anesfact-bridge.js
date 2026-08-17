@@ -256,7 +256,7 @@
       sendResponse({
         ok: true,
         href: location.href,
-        version: '0.5.2',
+        version: '0.5.5',
         hasBatch: !!readLocalStorageBatch(),
         hasQueue: !!readLocalStorageQueue()
       });
@@ -306,6 +306,34 @@
       sendResponse({ ok: true });
       return false;
     }
+
+    if (msg.type === 'AFG_MARK_ENVIADO_GECLISA') {
+      try {
+        window.postMessage({
+          source: 'AFG_EXT',
+          type: 'MARK_ENVIADO_GECLISA',
+          intervId: String(msg.intervId || msg.id || ''),
+          at: msg.at || new Date().toISOString(),
+          via: msg.via || 'extension'
+        }, '*');
+      } catch (eMark) {}
+      // La página responde vía CustomEvent; polling breve del resultado en window
+      var started = Date.now();
+      var check = function () {
+        var r = window.__AFG_LAST_MARK_ENVIADO;
+        if (r && String(r.intervId) === String(msg.intervId || msg.id || '') && (Date.now() - (r.atMs || 0) < 5000)) {
+          sendResponse(r);
+          return;
+        }
+        if (Date.now() - started > 2500) {
+          sendResponse({ ok: false, error: 'mark_timeout', intervId: msg.intervId });
+          return;
+        }
+        setTimeout(check, 80);
+      };
+      setTimeout(check, 60);
+      return true;
+    }
   });
 
   function tick() {
@@ -318,9 +346,9 @@
   setInterval(tick, 800);
 
   try {
-    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.5.2' }, '*');
+    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.5.5' }, '*');
   } catch (e) {}
   try {
-    console.log('[AFG bridge] 0.5.2 inyectado en', location.href);
+    console.log('[AFG bridge] 0.5.5 inyectado en', location.href);
   } catch (e2) {}
 })();

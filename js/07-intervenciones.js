@@ -40,8 +40,8 @@ function renderHome(){
   var lst=document.getElementById('inter-list');
   if(!total){lst.innerHTML='<div style="text-align:center;padding:48px 16px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px">🏥</div><div>Sin intervenciones</div><div style="font-size:12px;margin-top:6px">Tocá + Nueva para empezar</div></div>';return;}
   if(!n){lst.innerHTML='<div style="text-align:center;padding:32px 16px;color:var(--text3)"><div style="font-size:14px">Ninguna foja coincide con el filtro</div><button class="btn btn-s" style="width:auto;margin-top:12px;padding:8px 14px;font-size:12px" onclick="limpiarFiltrosHome()">Limpiar filtros</button></div>';return;}
-  var EC={borrador:'#E3B341',listo:'#1DB954',enviado:'#388BFD'};
-  var EL={borrador:'Borrador',listo:'Listo ✓',enviado:'Enviado ✓✓'};
+  var EC={borrador:'#E3B341',listo:'#1DB954',enviado:'#388BFD',enviado_geclisa:'#388BFD',enviado_evweb:'#388BFD'};
+  var EL={borrador:'Borrador',listo:'Listo ✓',enviado:'Enviado ✓✓',enviado_geclisa:'Enviado a GECLISA ✓✓',enviado_evweb:'Enviado a evweb ✓✓'};
   var html='';
   filtradas.slice().reverse().forEach(function(x){
     var c=EC[x.estado]||'#8B949E';var icon=x.san&&x.san.includes('Mayo')?'🏥':x.san&&x.san.includes('Aero')?'✈️':'🏨';

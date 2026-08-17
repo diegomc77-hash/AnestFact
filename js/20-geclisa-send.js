@@ -402,7 +402,84 @@ window.addEventListener('message', function(ev){
       }catch(ePost){}
     });
   }
+  // Tras fillOk: marcar intervención como enviada a GECLISA
+  if(d.type==='MARK_ENVIADO_GECLISA'){
+    var markRes={ok:false,error:'mark_fn_missing',intervId:d.intervId||'',atMs:Date.now()};
+    try{
+      if(typeof afMarkEnviadoGeclisa==='function'){
+        markRes=afMarkEnviadoGeclisa(d.intervId||d.id,{
+          at:d.at||null,
+          via:d.via||'extension',
+          toast:true
+        })||markRes;
+      }
+    }catch(eMark){
+      markRes={ok:false,error:String(eMark&&eMark.message||eMark),intervId:d.intervId||'',atMs:Date.now()};
+    }
+    markRes.atMs=Date.now();
+    markRes.intervId=String(d.intervId||d.id||markRes.intervId||'');
+    try{window.__AFG_LAST_MARK_ENVIADO=markRes;}catch(eW){}
+    try{console.log('[AFG] MARK_ENVIADO_GECLISA',markRes);}catch(eL){}
+  }
 });
+
+/**
+ * Marca una intervención como enviada a GECLISA (fillOk desde la extensión).
+ * estado: enviado_geclisa + enviadoAt (ISO) + enviadoVia.
+ */
+function afMarkEnviadoGeclisa(intervId, opts){
+  opts=opts||{};
+  var id=String(intervId||'').trim();
+  if(!id){
+    return{ok:false,error:'missing_intervId'};
+  }
+  if(typeof S==='undefined'||!S.intervs){
+    return{ok:false,error:'no_state',intervId:id};
+  }
+  var idx=-1;
+  for(var i=0;i<S.intervs.length;i++){
+    if(String(S.intervs[i].id)===id){idx=i;break;}
+  }
+  if(idx<0){
+    try{console.warn('[AFG] mark enviado: interv no encontrada',id);}catch(e){}
+    return{ok:false,error:'interv_not_found',intervId:id};
+  }
+  var at=opts.at||new Date().toISOString();
+  var via=opts.via||'extension';
+  var it=S.intervs[idx];
+  it.estado='enviado_geclisa';
+  it.enviadoAt=at;
+  it.enviadoVia=via;
+  it.enviadoDestino='geclisa';
+  it._ts=Date.now();
+  if(S.cur&&String(S.cur.id)===id){
+    S.cur.estado=it.estado;
+    S.cur.enviadoAt=it.enviadoAt;
+    S.cur.enviadoVia=it.enviadoVia;
+    S.cur.enviadoDestino=it.enviadoDestino;
+  }
+  if(typeof saveIntervsToStorage==='function')saveIntervsToStorage();
+  else{
+    try{
+      localStorage.setItem(
+        typeof afIntervsKey==='function'?afIntervsKey():'af_i',
+        JSON.stringify(S.intervs)
+      );
+    }catch(eS){}
+  }
+  if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+  if(opts.toast!==false&&typeof toast==='function'){
+    toast('Marcada Enviado a GECLISA ✓✓');
+  }
+  try{
+    if(typeof renderHome==='function'&&document.getElementById('view-home')&&
+       document.getElementById('view-home').classList.contains('active')){
+      renderHome();
+    }
+  }catch(eR){}
+  try{console.log('[AFG] enviado_geclisa',id,at,via);}catch(eL){}
+  return{ok:true,intervId:id,estado:'enviado_geclisa',enviadoAt:at,via:via};
+}
 
 function abrirGeclisa(){
   if(typeof checkPlan==='function'&&!checkPlan('geclisa'))return;

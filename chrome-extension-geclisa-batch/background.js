@@ -499,7 +499,8 @@ function fojaToPaciente(foja) {
     sector: String(sector || '').trim(),
     dni: foja.dni || '',
     plantilla: foja.plantilla || null,
-    token: foja.token || ''
+    token: foja.token || '',
+    intervId: foja.intervId ? String(foja.intervId) : ''
   };
 }
 
@@ -570,7 +571,8 @@ async function resolvePaciente(partial) {
     hora: partial.hora || partial.horaInicio || (fromFoja && fromFoja.hora) || '',
     sector: (partial.sector || partial.mayo_sector || (fromFoja && fromFoja.sector) || '').trim(),
     plantilla: partial.plantilla || (fromFoja && fromFoja.plantilla) || null,
-    token: (partial.token || (fromFoja && fromFoja.token) || sessionToken || '').trim()
+    token: (partial.token || (fromFoja && fromFoja.token) || sessionToken || '').trim(),
+    intervId: String(partial.intervId || partial.id || (fromFoja && fromFoja.intervId) || '').trim()
   };
   if (fromFoja) source = source || 'foja';
   else if (partial.fechaIngreso || partial.fechaCirugia || partial.fecha) source = 'payload';
@@ -666,10 +668,12 @@ async function findGeclisaTab() {
   return active || tabs[0];
 }
 
+var GECLISA_HOME_URL = 'http://sanatoriomayo.myvnc.com:84/';
+
 /**
- * Quita handlers beforeunload (propiedad + captura) en todos los frames.
- * El diálogo nativo «¿Abandonar el sitio?» igual puede aparecer si quedó otro listener;
- * en ese caso CDP Page.handleJavaScriptDialog lo acepta.
+ * Neutraliza beforeunload en todos los frames.
+ * IMPORTANTE: NUNCA llamar preventDefault() en beforeunload — en Chrome eso
+ * DISPARA el diálogo «¿Abandonar el sitio?» (bug del fix 0.5.1).
  */
 async function clearBeforeUnloadHandlers(tabId) {
   try {
@@ -686,154 +690,202 @@ async function clearBeforeUnloadHandlers(tabId) {
             set: function () { /* ignore re-assign */ }
           });
         } catch (e1) {}
+        // Captura: cortar otros listeners sin activar el prompt
         try {
           window.addEventListener('beforeunload', function (ev) {
             try {
               ev.stopImmediatePropagation();
-              if (ev.preventDefault) ev.preventDefault();
-              delete ev.returnValue;
+              // NO preventDefault — eso es lo que muestra el diálogo
+              try { delete ev.returnValue; } catch (eDel) {}
+              try { ev.returnValue = undefined; } catch (eRv) {}
             } catch (e2) {}
           }, true);
         } catch (e3) {}
+        // Burbuja tardía: si GECLISA ya hizo preventDefault/returnValue, intentar limpiar
+        try {
+          window.addEventListener('beforeunload', function (ev) {
+            try {
+              try { delete ev.returnValue; } catch (eDel2) {}
+              try { ev.returnValue = undefined; } catch (eRv2) {}
+            } catch (e4) {}
+          }, false);
+        } catch (e5) {}
         return true;
       }
     });
   } catch (eInj) {
     try { console.warn('[AFG] clearBeforeUnload inject', eInj && eInj.message); } catch (e) {}
   }
-  // También vía CDP (por si scripting no alcanza algún frame)
   try {
     await chrome.debugger.sendCommand(dbgTarget(tabId), 'Runtime.evaluate', {
       expression:
-        'try{window.onbeforeunload=null;}catch(e){};' +
-        'true',
+        'try{window.onbeforeunload=null;}catch(e){};true',
       awaitPromise: false,
       userGesture: true
     });
   } catch (eCdp) {}
 }
 
-/** Auto-acepta alert/confirm/beforeunload mientras el debugger está attached. */
-function installJsDialogAutoAccept(tabId) {
-  var accepted = 0;
-  function onEvent(source, method, params) {
-    if (!source || source.tabId !== tabId) return;
-    if (method !== 'Page.javascriptDialogOpening') return;
-    accepted += 1;
-    try {
-      console.log('[AFG] CDP auto-accept dialog', params && params.type, String((params && params.message) || '').slice(0, 80));
-    } catch (e) {}
-    chrome.debugger.sendCommand(dbgTarget(tabId), 'Page.handleJavaScriptDialog', {
-      accept: true
-    }).catch(function (err) {
-      try { console.warn('[AFG] handleJavaScriptDialog', err && err.message); } catch (e2) {}
-    });
-  }
-  chrome.debugger.onEvent.addListener(onEvent);
-  return {
-    cleanup: function () { chrome.debugger.onEvent.removeListener(onEvent); },
-    getAccepted: function () { return accepted; }
-  };
-}
-
 var RELOAD_BEFOREUNLOAD_MSG =
-  'PAUSA: Chrome bloqueó el reload con «¿Abandonar el sitio?» (foja GECLISA sin guardar). ' +
-  'Aceptá el aviso del navegador o guardá/cerrá la foja, y tocá Reintentar. ' +
+  'PAUSA: No se pudo ir a home GECLISA desde la foja anterior. ' +
+  'Si Chrome muestra «¿Abandonar el sitio?», aceptalo y tocá Reintentar. ' +
   'En uso normal: guardá antes de Siguiente paciente.';
 
 /**
- * F5 a home antes del paso 1.
- * 1) Limpia beforeunload  2) CDP acepta diálogo nativo si aparece  3) timeout → mensaje claro
+ * Espera a que la pestaña termine de cargar (tabs.onUpdated).
+ * @returns {Promise<void>}
+ */
+function waitTabComplete(tabId, timeoutMs) {
+  return new Promise(function (resolve, reject) {
+    var done = false;
+    var sawLoading = false;
+    var startedAt = Date.now();
+    var poll = null;
+
+    function cleanup() {
+      clearTimeout(timer);
+      if (poll) clearInterval(poll);
+      chrome.tabs.onUpdated.removeListener(onUpdated);
+    }
+
+    var timer = setTimeout(function () {
+      if (done) return;
+      done = true;
+      cleanup();
+      reject(new Error(RELOAD_BEFOREUNLOAD_MSG + ' (timeout esperando load tras tabs.update)'));
+    }, timeoutMs || 25000);
+
+    function finishOk() {
+      if (done) return;
+      done = true;
+      cleanup();
+      resolve();
+    }
+
+    function onUpdated(id, info) {
+      if (id !== tabId) return;
+      if (info.status === 'loading') {
+        sawLoading = true;
+        return;
+      }
+      if (info.status === 'complete' && sawLoading && Date.now() - startedAt > 200) {
+        finishOk();
+      }
+    }
+
+    chrome.tabs.onUpdated.addListener(onUpdated);
+
+    poll = setInterval(function () {
+      if (done) return;
+      chrome.tabs.get(tabId).then(function (t) {
+        if (done || !t) return;
+        if (t.status === 'complete' && sawLoading && Date.now() - startedAt > 600) {
+          finishOk();
+        }
+        // Ya en home y complete (update a misma URL a veces no dispara loading)
+        if (t.status === 'complete' && t.url &&
+            String(t.url).indexOf('sanatoriomayo.myvnc.com:84') >= 0 &&
+            /\/?$/.test(String(t.url).split('?')[0]) &&
+            Date.now() - startedAt > 2000 &&
+            !/Internado|Evoluc|redirto/i.test(String(t.url))) {
+          finishOk();
+        }
+      }).catch(function () {});
+    }, 350);
+  });
+}
+
+/**
+ * Navega a home GECLISA antes del paso 1.
+ *
+ * 0.5.4: NO usa Page.reload / Page.navigate (CDP). Esos disparan beforeunload
+ * “desde adentro”. Usa chrome.tabs.update({ url: home }) a nivel extensión.
+ * Se detacha el debugger antes para no interferir.
  */
 async function reloadToGeclisaHome(tabId) {
-  var attachedHere = false;
-  var dialogGuard = null;
+  var homeUrl = GECLISA_HOME_URL;
+  var navCount = 0;
+
+  // Soltar debugger: no queremos Page.* navegando la pestaña
   try {
+    await debuggerDetachSafe(tabId);
+  } catch (eDet) {}
+
+  await clearBeforeUnloadHandlers(tabId);
+
+  async function tabsUpdateHome(reason) {
+    navCount += 1;
+    // Cache-bust suave si ya estamos en home (fuerza reload real vía update)
+    var url = homeUrl;
     try {
-      await debuggerAttach(tabId);
-      attachedHere = true;
-    } catch (eAtt) {
-      try { console.warn('[AFG] reload: debugger attach', eAtt && eAtt.message); } catch (e) {}
-    }
-
-    if (attachedHere) {
-      try {
-        await chrome.debugger.sendCommand(dbgTarget(tabId), 'Page.enable', {});
-      } catch (ePe) {}
-      dialogGuard = installJsDialogAutoAccept(tabId);
-    }
-
-    await clearBeforeUnloadHandlers(tabId);
-
-    await new Promise(function (resolve, reject) {
-      var done = false;
-      var timer = setTimeout(function () {
-        if (done) return;
-        done = true;
-        chrome.tabs.onUpdated.removeListener(onUpdated);
-        var n = dialogGuard ? dialogGuard.getAccepted() : 0;
-        reject(new Error(
-          RELOAD_BEFOREUNLOAD_MSG +
-          (n ? ' (CDP aceptó ' + n + ' diálogo(s); igual no completó el reload.)' : '')
-        ));
-      }, 25000);
-
-      function onUpdated(id, info) {
-        if (id !== tabId || info.status !== 'complete') return;
-        if (done) return;
-        done = true;
-        clearTimeout(timer);
-        chrome.tabs.onUpdated.removeListener(onUpdated);
-        resolve();
+      var cur = await chrome.tabs.get(tabId);
+      var curUrl = (cur && cur.url) || '';
+      if (curUrl.replace(/\/?$/, '/') === homeUrl.replace(/\/?$/, '/')) {
+        url = homeUrl + (homeUrl.indexOf('?') >= 0 ? '&' : '?') + 'afg=' + Date.now();
       }
-
-      chrome.tabs.onUpdated.addListener(onUpdated);
-
-      var reloadPromise;
-      if (attachedHere) {
-        reloadPromise = chrome.debugger.sendCommand(dbgTarget(tabId), 'Page.reload', {
-          ignoreCache: false
-        });
-      } else {
-        reloadPromise = chrome.tabs.reload(tabId);
-      }
-      reloadPromise.catch(function (e) {
-        if (done) return;
-        done = true;
-        clearTimeout(timer);
-        chrome.tabs.onUpdated.removeListener(onUpdated);
-        reject(e);
-      });
-    });
-
-    // SPA: el shell puede quedar "complete" antes del menú; poll btn principal
-    var deadline = Date.now() + 35000;
-    while (Date.now() < deadline) {
-      try {
-        var probe = await chrome.scripting.executeScript({
-          target: { tabId: tabId, allFrames: false },
-          func: function () {
-            return !!document.getElementById('btn-Historias Clínicas')
-              || !!document.querySelector('[id="btn-Historias Clínicas"]');
-          }
-        });
-        if (probe[0] && probe[0].result) {
-          await sleep(1000);
-          return { ok: true, dialogsAccepted: dialogGuard ? dialogGuard.getAccepted() : 0 };
-        }
-      } catch (e) {
-        // content/scripting aún no listo post-reload
-      }
-      await sleep(400);
-    }
-    throw new Error(
-      'Tras F5 no apareció btn-Historias Clínicas. ' +
-      'Si ves «¿Abandonar el sitio?», aceptalo y Reintentar. ¿Sesión vencida?'
-    );
-  } finally {
-    if (dialogGuard) dialogGuard.cleanup();
-    // Dejar debugger attached: run111 lo reutiliza (debuggerAttach tolera already attached)
+    } catch (eU) {}
+    try {
+      console.log('[AFG] tabs.update home #' + navCount, reason || '', url);
+    } catch (eL) {}
+    return chrome.tabs.update(tabId, { url: url, active: true });
   }
+
+  // Intento 1
+  await tabsUpdateHome('initial');
+  try {
+    await waitTabComplete(tabId, 20000);
+  } catch (e1) {
+    try { console.warn('[AFG] tabs.update home intento 1 no completó → reintento', e1 && e1.message); } catch (eW) {}
+    await clearBeforeUnloadHandlers(tabId);
+    await tabsUpdateHome('retry');
+    try {
+      await waitTabComplete(tabId, 15000);
+    } catch (e2) {
+      throw new Error(
+        RELOAD_BEFOREUNLOAD_MSG +
+        ' (tabs.update x' + navCount + ' no llegó a home; URL sigue en Evolución u otra.)'
+      );
+    }
+  }
+
+  // Confirmar URL no quedó en Evolución / Internado
+  try {
+    var after = await chrome.tabs.get(tabId);
+    var au = String((after && after.url) || '');
+    if (/Evoluc|Internado|ConsultaxFecha|redirto/i.test(au) && au.indexOf('afg=') < 0) {
+      try { console.warn('[AFG] tras update seguimos en', au.slice(0, 120), '→ forzar home otra vez'); } catch (e) {}
+      await clearBeforeUnloadHandlers(tabId);
+      await tabsUpdateHome('force-leave-evolucion');
+      await waitTabComplete(tabId, 15000);
+    }
+  } catch (eChk) {}
+
+  await clearBeforeUnloadHandlers(tabId);
+
+  var deadline = Date.now() + 35000;
+  while (Date.now() < deadline) {
+    try {
+      var probe = await chrome.scripting.executeScript({
+        target: { tabId: tabId, allFrames: false },
+        func: function () {
+          return !!document.getElementById('btn-Historias Clínicas')
+            || !!document.querySelector('[id="btn-Historias Clínicas"]');
+        }
+      });
+      if (probe[0] && probe[0].result) {
+        await sleep(1000);
+        return {
+          ok: true,
+          via: 'tabs.update',
+          navigations: navCount
+        };
+      }
+    } catch (e) {}
+    await sleep(400);
+  }
+  throw new Error(
+    'Tras tabs.update a home no apareció btn-Historias Clínicas. ¿Sesión vencida?'
+  );
 }
 
 async function findFrameId(tabId, role) {
@@ -1123,6 +1175,14 @@ async function run111(paciente) {
     try { console.log('[AFG bg] ← runFillOnTab', fillRes); } catch (e5) {}
 
     var fillOk = !!(fillRes && fillRes.fillOk);
+    if (fillOk) {
+      var markId = String((paciente && (paciente.intervId || paciente.id)) || '').trim();
+      try {
+        await notifyAnesFactEnviadoGeclisa(markId, { via: 'run111_fillOk' });
+      } catch (eMark) {
+        try { console.warn('[AFG] notify enviado after fill', eMark); } catch (eM) {}
+      }
+    }
     return {
       ok: fillOk,
       paused: false,
@@ -1134,6 +1194,7 @@ async function run111(paciente) {
       fillCampos: fillRes && fillRes.camposOk,
       fillError: fillRes && fillRes.error,
       fillResult: fillRes,
+      intervId: String((paciente && (paciente.intervId || paciente.id)) || ''),
       userMessage: fillOk
         ? 'Foja completada, revisá y guardá manualmente'
         : ('Fill falló: ' + ((fillRes && fillRes.error) || 'desconocido')),
@@ -1342,6 +1403,38 @@ async function patchQueueItemStatus(intervId, status, message) {
       return;
     } catch (e) {}
   }
+}
+
+/**
+ * Tras fillOk: AnesFact marca la intervención como enviada a GECLISA (+ timestamp).
+ */
+async function notifyAnesFactEnviadoGeclisa(intervId, extra) {
+  var id = String(intervId || '').trim();
+  if (!id) {
+    try { console.warn('[AFG] mark enviado: sin intervId'); } catch (e) {}
+    return { ok: false, error: 'missing_intervId' };
+  }
+  var tabs = await findAnesFactTabs();
+  var lastErr = null;
+  for (var i = 0; i < (tabs || []).length; i++) {
+    try {
+      var res = await chrome.tabs.sendMessage(tabs[i].id, {
+        type: 'AFG_MARK_ENVIADO_GECLISA',
+        intervId: id,
+        at: (extra && extra.at) || new Date().toISOString(),
+        via: (extra && extra.via) || 'extension'
+      });
+      if (res && res.ok) {
+        try { console.log('[AFG] mark enviado_geclisa OK', id, res); } catch (eL) {}
+        return res;
+      }
+      lastErr = res || { ok: false, error: 'no_response' };
+    } catch (eTab) {
+      lastErr = { ok: false, error: String(eTab && eTab.message || eTab) };
+    }
+  }
+  try { console.warn('[AFG] mark enviado_geclisa falló', id, lastErr); } catch (eW) {}
+  return lastErr || { ok: false, error: 'no_anesfact_tab' };
 }
 
 function firstPendingQueueItem(queue, preferId) {

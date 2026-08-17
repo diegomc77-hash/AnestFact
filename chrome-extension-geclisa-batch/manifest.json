@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AnesFact GECLISA Batch (pasos 1–12)",
-  "version": "0.5.2",
-  "description": "GECLISA Mayo: runner; recovery tras paso 11 si el CS muere al abrir plantilla; fill en frame #8054.",
+  "version": "0.5.5",
+  "description": "GECLISA Mayo: al fillOk marca la foja en AnesFact como enviada a GECLISA.",
   "permissions": ["storage", "tabs", "scripting", "debugger", "clipboardRead"],
   "host_permissions": [
     "http://sanatoriomayo.myvnc.com:84/*",
