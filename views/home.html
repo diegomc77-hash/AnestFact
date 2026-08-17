@@ -26,7 +26,8 @@
   <div class="card" style="margin-bottom:12px;padding:12px 14px">
     <div class="ct" style="margin-bottom:8px">&#128269; Buscar fojas</div>
     <div class="field" style="margin-bottom:8px">
-      <input class="fi" type="search" id="home-q" placeholder="Nombre, DNI, cirujano, diagn&oacute;stico..." oninput="renderHome()" autocomplete="off">
+      <!-- Chrome ignora autocomplete=off en type=search; new-password + name raro evita sugerir mail/clave -->
+      <input class="fi" type="text" id="home-q" name="af_foja_q_not_login" placeholder="Nombre, DNI, cirujano, diagn&oacute;stico..." oninput="renderHome()" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other" role="searchbox">
     </div>
     <div class="g2" style="margin-bottom:8px">
       <select class="fi" id="home-san" onchange="renderHome()" style="font-size:13px;padding:9px 10px">

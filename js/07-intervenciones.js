@@ -3,9 +3,24 @@ function limpiarFiltrosHome(){
   ['home-san','home-estado'].forEach(function(id){var e=document.getElementById(id);if(e)e.selectedIndex=0;});
   renderHome();
 }
+/** Quita tildes para buscar "Garcia" ≈ "García". */
+function afFoldSearchText(s){
+  return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+/** Todas las palabras del query deben aparecer en el blob (cualquier orden). */
+function afMatchSearchQuery(blob,q){
+  if(!q)return true;
+  var b=afFoldSearchText(blob);
+  var tokens=afFoldSearchText(q).split(/\s+/).filter(Boolean);
+  if(!tokens.length)return true;
+  for(var i=0;i<tokens.length;i++){
+    if(b.indexOf(tokens[i])<0)return false;
+  }
+  return true;
+}
 function filterIntervs(list){
   var qEl=document.getElementById('home-q');
-  var q=(qEl&&qEl.value?qEl.value:'').trim().toLowerCase();
+  var q=(qEl&&qEl.value?qEl.value:'').trim();
   var san=(document.getElementById('home-san')||{value:''}).value;
   var est=(document.getElementById('home-estado')||{value:''}).value;
   var desde=(document.getElementById('home-desde')||{value:''}).value;
@@ -21,8 +36,8 @@ function filterIntervs(list){
     if(desde&&x.fecha&&x.fecha<desde)return false;
     if(hasta&&x.fecha&&x.fecha>hasta)return false;
     if(!q)return true;
-    var blob=((x.pac||'')+' '+(x.dni||'')+' '+(x.san||'')+' '+(x.diag||'')+' '+(x.ciru||'')+' '+(x.serv||'')).toLowerCase();
-    return blob.indexOf(q)>=0;
+    var blob=(x.pac||'')+' '+(x.dni||'')+' '+(x.san||'')+' '+(x.diag||'')+' '+(x.ciru||'')+' '+(x.serv||'');
+    return afMatchSearchQuery(blob,q);
   });
 }
 function afSanatorioCssClass(san){
