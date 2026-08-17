@@ -1,5 +1,166 @@
+var _afHomeQUserTyped=false;
+
+function afLooksLikeAutofillJunk(v){
+  v=String(v||'').trim();
+  if(!v)return false;
+  // Chrome mete el mail de la cuenta guardada en el primer text input
+  if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))return true;
+  return false;
+}
+
+function afUpdateHomeQClearBtn(){
+  var btn=document.getElementById('home-q-clear');
+  var inp=document.getElementById('home-q');
+  if(!btn||!inp)return;
+  if(String(inp.value||'').length)btn.classList.add('is-on');
+  else btn.classList.remove('is-on');
+}
+
+/** Limpia el buscador; hard=true recrea el input (única forma fiable de sacar autofill sticky). */
+function afClearHomeQ(hard){
+  _afHomeQUserTyped=false;
+  var inp=document.getElementById('home-q');
+  if(inp){
+    inp.value='';
+    try{inp.defaultValue='';}catch(e){}
+  }
+  if(hard)afMountHomeSearch(true);
+  else{
+    inp=document.getElementById('home-q');
+    if(inp){
+      inp.value='';
+      try{inp.defaultValue='';}catch(e2){}
+    }
+    afUpdateHomeQClearBtn();
+  }
+  if(typeof renderHome==='function')renderHome();
+}
+
+/**
+ * Monta el buscador de Home por JS (no en HTML estático) + form autocomplete=off
+ * + honeypots + readonly hasta foco + strip de mail autofill.
+ */
+function afMountHomeSearch(force){
+  var host=document.getElementById('home-q-mount');
+  if(!host)return;
+  if(!force&&document.getElementById('home-q')&&host.querySelector('form.af-home-q-form')){
+    afUpdateHomeQClearBtn();
+    return;
+  }
+  var keep='';
+  var old=document.getElementById('home-q');
+  if(old){
+    var ov=String(old.value||'');
+    if(ov&&!afLooksLikeAutofillJunk(ov)&&_afHomeQUserTyped)keep=ov;
+  }
+
+  host.innerHTML='';
+  var form=document.createElement('form');
+  form.className='af-home-q-form';
+  form.setAttribute('autocomplete','off');
+  form.setAttribute('autocapitalize','off');
+  form.addEventListener('submit',function(e){e.preventDefault();return false;});
+
+  // Cebos: Chrome suele llenar estos en vez del filtro real
+  function decoy(type,name,ac){
+    var d=document.createElement('input');
+    d.type=type;
+    d.name=name;
+    d.autocomplete=ac;
+    d.tabIndex=-1;
+    d.setAttribute('aria-hidden','true');
+    d.style.cssText='position:absolute;left:-10000px;top:auto;width:1px;height:1px;opacity:0;overflow:hidden';
+    return d;
+  }
+  form.appendChild(decoy('text','username','username'));
+  form.appendChild(decoy('email','email','email'));
+  form.appendChild(decoy('password','password','current-password'));
+
+  var wrap=document.createElement('div');
+  wrap.className='home-q-wrap';
+
+  var inp=document.createElement('input');
+  inp.className='fi';
+  inp.type='text';
+  inp.id='home-q';
+  // name random: sin search/query/user/email
+  inp.name='af-filtro-x7k2-'+Math.random().toString(36).slice(2,8);
+  inp.placeholder='Nombre, DNI, cirujano, diagnóstico...';
+  inp.spellcheck=false;
+  inp.setAttribute('autocapitalize','off');
+  inp.setAttribute('autocorrect','off');
+  inp.setAttribute('autocomplete','one-time-code');
+  inp.setAttribute('data-lpignore','true');
+  inp.setAttribute('data-1p-ignore','true');
+  inp.setAttribute('data-bwignore','true');
+  inp.setAttribute('data-form-type','other');
+  inp.setAttribute('inputmode','search');
+  inp.readOnly=true;
+  if(keep)inp.value=keep;
+
+  var clearBtn=document.createElement('button');
+  clearBtn.type='button';
+  clearBtn.id='home-q-clear';
+  clearBtn.className='home-q-clear';
+  clearBtn.setAttribute('aria-label','Limpiar búsqueda');
+  clearBtn.title='Limpiar';
+  clearBtn.textContent='\u00d7';
+  clearBtn.addEventListener('click',function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    afClearHomeQ(true);
+  });
+
+  inp.addEventListener('focus',function(){
+    var self=this;
+    setTimeout(function(){try{self.removeAttribute('readonly');}catch(e){}},30);
+  });
+  inp.addEventListener('input',function(){
+    _afHomeQUserTyped=true;
+    afUpdateHomeQClearBtn();
+    if(typeof renderHome==='function')renderHome();
+  });
+  inp.addEventListener('change',function(){
+    // Autofill a veces dispara change sin input
+    if(afLooksLikeAutofillJunk(this.value)&&!_afHomeQUserTyped){
+      this.value='';
+      afUpdateHomeQClearBtn();
+      if(typeof renderHome==='function')renderHome();
+      try{console.log('[AFG] home-q: stripped autofill on change');}catch(e){}
+      return;
+    }
+    afUpdateHomeQClearBtn();
+    if(typeof renderHome==='function')renderHome();
+  });
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){e.preventDefault();afClearHomeQ(true);}
+  });
+
+  wrap.appendChild(inp);
+  wrap.appendChild(clearBtn);
+  form.appendChild(wrap);
+  host.appendChild(form);
+
+  [50,150,400,900,1800].forEach(function(ms){
+    setTimeout(function(){
+      if(_afHomeQUserTyped)return;
+      var el=document.getElementById('home-q');
+      if(!el)return;
+      if(afLooksLikeAutofillJunk(el.value)){
+        el.value='';
+        try{el.defaultValue='';}catch(e){}
+        afUpdateHomeQClearBtn();
+        if(typeof renderHome==='function')renderHome();
+        try{console.log('[AFG] home-q: stripped autofill @'+ms+'ms');}catch(e2){}
+      }
+    },ms);
+  });
+  afUpdateHomeQClearBtn();
+}
+
 function limpiarFiltrosHome(){
-  ['home-q','home-desde','home-hasta'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  afClearHomeQ(true);
+  ['home-desde','home-hasta'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   ['home-san','home-estado'].forEach(function(id){var e=document.getElementById(id);if(e)e.selectedIndex=0;});
   renderHome();
 }
@@ -135,6 +296,7 @@ function borrarIntervencion(intervId,ev){
 }
 
 function renderHome(){
+  if(typeof afMountHomeSearch==='function')afMountHomeSearch(false);
   if(typeof refreshAdminPlanAlerts==='function'&&typeof isAdmin==='function'&&isAdmin()){
     refreshAdminPlanAlerts();
   }

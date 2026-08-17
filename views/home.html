@@ -25,10 +25,8 @@
   <button class="btn btn-s" style="width:100%;font-size:12px;margin-bottom:12px;background:rgba(255,180,0,.12);border-color:rgba(255,180,0,.35);color:#e6a800" onclick="go('ayuda')">&#128736; Ayuda / Reportar problema</button>
   <div class="card" style="margin-bottom:12px;padding:12px 14px">
     <div class="ct" style="margin-bottom:8px">&#128269; Buscar fojas</div>
-    <div class="field" style="margin-bottom:8px">
-      <!-- Chrome ignora autocomplete=off en type=search; new-password + name raro evita sugerir mail/clave -->
-      <input class="fi" type="text" id="home-q" name="af_foja_q_not_login" placeholder="Nombre, DNI, cirujano, diagn&oacute;stico..." oninput="renderHome()" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other" role="searchbox">
-    </div>
+    <!-- Input creado por JS (afMountHomeSearch) para romper heurística Chrome de autofill -->
+    <div id="home-q-mount" class="field" style="margin-bottom:8px"></div>
     <div class="g2" style="margin-bottom:8px">
       <select class="fi" id="home-san" onchange="renderHome()" style="font-size:13px;padding:9px 10px">
         <option value="">Todos los sanatorios</option>
