@@ -98,6 +98,48 @@ function sanitizeAfil(v){
   if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) return '';
   return s;
 }
+/** Solo dígitos del DNI (puede incluir ceros de padding GECLISA). */
+function afDniDigits(d){
+  return String(d==null?'':d).replace(/\D/g,'');
+}
+/** DNI de documento: sin ceros a la izquierda. */
+function afDniCanonical(d){
+  return afDniDigits(d).replace(/^0+/,'');
+}
+/**
+ * Valida 7–8 dígitos sobre el canónico (ignora 0 de padding).
+ * Vacío = ok. No bloquea guardado.
+ */
+function afCheckDni(d){
+  var raw=String(d==null?'':d).trim();
+  var dig=afDniDigits(raw);
+  if(!raw)return{ok:true,empty:true};
+  if(!dig){
+    return{ok:false,empty:false,message:'DNI: usá solo números (7 u 8 dígitos).'};
+  }
+  var canon=afDniCanonical(dig);
+  if(!canon){
+    return{ok:false,empty:false,message:'DNI inválido.'};
+  }
+  var n=canon.length;
+  if(n>=7&&n<=8){
+    return{ok:true,empty:false,canonical:canon,digits:dig,padded:dig.length>canon.length};
+  }
+  return{
+    ok:false,
+    empty:false,
+    canonical:canon,
+    digits:dig,
+    message:'DNI con '+n+' dígitos — un DNI argentino tiene 7 u 8. Revisá el número (no se bloqueó el guardado).'
+  };
+}
+function afWarnDniIfInvalid(d){
+  var r=afCheckDni(d);
+  if(r.ok)return r;
+  if(typeof toast==='function')toast(r.message||'DNI con formato dudoso');
+  try{console.warn('[AFG DNI]',r.message,d);}catch(e){}
+  return r;
+}
 function cargarForm(i){
   sv('f-fecha',i.fecha);sv('f-pac',i.pac);
   sv('f-edad',i.edad);sv('f-sexo',i.sexo||'');sv('f-dni',i.dni);
@@ -124,6 +166,7 @@ function guardar(extra){
     S.cur.edad=gv('f-edad');S.cur.sexo=gv('f-sexo');S.cur.dni=gv('f-dni');
     S.cur.peso=gv('f-peso');S.cur.ciru=gv('f-ciru');S.cur.serv=gv('f-serv');S.cur.diag=gv('f-diag');
     S.cur.san=gv('f-san');S.cur.mayo_sector=gv('f-mayo-sector')||'';S.cur.mayo_cama=gv('f-mayo-cama')||'';S.cur.mayo_quir=gv('f-mayo-quir')||'';S.cur.mayo_tipociru=gv('f-mayo-tipociru')||'';S.cur.mayo_posicion=gv('f-mayo-posicion')||'';S.cur.sala=gv('f-sala');S.cur.cama=gv('f-cama');
+    if(typeof afWarnDniIfInvalid==='function')afWarnDniIfInvalid(S.cur.dni);
   }
   if(document.getElementById('f-obra')){
     S.cur.obra=gv('f-obra');S.cur.afil=sanitizeAfil(gv('f-afil'));

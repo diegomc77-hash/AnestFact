@@ -11,7 +11,7 @@
     </div>
     <div class="g2">
       <div class="field"><label>DNI</label>
-        <div class="fr"><input class="fi" type="text" id="f-dni" placeholder="20123456" inputmode="numeric"><button class="mic" id="m-dni" onclick="mic('f-dni','m-dni')">&#127897;</button></div>
+        <div class="fr"><input class="fi" type="text" id="f-dni" placeholder="20123456" inputmode="numeric" maxlength="10" onblur="if(typeof afWarnDniIfInvalid==='function')afWarnDniIfInvalid(this.value)"><button class="mic" id="m-dni" onclick="mic('f-dni','m-dni')">&#127897;</button></div>
       </div>
       <div class="field"><label>Peso (kg)</label><input class="fi" type="number" id="f-peso" placeholder="70" oninput="onPesoEdadChange()"></div>
     </div>
