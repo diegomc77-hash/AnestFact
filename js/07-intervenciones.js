@@ -85,18 +85,37 @@ function borrarIntervencion(intervId,ev){
   var wasCurrent=!!(S.cur&&String(S.cur.id)===id);
   S.intervs=S.intervs.filter(function(x){return String(x.id)!==id;});
   if(wasCurrent)S.cur=null;
+  if(typeof afMarkIntervDeleted==='function')afMarkIntervDeleted(id);
   if(typeof afGeclisaQueueRemove==='function'){
     try{afGeclisaQueueRemove(id);}catch(eQ){}
   }
   saveIntervsToStorage();
-  if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
-  toast('Foja borrada');
-  if(wasCurrent&&typeof go==='function'){
-    try{S.hist=['home'];go('home',false);}catch(eGo){}
-  }else if(typeof renderHome==='function'){
-    renderHome();
+  // Cancelar debounce: el merge viejo reintroducía la foja desde la nube
+  if(typeof syncCancelPushDebounced==='function')syncCancelPushDebounced();
+  toast('Borrando y sincronizando con la nube…');
+  try{console.log('[AFG sync] delete local OK',id,'→ push inmediato');}catch(eL){}
+  var afterUi=function(){
+    if(wasCurrent&&typeof go==='function'){
+      try{S.hist=['home'];go('home',false);}catch(eGo){}
+    }else if(typeof renderHome==='function'){
+      renderHome();
+    }
+    if(typeof renderGeclisaQueuePanel==='function')renderGeclisaQueuePanel();
+  };
+  if(typeof syncPushAfterDelete==='function'){
+    syncPushAfterDelete(id).then(function(r){
+      toast('Foja borrada · nube actualizada ('+(r&&r.total!=null?r.total:'?')+' fojas)');
+      afterUi();
+    }).catch(function(e){
+      toast('Foja borrada en este equipo, pero falló el sync nube. No refresques hasta “Subir ahora”.');
+      try{console.error('[AFG sync] delete: sync falló',e);}catch(e2){}
+      afterUi();
+    });
+  }else{
+    if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+    toast('Foja borrada (sync diferido)');
+    afterUi();
   }
-  if(typeof renderGeclisaQueuePanel==='function')renderGeclisaQueuePanel();
   return false;
 }
 

@@ -174,11 +174,39 @@ function syncStatus(msg,color){
 }
 
 function intervTs(i){return i._ts||parseInt(String(i.id).replace(/\D/g,'').slice(0,13),10)||0;}
+
+/** IDs borrados (tombstones): el merge NUNCA debe resucitarlos desde la nube. */
+function afDeletedIntervsKey(){
+  return 'af_deleted_intervs'+(typeof afUserSuffix==='function'?afUserSuffix():'');
+}
+function afGetDeletedIntervsMap(){
+  try{return JSON.parse(localStorage.getItem(afDeletedIntervsKey())||'{}');}catch(e){return {};}
+}
+function afMarkIntervDeleted(id){
+  var m=afGetDeletedIntervsMap();
+  m[String(id)]=Date.now();
+  try{localStorage.setItem(afDeletedIntervsKey(),JSON.stringify(m));}catch(e){}
+  try{console.log('[AFG sync] tombstone',id,m[String(id)]);}catch(e2){}
+}
+function afFilterDeletedIntervs(list){
+  var m=afGetDeletedIntervsMap();
+  return (list||[]).filter(function(i){return i&&i.id&&!m[String(i.id)];});
+}
+
 function mergeIntervsLocalRemote(local,remote){
   var map={};
-  (local||[]).forEach(function(i){if(i&&i.id)map[i.id]=i;});
+  var deleted=afGetDeletedIntervsMap();
+  (local||[]).forEach(function(i){
+    if(!i||!i.id)return;
+    if(deleted[String(i.id)])return;
+    map[i.id]=i;
+  });
   (remote||[]).forEach(function(r){
     if(!r||!r.id)return;
+    if(deleted[String(r.id)]){
+      try{console.log('[AFG sync] merge: no resucitar borrada',r.id);}catch(e){}
+      return;
+    }
     var l=map[r.id];
     if(!l||intervTs(r)>intervTs(l))map[r.id]=r;
   });
@@ -218,7 +246,8 @@ function syncApplyMergedIntervs(merged,remoteMeta){
 function syncPrepareMergedPayload(){
   var clave=getSyncClave();
   return fetchSyncPayloadWithFallbacks(clave).then(function(remote){
-    var local=S.intervs||[];
+    var local=afFilterDeletedIntervs(S.intervs||[]);
+    S.intervs=local;
     if(!remote||!remote.intervs||!remote.intervs.length)return buildSyncPayload();
     var merged=mergeIntervsLocalRemote(local,remote.intervs);
     syncApplyMergedIntervs(merged,remote);
@@ -226,6 +255,49 @@ function syncPrepareMergedPayload(){
     data.total=data.intervs.length;
     return data;
   });
+}
+
+/**
+ * Push inmediato post-borrado: sube el listado local (sin la foja) a Supabase.
+ * No espera el debounce de 2.5s. Log explícito para diagnóstico.
+ */
+function syncPushAfterDelete(deletedId){
+  var id=String(deletedId||'');
+  function run(){
+    if(_syncBusy){
+      try{console.log('[AFG sync] push post-delete: busy, reintento…',id);}catch(e){}
+      return new Promise(function(resolve){
+        setTimeout(function(){resolve(run());},400);
+      });
+    }
+    _syncBusy=true;
+    S.intervs=afFilterDeletedIntervs(S.intervs||[]);
+    saveIntervsToStorage();
+    var data=buildSyncPayload();
+    try{
+      console.log('[AFG sync] push post-delete START',{
+        deletedId:id,
+        fojas:data.total,
+        tombstones:Object.keys(afGetDeletedIntervsMap()).length,
+        at:new Date().toISOString()
+      });
+    }catch(eL){}
+    return syncGuardarSupabase(data,false).then(function(){
+      try{
+        console.log('[AFG sync] push post-delete OK',{
+          deletedId:id,
+          fojas:data.total,
+          at:new Date().toISOString(),
+          lastPush:_lastSyncPush
+        });
+      }catch(e2){}
+      return{ok:true,deletedId:id,total:data.total};
+    }).catch(function(e){
+      try{console.error('[AFG sync] push post-delete FAIL',id,e&&e.message||e);}catch(e3){}
+      throw e;
+    }).finally(function(){_syncBusy=false;});
+  }
+  return run();
 }
 
 function syncAutoStatusUpdate(){
@@ -254,7 +326,8 @@ function mostrarCodigoScript(){var p=document.getElementById('script-code-panel'
 function copiarCodigoScript(){var ta=document.getElementById('script-code-text');if(ta){ta.select();document.execCommand('copy');toast('C\u00f3digo copiado \u2713');}}
 
 function buildSyncPayload(){
-  return{intervs:S.intervs||[],cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),key:S.key||'',guardado:new Date().toISOString(),version:'AnesFact v7',total:(S.intervs||[]).length};
+  var intervs=afFilterDeletedIntervs(S.intervs||[]);
+  return{intervs:intervs,cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),key:S.key||'',guardado:new Date().toISOString(),version:'AnesFact v7',total:intervs.length};
 }
 
 function _syncMergeMeta(data){
@@ -263,12 +336,13 @@ function _syncMergeMeta(data){
 }
 
 function aplicarSyncData(data,reemplazar,silent){
-  var nueva=(data&&data.intervs)||[];
-  if(!nueva.length){
+  var nueva=afFilterDeletedIntervs((data&&data.intervs)||[]);
+  if(!nueva.length&&!(data&&data.intervs&&data.intervs.length)){
     if(!silent){syncStatus('Backup vac\u00edo en la nube','err');toast('No hay fojas en el backup');}
     else syncAutoStatusUpdate();
     return;
   }
+  // Si la nube solo tenía fojas ya tombstoned, nueva puede quedar vacía pero es válido
   if(reemplazar){
     S.intervs=nueva.slice();
     saveIntervsToStorage();
@@ -414,6 +488,10 @@ function syncAutoPush(silent){
 function syncAutoPushDebounced(){
   clearTimeout(_syncPushTimer);
   _syncPushTimer=setTimeout(function(){syncAutoPush(true);},2500);
+}
+function syncCancelPushDebounced(){
+  clearTimeout(_syncPushTimer);
+  _syncPushTimer=null;
 }
 
 function initAutoSync(){
