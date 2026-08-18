@@ -3,7 +3,7 @@
     <div class="field" style="margin-bottom:10px">
       <label>Escala de Aldrete</label>
       <div id="aldrete-chips">
-        <select class="fi" onchange="if(this.value)setAldrete(this.value)">
+        <select class="fi" id="fj-aldrete-sel" onchange="if(this.value)setAldrete(this.value)">
           <option value="">— Puntaje Aldrete —</option>
           <option value="1">1/10</option><option value="2">2/10</option>
           <option value="3">3/10</option><option value="4">4/10</option>
@@ -13,6 +13,30 @@
         </select>
       </div>
       <input class="fi" type="text" id="fj-aldrete" placeholder="Aldrete .../10" style="margin-top:8px" readonly>
+    </div>
+    <div id="bromage-wrap" class="field" style="margin-bottom:10px;display:none">
+      <label>Escala de Bromage</label>
+      <select class="fi" id="fj-bromage-sel" onchange="setBromage(this.value)">
+        <option value="">— Bromage —</option>
+        <option value="0">Grado 0 (Nulo): Movimiento libre de pies y rodillas (100% de movilidad)</option>
+        <option value="1">Grado 1 (Parcial): Puede doblar las rodillas y mover los pies</option>
+        <option value="2">Grado 2 (Casi Total): Incapaz de doblar las rodillas, solo mueve los pies</option>
+        <option value="3">Grado 3 (Total): Incapaz de mover rodillas o pies</option>
+      </select>
+      <input class="fi" type="text" id="fj-bromage" placeholder="Bromage grado …" style="margin-top:8px" readonly>
+    </div>
+    <div id="ramsay-wrap" class="field" style="margin-bottom:10px;display:none">
+      <label>Escala de Sedación de Ramsay</label>
+      <select class="fi" id="fj-ramsay-sel" onchange="setRamsay(this.value)">
+        <option value="">— Ramsay —</option>
+        <option value="1">Nivel 1: Paciente ansioso, agitado o inquieto</option>
+        <option value="2">Nivel 2: Paciente cooperador, orientado y tranquilo</option>
+        <option value="3">Nivel 3: Paciente dormido, pero responde a órdenes verbales</option>
+        <option value="4">Nivel 4: Paciente dormido con respuesta rápida a estímulo en glabela o sonido fuerte</option>
+        <option value="5">Nivel 5: Paciente dormido con respuesta lenta al mismo estímulo físico</option>
+        <option value="6">Nivel 6: Paciente sin respuesta a ningún estímulo</option>
+      </select>
+      <input class="fi" type="text" id="fj-ramsay" placeholder="Ramsay nivel …" style="margin-top:8px" readonly>
     </div>
     <div id="recup-selects" style="margin-bottom:10px"></div>
     <div class="fr" style="align-items:flex-start">

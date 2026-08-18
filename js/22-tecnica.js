@@ -134,11 +134,71 @@ function actualizarMetodos(soloMateriales){
   }
 }
 
-// === RECUPERACIÓN ALDRETE + DESTINO ===
+// === RECUPERACIÓN ALDRETE + BROMAGE + RAMSAY + DESTINO ===
 var _aldrete='',_destino='',_destinoExtra='',_arm='',_inotrop='';
+var _bromage='',_ramsay='';
 var _antecedentes=[];
 var _viaEgreso='',_spo2='',_neuro='',_hemo='',_anal='',_ahem='';
-function setAldrete(val){_aldrete=val;var inp=document.getElementById('fj-aldrete');if(inp)inp.value='Aldrete '+val+'/10';document.querySelectorAll('#aldrete-chips .chip').forEach(function(b){b.style.background='var(--bg3)';b.style.borderColor='var(--border)';b.style.color='var(--text)';});if(event&&event.target){event.target.style.background='rgba(29,185,84,.15)';event.target.style.borderColor='var(--green)';event.target.style.color='var(--green)';}actualizarRecup();}
+
+var BROMAGE_LABELS={
+  '0':'Nulo — movimiento libre de pies y rodillas (100% movilidad)',
+  '1':'Parcial — puede doblar rodillas y mover los pies',
+  '2':'Casi total — incapaz de doblar rodillas, solo mueve los pies',
+  '3':'Total — incapaz de mover rodillas o pies'
+};
+var RAMSAY_LABELS={
+  '1':'Ansioso, agitado o inquieto',
+  '2':'Cooperador, orientado y tranquilo',
+  '3':'Dormido, responde a órdenes verbales',
+  '4':'Dormido, respuesta rápida a estímulo leve (glabela) o sonido fuerte',
+  '5':'Dormido, respuesta lenta al mismo estímulo físico',
+  '6':'Sin respuesta a ningún estímulo'
+};
+
+function setAldrete(val){
+  _aldrete=val;
+  var inp=document.getElementById('fj-aldrete');
+  if(inp)inp.value=val?'Aldrete '+val+'/10':'';
+  var sel=document.getElementById('fj-aldrete-sel');
+  if(sel&&String(sel.value)!==String(val||''))sel.value=val||'';
+  document.querySelectorAll('#aldrete-chips .chip').forEach(function(b){b.style.background='var(--bg3)';b.style.borderColor='var(--border)';b.style.color='var(--text)';});
+  if(typeof event!=='undefined'&&event&&event.target&&event.target.classList&&event.target.classList.contains('chip')){
+    event.target.style.background='rgba(29,185,84,.15)';event.target.style.borderColor='var(--green)';event.target.style.color='var(--green)';
+  }
+  actualizarRecup();
+}
+function setBromage(val,silent){
+  _bromage=val?String(val):'';
+  var inp=document.getElementById('fj-bromage');
+  if(inp)inp.value=_bromage?('Bromage grado '+_bromage+' ('+(BROMAGE_LABELS[_bromage]||'')+')'):'';
+  var sel=document.getElementById('fj-bromage-sel');
+  if(sel&&String(sel.value)!==_bromage)sel.value=_bromage;
+  if(!silent)actualizarRecup();
+}
+function setRamsay(val,silent){
+  _ramsay=val?String(val):'';
+  var inp=document.getElementById('fj-ramsay');
+  if(inp)inp.value=_ramsay?('Ramsay nivel '+_ramsay+': '+(RAMSAY_LABELS[_ramsay]||'')):'';
+  var sel=document.getElementById('fj-ramsay-sel');
+  if(sel&&String(sel.value)!==_ramsay)sel.value=_ramsay;
+  if(!silent)actualizarRecup();
+}
+/** Bromage solo neuroaxial; Ramsay solo sedacion; Aldrete siempre. */
+function updateEscalasRecupPorTecnica(silentClear){
+  var tipo=(document.getElementById('fj-tec-tipo')||{value:''}).value||'';
+  var showB=tipo==='neuroaxial';
+  var showR=tipo==='sedacion';
+  var bw=document.getElementById('bromage-wrap');
+  var rw=document.getElementById('ramsay-wrap');
+  if(bw){
+    bw.style.display=showB?'block':'none';
+    if(!showB&&_bromage)setBromage('',!!silentClear);
+  }
+  if(rw){
+    rw.style.display=showR?'block':'none';
+    if(!showR&&_ramsay)setRamsay('',!!silentClear);
+  }
+}
 function setDestino(val){_destino=val;_destinoExtra='';_arm='';_inotrop='';var extra=document.getElementById('destino-extra');var intoExtra=document.getElementById('intubado-extra');if(extra)extra.style.display=(val==='UTI'||val==='UCI')?'block':'none';if(intoExtra)intoExtra.style.display='none';actualizarRecup();}
 function setDestinoExtra(val){_destinoExtra=val;_arm='';_inotrop='';var intoExtra=document.getElementById('intubado-extra');if(intoExtra)intoExtra.style.display=(val==='intubado')?'block':'none';actualizarRecup();}
 function setARM(val){_arm=val;actualizarRecup();}
@@ -146,6 +206,8 @@ function setInotrop(val){_inotrop=val;actualizarRecup();}
 function actualizarRecup(){
   var partes=[];
   if(_aldrete)partes.push('Aldrete '+_aldrete+'/10');
+  if(_bromage)partes.push('Bromage grado '+_bromage+' ('+(BROMAGE_LABELS[_bromage]||'')+')');
+  if(_ramsay)partes.push('Ramsay nivel '+_ramsay+': '+(RAMSAY_LABELS[_ramsay]||''));
   if(_destino)partes.push('Pasa a '+_destino);
   if(_viaEgreso)partes.push(_viaEgreso);
   if(_spo2)partes.push(_spo2);
@@ -372,6 +434,7 @@ function tecNivel1(){
     if(typeof _sugerirDrogasPorTec==='function')_sugerirDrogasPorTec();
   }
   renderExamenRegional(tipo);
+  if(typeof updateEscalasRecupPorTecnica==='function')updateEscalasRecupPorTecnica();
 }
 
 function tecNivel2(){

@@ -2,7 +2,8 @@ function _fojaSv(id,v){var e=document.getElementById(id);if(!e)return;if(e.type=
 
 function resetFojaUIDom(){
   ['fj-asa','fj-via','fj-ind','fj-fin','fj-tec','fj-tec-tipo','fj-tec-subtipo','fj-examen-fisico','fj-mallampati',
-   'fj-premed','fj-metodos','fj-materiales','fj-recup','fj-obs','fj-aldrete',
+   'fj-premed','fj-metodos','fj-materiales','fj-recup','fj-obs','fj-aldrete','fj-bromage','fj-ramsay',
+   'fj-aldrete-sel','fj-bromage-sel','fj-ramsay-sel',
    'fj-suero-tipo','fj-suero','fj-sangre','fj-plasma','fj-otro','fj-obs-hemo',
    'fj-fluido1','fj-fluido2','fj-orina','fj-sangrado',
    'fj-mayo-quir','fj-posicion','fj-nivel-regional','fj-obs-geclisa',
@@ -24,6 +25,9 @@ function resetFojaUIDom(){
   S.signData=null;
   if(typeof _antecedentes!=='undefined')_antecedentes=[];
   if(typeof _aldrete!=='undefined'){_aldrete='';_destino='';_destinoExtra='';_arm='';_inotrop='';_viaEgreso='';_spo2='';_neuro='';_hemo='';_anal='';_ahem='';}
+  if(typeof _bromage!=='undefined')_bromage='';
+  if(typeof _ramsay!=='undefined')_ramsay='';
+  if(typeof updateEscalasRecupPorTecnica==='function')updateEscalasRecupPorTecnica(true);
   if(typeof _horaLinked!=='undefined')_horaLinked={hint:'',hext:'',cinicio:'',cfin:''};
   if(typeof _monUserEdited!=='undefined')_monUserEdited=false;
   if(typeof _monTecPrev!=='undefined')_monTecPrev='';
@@ -114,6 +118,14 @@ function cargarFojaUI(){
   if(typeof syncFojaHoras==='function')syncFojaHoras();
   sv('fj-premed',f.premed||'');sv('fj-atb',f.atb||'');sv('fj-metodos',f.metodos||'');sv('fj-materiales',f.materiales||'');
   sv('fj-recup',f.recup||'');sv('fj-obs',f.obs||'');sv('fj-examen-fisico',f.examenFisico||'');sv('fj-mallampati',f.mallampati||'');sv('fj-orina',f.orina||'');sv('fj-sangrado',f.sangrado||'');
+  if(typeof updateEscalasRecupPorTecnica==='function')updateEscalasRecupPorTecnica(true);
+  if(typeof setBromage==='function'&&f.bromage!=null&&f.bromage!=='')setBromage(String(f.bromage),true);
+  if(typeof setRamsay==='function'&&f.ramsay!=null&&f.ramsay!=='')setRamsay(String(f.ramsay),true);
+  if(f.aldrete!=null&&f.aldrete!==''&&typeof setAldrete==='function'){
+    try{setAldrete(String(f.aldrete));}catch(eA){}
+    // setAldrete reescribe recup: restaurar texto guardado
+    sv('fj-recup',f.recup||'');
+  }
   sv('fj-suero-tipo',_balNormalizarSueroTipo(f.suero_tipo||'')||f.suero_tipo||'');sv('fj-suero',f.suero||'');sv('fj-sangre',f.sangre||'');sv('fj-plasma',f.plasma||'');sv('fj-otro',f.otro||'');
   sv('fj-obs-hemo',f.obs_hemo||'');
   if(typeof resetObsHemoSuger==='function')resetObsHemoSuger(f.obs_hemo||'');
@@ -159,6 +171,9 @@ function guardarFoja(){guardarFojaVG();
     asa:gv('fj-asa'),via:gv('fj-via'),fin:gv('fj-fin'),tubo:gv('metodos-tubo'),
     ind:gv('fj-ind'),hint:gv('fj-hint'),hext:gv('fj-hext'),
     premed:gv('fj-premed'),atb:gv('fj-atb'),metodos:gv('fj-metodos'),recup:gv('fj-recup'),obs:gv('fj-obs'),examenFisico:gv('fj-examen-fisico'),mallampati:gv('fj-mallampati'),
+    aldrete:typeof _aldrete!=='undefined'?_aldrete:'',
+    bromage:typeof _bromage!=='undefined'?_bromage:'',
+    ramsay:typeof _ramsay!=='undefined'?_ramsay:'',
     examenAusc:typeof getExamenAuscState==='function'?getExamenAuscState():null,
     suero:gv('fj-suero'),suero_tipo:gv('fj-suero-tipo'),sangre:gv('fj-sangre'),plasma:gv('fj-plasma'),otro:gv('fj-otro'),orina:gv('fj-orina'),sangrado:gv('fj-sangrado'),
     obs_hemo:gv('fj-obs-hemo'),

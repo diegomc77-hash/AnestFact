@@ -65,6 +65,7 @@ function go(id,addH){
       if(typeof refrescarMetodosDesdeDrogas==='function')refrescarMetodosDesdeDrogas();
     }
     renderRecupSelects();
+    if(typeof updateEscalasRecupPorTecnica==='function')updateEscalasRecupPorTecnica(true);
     setTimeout(function(){if(typeof initExamenAuscUI==='function')initExamenAuscUI();},120);
     setTimeout(initSign,80);
     renderPesoChips();
