@@ -457,8 +457,13 @@ function guardar(extra){
   S.cur._ts=Date.now();
   saveIntervsToStorage();
   if(typeof maybeBumpDemoFojaOnSave==='function')maybeBumpDemoFojaOnSave();
-  // Learn cirujano
-  if(S.cur.ciru&&S.cur.ciru.trim()){var c=S.cur.ciru.trim();if(cirujanos.indexOf(c)<0){cirujanos.push(c);localStorage.setItem('af_ciru',JSON.stringify(cirujanos));}}
+  // Learn cirujano (ignorar placeholders de prueba)
+  if(S.cur.ciru&&S.cur.ciru.trim()){
+    var c=S.cur.ciru.trim();
+    if(!(typeof afIsCirujanoBasura==='function'&&afIsCirujanoBasura(c))){
+      if(cirujanos.indexOf(c)<0){cirujanos.push(c);localStorage.setItem('af_ciru',JSON.stringify(cirujanos));}
+    }
+  }
   if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
   toast('Guardado ✓');
 }

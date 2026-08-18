@@ -105,6 +105,7 @@ function acCirujano(){
   var inp=document.getElementById('f-ciru');
   var list=document.getElementById('ac-ciru');
   if(!inp||!list)return;
+  try{afPurgeCirujanosBasuraLocal();}catch(eP){}
   actualizarHintCirujano();
   var esp=(document.getElementById('f-serv')||{value:''}).value||'';
   if(!esp){list.style.display='none';return;}
