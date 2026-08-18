@@ -22,6 +22,7 @@ function _qrModalEl() {
     '<button type="button" id="qr-val-close" style="background:none;border:none;color:var(--text2);font-size:24px;cursor:pointer">&times;</button></div>' +
     '<p style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.45">Sanatorio Mayo · un solo uso · vence en 48 h. El paciente completa sin login.</p>' +
     '<div style="text-align:center;margin-bottom:14px"><img id="qr-val-img" alt="QR" width="200" height="200" style="border-radius:8px;background:#fff;padding:8px"></div>' +
+    '<p id="qr-val-img-err" style="display:none;font-size:12px;color:var(--red);text-align:center;margin:0 0 12px;line-height:1.4">No se pudo generar la imagen del QR — usá el enlace de abajo</p>' +
     '<div class="field"><label style="font-size:11px">Enlace</label><input class="fi" id="qr-val-url" readonly style="font-size:12px"></div>' +
     '<div style="display:flex;gap:8px;margin-top:12px">' +
     '<button type="button" class="btn btn-g" style="flex:1" id="qr-val-copy">Copiar enlace</button>' +
@@ -63,12 +64,17 @@ function mostrarModalQrValoracion(data) {
   _qrModalEl().style.display = 'block';
   _qr$('qr-val-url').value = url;
   var img = _qr$('qr-val-img');
+  var imgErr = _qr$('qr-val-img-err');
   function setQrSrc(dataUrl) {
     if (dataUrl) {
       img.src = dataUrl;
       img.style.display = 'inline-block';
+      if (imgErr) imgErr.style.display = 'none';
     } else {
+      img.removeAttribute('src');
       img.style.display = 'none';
+      if (imgErr) imgErr.style.display = 'block';
+      try { console.warn('[AFG] QR imagen: no se pudo generar (CDN o QRCode.toDataURL)'); } catch (e0) {}
     }
   }
   function paint() {
@@ -82,7 +88,7 @@ function mostrarModalQrValoracion(data) {
   }
   if (typeof QRCode === 'undefined' || typeof QRCode.toDataURL !== 'function') {
     var s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js';
+    s.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js';
     s.onload = paint;
     s.onerror = function () { setQrSrc(null); };
     document.head.appendChild(s);
