@@ -21,7 +21,7 @@ function actualizarHintCirujano(){
   var tieneCatalogo=Object.keys(map).length>0;
   var n=(map[esp]||[]).length;
   if(san==='Hospital Aeronáutico'&&!n){
-    hint.textContent='Aeronáutico: listado pendiente de cargar. Podés escribir el nombre a mano.';
+    hint.textContent='Aeronáutico: sin nómina para esta especialidad. Escribí a mano o avisá para completarla.';
     return;
   }
   if(!tieneCatalogo){

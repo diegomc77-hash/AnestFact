@@ -1,6 +1,6 @@
 // Cirujanos por lugar + especialidad (predictivo en Datos de la intervención).
-// Hospital Aeronáutico: pendiente de cargar (lo aporta el usuario).
-// Otras clínicas: sin catálogo fijo → solo aprendidos de intervenciones previas del mismo lugar.
+// Claves de especialidad = valores exactos de #f-serv (views/nueva.html).
+// Otras clínicas: sin catálogo fijo → solo aprendidos de intervenciones del mismo lugar.
 
 var CIRUJANOS_POR_LUGAR = {
   'Sanatorio Mayo': {
@@ -31,7 +31,69 @@ var CIRUJANOS_POR_LUGAR = {
     'Odontología': []
   },
   'Hospital Aeronáutico': {
-    // Pendiente: cargar especialistas del Aeronáutico
+    'Oftalmología': [
+      'Dra. Sonzini Emma Eugenia',
+      'Dr. Peña José',
+      'Dra. Namur Sandra',
+      'Dra. Botta Castelli Viviana',
+      'Tealdi Daniela'
+    ],
+    'ORL (Otorrinolaringología)': [
+      'Dr. Sapag Julio',
+      'Latini María Cecilia',
+      'Conci Rodolfo'
+    ],
+    'Endoscopía Digestiva': [
+      'Dr. Bernardi Gustavo',
+      'Dra. Silvestri Patricia',
+      'Flores Cintia'
+    ],
+    'Traumatología y Ortopedia': [
+      'Puertas Jorge',
+      'Olmedo Damián',
+      'Simes José',
+      'Oyola Diego',
+      'Lauret José',
+      'Lezama Luis'
+    ],
+    'Cirugía General': [
+      'Dr. Natalia Denis',
+      'Dr. Mariategui Emilio',
+      'Dr. Passadore Guido',
+      'Dr. Rusculleda Pablo',
+      'Jalil Norman'
+    ],
+    'Cirugía Vascular': [
+      'Dr. Navarro Juan Manuel',
+      'Dr. Figueroa Adolfo'
+    ],
+    'Urología': [
+      'Dr. Durany Francisco',
+      'Dr. Garay Novillo Juan Ignacio',
+      'Dr. Páez Héctor Marcelo',
+      'Revol Martín',
+      'Del Franco Monserrat'
+    ],
+    'Cirugía Torácica': [
+      'Dr. Losano Brotons Matías'
+    ],
+    'Cirugía Pediátrica': [
+      'Dr. Sferco Ariel'
+    ],
+    'Neurocirugía': [
+      'Dr. Cabanillas Juan'
+    ],
+    'Ginecología y Obstetricia': [
+      'Dr. Cueto Ecca Néstor',
+      'Dra. Gabutti Jésica',
+      'Dr. Goldsmorthi Gustavo',
+      'Dra. Folla Mónica Andrea',
+      'Dra. Barbero Soledad',
+      'Dr. Goicoechea Javier',
+      'Larrazabal Fernando',
+      'Luna Campos Sandra',
+      'Moreno María José'
+    ]
   }
 };
 

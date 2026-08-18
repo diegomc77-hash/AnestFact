@@ -9,7 +9,7 @@
   if(typeof navigator!=='undefined'&&!navigator.onLine)setOffline(true);
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){
-      navigator.serviceWorker.register('./sw.js?v=12.13').then(function(reg){
+      navigator.serviceWorker.register('./sw.js?v=12.14').then(function(reg){
         if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});
         navigator.serviceWorker.addEventListener('message',function(ev){
           if(ev.data&&ev.data.type==='OFFLINE')setOffline(true);
