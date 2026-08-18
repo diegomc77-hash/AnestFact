@@ -10,7 +10,7 @@ var AF_VALORACION_CFG = {
     fields: {
       edad: { enabled: true, required: true },
       sexo: { enabled: true, required: false },
-      historia_clinica: { enabled: true, required: true },
+      historia_clinica: { enabled: true, required: false },
       obra_social: { enabled: true, required: false },
       afiliado: { enabled: true, required: true },
       peso: { enabled: true, required: false },
@@ -18,9 +18,9 @@ var AF_VALORACION_CFG = {
       especialidad: { enabled: true, required: true },
       cirujano: { enabled: true, required: true }
     },
-    /** Campos filiatorios críticos: bloquear envío si vacíos/invalidos + confirmación explícita */
-    criticos: ['nombre', 'dni', 'historia_clinica', 'afiliado', 'edad'],
-    antecedentesChips: null, // null = usa organos-enfermedades existentes
+    /** Campos filiatorios críticos (HC opcional Mayo) */
+    criticos: ['nombre', 'dni', 'afiliado', 'edad'],
+    antecedentesChips: null,
     extras: [],
     diagSinonimos: 'mayo'
   }

@@ -4,6 +4,8 @@
   var organState = {};
   var estudiosExtraidos = {};
   var MAX_ESTUDIOS = 5;
+  var dxMedicoSugerido = null;
+  var alergiasSel = {};
 
   function $(id) { return document.getElementById(id); }
 
@@ -67,14 +69,109 @@
 
   function wireAnticoagAc() {
     var inp = $('v-anticoag-farm');
+    var dosis = $('v-anticoag-dosis');
     if (!inp || typeof ANTICOAG_COMUN === 'undefined') return;
     inp.addEventListener('input', function () {
       var q = inp.value.toLowerCase();
       if (q.length < 1) { closeAllAc(); return; }
       var hits = ANTICOAG_COMUN.filter(function (x) { return x.toLowerCase().indexOf(q) >= 0; }).slice(0, 8);
-      renderAc('ac-v-anticoag', hits, function (x) { return x; }, null, function (x) { inp.value = x; });
+      renderAc('ac-v-anticoag', hits, function (x) { return x; }, null, function (x) {
+        inp.value = x;
+        if (dosis && typeof anticoagDosesFor === 'function') {
+          var ds = anticoagDosesFor(x);
+          if (ds.length && !dosis.value) dosis.value = ds[0];
+        }
+      });
     });
     inp.addEventListener('blur', function () { setTimeout(closeAllAc, 150); });
+    if (dosis) {
+      function showDosis() {
+        if (typeof anticoagDosesFor !== 'function') return;
+        var ds = anticoagDosesFor(inp.value);
+        if (!ds.length) { closeAllAc(); return; }
+        var q = dosis.value.toLowerCase();
+        var hits = q ? ds.filter(function (d) { return d.toLowerCase().indexOf(q) >= 0; }) : ds;
+        renderAc('ac-v-anticoag-dosis', hits, function (x) { return x; }, null, function (x) { dosis.value = x; });
+      }
+      dosis.addEventListener('focus', showDosis);
+      dosis.addEventListener('input', showDosis);
+      dosis.addEventListener('blur', function () { setTimeout(closeAllAc, 150); });
+    }
+  }
+
+  function wireAlergiasChips() {
+    var box = $('v-alerg-chips');
+    var otro = $('v-alerg-otro');
+    if (!box || typeof AF_ALERGIAS_COMUNES === 'undefined') return;
+    box.innerHTML = '';
+    AF_ALERGIAS_COMUNES.concat(['Otro']).forEach(function (lab) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.textContent = lab;
+      b.setAttribute('data-al', lab);
+      b.onclick = function () {
+        if (lab === 'Ninguna') {
+          alergiasSel = { Ninguna: true };
+          box.querySelectorAll('.chip').forEach(function (c) {
+            c.classList.toggle('sel', c.getAttribute('data-al') === 'Ninguna');
+          });
+          if (otro) { otro.style.display = 'none'; otro.value = ''; }
+          return;
+        }
+        if (alergiasSel.Ninguna) delete alergiasSel.Ninguna;
+        if (alergiasSel[lab]) delete alergiasSel[lab];
+        else alergiasSel[lab] = true;
+        box.querySelectorAll('.chip').forEach(function (c) {
+          var k = c.getAttribute('data-al');
+          c.classList.toggle('sel', !!alergiasSel[k]);
+        });
+        if (otro) otro.style.display = alergiasSel.Otro ? 'block' : 'none';
+      };
+      box.appendChild(b);
+    });
+  }
+
+  function collectAlergias() {
+    var list = Object.keys(alergiasSel).filter(function (k) { return alergiasSel[k] && k !== 'Otro'; });
+    var otroTxt = ($('v-alerg-otro') && $('v-alerg-otro').value.trim()) || '';
+    if (alergiasSel.Otro && otroTxt) list.push(otroTxt);
+    return {
+      items: list,
+      texto: list.join('; ') || null,
+      sugerido: true
+    };
+  }
+
+  function collectChecked(containerId, ningunoId) {
+    var box = $(containerId);
+    if (!box) return [];
+    var out = [];
+    box.querySelectorAll('input[type=checkbox]').forEach(function (cb) {
+      if (cb.id === ningunoId) return;
+      if (cb.checked) out.push(cb.value);
+    });
+    var ning = ningunoId ? $(ningunoId) : null;
+    if (ning && ning.checked && !out.length) return ['Ninguno'];
+    return out;
+  }
+
+  function wireNingunoExclusive(containerId, ningunoId) {
+    var box = $(containerId);
+    var ning = $(ningunoId);
+    if (!box || !ning) return;
+    ning.addEventListener('change', function () {
+      if (!ning.checked) return;
+      box.querySelectorAll('input[type=checkbox]').forEach(function (cb) {
+        if (cb !== ning) cb.checked = false;
+      });
+    });
+    box.querySelectorAll('input[type=checkbox]').forEach(function (cb) {
+      if (cb === ning) return;
+      cb.addEventListener('change', function () {
+        if (cb.checked) ning.checked = false;
+      });
+    });
   }
 
   function renderOrganos() {
@@ -199,14 +296,28 @@
     wrap.innerHTML =
       '<div class="ac-wrap" style="grid-column:1/-1"><input class="fi med-n" placeholder="Nombre comercial o droga" value="' + esc(data && data.nombre) + '" autocomplete="off">' +
       '<div class="ac-list" id="ac-' + uid + '"></div></div>' +
-      '<input class="fi med-d" placeholder="Dosis (ej. 10 mg)" value="' + esc(data && data.dosis) + '">' +
+      '<div class="ac-wrap"><input class="fi med-d" placeholder="Dosis (ej. 100 mg)" value="' + esc(data && data.dosis) + '" autocomplete="off">' +
+      '<div class="ac-list" id="ac-d-' + uid + '"></div></div>' +
       '<input class="fi med-h" placeholder="Horario" value="' + esc(data && data.horario) + '">' +
       '<input class="fi med-v" placeholder="Pastilla / inyección" value="' + esc(data && data.via) + '" style="grid-column:1/-1">';
     if (data && data.nombre_comercial) {
       wrap.dataset.comercial = data.nombre_comercial;
     }
     var nInp = wrap.querySelector('.med-n');
+    var dInp = wrap.querySelector('.med-d');
     var acId = 'ac-' + uid;
+    var acD = 'ac-d-' + uid;
+    var doseOpts = (data && data.doses) || [];
+
+    function showDoses() {
+      var opts = doseOpts.length ? doseOpts : [];
+      if (!opts.length && wrap._medRef && wrap._medRef.doses) opts = wrap._medRef.doses;
+      if (!opts.length) return;
+      var q = dInp.value.toLowerCase();
+      var hits = q ? opts.filter(function (x) { return x.toLowerCase().indexOf(q) >= 0; }) : opts;
+      renderAc(acD, hits, function (x) { return x; }, null, function (x) { dInp.value = x; });
+    }
+
     nInp.addEventListener('input', function () {
       if (typeof medHabitualMatch !== 'function') return;
       var q = nInp.value;
@@ -215,12 +326,18 @@
       renderAc(acId, hits, function (d) { return medHabitualLabel(d); }, function (d) { return d.cat; }, function (d) {
         nInp.value = d.n;
         wrap.dataset.comercial = (d.comercial && d.comercial[0]) || '';
-        wrap.querySelector('.med-d').value = d.doses[0] || '';
+        wrap.dataset.sugerido = '1';
+        wrap._medRef = d;
+        doseOpts = (d.doses || []).slice();
+        dInp.value = doseOpts[0] || '';
         wrap.querySelector('.med-h').value = d.horario || '';
         wrap.querySelector('.med-v').value = d.via || 'VO';
       });
     });
     nInp.addEventListener('blur', function () { setTimeout(function () { var el = $(acId); if (el) el.style.display = 'none'; }, 150); });
+    dInp.addEventListener('focus', showDoses);
+    dInp.addEventListener('input', showDoses);
+    dInp.addEventListener('blur', function () { setTimeout(function () { var el = $(acD); if (el) el.style.display = 'none'; }, 150); });
     return wrap;
   }
 
@@ -236,6 +353,7 @@
         dosis: r.querySelector('.med-d').value.trim(),
         horario: r.querySelector('.med-h').value.trim(),
         via: r.querySelector('.med-v').value.trim(),
+        sugerido: r.dataset.sugerido === '1'
       });
     });
     return out;
@@ -441,12 +559,16 @@
     var cfg = afValoracionCfg(SANATORIO);
     var nombre = $('v-nombre').value.trim();
     var dni = $('v-dni').value.trim();
-    var dx = $('v-dx').value.trim();
+    var dxPaciente = $('v-dx').value.trim();
+    var mapped = dxMedicoSugerido || (typeof afDiagMapearMedicoMayo === 'function' ? afDiagMapearMedicoMayo(dxPaciente) : null);
+    var al = collectAlergias();
+    var protesis = collectChecked('v-protesis-dental', 'v-protesis-ninguno');
+    var cuello = collectChecked('v-cuello', 'v-cuello-ninguno');
     return {
       token: TOKEN,
       nombre: nombre,
       dni: dni,
-      diagnostico_cirugia: dx,
+      diagnostico_cirugia: dxPaciente,
       motivo_valoracion: $('v-motivo').value,
       fecha_cirugia_programada: $('v-fecha-cx').value || null,
       datos_basicos: {
@@ -470,8 +592,11 @@
         anticoag: {
           farmaco: $('v-anticoag-farm').value.trim() || null,
           ultima_dosis: $('v-anticoag-dosis').value.trim() || null,
+          sugerido: true
         },
-        alergias: $('v-alergias').value.trim() || null,
+        alergias: al.texto,
+        alergias_items: al.items,
+        alergias_sugerido: true
       },
       medicacion: collectMeds(),
       antec_anestesicos: {
@@ -490,13 +615,17 @@
         funcional_escaleras: $('v-func-escalera').checked,
         tabaco: $('v-tabaco').value.trim() || null,
         alcohol: $('v-alcohol').value.trim() || null,
-        protesis_cuello: $('v-protesis').value.trim() || null,
+        protesis_dental: protesis,
+        antecedentes_cuello: cuello,
         mcp_dai: $('v-mcp').value.trim() || null,
         fiebre_infeccion: $('v-fiebre').value.trim() || null,
         tvp_viaje: $('v-tvp').value.trim() || null,
         sanatorio: SANATORIO,
         cfg_id: cfg.id,
-        etiqueta_lista: nombre + ' · DNI ' + maskDni(dni) + ' · ' + (dx || 'Sin diagnóstico')
+        diagnostico_paciente: dxPaciente,
+        diagnostico_medico_sugerido: mapped || null,
+        diagnostico_sugerido: !!mapped,
+        etiqueta_lista: nombre + ' · DNI ' + maskDni(dni) + ' · ' + (dxPaciente || 'Sin diagnóstico')
       },
     };
   }
@@ -511,13 +640,12 @@
     return String(d == null ? '' : d).replace(/\D/g, '').replace(/^0+/, '') || '';
   }
 
-  /** Validación fuerte de campos críticos (Mayo). */
+  /** Validación fuerte de campos críticos (Mayo). HC opcional. */
   function validateCriticos() {
     var errs = [];
     var nombre = $('v-nombre').value.trim();
     var dni = digitsDni($('v-dni').value);
     var edad = numOrNull($('v-edad').value);
-    var hc = $('v-hc') ? $('v-hc').value.trim() : '';
     var afil = $('v-afil').value.trim();
     var serv = $('v-serv') ? $('v-serv').value : '';
     var ciru = $('v-ciru') ? $('v-ciru').value.trim() : '';
@@ -526,7 +654,6 @@
     if (!nombre || nombre.length < 3) errs.push('Nombre y apellido (completo)');
     if (dni.length < 7 || dni.length > 8) errs.push('DNI (7 u 8 dígitos, sin ceros de más al frente)');
     if (edad == null || edad < 0 || edad > 120) errs.push('Edad (años)');
-    if (!hc) errs.push('N° de Historia Clínica');
     if (!afil) errs.push('N° de afiliado / credencial');
     if (!dx) errs.push('Qué operación le van a hacer');
     if (!serv) errs.push('Especialidad / servicio');
@@ -537,17 +664,17 @@
   function confirmCriticos() {
     var nombre = $('v-nombre').value.trim();
     var dni = $('v-dni').value.trim();
-    var hc = $('v-hc') ? $('v-hc').value.trim() : '';
     var afil = $('v-afil').value.trim();
     var edad = $('v-edad').value.trim();
+    var hc = $('v-hc') ? $('v-hc').value.trim() : '';
     var msg =
       'Revisá estos datos antes de enviar (un error puede traer problemas):\n\n' +
       'Nombre: ' + nombre + '\n' +
       'DNI: ' + dni + '\n' +
       'Edad: ' + edad + '\n' +
-      'Historia clínica: ' + hc + '\n' +
-      'Afiliado: ' + afil + '\n\n' +
-      '¿Están correctos?';
+      'Afiliado: ' + afil + '\n' +
+      (hc ? 'Historia clínica: ' + hc + '\n' : '') +
+      '\n¿Están correctos?';
     return confirm(msg);
   }
 
@@ -682,9 +809,18 @@
   function wireDiagSinonimos() {
     var inp = $('v-dx');
     if (!inp || typeof afDiagSugerenciasMayo !== 'function') return;
+    function setMapped(medico) {
+      dxMedicoSugerido = medico || null;
+      var hint = $('v-dx-map-hint');
+      if (hint) hint.style.display = 'none';
+    }
     inp.addEventListener('input', function () {
       var hits = afDiagSugerenciasMayo(inp.value);
-      renderAc('ac-v-dx', hits, function (x) { return x; }, null, function (x) { inp.value = x; });
+      renderAc('ac-v-dx', hits, function (row) { return row.paciente; }, null, function (row) {
+        inp.value = row.paciente;
+        setMapped(row.medico);
+      });
+      setMapped(typeof afDiagMapearMedicoMayo === 'function' ? afDiagMapearMedicoMayo(inp.value) : null);
     });
     inp.addEventListener('blur', function () { setTimeout(closeAllAc, 150); });
   }
@@ -712,6 +848,9 @@
     renderOrganos();
     wireObraAc();
     wireAnticoagAc();
+    wireAlergiasChips();
+    wireNingunoExclusive('v-protesis-dental', 'v-protesis-ninguno');
+    wireNingunoExclusive('v-cuello', 'v-cuello-ninguno');
     wireCirujanoAc();
     wireDiagSinonimos();
     wireEstudios();

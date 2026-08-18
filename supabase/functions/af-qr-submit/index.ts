@@ -76,12 +76,10 @@ Deno.serve(async (req) => {
   const ownerId = qr.owner_id;
   const db = (body.datos_basicos || {}) as Record<string, unknown>;
   const edad = db.edad;
-  const hc = String(db.historia_clinica || '').trim();
   const afil = String(db.afiliado || '').trim();
   if (edad == null || edad === '' || Number(edad) < 0 || Number(edad) > 120) {
     return jsonResponse({ error: 'Edad obligatoria (0–120)' }, 400);
   }
-  if (!hc) return jsonResponse({ error: 'N° de Historia Clínica obligatorio' }, 400);
   if (!afil) return jsonResponse({ error: 'N° de afiliado obligatorio' }, 400);
   let dniH: string;
   try {

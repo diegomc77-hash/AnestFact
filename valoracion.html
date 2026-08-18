@@ -55,18 +55,18 @@
   </div>
 
   <div id="val-privacy" style="display:none">
-    <div class="card" style="padding:18px 16px">
-      <div class="ct" style="margin-bottom:10px">Antes de continuar</div>
-      <p style="font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:12px">Esta encuesta la solicitó <strong>su anestesiólogo/a</strong> a través de AnesFact, para preparar su <strong>valoración preanestésica</strong>.</p>
-      <ul style="font-size:13px;color:var(--text2);line-height:1.55;padding-left:18px;margin:0 0 14px">
-        <li><strong>Quién trata sus datos:</strong> su profesional de anestesia, mediante esta aplicación (AnesFact solo provee la herramienta técnica).</li>
-        <li><strong>Para qué:</strong> elaborar y documentar su valoración preanestésica antes de la cirugía.</li>
-        <li><strong>No</strong> necesita crear una cuenta ni registrarse.</li>
-        <li>El enlace o código QR es <strong>temporal</strong> y de <strong>un solo uso</strong>.</li>
-        <li>La información queda bajo la <strong>confidencialidad del acto médico</strong> con su profesional.</li>
+    <div class="card" style="padding:20px 18px">
+      <div class="ct" style="margin-bottom:12px;font-size:20px">Antes de continuar</div>
+      <p style="font-size:17px;color:var(--text);line-height:1.55;margin-bottom:14px">Esta encuesta la solicitó <strong>su anestesiólogo/a</strong> a través de AnesFact, para preparar su <strong>valoración preanestésica</strong>.</p>
+      <ul style="font-size:16px;color:var(--text);line-height:1.6;padding-left:20px;margin:0 0 16px">
+        <li style="margin-bottom:8px"><strong>Quién trata sus datos:</strong> su profesional de anestesia, mediante esta aplicación (AnesFact solo provee la herramienta técnica).</li>
+        <li style="margin-bottom:8px"><strong>Para qué:</strong> elaborar y documentar su valoración preanestésica antes de la cirugía.</li>
+        <li style="margin-bottom:8px"><strong>No</strong> necesita crear una cuenta ni registrarse.</li>
+        <li style="margin-bottom:8px">El enlace o código QR es <strong>temporal</strong> y de <strong>un solo uso</strong>.</li>
+        <li style="margin-bottom:8px">La información queda bajo la <strong>confidencialidad del acto médico</strong> con su profesional.</li>
       </ul>
-      <p style="font-size:12px;color:var(--text3);line-height:1.4;margin-bottom:16px">Si completa el formulario por otra persona (por ejemplo, un menor), debe ser su representante o responsable.</p>
-      <button type="button" class="btn btn-g" id="val-privacy-ok">Continuar</button>
+      <p style="font-size:15px;color:var(--text2);line-height:1.5;margin-bottom:18px">Si completa el formulario por otra persona (por ejemplo, un menor), debe ser su representante o responsable.</p>
+      <button type="button" class="btn btn-g" id="val-privacy-ok" style="font-size:16px;padding:14px">Continuar</button>
     </div>
   </div>
 
@@ -85,9 +85,9 @@
       <div class="card">
         <div class="ct">Cirugía programada</div>
         <div class="field ac-wrap"><label>¿Qué operación o estudio le van a hacer? *</label>
-          <input class="fi" id="v-dx" required placeholder="Ej. operación de vesícula, hernia, rodilla" autocomplete="off">
+          <input class="fi" id="v-dx" required placeholder="Ej. piedras en la vesícula, hernia, rodilla" autocomplete="off">
           <div class="ac-list" id="ac-v-dx"></div>
-          <p class="val-hint">Escribí en tus palabras; si aparece una sugerencia, podés elegirla.</p>
+          <p class="val-hint">Escribí como te lo dijeron en casa. Si aparece una sugerencia en tus palabras, elegila.</p>
         </div>
         <div class="field"><label>Motivo de este formulario</label>
           <select class="fi" id="v-motivo">
@@ -110,10 +110,10 @@
 
       <div class="card">
         <div class="ct">Sus datos</div>
-        <p class="val-hint" style="margin-bottom:10px;color:#e3b341">Nombre, DNI, edad, N° de historia clínica y N° de afiliado son <strong>obligatorios</strong> — un error acá complica la cirugía y la facturación.</p>
+        <p class="val-hint" style="margin-bottom:10px;color:#e3b341">Nombre, DNI, edad y N° de afiliado son <strong>obligatorios</strong> — un error acá complica la cirugía y la facturación. La historia clínica es opcional.</p>
         <div class="field"><label>Nombre y apellido *</label><input class="fi" id="v-nombre" required autocomplete="name"></div>
         <div class="field"><label>DNI *</label><input class="fi" id="v-dni" required inputmode="numeric" autocomplete="off" maxlength="10"></div>
-        <div class="field" id="v-hc-wrap"><label>N° de Historia Clínica *</label><input class="fi" id="v-hc" required placeholder="Como figura en el sanatorio" autocomplete="off"></div>
+        <div class="field" id="v-hc-wrap"><label>N° de Historia Clínica (opcional)</label><input class="fi" id="v-hc" placeholder="Si lo tiene a mano" autocomplete="off"></div>
         <div class="g2">
           <div class="field"><label>Edad (años) *</label><input class="fi" type="number" id="v-edad" required min="0" max="120"></div>
           <div class="field"><label>Sexo</label>
@@ -144,13 +144,22 @@
           <input class="fi" id="v-enf-otra" placeholder="Ej. lupus, artritis">
         </div>
         <hr class="hr">
-        <div class="field ac-wrap"><label>¿Toma algo para <strong>fluidificar la sangre</strong>? (aspirina, Plavix, Sintrom, etc.)</label>
-          <input class="fi" id="v-anticoag-farm" placeholder="Ej. aspirina 100, Plavix, Xarelto..." autocomplete="off">
-          <div class="ac-list" id="ac-v-anticoag"></div>
+        <div class="field"><label>¿Toma algo para <strong>fluidificar la sangre</strong>? (aspirina, Plavix, Sintrom, etc.)</label>
+          <div class="ac-wrap">
+            <input class="fi" id="v-anticoag-farm" placeholder="Ej. Aspirineta, Plavix, Xarelto..." autocomplete="off">
+            <div class="ac-list" id="ac-v-anticoag"></div>
+          </div>
           <p class="val-hint">Incluye aspirina protectora, clopidogrel, rivaroxabán, warfarina/sintrom.</p>
         </div>
-        <div class="field"><label>¿Cuándo tomó la última dosis o cuándo la dejó?</label><input class="fi" id="v-anticoag-dosis" placeholder="Ej. ayer a la noche / hace 3 días"></div>
-        <div class="field"><label>Alergias (medicamentos, yodo, látex, etc.)</label><textarea class="fi" id="v-alergias" placeholder="Si no tiene, escriba: ninguna"></textarea></div>
+        <div class="field ac-wrap"><label>¿Cuándo tomó la última dosis o cuándo la dejó?</label>
+          <input class="fi" id="v-anticoag-dosis" placeholder="Ej. 100 mg / ayer a la noche" autocomplete="off">
+          <div class="ac-list" id="ac-v-anticoag-dosis"></div>
+        </div>
+        <div class="field"><label>Alergias (medicamentos, yodo, látex, etc.)</label>
+          <div id="v-alerg-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0"></div>
+          <input class="fi" id="v-alerg-otro" placeholder="Si eligió Otro, escriba acá" style="display:none;margin-top:6px" autocomplete="off">
+          <p class="val-hint">Tocá una o más opciones. Podés elegir Otro y completar.</p>
+        </div>
       </div>
 
       <div class="card">
@@ -232,8 +241,28 @@
           <div class="field"><label>¿Fuma?</label><input class="fi" id="v-tabaco" placeholder="No / cuántos por día"></div>
           <div class="field"><label>¿Toma alcohol?</label><input class="fi" id="v-alcohol" placeholder="No / cuánto"></div>
         </div>
-        <div class="field"><label>Prótesis dental o problemas de cuello</label><input class="fi" id="v-protesis" placeholder="Ej. dientes postizos, collarín"></div>
-        <div class="field"><label>Marcapasos o desfibrilador (DAI)</label><input class="fi" id="v-mcp" placeholder="Si no tiene, dejar vacío"></div>
+        <div class="field"><label>Prótesis dentales / cuerpos extraños</label>
+          <div id="v-protesis-dental" style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+            <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" value="Dentadura postiza"> Dentadura postiza</label>
+            <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" value="Puente dental"> Puente dental</label>
+            <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" value="Implantes dentales"> Implantes dentales</label>
+            <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" value="Piezas dentales flojas"> Piezas dentales flojas</label>
+            <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" value="Brackets/ortodoncia"> Brackets/ortodoncia</label>
+            <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" value="Corona dental"> Corona dental</label>
+            <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" id="v-protesis-ninguno" value="Ninguno"> Ninguno</label>
+          </div>
+        </div>
+        <div class="field" style="margin-top:14px"><label>Antecedentes de cuello</label>
+          <div id="v-cuello" style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+            <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" value="Cirugía previa de tiroides/cuello"> Cirugía previa de tiroides/cuello</label>
+            <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" value="Traqueotomía previa"> Traqueotomía previa</label>
+            <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" value="Collar cervical/rigidez"> Collar cervical/rigidez</label>
+            <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" value="Bocio o nódulo visible"> Bocio o nódulo visible</label>
+            <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" value="Movilidad limitada"> Movilidad limitada</label>
+            <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" id="v-cuello-ninguno" value="Ninguno"> Ninguno</label>
+          </div>
+        </div>
+        <div class="field" style="margin-top:14px"><label>Marcapasos o desfibrilador (DAI)</label><input class="fi" id="v-mcp" placeholder="Si no tiene, dejar vacío"></div>
         <div class="field"><label>¿Fiebre o infección en los últimos días?</label><input class="fi" id="v-fiebre" placeholder="Ej. gripe hace 1 semana"></div>
         <div class="field"><label>¿Viajó lejos o tuvo trombosis antes?</label><input class="fi" id="v-tvp" placeholder="Si no, dejar vacío"></div>
       </div>
@@ -251,17 +280,18 @@ if (typeof pdfjsLib !== 'undefined') {
 </script>
 <script src="js/supabase-keepalive.js?v=8.0"></script>
 <script src="js/00-env.js?v=9.0"></script>
-<script src="data/cirujanos-esp.js?v=12.17"></script>
-<script src="data/valoracion/cfg-instituciones.js?v=12.17"></script>
-<script src="data/valoracion/diag-sinonimos-mayo.js?v=12.17"></script>
+<script src="data/cirujanos-esp.js?v=12.19"></script>
+<script src="data/valoracion/cfg-instituciones.js?v=12.19"></script>
+<script src="data/valoracion/diag-sinonimos-mayo.js?v=12.19"></script>
+<script src="data/valoracion/alergias-comunes.js?v=12.19"></script>
 <script src="data/obras-sociales-ar.js?v=9.0"></script>
 <script src="data/organos-enfermedades.js?v=9.0"></script>
-<script src="data/medicacion-habitual.js?v=9.0"></script>
+<script src="data/medicacion-habitual.js?v=12.19"></script>
 <script src="js/estudios/pdf-text.js?v=10.8"></script>
 <script src="js/estudios/lab_parser.js?v=10.8"></script>
 <script src="js/estudios/ecg_parser.js?v=10.8"></script>
 <script src="js/estudios/espirometria_parser.js?v=10.8"></script>
 <script src="js/estudios/estudio-extract-local.js?v=10.8"></script>
-<script src="js/valoracion-form.js?v=12.17"></script>
+<script src="js/valoracion-form.js?v=12.19"></script>
 </body>
 </html>
