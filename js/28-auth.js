@@ -181,6 +181,7 @@ var AF_AUTH = (function(){
       return afterAuthProfileLoad().then(function(){
         ready = true;
         if(typeof AfSesiones!=='undefined'&&AfSesiones.onAuthReady)AfSesiones.onAuthReady();
+        if(typeof afSyncValoracionesPreop==='function')afSyncValoracionesPreop();
         return true;
       });
     });
@@ -211,6 +212,7 @@ var AF_AUTH = (function(){
         });
         return afterAuthProfileLoad().then(function(){
           if(typeof AfSesiones!=='undefined'&&AfSesiones.onAuthReady)AfSesiones.onAuthReady();
+          if(typeof afSyncValoracionesPreop==='function')afSyncValoracionesPreop();
           return true;
         });
       });

@@ -33,8 +33,15 @@ Deno.serve(async (req) => {
 
   const token = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '');
   const hash = await tokenHash(token);
+  const contexto = (body.contexto || {}) as Record<string, unknown>;
+  const sanatorio = String(contexto.sanatorio || '');
+  const singleUse = contexto.modo === 'preoperatorio' ||
+    contexto.max_uses === 1 ||
+    sanatorio === 'Sanatorio Mayo';
+
   const expires = new Date();
-  expires.setDate(expires.getDate() + 30);
+  if (singleUse) expires.setHours(expires.getHours() + 48);
+  else expires.setDate(expires.getDate() + 30);
 
   const admin = adminClient();
   const { data, error } = await admin
@@ -42,12 +49,16 @@ Deno.serve(async (req) => {
     .insert({
       owner_id: user.id,
       token_hash: hash,
-      contexto: body.contexto || {},
+      contexto: {
+        ...contexto,
+        sanatorio: sanatorio || 'Sanatorio Mayo',
+        modo: singleUse ? 'preoperatorio' : (contexto.modo || 'consultorio'),
+      },
       expires_at: expires.toISOString(),
-      max_uses: 500,
+      max_uses: singleUse ? 1 : 500,
       activo: true,
     })
-    .select('id, expires_at')
+    .select('id, expires_at, max_uses')
     .single();
 
   if (error) return jsonResponse({ error: error.message }, 500);
@@ -57,5 +68,7 @@ Deno.serve(async (req) => {
     token,
     token_id: data.id,
     expires_at: data.expires_at,
+    max_uses: data.max_uses,
+    single_use: singleUse,
   });
 });

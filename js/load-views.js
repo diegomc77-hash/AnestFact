@@ -38,6 +38,11 @@
     var dateEl = document.getElementById('f-fecha');
     if (dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0, 10);
     if (typeof renderHome === 'function') renderHome();
+    if (typeof afSyncValoracionesPreop === 'function') {
+      afSyncValoracionesPreop().then(function () {
+        if (typeof renderHome === 'function') renderHome();
+      });
+    }
     if (typeof initAutoSync === 'function') initAutoSync();
     if (typeof planBadgeText === 'function') {
       var pb = document.getElementById('plan-badge');
@@ -63,7 +68,7 @@
   }
 
   function fetchHtml(url) {
-      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.16';
+      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.17';
     return fetch(bust).then(function (r) {
       if (!r.ok) throw new Error(url + ' HTTP ' + r.status);
       return r.text();

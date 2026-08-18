@@ -20,7 +20,7 @@ function _qrModalEl() {
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">' +
     '<div style="font-weight:600;font-size:16px">QR valoración</div>' +
     '<button type="button" id="qr-val-close" style="background:none;border:none;color:var(--text2);font-size:24px;cursor:pointer">&times;</button></div>' +
-    '<p style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.45">El paciente completa el cuestionario sin login. Válido 30 días.</p>' +
+    '<p style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.45">Sanatorio Mayo · un solo uso · vence en 48 h. El paciente completa sin login.</p>' +
     '<div style="text-align:center;margin-bottom:14px"><img id="qr-val-img" alt="QR" width="200" height="200" style="border-radius:8px;background:#fff;padding:8px"></div>' +
     '<div class="field"><label style="font-size:11px">Enlace</label><input class="fi" id="qr-val-url" readonly style="font-size:12px"></div>' +
     '<div style="display:flex;gap:8px;margin-top:12px">' +
@@ -89,8 +89,11 @@ function mostrarModalQrValoracion(data) {
   } else {
     paint();
   }
-  var exp = data.expires_at ? new Date(data.expires_at).toLocaleDateString('es-AR') : '';
-  _qr$('qr-val-exp').textContent = exp ? 'Vence el ' + exp + ' · QR de consultorio (multi-paciente)' : 'QR de consultorio (multi-paciente)';
+  var exp = data.expires_at ? new Date(data.expires_at).toLocaleString('es-AR') : '';
+  var single = data.single_use || data.max_uses === 1;
+  _qr$('qr-val-exp').textContent = single
+    ? (exp ? 'Un solo uso · vence ' + exp : 'Un solo uso · 48 h')
+    : (exp ? 'Vence el ' + exp : '');
 }
 
 function crearQrValoracion() {
@@ -103,7 +106,14 @@ function crearQrValoracion() {
   fetch(afSupabaseUrl() + '/functions/v1/af-qr-create', {
     method: 'POST',
     headers: afSupabaseHeaders({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify({ contexto: { origen: 'home' } }),
+    body: JSON.stringify({
+      contexto: {
+        origen: 'home',
+        sanatorio: 'Sanatorio Mayo',
+        modo: 'preoperatorio',
+        max_uses: 1,
+      },
+    }),
   })
     .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
     .then(function (res) {
@@ -111,7 +121,7 @@ function crearQrValoracion() {
         throw new Error((res.j && res.j.error) || 'No se pudo crear el QR');
       }
       mostrarModalQrValoracion(res.j);
-      toast('QR listo');
+      toast('QR Mayo listo (un uso)');
     })
     .catch(function (err) {
       toast(err.message || 'Error al crear QR');

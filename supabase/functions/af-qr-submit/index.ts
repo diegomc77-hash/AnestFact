@@ -64,16 +64,25 @@ Deno.serve(async (req) => {
 
   const { data: qr, error: qrErr } = await admin
     .from('anesfact_qr_tokens')
-    .select('id, owner_id, expires_at, max_uses, uses_count, activo')
+    .select('id, owner_id, expires_at, max_uses, uses_count, activo, contexto')
     .eq('token_hash', hash)
     .maybeSingle();
 
   if (qrErr) return jsonResponse({ error: qrErr.message }, 500);
   if (!qr || !qr.activo) return jsonResponse({ error: 'Enlace inválido o desactivado' }, 403);
   if (new Date(qr.expires_at) < new Date()) return jsonResponse({ error: 'Enlace expirado' }, 403);
-  if (qr.uses_count >= qr.max_uses) return jsonResponse({ error: 'Enlace agotado' }, 403);
+  if (qr.uses_count >= qr.max_uses) return jsonResponse({ error: 'Enlace agotado (ya fue usado)' }, 403);
 
   const ownerId = qr.owner_id;
+  const db = (body.datos_basicos || {}) as Record<string, unknown>;
+  const edad = db.edad;
+  const hc = String(db.historia_clinica || '').trim();
+  const afil = String(db.afiliado || '').trim();
+  if (edad == null || edad === '' || Number(edad) < 0 || Number(edad) > 120) {
+    return jsonResponse({ error: 'Edad obligatoria (0–120)' }, 400);
+  }
+  if (!hc) return jsonResponse({ error: 'N° de Historia Clínica obligatorio' }, 400);
+  if (!afil) return jsonResponse({ error: 'N° de afiliado obligatorio' }, 400);
   let dniH: string;
   try {
     dniH = await dniHash(dni, secrets.salt);
@@ -117,12 +126,27 @@ Deno.serve(async (req) => {
     pacienteId = created.id;
   }
 
+  const extrasIn = (body.extras || {}) as Record<string, unknown>;
+  const ctx = (qr.contexto || {}) as Record<string, unknown>;
+  const sanatorio = String(extrasIn.sanatorio || ctx.sanatorio || 'Sanatorio Mayo');
+  const dniMasked = dni.length >= 4 ? ('***' + dni.slice(-4)) : '****';
+  const etiqueta = String(
+    extrasIn.etiqueta_lista ||
+      (nombre + ' · DNI ' + dniMasked + ' · ' + ((body.diagnostico_cirugia || '').trim() || 'Sin diagnóstico')),
+  );
+
   const payload = {
     datos_basicos: body.datos_basicos || {},
     antecedentes: body.antecedentes || {},
     medicacion: body.medicacion || [],
     antec_anestesicos: body.antec_anestesicos || {},
-    extras: body.extras || {},
+    extras: {
+      ...extrasIn,
+      sanatorio,
+      etiqueta_lista: etiqueta,
+      etiqueta_nombre: nombre,
+      dni_enmascarado: dniMasked,
+    },
   };
   const reglas = evaluarReglas(payload);
 
@@ -163,9 +187,14 @@ Deno.serve(async (req) => {
 
   if (vErr || !val) return jsonResponse({ error: vErr?.message || 'Error valoración' }, 500);
 
+  const newUses = qr.uses_count + 1;
+  const deactivate = newUses >= qr.max_uses;
   await admin
     .from('anesfact_qr_tokens')
-    .update({ uses_count: qr.uses_count + 1 })
+    .update({
+      uses_count: newUses,
+      activo: deactivate ? false : true,
+    })
     .eq('id', qr.id);
 
   return jsonResponse({
@@ -174,5 +203,6 @@ Deno.serve(async (req) => {
     paciente_id: pacienteId,
     asa_sugerido: val.asa_sugerido,
     created_at: val.submitted_at,
+    sanatorio,
   });
 });

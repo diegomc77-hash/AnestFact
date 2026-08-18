@@ -1,5 +1,6 @@
 (function () {
   var TOKEN = '';
+  var SANATORIO = 'Sanatorio Mayo'; // Etapa 1
   var organState = {};
   var estudiosExtraidos = {};
   var MAX_ESTUDIOS = 5;
@@ -437,11 +438,15 @@
     var urg = $('v-urgencia').checked;
     var org = collectOrganos();
     var provEl = $('v-prov-obra');
+    var cfg = afValoracionCfg(SANATORIO);
+    var nombre = $('v-nombre').value.trim();
+    var dni = $('v-dni').value.trim();
+    var dx = $('v-dx').value.trim();
     return {
       token: TOKEN,
-      nombre: $('v-nombre').value.trim(),
-      dni: $('v-dni').value.trim(),
-      diagnostico_cirugia: $('v-dx').value.trim(),
+      nombre: nombre,
+      dni: dni,
+      diagnostico_cirugia: dx,
       motivo_valoracion: $('v-motivo').value,
       fecha_cirugia_programada: $('v-fecha-cx').value || null,
       datos_basicos: {
@@ -453,6 +458,9 @@
         obra_social: $('v-obra').value.trim() || null,
         obra_social_provincia: provEl ? provEl.value : null,
         afiliado: $('v-afil').value.trim() || null,
+        historia_clinica: ($('v-hc') && $('v-hc').value.trim()) || null,
+        especialidad: ($('v-serv') && $('v-serv').value) || null,
+        cirujano: ($('v-ciru') && $('v-ciru').value.trim()) || null
       },
       antecedentes: {
         organos: org.organos,
@@ -486,8 +494,61 @@
         mcp_dai: $('v-mcp').value.trim() || null,
         fiebre_infeccion: $('v-fiebre').value.trim() || null,
         tvp_viaje: $('v-tvp').value.trim() || null,
+        sanatorio: SANATORIO,
+        cfg_id: cfg.id,
+        etiqueta_lista: nombre + ' · DNI ' + maskDni(dni) + ' · ' + (dx || 'Sin diagnóstico')
       },
     };
+  }
+
+  function maskDni(d) {
+    var s = String(d || '').replace(/\D/g, '');
+    if (s.length < 4) return '****';
+    return '***' + s.slice(-4);
+  }
+
+  function digitsDni(d) {
+    return String(d == null ? '' : d).replace(/\D/g, '').replace(/^0+/, '') || '';
+  }
+
+  /** Validación fuerte de campos críticos (Mayo). */
+  function validateCriticos() {
+    var errs = [];
+    var nombre = $('v-nombre').value.trim();
+    var dni = digitsDni($('v-dni').value);
+    var edad = numOrNull($('v-edad').value);
+    var hc = $('v-hc') ? $('v-hc').value.trim() : '';
+    var afil = $('v-afil').value.trim();
+    var serv = $('v-serv') ? $('v-serv').value : '';
+    var ciru = $('v-ciru') ? $('v-ciru').value.trim() : '';
+    var dx = $('v-dx').value.trim();
+
+    if (!nombre || nombre.length < 3) errs.push('Nombre y apellido (completo)');
+    if (dni.length < 7 || dni.length > 8) errs.push('DNI (7 u 8 dígitos, sin ceros de más al frente)');
+    if (edad == null || edad < 0 || edad > 120) errs.push('Edad (años)');
+    if (!hc) errs.push('N° de Historia Clínica');
+    if (!afil) errs.push('N° de afiliado / credencial');
+    if (!dx) errs.push('Qué operación le van a hacer');
+    if (!serv) errs.push('Especialidad / servicio');
+    if (!ciru) errs.push('Cirujano/a');
+    return errs;
+  }
+
+  function confirmCriticos() {
+    var nombre = $('v-nombre').value.trim();
+    var dni = $('v-dni').value.trim();
+    var hc = $('v-hc') ? $('v-hc').value.trim() : '';
+    var afil = $('v-afil').value.trim();
+    var edad = $('v-edad').value.trim();
+    var msg =
+      'Revisá estos datos antes de enviar (un error puede traer problemas):\n\n' +
+      'Nombre: ' + nombre + '\n' +
+      'DNI: ' + dni + '\n' +
+      'Edad: ' + edad + '\n' +
+      'Historia clínica: ' + hc + '\n' +
+      'Afiliado: ' + afil + '\n\n' +
+      '¿Están correctos?';
+    return confirm(msg);
   }
 
   function numOrNull(v) {
@@ -544,11 +605,13 @@
   function submitForm(e) {
     e.preventDefault();
     hideErr();
-    var payload = buildPayload();
-    if (!payload.nombre || !payload.dni || !payload.diagnostico_cirugia) {
-      showErr('Completá nombre, DNI y qué operación le van a hacer.');
+    var errs = validateCriticos();
+    if (errs.length) {
+      showErr('Faltan o están mal datos obligatorios: ' + errs.join('; ') + '.');
       return;
     }
+    if (!confirmCriticos()) return;
+    var payload = buildPayload();
     var btn = $('val-submit');
     btn.disabled = true;
     btn.textContent = 'Enviando…';
@@ -560,7 +623,12 @@
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (res) {
         if (!res.ok || !res.j.ok) throw new Error((res.j && res.j.error) || 'No se pudo enviar');
+        try {
+          sessionStorage.removeItem('af_val_draft');
+          localStorage.removeItem('af_val_draft');
+        } catch (e0) {}
         $('val-form-wrap').style.display = 'none';
+        $('val-privacy').style.display = 'none';
         $('val-ok').style.display = 'block';
         if (res.j.asa_sugerido) $('val-asa').textContent = 'Clasificación sugerida (orientativa): ASA ' + res.j.asa_sugerido;
         window.scrollTo(0, 0);
@@ -572,15 +640,80 @@
       });
   }
 
+  function applyMayoCfg() {
+    var cfg = typeof afValoracionCfg === 'function' ? afValoracionCfg(SANATORIO) : null;
+    var badge = $('val-inst-badge');
+    if (badge) badge.textContent = 'Institución: ' + (cfg ? cfg.label : SANATORIO);
+    var map = typeof getCirujanosMapForLugar === 'function' ? getCirujanosMapForLugar(SANATORIO) : {};
+    var sel = $('v-serv');
+    if (sel) {
+      var keys = Object.keys(map).filter(function (k) { return (map[k] || []).length > 0; }).sort();
+      sel.innerHTML = '<option value="">Seleccionar…</option>' + keys.map(function (k) {
+        return '<option value="' + k.replace(/"/g, '&quot;') + '">' + k + '</option>';
+      }).join('');
+    }
+  }
+
+  function wireCirujanoAc() {
+    var inp = $('v-ciru');
+    var sel = $('v-serv');
+    if (!inp || !sel) return;
+    function lista() {
+      var map = typeof getCirujanosMapForLugar === 'function' ? getCirujanosMapForLugar(SANATORIO) : {};
+      return (map[sel.value] || []).slice();
+    }
+    function buscar() {
+      var q = inp.value.toLowerCase();
+      var src = lista();
+      if (!sel.value) { closeAllAc(); return; }
+      if (!q) {
+        renderAc('ac-v-ciru', src.slice(0, 12), function (x) { return x; }, null, function (x) { inp.value = x; });
+        return;
+      }
+      var hits = src.filter(function (x) { return x.toLowerCase().indexOf(q) >= 0; }).slice(0, 12);
+      renderAc('ac-v-ciru', hits, function (x) { return x; }, null, function (x) { inp.value = x; });
+    }
+    sel.addEventListener('change', function () { inp.value = ''; closeAllAc(); });
+    inp.addEventListener('focus', buscar);
+    inp.addEventListener('input', buscar);
+    inp.addEventListener('blur', function () { setTimeout(closeAllAc, 150); });
+  }
+
+  function wireDiagSinonimos() {
+    var inp = $('v-dx');
+    if (!inp || typeof afDiagSugerenciasMayo !== 'function') return;
+    inp.addEventListener('input', function () {
+      var hits = afDiagSugerenciasMayo(inp.value);
+      renderAc('ac-v-dx', hits, function (x) { return x; }, null, function (x) { inp.value = x; });
+    });
+    inp.addEventListener('blur', function () { setTimeout(closeAllAc, 150); });
+  }
+
+  function showPrivacyThenForm() {
+    $('val-invalid').classList.remove('on');
+    $('val-form-wrap').style.display = 'none';
+    $('val-privacy').style.display = 'block';
+    var ok = $('val-privacy-ok');
+    if (ok) {
+      ok.onclick = function () {
+        $('val-privacy').style.display = 'none';
+        $('val-form-wrap').style.display = 'block';
+        window.scrollTo(0, 0);
+      };
+    }
+  }
+
   function init() {
     TOKEN = parseToken();
     if (!TOKEN) return;
-    $('val-invalid').classList.remove('on');
-    $('val-form-wrap').style.display = 'block';
+    showPrivacyThenForm();
+    applyMayoCfg();
     initProvincias();
     renderOrganos();
     wireObraAc();
     wireAnticoagAc();
+    wireCirujanoAc();
+    wireDiagSinonimos();
     wireEstudios();
     wireManualEstudios();
     $('v-meds').appendChild(medRow(null));

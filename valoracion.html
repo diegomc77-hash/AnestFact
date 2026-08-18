@@ -54,6 +54,22 @@
     <div class="err-msg" style="font-family:inherit">Abrí el enlace o QR que te dio tu anestesiólogo/a. Si el enlace expiró, pedí uno nuevo.</div>
   </div>
 
+  <div id="val-privacy" style="display:none">
+    <div class="card" style="padding:18px 16px">
+      <div class="ct" style="margin-bottom:10px">Antes de continuar</div>
+      <p style="font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:12px">Esta encuesta la solicitó <strong>su anestesiólogo/a</strong> a través de AnesFact, para preparar su <strong>valoración preanestésica</strong>.</p>
+      <ul style="font-size:13px;color:var(--text2);line-height:1.55;padding-left:18px;margin:0 0 14px">
+        <li><strong>Quién trata sus datos:</strong> su profesional de anestesia, mediante esta aplicación (AnesFact solo provee la herramienta técnica).</li>
+        <li><strong>Para qué:</strong> elaborar y documentar su valoración preanestésica antes de la cirugía.</li>
+        <li><strong>No</strong> necesita crear una cuenta ni registrarse.</li>
+        <li>El enlace o código QR es <strong>temporal</strong> y de <strong>un solo uso</strong>.</li>
+        <li>La información queda bajo la <strong>confidencialidad del acto médico</strong> con su profesional.</li>
+      </ul>
+      <p style="font-size:12px;color:var(--text3);line-height:1.4;margin-bottom:16px">Si completa el formulario por otra persona (por ejemplo, un menor), debe ser su representante o responsable.</p>
+      <button type="button" class="btn btn-g" id="val-privacy-ok">Continuar</button>
+    </div>
+  </div>
+
   <div id="val-ok">
     <div style="font-size:48px;margin-bottom:12px">&#10003;</div>
     <div style="font-size:18px;font-weight:600;margin-bottom:8px">Datos enviados</div>
@@ -63,11 +79,16 @@
 
   <div id="val-form-wrap">
     <div class="val-banner">Completá con calma. Los datos van de forma segura a tu anestesiólogo/a. Si no entendés algo, preguntale a tu médico antes de la cirugía.</div>
+    <p id="val-inst-badge" style="font-size:12px;color:var(--text3);margin-bottom:10px;text-align:center"></p>
     <form id="val-form" autocomplete="off">
 
       <div class="card">
         <div class="ct">Cirugía programada</div>
-        <div class="field"><label>¿Qué operación o estudio le van a hacer? *</label><input class="fi" id="v-dx" required placeholder="Ej. operación de vesícula, hernia, rodilla"></div>
+        <div class="field ac-wrap"><label>¿Qué operación o estudio le van a hacer? *</label>
+          <input class="fi" id="v-dx" required placeholder="Ej. operación de vesícula, hernia, rodilla" autocomplete="off">
+          <div class="ac-list" id="ac-v-dx"></div>
+          <p class="val-hint">Escribí en tus palabras; si aparece una sugerencia, podés elegirla.</p>
+        </div>
         <div class="field"><label>Motivo de este formulario</label>
           <select class="fi" id="v-motivo">
             <option value="primera">Es la primera vez que lo completo</option>
@@ -78,14 +99,23 @@
           </select>
         </div>
         <div class="field"><label>Fecha de la cirugía (si la sabe)</label><input class="fi" type="date" id="v-fecha-cx"></div>
+        <div class="field" id="v-serv-wrap"><label>Especialidad / servicio *</label>
+          <select class="fi" id="v-serv" required><option value="">Seleccionar…</option></select>
+        </div>
+        <div class="field ac-wrap" id="v-ciru-wrap"><label>Cirujano/a *</label>
+          <input class="fi" id="v-ciru" required placeholder="Primero elegí especialidad" autocomplete="off">
+          <div class="ac-list" id="ac-v-ciru"></div>
+        </div>
       </div>
 
       <div class="card">
         <div class="ct">Sus datos</div>
+        <p class="val-hint" style="margin-bottom:10px;color:#e3b341">Nombre, DNI, edad, N° de historia clínica y N° de afiliado son <strong>obligatorios</strong> — un error acá complica la cirugía y la facturación.</p>
         <div class="field"><label>Nombre y apellido *</label><input class="fi" id="v-nombre" required autocomplete="name"></div>
-        <div class="field"><label>DNI *</label><input class="fi" id="v-dni" required inputmode="numeric" autocomplete="off"></div>
+        <div class="field"><label>DNI *</label><input class="fi" id="v-dni" required inputmode="numeric" autocomplete="off" maxlength="10"></div>
+        <div class="field" id="v-hc-wrap"><label>N° de Historia Clínica *</label><input class="fi" id="v-hc" required placeholder="Como figura en el sanatorio" autocomplete="off"></div>
         <div class="g2">
-          <div class="field"><label>Edad (años)</label><input class="fi" type="number" id="v-edad" min="0" max="120"></div>
+          <div class="field"><label>Edad (años) *</label><input class="fi" type="number" id="v-edad" required min="0" max="120"></div>
           <div class="field"><label>Sexo</label>
             <select class="fi" id="v-sexo"><option value="">—</option><option value="F">Mujer</option><option value="M">Hombre</option><option value="X">Otro</option></select>
           </div>
@@ -103,7 +133,7 @@
           <div class="ac-list" id="ac-v-obra"></div>
           <p class="val-hint">Primero elija provincia. Después escriba y elija de la lista.</p>
         </div>
-        <div class="field"><label>N° de afiliado / credencial</label><input class="fi" id="v-afil"></div>
+        <div class="field"><label>N° de afiliado / credencial *</label><input class="fi" id="v-afil" required autocomplete="off"></div>
       </div>
 
       <div class="card">
@@ -221,6 +251,9 @@ if (typeof pdfjsLib !== 'undefined') {
 </script>
 <script src="js/supabase-keepalive.js?v=8.0"></script>
 <script src="js/00-env.js?v=9.0"></script>
+<script src="data/cirujanos-esp.js?v=12.17"></script>
+<script src="data/valoracion/cfg-instituciones.js?v=12.17"></script>
+<script src="data/valoracion/diag-sinonimos-mayo.js?v=12.17"></script>
 <script src="data/obras-sociales-ar.js?v=9.0"></script>
 <script src="data/organos-enfermedades.js?v=9.0"></script>
 <script src="data/medicacion-habitual.js?v=9.0"></script>
@@ -229,6 +262,6 @@ if (typeof pdfjsLib !== 'undefined') {
 <script src="js/estudios/ecg_parser.js?v=10.8"></script>
 <script src="js/estudios/espirometria_parser.js?v=10.8"></script>
 <script src="js/estudios/estudio-extract-local.js?v=10.8"></script>
-<script src="js/valoracion-form.js?v=10.8"></script>
+<script src="js/valoracion-form.js?v=12.17"></script>
 </body>
 </html>
