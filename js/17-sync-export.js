@@ -11,6 +11,33 @@ function acKey(e,lid){
 function closeAllAC(){document.querySelectorAll('.ac-list').forEach(function(el){el.style.display='none';});}
 document.addEventListener('click',function(e){if(!e.target.closest||!e.target.closest('.ac-wrap'))closeAllAC();});
 // === CIRUJANOS POR LUGAR + ESPECIALIDAD (catálogo en data/cirujanos-esp.js) ===
+/** Nombres de prueba / basura que no deben sugerirse (viven en fojas o af_ciru, no en el catálogo). */
+function afIsCirujanoBasura(name){
+  var s=String(name||'').trim();
+  if(!s)return true;
+  // chupato/chupame/chupito/chupala y variantes
+  if(/chupa/i.test(s))return true;
+  if(/^(test|prueba|xxx+|asdf|foo|bar)$/i.test(s))return true;
+  return false;
+}
+function afPurgeCirujanosBasuraLocal(){
+  var changed=false;
+  try{
+    var raw=localStorage.getItem('af_ciru');
+    if(raw){
+      var arr=JSON.parse(raw);
+      if(Array.isArray(arr)){
+        var clean=arr.filter(function(c){return !afIsCirujanoBasura(c);});
+        if(clean.length!==arr.length){
+          localStorage.setItem('af_ciru',JSON.stringify(clean));
+          changed=true;
+        }
+        if(typeof cirujanos!=='undefined')cirujanos=clean;
+      }
+    }
+  }catch(e){}
+  return changed;
+}
 function actualizarHintCirujano(){
   var hint=document.getElementById('ciru-hint');
   if(!hint)return;
@@ -38,17 +65,21 @@ function getCirujanosByEsp(){
   var esp=(document.getElementById('f-serv')||{value:''}).value||'';
   var san=(document.getElementById('f-san')||{value:''}).value||'';
   var map=typeof getCirujanosMapForLugar==='function'?getCirujanosMapForLugar(san):{};
-  var all=(esp&&map[esp])?map[esp].slice():[];
+  var catalog=(esp&&map[esp])?map[esp].slice():[];
+  var all=catalog.filter(function(c){return !afIsCirujanoBasura(c);});
   var seen={};
   all.forEach(function(c){seen[String(c).toUpperCase()]=true;});
-  // Solo aprendidos del mismo lugar + misma especialidad (no mezclar Mayo/Aero ni otras esp.)
+  // Si hay nómina fija para esta esp+lugar, no mezclar aprendidos (evita placeholders “por todos lados”)
+  var tieneNomina=all.length>0;
+  if(tieneNomina)return all;
+  // Sin nómina: solo aprendidos del mismo lugar + misma especialidad (serv vacío no cuenta)
   if(typeof S!=='undefined'&&S.intervs){
     S.intervs.forEach(function(i){
       if(!i||!i.ciru)return;
       if(san&&i.san&&i.san!==san)return;
-      if(esp&&i.serv&&i.serv!==esp)return;
+      if(!esp||!i.serv||i.serv!==esp)return;
       var c=String(i.ciru).trim();
-      if(!c)return;
+      if(!c||afIsCirujanoBasura(c))return;
       var k=c.toUpperCase();
       if(!seen[k]){all.push(c);seen[k]=true;}
     });

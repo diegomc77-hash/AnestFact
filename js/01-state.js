@@ -31,6 +31,9 @@ function loadIntervsFromStorage(){
   try{
     if(typeof afMigrateEnviadoLegado==='function')afMigrateEnviadoLegado();
   }catch(eMig){}
+  try{
+    if(typeof afPurgeCirujanosBasuraLocal==='function')afPurgeCirujanosBasuraLocal();
+  }catch(ePur){}
 }
 function saveIntervsToStorage(){
   localStorage.setItem(afIntervsKey(),JSON.stringify(S.intervs||[]));
