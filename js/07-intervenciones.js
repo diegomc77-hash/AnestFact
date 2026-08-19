@@ -336,6 +336,9 @@ function renderHome(){
           +'color:'+(inCola?'var(--blue)':'var(--text3)')+';cursor:pointer;font-size:10px;flex-shrink:0">'
           +(inCola?'Cola ✓':'Cola')+'</button>')
         :'')
+      +(x.alerta_seguridad
+        ?('<span class="badge" style="background:rgba(248,81,73,.22);color:#f85149;border:1px solid rgba(248,81,73,.55);font-size:10px;flex-shrink:0;max-width:140px;text-align:center;line-height:1.25">⚠️ Revisar medicación/alergias</span>')
+        :'')
       +'<span class="badge" style="background:'+c+'22;color:'+c+'">'+(EL[x.estado]||'Borrador')+'</span>'
       +'<button type="button" class="badge" title="Borrar foja" onclick="borrarIntervencion(\''+safeId+'\',event)" '
       +'style="border:1px solid rgba(248,81,73,.45);background:transparent;color:var(--red);cursor:pointer;font-size:10px;flex-shrink:0">Borrar</button>'
@@ -360,6 +363,7 @@ function abrirInter(id){
     if(S.cur.origen==='qr_valoracion'&&S.cur.foja&&S.cur.foja.antecedentes&&S.cur.foja.antecedentes.length&&typeof toast==='function'){
       toast('Antecedentes QR: '+S.cur.foja.antecedentes.join(', ')+' (ver Foja)');
     }
+    if(typeof afUpdateAlertaSeguridadFicha==='function')afUpdateAlertaSeguridadFicha(S.cur);
     go('nueva');
   }
 }
@@ -369,6 +373,7 @@ function nuevaInter(){
   var badge=document.getElementById('ia-badge');if(badge)badge.style.display='none';
   cargarForm(S.cur);
   if(typeof cargarFojaUI==='function')cargarFojaUI();
+  if(typeof afUpdateAlertaSeguridadFicha==='function')afUpdateAlertaSeguridadFicha(null);
   go('nueva');
 }
 function sv(id,v){var e=document.getElementById(id);if(e)e.value=v||'';}

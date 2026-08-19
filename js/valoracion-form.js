@@ -82,6 +82,7 @@
           var ds = anticoagDosesFor(x);
           if (ds.length && !dosis.value) dosis.value = ds[0];
         }
+        if (typeof refreshAlertaSeguridadPaciente === 'function') refreshAlertaSeguridadPaciente();
       });
     });
     inp.addEventListener('blur', function () { setTimeout(closeAllAc, 150); });
@@ -576,7 +577,7 @@
     var al = collectAlergias();
     var protesis = collectChecked('v-protesis-dental', 'v-protesis-ninguno');
     var cuello = collectChecked('v-cuello', 'v-cuello-ninguno');
-    return {
+    var payload = {
       token: TOKEN,
       nombre: nombre,
       dni: dniCanon || dniRaw,
@@ -643,6 +644,18 @@
         etiqueta_lista: nombre + ' · DNI ' + (dniCanon || dniRaw) + ' · ' + (diagPrincipal || 'Sin diagnóstico')
       },
     };
+    var alerta = typeof afDetectarAlertasSeguridad === 'function'
+      ? afDetectarAlertasSeguridad({
+          anticoagFarmaco: payload.antecedentes.anticoag.farmaco,
+          alergiasItems: al.items,
+          alergiasTexto: al.texto,
+          medicacion: payload.medicacion
+        })
+      : { alerta: false, motivos: [] };
+    payload.extras.alerta_seguridad = !!alerta.alerta;
+    payload.extras.alerta_motivos = alerta.motivos || [];
+    payload.extras.alerta_detalle = alerta.detalle || null;
+    return payload;
   }
 
   function maskDni(d) {
@@ -829,6 +842,47 @@
     inp.addEventListener('blur', function () { setTimeout(closeAllAc, 150); });
   }
 
+  function refreshAlertaSeguridadPaciente() {
+    var el = $('val-alerta-seg');
+    if (!el || typeof afDetectarAlertasSeguridad !== 'function') return;
+    var al = collectAlergias();
+    var det = afDetectarAlertasSeguridad({
+      anticoagFarmaco: ($('v-anticoag-farm') && $('v-anticoag-farm').value) || '',
+      alergiasItems: al.items,
+      alergiasTexto: al.texto,
+      medicacion: collectMeds()
+    });
+    if (det.alerta) {
+      el.textContent = det.texto_paciente || AF_ALERTA_SEGURIDAD_TEXTO_PACIENTE;
+      el.classList.add('on');
+    } else {
+      el.classList.remove('on');
+      el.textContent = '';
+    }
+    return det;
+  }
+
+  function wireAlertaSeguridadLive() {
+    function tick() { refreshAlertaSeguridadPaciente(); }
+    var farm = $('v-anticoag-farm');
+    if (farm) {
+      farm.addEventListener('input', tick);
+      farm.addEventListener('change', tick);
+      farm.addEventListener('blur', tick);
+    }
+    var chips = $('v-alerg-chips');
+    if (chips) chips.addEventListener('click', function () { setTimeout(tick, 0); });
+    var otro = $('v-alerg-otro');
+    if (otro) otro.addEventListener('input', tick);
+    var meds = $('v-meds');
+    if (meds) {
+      meds.addEventListener('input', tick);
+      meds.addEventListener('change', tick);
+    }
+    var add = $('v-med-add');
+    if (add) add.addEventListener('click', function () { setTimeout(tick, 50); });
+  }
+
   function wireDiagSinonimos() {
     var inp = $('v-dx');
     if (!inp || typeof afDiagSugerenciasMayo !== 'function') return;
@@ -873,10 +927,12 @@
     wireNingunoExclusive('v-cuello', 'v-cuello-ninguno');
     wireCirujanoAc();
     wireDiagSinonimos();
+    wireAlertaSeguridadLive();
     wireEstudios();
     wireManualEstudios();
     $('v-meds').appendChild(medRow(null));
-    $('v-med-add').onclick = function () { $('v-meds').appendChild(medRow(null)); };
+    $('v-med-add').onclick = function () { $('v-meds').appendChild(medRow(null)); refreshAlertaSeguridadPaciente(); };
+    refreshAlertaSeguridadPaciente();
     $('v-peso').addEventListener('input', calcImc);
     $('v-talla').addEventListener('input', calcImc);
     $('v-urgencia').addEventListener('change', function () { $('v-ayuno-card').style.display = this.checked ? 'block' : 'none'; });

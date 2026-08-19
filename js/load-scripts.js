@@ -39,6 +39,7 @@
     'js/30-admin.js',
     'js/31-valoracion-qr.js',
     'js/40-valoracion-preop-sync.js',
+    'data/valoracion/alertas-seguridad.js',
     'js/32-tiva-calc.js',
     'js/33-gases-calc.js',
     'js/34-capture-guard.js',
@@ -50,7 +51,7 @@
     'js/24-sw-register.js'
   ];
 
-  var CACHE_V = '12.20';
+  var CACHE_V = '12.21';
 
   function loadNext(i) {
     if (i >= SCRIPTS.length) return;

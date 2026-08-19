@@ -31,6 +31,17 @@ function afSyncValoracionesPreop() {
         var dniShow = dniFull || String(ex.dni_enmascarado || '');
         var diagPrincipal = v.diagnostico_cirugia || '';
         var chips = Array.isArray(ant.chips) ? ant.chips.slice() : [];
+        var alerta = typeof afDetectarAlertasSeguridad === 'function'
+          ? afDetectarAlertasSeguridad({
+              antecedentes: ant,
+              medicacion: v.medicacion || [],
+              extras: ex
+            })
+          : { alerta: !!ex.alerta_seguridad, motivos: ex.alerta_motivos || [] };
+        if (ex.alerta_seguridad) {
+          alerta.alerta = true;
+          if (!alerta.motivos || !alerta.motivos.length) alerta.motivos = ex.alerta_motivos || [];
+        }
         var interv = {
           id: 'preop_' + v.id,
           estado: 'preoperatorio',
@@ -60,6 +71,8 @@ function afSyncValoracionesPreop() {
           paciente_id: v.paciente_id || null,
           diagnostico_paciente: ex.diagnostico_paciente || null,
           diagnostico_sin_confirmar: !!ex.diagnostico_sin_confirmar,
+          alerta_seguridad: !!alerta.alerta,
+          alerta_motivos: alerta.motivos || [],
           foja: {
             antecedentes: chips,
             valoracion: {
@@ -90,4 +103,38 @@ function afSyncValoracionesPreop() {
 function afPreopBadgeLabel(estado) {
   if (estado === 'preoperatorio') return 'Preoperatorio pendiente';
   return '';
+}
+
+function afUpdateAlertaSeguridadFicha(interv) {
+  var el = document.getElementById('af-alerta-seg-ficha');
+  if (!el) {
+    var host = document.getElementById('view-nueva');
+    if (!host) return;
+    el = document.createElement('div');
+    el.id = 'af-alerta-seg-ficha';
+    el.setAttribute('role', 'alert');
+    el.style.cssText = 'display:none;margin:0 0 12px;padding:12px 14px;border-radius:8px;background:rgba(248,81,73,.16);border:1px solid rgba(248,81,73,.55);color:#fecaca;font-size:13px;line-height:1.45;font-weight:500';
+    host.insertBefore(el, host.firstChild);
+  }
+  var on = !!(interv && interv.alerta_seguridad);
+  if (!on && interv && typeof afDetectarAlertasSeguridad === 'function' && interv.foja && interv.foja.valoracion) {
+    var det = afDetectarAlertasSeguridad({
+      antecedentes: interv.foja.valoracion.antecedentes,
+      medicacion: interv.foja.valoracion.medicacion,
+      extras: interv.foja.valoracion.extras
+    });
+    on = !!det.alerta;
+  }
+  if (on) {
+    var motivos = (interv && interv.alerta_motivos && interv.alerta_motivos.length)
+      ? ' (' + interv.alerta_motivos.join(', ') + ')'
+      : '';
+    el.textContent = (typeof AF_ALERTA_SEGURIDAD_TEXTO_ANEST !== 'undefined'
+      ? AF_ALERTA_SEGURIDAD_TEXTO_ANEST
+      : '⚠️ Revisar medicación/alergias') + motivos;
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+    el.textContent = '';
+  }
 }

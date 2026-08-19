@@ -40,6 +40,8 @@
 .est-res.err{border-color:rgba(248,81,73,.4)}
 .est-spin{font-size:12px;color:var(--text3);padding:8px 0}
 .est-manual-tag{display:inline-block;font-size:11px;font-weight:600;color:#b45309;background:rgba(227,179,65,.18);border:1px solid rgba(227,179,65,.45);border-radius:6px;padding:3px 8px;margin-top:4px}
+.val-alerta-seg{display:none;position:sticky;top:0;z-index:20;background:rgba(248,81,73,.14);border:1px solid rgba(248,81,73,.55);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:14px;color:#fecaca;line-height:1.45;font-weight:500}
+.val-alerta-seg.on{display:block}
 </style>
 </head>
 <body>
@@ -78,6 +80,7 @@
   </div>
 
   <div id="val-form-wrap">
+    <div id="val-alerta-seg" class="val-alerta-seg" role="alert"></div>
     <div class="val-banner">Completá con calma. Los datos van de forma segura a tu anestesiólogo/a. Si no entendés algo, preguntale a tu médico antes de la cirugía.</div>
     <p id="val-inst-badge" style="font-size:12px;color:var(--text3);margin-bottom:10px;text-align:center"></p>
     <form id="val-form" autocomplete="off">
@@ -280,18 +283,19 @@ if (typeof pdfjsLib !== 'undefined') {
 </script>
 <script src="js/supabase-keepalive.js?v=8.0"></script>
 <script src="js/00-env.js?v=9.0"></script>
-<script src="data/cirujanos-esp.js?v=12.20"></script>
-<script src="data/valoracion/cfg-instituciones.js?v=12.20"></script>
-<script src="data/valoracion/diag-sinonimos-mayo.js?v=12.20"></script>
-<script src="data/valoracion/alergias-comunes.js?v=12.20"></script>
+<script src="data/cirujanos-esp.js?v=12.21"></script>
+<script src="data/valoracion/cfg-instituciones.js?v=12.21"></script>
+<script src="data/valoracion/diag-sinonimos-mayo.js?v=12.21"></script>
+<script src="data/valoracion/alergias-comunes.js?v=12.21"></script>
 <script src="data/obras-sociales-ar.js?v=9.0"></script>
 <script src="data/organos-enfermedades.js?v=9.0"></script>
-<script src="data/medicacion-habitual.js?v=12.20"></script>
+<script src="data/medicacion-habitual.js?v=12.21"></script>
+<script src="data/valoracion/alertas-seguridad.js?v=12.21"></script>
 <script src="js/estudios/pdf-text.js?v=10.8"></script>
 <script src="js/estudios/lab_parser.js?v=10.8"></script>
 <script src="js/estudios/ecg_parser.js?v=10.8"></script>
 <script src="js/estudios/espirometria_parser.js?v=10.8"></script>
 <script src="js/estudios/estudio-extract-local.js?v=10.8"></script>
-<script src="js/valoracion-form.js?v=12.20"></script>
+<script src="js/valoracion-form.js?v=12.21"></script>
 </body>
 </html>
