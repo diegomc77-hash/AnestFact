@@ -13,13 +13,13 @@ var AF_VALORACION_CFG = {
       historia_clinica: { enabled: true, required: false },
       obra_social: { enabled: true, required: false },
       afiliado: { enabled: true, required: true },
-      peso: { enabled: true, required: false },
-      talla: { enabled: true, required: false },
+      peso: { enabled: true, required: true },
+      talla: { enabled: true, required: true },
       especialidad: { enabled: true, required: true },
       cirujano: { enabled: true, required: true }
     },
     /** Campos filiatorios críticos (HC opcional Mayo) */
-    criticos: ['nombre', 'dni', 'afiliado', 'edad'],
+    criticos: ['nombre', 'dni', 'afiliado', 'edad', 'peso', 'talla'],
     antecedentesChips: null,
     extras: [],
     diagSinonimos: 'mayo'

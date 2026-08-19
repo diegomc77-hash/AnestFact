@@ -14,14 +14,18 @@ var MED_HABITUAL = [
   { n: 'Insulina NPH', comercial: ['Humulin N', 'Novolin N'], cat: 'Diabetes', doses: ['10 UI', '20 UI', '30 UI'], horario: 'Mañana y/o noche', via: 'Inyección' },
   { n: 'Insulina glargina', comercial: ['Lantus', 'Tresiba'], cat: 'Diabetes', doses: ['10 UI', '20 UI', '30 UI'], horario: 'Noche', via: 'Inyección' },
   { n: 'Levotiroxina', comercial: ['Eutirox', 'Levotirox'], cat: 'Tiroides', doses: ['50 mcg', '75 mcg', '100 mcg'], horario: 'En ayunas', via: 'VO' },
-  { n: 'Ácido acetilsalicílico', comercial: ['Aspirineta', 'Aspirina', 'Bayaspirina', 'Cafiaspirina', 'AAS', 'Aspirina Prevent'], cat: 'Fluidifica sangre', doses: ['100 mg', '500 mg'], horario: 'Mañana', via: 'VO' },
-  { n: 'Clopidogrel', comercial: ['Plavix', 'Clopidogrel'], cat: 'Fluidifica sangre', doses: ['75 mg'], horario: 'Mañana', via: 'VO' },
-  { n: 'Rivaroxabán', comercial: ['Xarelto'], cat: 'Fluidifica sangre', doses: ['10 mg', '15 mg', '20 mg'], horario: 'Con comida', via: 'VO' },
-  { n: 'Apixabán', comercial: ['Eliquis'], cat: 'Fluidifica sangre', doses: ['2.5 mg', '5 mg'], horario: '2 veces al día', via: 'VO' },
-  { n: 'Warfarina', comercial: ['Coumadin'], cat: 'Fluidifica sangre', doses: ['Según INR'], horario: 'Tarde', via: 'VO' },
-  { n: 'Acenocumarol', comercial: ['Sintrom'], cat: 'Fluidifica sangre', doses: ['Según INR'], horario: 'Tarde', via: 'VO' },
-  { n: 'Dabigatrán', comercial: ['Pradaxa'], cat: 'Fluidifica sangre', doses: ['110 mg', '150 mg'], horario: '2 veces al día', via: 'VO' },
-  { n: 'Enoxaparina', comercial: ['Clexane'], cat: 'Fluidifica sangre', doses: ['20 mg', '40 mg', '60 mg', '80 mg'], horario: 'Según indicación', via: 'Inyección' },
+  { n: 'Ácido acetilsalicílico (Aspirineta)', comercial: ['Aspirineta'], aliases: ['aspirineta'], cat: 'Fluidifica sangre', doses: [], horario: 'Mañana', via: 'VO', nota_dosis: 'Confirmar dosis' },
+  { n: 'Ácido acetilsalicílico (Aspirina)', comercial: ['Aspirina'], aliases: ['aspirina'], cat: 'Fluidifica sangre', doses: [], horario: 'Mañana', via: 'VO', nota_dosis: 'Confirmar dosis' },
+  { n: 'Ácido acetilsalicílico (Bayaspirina)', comercial: ['Bayaspirina'], aliases: ['bayaspirina'], cat: 'Fluidifica sangre', doses: [], horario: 'Mañana', via: 'VO', nota_dosis: 'Confirmar dosis' },
+  { n: 'Ácido acetilsalicílico (Cafiaspirina)', comercial: ['Cafiaspirina'], aliases: ['cafiaspirina'], cat: 'Fluidifica sangre', doses: [], horario: 'Mañana', via: 'VO', nota_dosis: 'Confirmar dosis' },
+  { n: 'Ácido acetilsalicílico (AAS / Prevent)', comercial: ['AAS', 'Aspirina Prevent'], aliases: ['aas', 'aspirina prevent', 'prevent'], cat: 'Fluidifica sangre', doses: [], horario: 'Mañana', via: 'VO', nota_dosis: 'Confirmar dosis' },
+  { n: 'Clopidogrel', comercial: ['Plavix', 'Clopidogrel'], aliases: ['plavix', 'clopidogrel'], cat: 'Fluidifica sangre', doses: ['75 mg'], horario: 'Mañana', via: 'VO' },
+  { n: 'Rivaroxabán', comercial: ['Xarelto', 'Remexal'], aliases: ['rivaroxaban', 'rivaroxabán', 'xarelto', 'remexal'], cat: 'Fluidifica sangre', doses: ['2.5 mg', '10 mg', '15 mg', '20 mg'], horario: 'Con comida', via: 'VO' },
+  { n: 'Apixabán', comercial: ['Eliquis'], aliases: ['apixaban', 'eliquis'], cat: 'Fluidifica sangre', doses: ['2.5 mg', '5 mg'], horario: '2 veces al día', via: 'VO' },
+  { n: 'Warfarina', comercial: ['Coumadin'], aliases: ['warfarina', 'coumadin'], cat: 'Fluidifica sangre', doses: ['Según INR'], horario: 'Tarde', via: 'VO' },
+  { n: 'Acenocumarol', comercial: ['Sintrom'], aliases: ['acenocumarol', 'sintrom'], cat: 'Fluidifica sangre', doses: ['Según INR'], horario: 'Tarde', via: 'VO' },
+  { n: 'Dabigatrán', comercial: ['Pradaxa'], aliases: ['dabigatran', 'pradaxa'], cat: 'Fluidifica sangre', doses: ['110 mg', '150 mg'], horario: '2 veces al día', via: 'VO' },
+  { n: 'Enoxaparina', comercial: ['Clexane'], aliases: ['enoxaparina', 'clexane'], cat: 'Fluidifica sangre', doses: ['20 mg', '40 mg', '60 mg', '80 mg'], horario: 'Según indicación', via: 'Inyección' },
   { n: 'Omeprazol', comercial: ['Omepraz', 'Losec'], cat: 'Estómago', doses: ['20 mg', '40 mg'], horario: 'Antes del desayuno', via: 'VO' },
   { n: 'Pantoprazol', comercial: ['Pantus', 'Pantoloc'], cat: 'Estómago', doses: ['20 mg', '40 mg'], horario: 'Mañana', via: 'VO' },
   { n: 'Salbutamol inhalador', comercial: ['Ventolin', 'Salbutral'], cat: 'Asma / pulmones', doses: ['2 puff'], horario: 'Si falta aire', via: 'Inhalador' },
@@ -48,33 +52,46 @@ var MED_HABITUAL = [
   { n: 'Amlodipina + Losartán', comercial: ['Lopresor'], cat: 'Presión alta', doses: ['5/50 mg'], horario: 'Mañana', via: 'VO' },
 ];
 
+function medFold(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
+}
+
 function medHabitualLabel(d) {
-  var c = (d.comercial && d.comercial.length) ? d.comercial.slice(0, 3).join(', ') : '';
+  var c = (d.comercial && d.comercial.length) ? d.comercial[0] : '';
   if (c) return c + ' → ' + d.n;
   return d.n;
 }
 
 function medHabitualMatch(d, q) {
-  q = (q || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  q = medFold(q);
   if (!q || q.length < 2) return false;
-  var n = d.n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  if (n.indexOf(q) >= 0) return true;
-  if (d.cat.toLowerCase().indexOf(q) >= 0) return true;
+  if (medFold(d.n).indexOf(q) >= 0) return true;
+  if (medFold(d.cat).indexOf(q) >= 0) return true;
+  var i;
   if (d.comercial) {
-    for (var i = 0; i < d.comercial.length; i++) {
-      var c = d.comercial[i].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      if (c.indexOf(q) >= 0) return true;
+    for (i = 0; i < d.comercial.length; i++) {
+      if (medFold(d.comercial[i]).indexOf(q) >= 0) return true;
+    }
+  }
+  if (d.aliases) {
+    for (i = 0; i < d.aliases.length; i++) {
+      if (medFold(d.aliases[i]).indexOf(q) >= 0) return true;
     }
   }
   return false;
 }
 
 var ANTICOAG_COMUN = [
-  'Aspirineta / Aspirina / AAS → Ácido acetilsalicílico',
+  'Aspirineta → Ácido acetilsalicílico',
+  'Aspirina → Ácido acetilsalicílico',
+  'Bayaspirina → Ácido acetilsalicílico',
+  'Cafiaspirina → Ácido acetilsalicílico',
+  'AAS / Aspirina Prevent → Ácido acetilsalicílico',
   'Plavix → Clopidogrel',
   'Sintrom → Acenocumarol',
   'Coumadin → Warfarina',
   'Xarelto → Rivaroxabán',
+  'Remexal → Rivaroxabán',
   'Eliquis → Apixabán',
   'Pradaxa → Dabigatrán',
   'Clexane → Enoxaparina',
@@ -82,28 +99,30 @@ var ANTICOAG_COMUN = [
 ];
 
 var ANTICOAG_DOSES = {
-  'acido acetilsalicilico': ['100 mg', '500 mg'],
-  'aspirineta': ['100 mg', '500 mg'],
-  'aspirina': ['100 mg', '500 mg'],
-  'aas': ['100 mg', '500 mg'],
+  'rivaroxaban': ['2.5 mg', '10 mg', '15 mg', '20 mg'],
+  'xarelto': ['2.5 mg', '10 mg', '15 mg', '20 mg'],
+  'remexal': ['10 mg', '15 mg', '20 mg'],
   'clopidogrel': ['75 mg'],
   'plavix': ['75 mg'],
   'acenocumarol': ['Según INR'],
   'sintrom': ['Según INR'],
   'warfarina': ['Según INR'],
   'coumadin': ['Según INR'],
-  'rivaroxaban': ['10 mg', '15 mg', '20 mg'],
-  'xarelto': ['10 mg', '15 mg', '20 mg'],
   'apixaban': ['2.5 mg', '5 mg'],
   'eliquis': ['2.5 mg', '5 mg'],
   'dabigatran': ['110 mg', '150 mg'],
   'pradaxa': ['110 mg', '150 mg'],
   'enoxaparina': ['20 mg', '40 mg', '60 mg', '80 mg'],
-  'clexane': ['20 mg', '40 mg', '60 mg', '80 mg']
+  'clexane': ['20 mg', '40 mg', '60 mg', '80 mg'],
+  'aspirineta': ['Confirmar dosis'],
+  'aspirina': ['Confirmar dosis'],
+  'bayaspirina': ['Confirmar dosis'],
+  'cafiaspirina': ['Confirmar dosis'],
+  'aas': ['Confirmar dosis']
 };
 
 function anticoagDosesFor(text) {
-  var q = String(text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  var q = medFold(text);
   var keys = Object.keys(ANTICOAG_DOSES);
   for (var i = 0; i < keys.length; i++) {
     if (q.indexOf(keys[i]) >= 0) return ANTICOAG_DOSES[keys[i]].slice();

@@ -26,7 +26,11 @@ function afSyncValoracionesPreop() {
         var ex = v.extras || {};
         var ant = v.antecedentes || {};
         var pac = ex.etiqueta_nombre || (ex.etiqueta_lista ? String(ex.etiqueta_lista).split(' · ')[0] : '') || 'Paciente (QR)';
-        var dniMask = ex.dni_enmascarado || '';
+        // Profesional autenticado: DNI completo (datos_basicos). Máscara solo fallback legado.
+        var dniFull = String(db.dni || '').replace(/\D/g, '');
+        var dniShow = dniFull || String(ex.dni_enmascarado || '');
+        var diagPrincipal = v.diagnostico_cirugia || '';
+        var chips = Array.isArray(ant.chips) ? ant.chips.slice() : [];
         var interv = {
           id: 'preop_' + v.id,
           estado: 'preoperatorio',
@@ -35,11 +39,12 @@ function afSyncValoracionesPreop() {
           pac: pac,
           edad: db.edad != null ? String(db.edad) : '',
           sexo: db.sexo || '',
-          dni: dniMask,
+          dni: dniShow,
           peso: db.peso_kg != null ? String(db.peso_kg) : '',
+          talla: db.talla_cm != null ? String(db.talla_cm) : '',
           ciru: db.cirujano || '',
           serv: db.especialidad || '',
-          diag: v.diagnostico_cirugia || '',
+          diag: diagPrincipal,
           san: ex.sanatorio || 'Sanatorio Mayo',
           sala: '',
           cama: '',
@@ -53,8 +58,10 @@ function afSyncValoracionesPreop() {
           origen: 'qr_valoracion',
           valoracion_id: v.id,
           paciente_id: v.paciente_id || null,
+          diagnostico_paciente: ex.diagnostico_paciente || null,
+          diagnostico_sin_confirmar: !!ex.diagnostico_sin_confirmar,
           foja: {
-            antecedentes: ant.chips || [],
+            antecedentes: chips,
             valoracion: {
               datos_basicos: db,
               antecedentes: ant,

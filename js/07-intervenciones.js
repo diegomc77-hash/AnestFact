@@ -325,7 +325,8 @@ function renderHome(){
       +'<div style="width:10px;height:10px;border-radius:50%;background:'+c+';flex-shrink:0"></div>'
       +'<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(x.pac||'Sin nombre')+'</div>'
       +'<div style="font-size:12px;color:var(--text2);margin-top:2px">'+fmt(x.fecha)+' · '+icon+' '+(x.san||'—')+(x.dni?' · DNI '+x.dni:'')+'</div>'
-      +(x.diag?'<div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+x.diag+'</div>':'')
+      +(x.diag?'<div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+x.diag+(x.diagnostico_sin_confirmar?' · <span style="color:#e3b341">sin confirmar</span>':'')+(x.diagnostico_paciente&&x.diagnostico_paciente!==x.diag?' · “'+x.diagnostico_paciente+'”':'')+'</div>':'')
+      +(x.origen==='qr_valoracion'&&x.foja&&x.foja.antecedentes&&x.foja.antecedentes.length?'<div style="font-size:10px;color:var(--text3);margin-top:2px">Antecedentes: '+x.foja.antecedentes.join(', ')+'</div>':'')
       +'</div>'
       +(esMayo
         ?('<button type="button" class="badge" title="'+(inCola?'Sacar de cola GECLISA':'Agregar a cola GECLISA')+'" '
@@ -356,6 +357,9 @@ function abrirInter(id){
     cargarForm(S.cur);
     if(typeof cargarFojaUI==='function')cargarFojaUI();
     var badge=document.getElementById('ia-badge');if(badge)badge.style.display='none';
+    if(S.cur.origen==='qr_valoracion'&&S.cur.foja&&S.cur.foja.antecedentes&&S.cur.foja.antecedentes.length&&typeof toast==='function'){
+      toast('Antecedentes QR: '+S.cur.foja.antecedentes.join(', ')+' (ver Foja)');
+    }
     go('nueva');
   }
 }

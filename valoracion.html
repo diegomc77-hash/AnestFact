@@ -84,10 +84,10 @@
 
       <div class="card">
         <div class="ct">Cirugía programada</div>
-        <div class="field ac-wrap"><label>¿Qué operación o estudio le van a hacer? *</label>
+        <div class="field ac-wrap"><label>¿Cuál es el diagnóstico o el motivo por el que lo van a operar? *</label>
           <input class="fi" id="v-dx" required placeholder="Ej. piedras en la vesícula, hernia, rodilla" autocomplete="off">
           <div class="ac-list" id="ac-v-dx"></div>
-          <p class="val-hint">Escribí como te lo dijeron en casa. Si aparece una sugerencia en tus palabras, elegila.</p>
+          <p class="val-hint">Si aparece una sugerencia en sus palabras, puede elegirla.</p>
         </div>
         <div class="field"><label>Motivo de este formulario</label>
           <select class="fi" id="v-motivo">
@@ -110,7 +110,7 @@
 
       <div class="card">
         <div class="ct">Sus datos</div>
-        <p class="val-hint" style="margin-bottom:10px;color:#e3b341">Nombre, DNI, edad y N° de afiliado son <strong>obligatorios</strong> — un error acá complica la cirugía y la facturación. La historia clínica es opcional.</p>
+        <p class="val-hint" style="margin-bottom:10px;color:#e3b341">Nombre, DNI, edad, peso, talla y N° de afiliado son <strong>obligatorios</strong> — un error acá puede afectar la evaluación correcta de su riesgo anestésico. Es por su seguridad. La historia clínica es opcional.</p>
         <div class="field"><label>Nombre y apellido *</label><input class="fi" id="v-nombre" required autocomplete="name"></div>
         <div class="field"><label>DNI *</label><input class="fi" id="v-dni" required inputmode="numeric" autocomplete="off" maxlength="10"></div>
         <div class="field" id="v-hc-wrap"><label>N° de Historia Clínica (opcional)</label><input class="fi" id="v-hc" placeholder="Si lo tiene a mano" autocomplete="off"></div>
@@ -121,8 +121,8 @@
           </div>
         </div>
         <div class="g2">
-          <div class="field"><label>Peso (kg)</label><input class="fi" type="number" id="v-peso" step="0.1" min="0" placeholder="Ej. 78"></div>
-          <div class="field"><label>Altura (cm)</label><input class="fi" type="number" id="v-talla" step="1" min="0" placeholder="Ej. 170"></div>
+          <div class="field"><label>Peso (kg) *</label><input class="fi" type="number" id="v-peso" required step="0.1" min="1" max="400" placeholder="Ej. 78"></div>
+          <div class="field"><label>Altura (cm) *</label><input class="fi" type="number" id="v-talla" required step="1" min="40" max="250" placeholder="Ej. 170"></div>
         </div>
         <div class="field"><label>Peso / altura (IMC)</label><input class="fi" id="v-imc" readonly placeholder="Se calcula solo"></div>
         <div class="field"><label>Provincia donde vive o tiene la cobertura</label>
@@ -280,18 +280,18 @@ if (typeof pdfjsLib !== 'undefined') {
 </script>
 <script src="js/supabase-keepalive.js?v=8.0"></script>
 <script src="js/00-env.js?v=9.0"></script>
-<script src="data/cirujanos-esp.js?v=12.19"></script>
-<script src="data/valoracion/cfg-instituciones.js?v=12.19"></script>
-<script src="data/valoracion/diag-sinonimos-mayo.js?v=12.19"></script>
-<script src="data/valoracion/alergias-comunes.js?v=12.19"></script>
+<script src="data/cirujanos-esp.js?v=12.20"></script>
+<script src="data/valoracion/cfg-instituciones.js?v=12.20"></script>
+<script src="data/valoracion/diag-sinonimos-mayo.js?v=12.20"></script>
+<script src="data/valoracion/alergias-comunes.js?v=12.20"></script>
 <script src="data/obras-sociales-ar.js?v=9.0"></script>
 <script src="data/organos-enfermedades.js?v=9.0"></script>
-<script src="data/medicacion-habitual.js?v=12.19"></script>
+<script src="data/medicacion-habitual.js?v=12.20"></script>
 <script src="js/estudios/pdf-text.js?v=10.8"></script>
 <script src="js/estudios/lab_parser.js?v=10.8"></script>
 <script src="js/estudios/ecg_parser.js?v=10.8"></script>
 <script src="js/estudios/espirometria_parser.js?v=10.8"></script>
 <script src="js/estudios/estudio-extract-local.js?v=10.8"></script>
-<script src="js/valoracion-form.js?v=12.19"></script>
+<script src="js/valoracion-form.js?v=12.20"></script>
 </body>
 </html>

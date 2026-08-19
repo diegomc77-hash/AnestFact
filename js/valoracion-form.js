@@ -5,6 +5,7 @@
   var estudiosExtraidos = {};
   var MAX_ESTUDIOS = 5;
   var dxMedicoSugerido = null;
+  var dxElegidoDiccionario = false;
   var alergiasSel = {};
 
   function $(id) { return document.getElementById(id); }
@@ -310,25 +311,29 @@
     var doseOpts = (data && data.doses) || [];
 
     function showDoses() {
-      var opts = doseOpts.length ? doseOpts : [];
-      if (!opts.length && wrap._medRef && wrap._medRef.doses) opts = wrap._medRef.doses;
-      if (!opts.length) return;
+      var opts = doseOpts.length ? doseOpts.slice() : [];
+      if (!opts.length && wrap._medRef) {
+        if (wrap._medRef.doses && wrap._medRef.doses.length) opts = wrap._medRef.doses.slice();
+        else if (wrap._medRef.nota_dosis) opts = [wrap._medRef.nota_dosis];
+      }
+      if (!opts.length) opts = ['Confirmar dosis'];
       var q = dInp.value.toLowerCase();
       var hits = q ? opts.filter(function (x) { return x.toLowerCase().indexOf(q) >= 0; }) : opts;
       renderAc(acD, hits, function (x) { return x; }, null, function (x) { dInp.value = x; });
     }
 
     nInp.addEventListener('input', function () {
-      if (typeof medHabitualMatch !== 'function') return;
+      if (typeof medHabitualMatch !== 'function' || typeof MED_HABITUAL === 'undefined') return;
       var q = nInp.value;
       if (q.length < 2) { var el = $(acId); if (el) el.style.display = 'none'; return; }
-      var hits = MED_HABITUAL.filter(function (d) { return medHabitualMatch(d, q); }).slice(0, 10);
+      var hits = MED_HABITUAL.filter(function (d) { return medHabitualMatch(d, q); }).slice(0, 12);
       renderAc(acId, hits, function (d) { return medHabitualLabel(d); }, function (d) { return d.cat; }, function (d) {
-        nInp.value = d.n;
-        wrap.dataset.comercial = (d.comercial && d.comercial[0]) || '';
+        var com = (d.comercial && d.comercial[0]) || '';
+        nInp.value = com ? (com + ' (' + d.n + ')') : d.n;
+        wrap.dataset.comercial = com;
         wrap.dataset.sugerido = '1';
         wrap._medRef = d;
-        doseOpts = (d.doses || []).slice();
+        doseOpts = (d.doses && d.doses.length) ? d.doses.slice() : (d.nota_dosis ? [d.nota_dosis] : ['Confirmar dosis']);
         dInp.value = doseOpts[0] || '';
         wrap.querySelector('.med-h').value = d.horario || '';
         wrap.querySelector('.med-v').value = d.via || 'VO';
@@ -558,20 +563,28 @@
     var provEl = $('v-prov-obra');
     var cfg = afValoracionCfg(SANATORIO);
     var nombre = $('v-nombre').value.trim();
-    var dni = $('v-dni').value.trim();
+    var dniRaw = $('v-dni').value.trim();
+    var dniCanon = digitsDni(dniRaw);
     var dxPaciente = $('v-dx').value.trim();
-    var mapped = dxMedicoSugerido || (typeof afDiagMapearMedicoMayo === 'function' ? afDiagMapearMedicoMayo(dxPaciente) : null);
+    var mapped = null;
+    var sinConfirmar = true;
+    if (dxElegidoDiccionario && dxMedicoSugerido) {
+      mapped = dxMedicoSugerido;
+      sinConfirmar = true; // rastro paciente / sugerencia pendiente de revisión médica
+    }
+    var diagPrincipal = mapped || dxPaciente;
     var al = collectAlergias();
     var protesis = collectChecked('v-protesis-dental', 'v-protesis-ninguno');
     var cuello = collectChecked('v-cuello', 'v-cuello-ninguno');
     return {
       token: TOKEN,
       nombre: nombre,
-      dni: dni,
-      diagnostico_cirugia: dxPaciente,
+      dni: dniCanon || dniRaw,
+      diagnostico_cirugia: diagPrincipal,
       motivo_valoracion: $('v-motivo').value,
       fecha_cirugia_programada: $('v-fecha-cx').value || null,
       datos_basicos: {
+        dni: dniCanon || dniRaw,
         edad: numOrNull($('v-edad').value),
         sexo: $('v-sexo').value || null,
         peso_kg: numOrNull($('v-peso').value),
@@ -625,7 +638,9 @@
         diagnostico_paciente: dxPaciente,
         diagnostico_medico_sugerido: mapped || null,
         diagnostico_sugerido: !!mapped,
-        etiqueta_lista: nombre + ' · DNI ' + maskDni(dni) + ' · ' + (dxPaciente || 'Sin diagnóstico')
+        diagnostico_sin_confirmar: sinConfirmar || !mapped,
+        diagnostico_confirmado: false,
+        etiqueta_lista: nombre + ' · DNI ' + (dniCanon || dniRaw) + ' · ' + (diagPrincipal || 'Sin diagnóstico')
       },
     };
   }
@@ -646,6 +661,8 @@
     var nombre = $('v-nombre').value.trim();
     var dni = digitsDni($('v-dni').value);
     var edad = numOrNull($('v-edad').value);
+    var peso = numOrNull($('v-peso').value);
+    var talla = numOrNull($('v-talla').value);
     var afil = $('v-afil').value.trim();
     var serv = $('v-serv') ? $('v-serv').value : '';
     var ciru = $('v-ciru') ? $('v-ciru').value.trim() : '';
@@ -654,8 +671,10 @@
     if (!nombre || nombre.length < 3) errs.push('Nombre y apellido (completo)');
     if (dni.length < 7 || dni.length > 8) errs.push('DNI (7 u 8 dígitos, sin ceros de más al frente)');
     if (edad == null || edad < 0 || edad > 120) errs.push('Edad (años)');
+    if (peso == null || peso <= 0 || peso > 400) errs.push('Peso (kg)');
+    if (talla == null || talla < 40 || talla > 250) errs.push('Altura / talla (cm)');
     if (!afil) errs.push('N° de afiliado / credencial');
-    if (!dx) errs.push('Qué operación le van a hacer');
+    if (!dx) errs.push('Diagnóstico o motivo de la cirugía');
     if (!serv) errs.push('Especialidad / servicio');
     if (!ciru) errs.push('Cirujano/a');
     return errs;
@@ -666,12 +685,16 @@
     var dni = $('v-dni').value.trim();
     var afil = $('v-afil').value.trim();
     var edad = $('v-edad').value.trim();
+    var peso = $('v-peso').value.trim();
+    var talla = $('v-talla').value.trim();
     var hc = $('v-hc') ? $('v-hc').value.trim() : '';
     var msg =
-      'Revisá estos datos antes de enviar (un error puede traer problemas):\n\n' +
+      'Revisá estos datos antes de enviar (un error puede afectar su evaluación anestésica):\n\n' +
       'Nombre: ' + nombre + '\n' +
       'DNI: ' + dni + '\n' +
       'Edad: ' + edad + '\n' +
+      'Peso: ' + peso + ' kg\n' +
+      'Talla: ' + talla + ' cm\n' +
       'Afiliado: ' + afil + '\n' +
       (hc ? 'Historia clínica: ' + hc + '\n' : '') +
       '\n¿Están correctos?';
@@ -809,18 +832,15 @@
   function wireDiagSinonimos() {
     var inp = $('v-dx');
     if (!inp || typeof afDiagSugerenciasMayo !== 'function') return;
-    function setMapped(medico) {
-      dxMedicoSugerido = medico || null;
-      var hint = $('v-dx-map-hint');
-      if (hint) hint.style.display = 'none';
-    }
     inp.addEventListener('input', function () {
+      dxElegidoDiccionario = false;
+      dxMedicoSugerido = null;
       var hits = afDiagSugerenciasMayo(inp.value);
       renderAc('ac-v-dx', hits, function (row) { return row.paciente; }, null, function (row) {
         inp.value = row.paciente;
-        setMapped(row.medico);
+        dxMedicoSugerido = row.medico;
+        dxElegidoDiccionario = true;
       });
-      setMapped(typeof afDiagMapearMedicoMayo === 'function' ? afDiagMapearMedicoMayo(inp.value) : null);
     });
     inp.addEventListener('blur', function () { setTimeout(closeAllAc, 150); });
   }

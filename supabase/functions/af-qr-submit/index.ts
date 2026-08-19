@@ -74,11 +74,19 @@ Deno.serve(async (req) => {
   if (qr.uses_count >= qr.max_uses) return jsonResponse({ error: 'Enlace agotado (ya fue usado)' }, 403);
 
   const ownerId = qr.owner_id;
-  const db = (body.datos_basicos || {}) as Record<string, unknown>;
-  const edad = db.edad;
-  const afil = String(db.afiliado || '').trim();
+  const dbIn = (body.datos_basicos || {}) as Record<string, unknown>;
+  const edad = dbIn.edad;
+  const peso = dbIn.peso_kg;
+  const talla = dbIn.talla_cm;
+  const afil = String(dbIn.afiliado || '').trim();
   if (edad == null || edad === '' || Number(edad) < 0 || Number(edad) > 120) {
     return jsonResponse({ error: 'Edad obligatoria (0–120)' }, 400);
+  }
+  if (peso == null || peso === '' || Number(peso) <= 0 || Number(peso) > 400) {
+    return jsonResponse({ error: 'Peso obligatorio (kg)' }, 400);
+  }
+  if (talla == null || talla === '' || Number(talla) < 40 || Number(talla) > 250) {
+    return jsonResponse({ error: 'Talla obligatoria (cm)' }, 400);
   }
   if (!afil) return jsonResponse({ error: 'N° de afiliado obligatorio' }, 400);
   let dniH: string;
@@ -130,11 +138,16 @@ Deno.serve(async (req) => {
   const dniMasked = dni.length >= 4 ? ('***' + dni.slice(-4)) : '****';
   const etiqueta = String(
     extrasIn.etiqueta_lista ||
-      (nombre + ' · DNI ' + dniMasked + ' · ' + ((body.diagnostico_cirugia || '').trim() || 'Sin diagnóstico')),
+      (nombre + ' · DNI ' + dni + ' · ' + ((body.diagnostico_cirugia || '').trim() || 'Sin diagnóstico')),
   );
 
+  const datosBasicos = {
+    ...(body.datos_basicos || {}),
+    dni: dni,
+  };
+
   const payload = {
-    datos_basicos: body.datos_basicos || {},
+    datos_basicos: datosBasicos,
     antecedentes: body.antecedentes || {},
     medicacion: body.medicacion || [],
     antec_anestesicos: body.antec_anestesicos || {},

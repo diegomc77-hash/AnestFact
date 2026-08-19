@@ -68,7 +68,7 @@
   }
 
   function fetchHtml(url) {
-      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.19';
+      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.20';
     return fetch(bust).then(function (r) {
       if (!r.ok) throw new Error(url + ' HTTP ' + r.status);
       return r.text();
