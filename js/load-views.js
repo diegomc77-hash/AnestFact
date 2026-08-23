@@ -2,6 +2,7 @@
 
 (function () {
   var VIEWS = ['home', 'nueva', 'facturacion', 'escanear', 'config', 'foja', 'nom', 'geclisa', 'resumen', 'ayuda', 'admin'];
+  // Si agregás vistas o partes de foja, actualizá también STATIC_CORE en sw.js.
   var FOJA_PARTS = [
     'tiempos', 'mayo-quir', 'tecnica', 'drogas', 'metodos', 'mayo-geclisa',
     'vitals', 'fluidos', 'recuperacion', 'observaciones', 'firma', 'acciones'
@@ -68,7 +69,7 @@
   }
 
   function fetchHtml(url) {
-      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.21';
+      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.22';
     return fetch(bust).then(function (r) {
       if (!r.ok) throw new Error(url + ' HTTP ' + r.status);
       return r.text();

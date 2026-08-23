@@ -1,4 +1,5 @@
 (function () {
+  // Si agregás/quitás un script acá, actualizá también STATIC_CORE en sw.js (precache shell).
   var SCRIPTS = [
     'js/00-env.js',
     'data/nomenclador.js',
@@ -51,7 +52,7 @@
     'js/24-sw-register.js'
   ];
 
-  var CACHE_V = '12.21';
+  var CACHE_V = '12.22';
 
   function loadNext(i) {
     if (i >= SCRIPTS.length) return;
