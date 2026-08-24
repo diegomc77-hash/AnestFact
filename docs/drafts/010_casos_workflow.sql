@@ -1,14 +1,18 @@
 -- =============================================================================
--- DRAFT — NO APLICAR. Esperar validación de docs/ARQUITECTURA_CASOS_EVWEB.md
+-- DRAFT — NO APLICAR hasta el mapeo pantalla a pantalla de evweb/Traditum.
+-- Arquitectura cerrada: docs/ARQUITECTURA_CASOS_EVWEB.md (24-08-2026).
 -- =============================================================================
 -- AnesFact 010 — Casos de facturación, intake QR, políticas institución×mutual
 --
 -- No reemplaza anesfact_datos ni anesfact_qr_tokens (valoración paciente).
 -- No toca fill.js / GECLISA tokens.
 --
--- Prerrequisito conceptual: 001–009 + anesfact_pacientes (005).
--- Extensiones: pgcrypto (ya en 008). pg_cron NO es requisito: el purge
--- corre en GitHub Action / Edge Function.
+-- Cierre de producto:
+--   * Geclisa se dispara por institución (Mayo = siempre), no por mutual.
+--   * Aero atiende IOSFA, no PAMI. Sin fila Aero×PAMI.
+--   * cirugia_clinica vs cirugia_autorizada (Traditum no usa el dato real).
+--   * auth_status Traditum: enviado → validado | sujeto_a_auditoria | rechazado.
+--   * Purge autorización al confirmar OCR; fojas 14 d post-facturado.
 -- =============================================================================
 
 -- CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -31,7 +35,8 @@ CREATE TABLE IF NOT EXISTS public.anesfact_mutuales (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   codigo text NOT NULL UNIQUE,
   nombre text NOT NULL,
-  -- "os_varias" agrupa OSDE/IOSFA/etc. El nombre concreto vive en casos.obra_social
+  -- os_varias agrupa OSDE/etc. El nombre concreto vive en casos.obra_social.
+  -- iosfa es fila propia (Aero). En Mayo, IOSFA cae en os_varias salvo override.
   auth_mode_default text NOT NULL DEFAULT 'upload'
     CHECK (auth_mode_default IN ('none', 'upload', 'traditum', 'geclisa')),
   requiere_foja_anest_evweb boolean NOT NULL DEFAULT true,
@@ -50,10 +55,10 @@ CREATE TABLE IF NOT EXISTS public.anesfact_workflow_policies (
 );
 
 COMMENT ON COLUMN public.anesfact_workflow_policies.requisitos IS
-  '{version, slots: {foja_anest_anesfact, foja_qx_anesfact, foja_geclisa, autorizacion}}';
+  '{version, slots, geclisa:{required}} — geclisa.required sigue a institucion.usa_geclisa, no a la mutual';
 
 -- ---------------------------------------------------------------------------
--- 2) Casos (expediente de facturación; la foja clínica sigue en anesfact_datos)
+-- 2) Casos
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.anesfact_casos (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -66,11 +71,17 @@ CREATE TABLE IF NOT EXISTS public.anesfact_casos (
   obra_social text,
   afiliado_hash text,
   complejidad smallint,
+  -- Traditum: no enviar el dato clínico si difiere del papel.
+  cirugia_clinica jsonb NOT NULL DEFAULT '{}'::jsonb,
+  cirugia_autorizada jsonb NOT NULL DEFAULT '{}'::jsonb,
   requisitos_snapshot jsonb NOT NULL DEFAULT '{}'::jsonb,
   caso_status text NOT NULL DEFAULT 'abierto'
     CHECK (caso_status IN ('abierto', 'cerrado', 'anulado')),
   auth_status text NOT NULL DEFAULT 'pendiente_doc'
-    CHECK (auth_status IN ('no_aplica', 'pendiente_doc', 'pendiente_externo', 'autorizado', 'rechazado')),
+    CHECK (auth_status IN (
+      'no_aplica', 'pendiente_doc', 'enviado',
+      'validado', 'sujeto_a_auditoria', 'autorizado', 'rechazado'
+    )),
   geclisa_status text NOT NULL DEFAULT 'no_aplica'
     CHECK (geclisa_status IN ('no_aplica', 'pendiente_envio', 'enviado', 'foja_bajada')),
   evweb_status text NOT NULL DEFAULT 'bloqueado'
@@ -89,9 +100,16 @@ CREATE INDEX IF NOT EXISTS anesfact_casos_bandeja_idx
   ON public.anesfact_casos (institucion_id, mutual_id, evweb_status, auth_status);
 CREATE INDEX IF NOT EXISTS anesfact_casos_paciente_idx
   ON public.anesfact_casos (paciente_id, fecha_cirugia);
+CREATE INDEX IF NOT EXISTS anesfact_casos_alerta_auth_idx
+  ON public.anesfact_casos (owner_id, auth_status)
+  WHERE auth_status = 'rechazado';
 
 COMMENT ON TABLE public.anesfact_casos IS
-  'Expediente de facturación. interv_id apunta a la foja en anesfact_datos; puede ser NULL si el intake llegó antes.';
+  'Expediente de facturación. interv_id → foja en anesfact_datos (NULL si el intake llegó antes). Dos cirugías el mismo día = dos interv_id = dos filas.';
+COMMENT ON COLUMN public.anesfact_casos.cirugia_clinica IS
+  'Lo que hizo la doctora. Va a foja / evweb.';
+COMMENT ON COLUMN public.anesfact_casos.cirugia_autorizada IS
+  'Lo que dice el papel Traditum. Va al envío de validación. No se concilia con cirugia_clinica.';
 
 -- ---------------------------------------------------------------------------
 -- 3) Documentos (Storage, no base64 en el blob de sync)
@@ -111,6 +129,7 @@ CREATE TABLE IF NOT EXISTS public.anesfact_caso_documentos (
   bytes integer,
   extracted jsonb NOT NULL DEFAULT '{}'::jsonb,
   ocr_confianza text,
+  ocr_confirmado_at timestamptz,
   purge_after timestamptz,
   purged_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now()
@@ -123,7 +142,7 @@ CREATE INDEX IF NOT EXISTS anesfact_caso_docs_purge_idx
   WHERE purged_at IS NULL AND storage_path IS NOT NULL;
 
 -- ---------------------------------------------------------------------------
--- 4) Autorizaciones (historial; Traditum = una fila pending_external)
+-- 4) Autorizaciones (historial; Traditum = intentos)
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.anesfact_caso_autorizaciones (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -132,10 +151,13 @@ CREATE TABLE IF NOT EXISTS public.anesfact_caso_autorizaciones (
   canal text NOT NULL
     CHECK (canal IN ('upload', 'traditum', 'geclisa', 'manual')),
   status text NOT NULL DEFAULT 'pendiente'
-    CHECK (status IN ('pendiente', 'autorizado', 'rechazado', 'vencido')),
+    CHECK (status IN (
+      'pendiente', 'enviado', 'validado', 'sujeto_a_auditoria', 'rechazado', 'vencido'
+    )),
   documento_id uuid REFERENCES public.anesfact_caso_documentos(id) ON DELETE SET NULL,
   complejidad_solicitada smallint,
   complejidad_autorizada smallint,
+  payload jsonb NOT NULL DEFAULT '{}'::jsonb, -- copia de cirugia_autorizada al enviar
   notas text,
   created_at timestamptz NOT NULL DEFAULT now(),
   resolved_at timestamptz
@@ -145,7 +167,7 @@ CREATE INDEX IF NOT EXISTS anesfact_caso_auth_pend_idx
   ON public.anesfact_caso_autorizaciones (owner_id, status, created_at DESC);
 
 -- ---------------------------------------------------------------------------
--- 5) Intake QR secretaria (distinto de anesfact_qr_tokens / valoración paciente)
+-- 5) Intake QR secretaria (distinto de anesfact_qr_tokens)
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.anesfact_intake_tokens (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -205,7 +227,7 @@ CREATE TABLE IF NOT EXISTS public.anesfact_evweb_lote_items (
 );
 
 -- ---------------------------------------------------------------------------
--- 7) Membresía (fase 2: secretaria). MVP puede omitirse.
+-- 7) Membresía (fase 2). MVP: secretaria sube por QR+PIN, no confirma matches.
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.anesfact_institucion_miembros (
   institucion_id uuid NOT NULL REFERENCES public.anesfact_instituciones(id) ON DELETE CASCADE,
@@ -215,19 +237,21 @@ CREATE TABLE IF NOT EXISTS public.anesfact_institucion_miembros (
 );
 
 -- ---------------------------------------------------------------------------
--- 8) Vista de bandeja (derivada; no es estado persistido)
+-- 8) Vista de bandeja
 -- ---------------------------------------------------------------------------
 CREATE OR REPLACE VIEW public.anesfact_casos_bandeja AS
 SELECT
   c.*,
+  (c.cirugia_clinica IS DISTINCT FROM '{}'::jsonb
+    AND c.cirugia_autorizada IS DISTINCT FROM '{}'::jsonb
+    AND c.cirugia_clinica IS DISTINCT FROM c.cirugia_autorizada) AS discrepancia_cirugia,
   CASE
     WHEN c.evweb_status = 'facturado' THEN 'facturado'
     WHEN c.evweb_status = 'cargado' THEN 'cargado'
     WHEN c.evweb_status = 'rechazado' THEN 'rechazado_evweb'
+    WHEN c.auth_status = 'rechazado' THEN 'alerta_auth'
     WHEN c.evweb_status = 'listo' THEN 'listo_evweb'
-    WHEN c.auth_status IN ('pendiente_doc', 'pendiente_externo', 'rechazado')
-         AND c.auth_status IS DISTINCT FROM 'no_aplica'
-      THEN 'esperando_autorizacion'
+    WHEN c.auth_status IN ('pendiente_doc', 'enviado', 'sujeto_a_auditoria') THEN 'esperando_autorizacion'
     WHEN c.geclisa_status IN ('pendiente_envio', 'enviado') THEN 'esperando_geclisa'
     WHEN c.paciente_id IS NULL OR c.interv_id IS NULL THEN 'huerfanos'
     ELSE 'faltan_documentos'
@@ -236,9 +260,32 @@ FROM public.anesfact_casos c
 WHERE c.caso_status = 'abierto';
 
 -- ---------------------------------------------------------------------------
--- 9) Trigger: al facturar, programar purge; al rechazar, cancelarlo
---     El DELETE en Storage lo hace un job (Action / Edge), no este trigger.
+-- 9) Purge: trigger solo setea purge_after. Storage lo borra un job.
+--    Autorización: al confirmar OCR → ahora.
+--    Fojas: 14 días después de facturado.
+--    Rechazo (auth o evweb) cancela purge pendiente (purged_at IS NULL).
 -- ---------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.af_docs_set_purge_on_ocr()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NEW.kind = 'autorizacion'
+     AND NEW.ocr_confirmado_at IS NOT NULL
+     AND (OLD.ocr_confirmado_at IS DISTINCT FROM NEW.ocr_confirmado_at)
+     AND NEW.purged_at IS NULL
+     AND NEW.storage_path IS NOT NULL THEN
+    NEW.purge_after := now();
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_docs_purge_ocr ON public.anesfact_caso_documentos;
+CREATE TRIGGER trg_docs_purge_ocr
+  BEFORE UPDATE OF ocr_confirmado_at ON public.anesfact_caso_documentos
+  FOR EACH ROW EXECUTE FUNCTION public.af_docs_set_purge_on_ocr();
+
 CREATE OR REPLACE FUNCTION public.af_casos_set_purge()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -249,10 +296,13 @@ BEGIN
     UPDATE public.anesfact_caso_documentos
     SET purge_after = now() + interval '14 days'
     WHERE caso_id = NEW.id
+      AND kind IN ('foja_anest_anesfact', 'foja_qx_anesfact', 'foja_geclisa', 'otro')
       AND purged_at IS NULL
       AND storage_path IS NOT NULL;
-  ELSIF NEW.evweb_status IN ('rechazado', 'listo', 'bloqueado')
-        AND OLD.evweb_status IN ('facturado', 'cargado') THEN
+  END IF;
+
+  IF (NEW.evweb_status = 'rechazado' AND OLD.evweb_status IS DISTINCT FROM 'rechazado')
+     OR (NEW.auth_status = 'rechazado' AND OLD.auth_status IS DISTINCT FROM 'rechazado') THEN
     UPDATE public.anesfact_caso_documentos
     SET purge_after = NULL
     WHERE caso_id = NEW.id
@@ -264,12 +314,11 @@ $$;
 
 DROP TRIGGER IF EXISTS trg_casos_purge ON public.anesfact_casos;
 CREATE TRIGGER trg_casos_purge
-  AFTER UPDATE OF evweb_status ON public.anesfact_casos
+  AFTER UPDATE OF evweb_status, auth_status ON public.anesfact_casos
   FOR EACH ROW EXECUTE FUNCTION public.af_casos_set_purge();
 
 -- ---------------------------------------------------------------------------
--- 10) Seed Mayo / Aero × PAMI / APROSS / ART / os_varias
---     Ajustar si las preguntas abiertas del doc cambian Aero+PAMI o APROSS+Geclisa.
+-- 10) Seed — sin Aero×PAMI
 -- ---------------------------------------------------------------------------
 INSERT INTO public.anesfact_instituciones (codigo, nombre, usa_geclisa, fuente_foja_evweb)
 VALUES
@@ -284,19 +333,37 @@ INSERT INTO public.anesfact_mutuales (
   ('pami',     'PAMI',                    'none',     true,  true),
   ('apross',   'APROSS',                  'traditum', false, false),
   ('art',      'ART',                     'upload',   true,  true),
+  ('iosfa',    'IOSFA',                   'upload',   true,  true),
   ('os_varias','Obras sociales varias',   'geclisa',  true,  true)
 ON CONFLICT (codigo) DO NOTHING;
 
--- Políticas: se cargan a mano tras validar las 6 preguntas del doc.
--- Ejemplo (comentado):
---
--- APROSS + Mayo: evweb sin fojas; auth Traditum; Geclisa igual se usa para HC.
--- PAMI + Aero: fojas AnesFact; auth none.
--- os_varias + Aero: auth_mode override a 'upload' (no hay Geclisa).
+-- Políticas (ids por codigo). Geclisa.required sigue a la institución.
+INSERT INTO public.anesfact_workflow_policies (institucion_id, mutual_id, requisitos, notas)
+SELECT i.id, m.id, p.requisitos, p.notas
+FROM public.anesfact_instituciones i
+JOIN public.anesfact_mutuales m ON true
+JOIN (VALUES
+  ('mayo', 'pami',
+    '{"version":1,"geclisa":{"required":true},"slots":{"foja_anest_anesfact":{"required_for_evweb":false},"foja_qx_anesfact":{"required_for_evweb":false},"foja_geclisa":{"required_for_evweb":true},"autorizacion":{"required_for_evweb":false,"auth_mode":"none"}}}'::jsonb,
+    'PAMI Mayo: Geclisa siempre; evweb sin autorización'),
+  ('mayo', 'apross',
+    '{"version":1,"geclisa":{"required":true},"slots":{"foja_anest_anesfact":{"required_for_evweb":false},"foja_qx_anesfact":{"required_for_evweb":false},"foja_geclisa":{"required_for_evweb":false},"autorizacion":{"required_for_evweb":true,"auth_mode":"traditum"}}}'::jsonb,
+    'APROSS: Geclisa igual (HC); evweb = paciente+complejidad+Traditum'),
+  ('mayo', 'art',
+    '{"version":1,"geclisa":{"required":true},"slots":{"foja_anest_anesfact":{"required_for_evweb":false},"foja_qx_anesfact":{"required_for_evweb":false},"foja_geclisa":{"required_for_evweb":true},"autorizacion":{"required_for_evweb":true,"auth_mode":"upload"}}}'::jsonb,
+    'ART: QR autorización + foja Geclisa a evweb'),
+  ('mayo', 'os_varias',
+    '{"version":1,"geclisa":{"required":true},"slots":{"foja_anest_anesfact":{"required_for_evweb":false},"foja_qx_anesfact":{"required_for_evweb":false},"foja_geclisa":{"required_for_evweb":true},"autorizacion":{"required_for_evweb":true,"auth_mode":"geclisa"}}}'::jsonb,
+    'OS varias: autorización en Geclisa'),
+  ('aero', 'iosfa',
+    '{"version":1,"geclisa":{"required":false},"slots":{"foja_anest_anesfact":{"required_for_evweb":true},"foja_qx_anesfact":{"required_for_evweb":true},"foja_geclisa":{"required_for_evweb":false},"autorizacion":{"required_for_evweb":true,"auth_mode":"upload"}}}'::jsonb,
+    'Aero IOSFA: ambas fojas nativas + foto autorización. Sin Geclisa, sin Traditum')
+) AS p(inst, mut, requisitos, notas)
+  ON p.inst = i.codigo AND p.mut = m.codigo
+ON CONFLICT (institucion_id, mutual_id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------
--- 11) RLS (esqueleto). Afinar al implementar.
---     Cliente autenticado: dueño. Intake: solo Edge (service role).
+-- 11) RLS (esqueleto). Intake INSERT solo vía Edge (service role).
 -- ---------------------------------------------------------------------------
 ALTER TABLE public.anesfact_instituciones ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.anesfact_mutuales ENABLE ROW LEVEL SECURITY;
@@ -310,7 +377,6 @@ ALTER TABLE public.anesfact_evweb_lotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.anesfact_evweb_lote_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.anesfact_institucion_miembros ENABLE ROW LEVEL SECURITY;
 
--- Catálogos: lectura autenticada
 DROP POLICY IF EXISTS inst_select_auth ON public.anesfact_instituciones;
 CREATE POLICY inst_select_auth ON public.anesfact_instituciones
   FOR SELECT TO authenticated USING (true);
@@ -341,7 +407,6 @@ CREATE POLICY authz_owner ON public.anesfact_caso_autorizaciones
   USING (owner_id = auth.uid() OR public.af_is_admin())
   WITH CHECK (owner_id = auth.uid());
 
--- Tokens / submissions: el dueño lista metadatos; INSERT público solo vía Edge (sin policy = deny)
 DROP POLICY IF EXISTS intake_tokens_select_own ON public.anesfact_intake_tokens;
 CREATE POLICY intake_tokens_select_own ON public.anesfact_intake_tokens
   FOR SELECT TO authenticated
