@@ -134,6 +134,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     return true;
   }
 
+  // Usuario tocó GRABAR en GECLISA → auto-avanzar cola (si awaiting_save)
+  if (msg && msg.type === 'AFG_USER_SAVED_FOJA') {
+    handleUserSavedFoja(msg)
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+
   // Reusar pestaña GECLISA existente; solo crear si no hay ninguna
   if (msg && msg.type === 'AFG_OPEN_GECLISA') {
     focusOrOpenGeclisaTab()
@@ -145,6 +153,81 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
 /** Lock para no solapar dos run111 de cola. */
 var queueRunnerBusy = false;
+/** Evita doble auto-next si GRABAR dispara varios mensajes. */
+var autoNextAfterSaveTimer = null;
+var autoNextInFlight = false;
+
+/**
+ * Inyecta watcher de GRABAR en todos los frames de la pestaña GECLISA.
+ */
+async function armGrabarAutoNextWatcher(tabId) {
+  if (!tabId) return { ok: false, error: 'no_tab' };
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId: tabId, allFrames: true },
+      files: ['content/grabar-watch.js']
+    });
+    try { console.log('[AFG runner] grabar-watch armado tab', tabId); } catch (e) {}
+    return { ok: true };
+  } catch (eArm) {
+    try { console.warn('[AFG runner] arm grabar-watch fail', eArm); } catch (e2) {}
+    return { ok: false, error: String(eArm && eArm.message || eArm) };
+  }
+}
+
+/**
+ * Tras GRABAR del usuario: marca done y lanza el siguiente de la cola.
+ * No hace click en Guardar — solo detecta el click humano.
+ */
+async function handleUserSavedFoja(msg) {
+  if (msg && msg.saveFailed) {
+    clearTimeout(autoNextAfterSaveTimer);
+    autoNextAfterSaveTimer = null;
+    try { console.warn('[AFG runner] GRABAR con texto de error — no auto-avanzo'); } catch (e) {}
+    try {
+      var stErr = await getRunnerState();
+      if (stErr.status === 'awaiting_save') {
+        await setRunnerState(Object.assign(stErr, {
+          message: 'Parece que GRABAR falló — corregí y volvé a grabar, o usá Siguiente a mano'
+        }));
+      }
+    } catch (e2) {}
+    return { ok: false, ignored: true, reason: 'save_failed' };
+  }
+  var state = await getRunnerState();
+  if (state.status !== 'awaiting_save') {
+    return { ok: false, ignored: true, reason: 'not_awaiting_save', status: state.status };
+  }
+  if (autoNextInFlight || queueRunnerBusy) {
+    return { ok: false, ignored: true, reason: 'busy' };
+  }
+
+  // confirmed=false (click) → esperar un poco; confirmed=true → avanzar pronto
+  var delayMs = (msg && msg.confirmed) ? 600 : 3200;
+  clearTimeout(autoNextAfterSaveTimer);
+  autoNextAfterSaveTimer = setTimeout(function () {
+    autoNextInFlight = true;
+    getRunnerState().then(function (st) {
+      if (!(st && st.status === 'awaiting_save')) {
+        autoNextInFlight = false;
+        return null;
+      }
+      return setRunnerState(Object.assign(st, {
+        message: 'GRABAR detectado — siguiente paciente…'
+      })).then(function () {
+        return runQueueAction('next');
+      });
+    }).then(function (r) {
+      try { console.log('[AFG runner] auto-next tras GRABAR', r && r.ok, r && r.message); } catch (e) {}
+    }).catch(function (e) {
+      try { console.warn('[AFG runner] auto-next fail', e); } catch (e2) {}
+    }).finally(function () {
+      autoNextInFlight = false;
+    });
+  }, delayMs);
+
+  return { ok: true, scheduled: true, delayMs: delayMs, confirmed: !!(msg && msg.confirmed) };
+}
 
 /** Último ping del content script del iframe (paso 11 puede matar el CS al navegar). */
 var lastIframeNavProgress = null;
@@ -318,6 +401,36 @@ async function pullQueueFromAnesFactTabs() {
 }
 
 /**
+ * Asegura content script anesfact-bridge en la pestaña.
+ * Tras reload de la extensión, las pestañas ya abiertas no tienen listener
+ * → "Receiving end does not exist". Re-inyectamos y hacemos ping.
+ */
+async function ensureAnesFactBridge(tabId) {
+  try {
+    var ping = await chrome.tabs.sendMessage(tabId, { type: 'AFG_BRIDGE_PING' });
+    if (ping && ping.ok) return { ok: true, injected: false, ping: ping };
+  } catch (ePing) {
+    /* reinyectar abajo */
+  }
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId: tabId },
+      files: ['content/anesfact-bridge.js']
+    });
+  } catch (eInj) {
+    return { ok: false, error: 'inject_failed: ' + String(eInj && eInj.message || eInj) };
+  }
+  await sleep(150);
+  try {
+    var ping2 = await chrome.tabs.sendMessage(tabId, { type: 'AFG_BRIDGE_PING' });
+    if (ping2 && ping2.ok) return { ok: true, injected: true, ping: ping2 };
+    return { ok: false, error: 'ping_after_inject_failed', ping: ping2 };
+  } catch (e2) {
+    return { ok: false, error: 'Receiving end does not exist (tras inject). Recargá la pestaña AnesFact.' };
+  }
+}
+
+/**
  * Pide mint al content script de AnesFact (page world hace el RPC).
  */
 async function mintTokenViaAnesFactBridge(intervId, timeoutMs) {
@@ -330,12 +443,15 @@ async function mintTokenViaAnesFactBridge(intervId, timeoutMs) {
       message: 'Abrí AnesFact (logueado) para mintear el token.'
     };
   }
-  // Preferir pestaña con cola / batch
-  var tab = tabs[0];
   var lastErr = null;
   for (var i = 0; i < tabs.length; i++) {
-    tab = tabs[i];
+    var tab = tabs[i];
     try {
+      var ready = await ensureAnesFactBridge(tab.id);
+      if (!(ready && ready.ok)) {
+        lastErr = ready || { ok: false, error: 'bridge_not_ready' };
+        continue;
+      }
       var res = await chrome.tabs.sendMessage(tab.id, {
         type: 'AFG_MINT_TOKEN_FOR_FOJA',
         intervId: String(intervId),
@@ -343,7 +459,8 @@ async function mintTokenViaAnesFactBridge(intervId, timeoutMs) {
       });
       if (res && res.ok) {
         try {
-          console.log('[AFG bg] mint ok', intervId, res.foja && res.foja.apellido, 'tokenLen', res.tokenLen);
+          console.log('[AFG bg] mint ok', intervId, res.foja && res.foja.apellido, 'tokenLen', res.tokenLen,
+            ready.injected ? '(bridge re-inyectado)' : '');
         } catch (e) {}
         return Object.assign({ tabId: tab.id }, res);
       }
@@ -1456,6 +1573,9 @@ function firstPendingQueueItem(queue, preferId) {
 
 async function runQueueAction(action) {
   if (action === 'abort') {
+    clearTimeout(autoNextAfterSaveTimer);
+    autoNextAfterSaveTimer = null;
+    autoNextInFlight = false;
     var stAbort = await getRunnerState();
     if (stAbort.currentIntervId) {
       await patchQueueItemStatus(stAbort.currentIntervId, 'queued', 'Abortada por el usuario');
@@ -1637,11 +1757,17 @@ async function runQueueAction(action) {
     if (fillOk) {
       state = await setRunnerState(Object.assign(state, {
         status: 'awaiting_save',
-        message: 'Foja completada — revisá GECLISA, guardá a mano, luego Siguiente paciente',
+        message: 'Foja lista — revisá y tocá GRABAR en GECLISA; la cola sigue sola',
         lastResult: runRes,
         currentPac: (resolved.paciente.apellido || '') + ', ' + (resolved.paciente.nombre || '')
       }));
       await patchQueueItemStatus(item.id, 'awaiting_save', '');
+      try {
+        var gTab = await findGeclisaTab();
+        if (gTab && gTab.id) await armGrabarAutoNextWatcher(gTab.id);
+      } catch (eArm) {
+        try { console.warn('[AFG runner] no pude armar grabar-watch', eArm); } catch (e2) {}
+      }
       return {
         ok: true,
         awaitingSave: true,
@@ -1652,7 +1778,10 @@ async function runQueueAction(action) {
       };
     }
 
-    var why = (runRes && (runRes.message || runRes.error || runRes.reason)) || 'error_desconocido';
+    var why = (runRes && (runRes.message || runRes.error || runRes.reason)) ||
+      (runRes && runRes.iframe && (runRes.iframe.message || runRes.iframe.error || runRes.iframe.reason)) ||
+      'error_desconocido';
+    if (typeof why === 'string' && why.indexOf('PAUSA:') === 0) why = why.replace(/^PAUSA:\s*/, '');
     state = await setRunnerState(Object.assign(state, {
       status: 'paused_error',
       message: paused ? ('PAUSA: ' + why) : ('Error: ' + why),

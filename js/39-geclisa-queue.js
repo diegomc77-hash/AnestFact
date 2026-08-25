@@ -481,6 +481,73 @@ function afToggleColaGeclisa(intervId, ev) {
   return false;
 }
 
+function afGeclisaQueueRequestExtAction(action) {
+  action = String(action || 'QUEUE_START').toUpperCase();
+  if (action.indexOf('QUEUE_') !== 0) action = 'QUEUE_' + action;
+  try {
+    window.postMessage({ source: 'AFG_ANESFACT', type: action }, '*');
+  } catch (e) {
+    if (typeof toast === 'function') toast('No pude hablar con la extensión');
+    return;
+  }
+  if (typeof toast === 'function') {
+    if (action === 'QUEUE_START') toast('Iniciando cola GECLISA… (extensión)');
+    else if (action === 'QUEUE_ABORT') toast('Abortando cola…');
+    else if (action === 'QUEUE_RETRY') toast('Reintentando…');
+  }
+}
+
+function afGeclisaQueueStartUi(ev) {
+  if (ev && ev.preventDefault) ev.preventDefault();
+  if (ev && ev.stopPropagation) ev.stopPropagation();
+  var n = afGeclisaQueuePendingCount();
+  if (!n) {
+    if (typeof toast === 'function') toast('No hay pendientes en la cola');
+    return;
+  }
+  afGeclisaQueueRequestExtAction('QUEUE_START');
+}
+
+function afGeclisaQueueAbortUi(ev) {
+  if (ev && ev.preventDefault) ev.preventDefault();
+  if (ev && ev.stopPropagation) ev.stopPropagation();
+  afGeclisaQueueRequestExtAction('QUEUE_ABORT');
+}
+
+// Feedback de la extensión tras Iniciar cola desde AnesFact
+(function afGeclisaQueueExtAckListener() {
+  if (window.__AFG_QUEUE_ACK_LISTENER__) return;
+  window.__AFG_QUEUE_ACK_LISTENER__ = true;
+  window.addEventListener('message', function (ev) {
+    var d = ev && ev.data;
+    if (!d || d.source !== 'AFG_EXT' || d.type !== 'QUEUE_ACTION_ACK') return;
+    var res = d.result || {};
+    var err = d.error || res.error || res.message;
+    if (d.error && !res.ok) {
+      if (typeof toast === 'function') {
+        toast('Extensión: ' + String(err).slice(0, 80) + (String(err).indexOf('Receiving end') >= 0
+          ? ' — recargá AnesFact o el popup de la extensión'
+          : ''));
+      }
+      return;
+    }
+    if (res.ok === false && err) {
+      if (typeof toast === 'function') toast(String(err).slice(0, 100));
+      return;
+    }
+    if (res.awaitingSave || (res.state && res.state.status === 'awaiting_save')) {
+      if (typeof toast === 'function') toast('Foja lista — tocá GRABAR en GECLISA');
+    } else if (res.state && res.state.status === 'running') {
+      if (typeof toast === 'function') toast('Cola en curso…');
+    } else if (res.ok && d.action === 'QUEUE_START') {
+      if (typeof toast === 'function') toast('Cola iniciada');
+    }
+    try {
+      if (typeof renderGeclisaQueuePanel === 'function') renderGeclisaQueuePanel();
+    } catch (eR) {}
+  });
+})();
+
 function afGeclisaQueueMoveUi(intervId, dir, ev) {
   if (ev) { try { ev.stopPropagation(); ev.preventDefault(); } catch (e) {} }
   afGeclisaQueueMove(intervId, dir);
@@ -562,9 +629,13 @@ function renderGeclisaQueuePanel() {
 
     html += '</div>';
     html += '<p style="font-size:11px;color:var(--text3);margin:10px 0 0;line-height:1.4">';
-    html += 'Sin token al encolar. Abrí el popup de la extensión → <b>Iniciar cola</b> (mint + nav + fill; vos guardás; Siguiente).';
+    html += 'Extensión instalada + GECLISA logueado. <b>Iniciar cola</b> enfoca GECLISA, llena cada foja; vos tocás <b>GRABAR</b> y sigue sola.';
     html += '</p>';
-    html += '<div style="display:flex;gap:8px;margin-top:8px">';
+    html += '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">';
+    if (pending.length) {
+      html += '<button type="button" class="btn btn-b" style="flex:1;min-width:120px;font-size:13px;padding:10px" onclick="afGeclisaQueueStartUi(event)">&#9654; Iniciar cola</button>';
+      html += '<button type="button" class="btn btn-s" style="flex:0 0 auto;font-size:12px;padding:10px" onclick="afGeclisaQueueAbortUi(event)">Abortar</button>';
+    }
     if (env.items.some(function (x) { return x.status === 'done'; })) {
       html += '<button type="button" class="btn btn-s" style="flex:1;font-size:12px" onclick="afGeclisaQueueClearDone();renderGeclisaQueuePanel();renderHome();">Limpiar completadas</button>';
     }

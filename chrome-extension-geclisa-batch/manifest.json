@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AnesFact GECLISA Batch (pasos 1–12)",
-  "version": "0.5.5",
-  "description": "GECLISA Mayo: al fillOk marca la foja en AnesFact como enviada a GECLISA.",
+  "version": "0.5.10",
+  "description": "GECLISA Mayo: Iniciar cola desde AnesFact o popup; tras GRABAR avanza sola.",
   "permissions": ["storage", "tabs", "scripting", "debugger", "clipboardRead"],
   "host_permissions": [
     "http://sanatoriomayo.myvnc.com:84/*",

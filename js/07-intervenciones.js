@@ -311,9 +311,14 @@ function renderHome(){
   var lst=document.getElementById('inter-list');
   if(!total){lst.innerHTML='<div style="text-align:center;padding:48px 16px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px">🏥</div><div>Sin intervenciones</div><div style="font-size:12px;margin-top:6px">Tocá + Nueva para empezar</div></div>';return;}
   if(!n){lst.innerHTML='<div style="text-align:center;padding:32px 16px;color:var(--text3)"><div style="font-size:14px">Ninguna foja coincide con el filtro</div><button class="btn btn-s" style="width:auto;margin-top:12px;padding:8px 14px;font-size:12px" onclick="limpiarFiltrosHome()">Limpiar filtros</button></div>';return;}
-  // Estado: GECLISA azul, evweb teal (distintos a simple vista)
+  // Estado GECLISA: marca LOCAL (auto o manual) — no verifica Geclisa en vivo
   var EC={borrador:'#E3B341',listo:'#1DB954',enviado:'#388BFD',enviado_geclisa:'#388BFD',enviado_evweb:'#14B8A6',preoperatorio:'#A78BFA'};
-  var EL={borrador:'Borrador',listo:'Listo ✓',enviado:'Enviado ✓✓',enviado_geclisa:'Enviado a GECLISA ✓✓',enviado_evweb:'Enviado a evweb ✓✓',preoperatorio:'Preoperatorio pendiente'};
+  var EL={borrador:'Borrador',listo:'Listo ✓',enviado:'Enviado ✓✓',enviado_geclisa:'GECLISA ✓✓',enviado_evweb:'Enviado a evweb ✓✓',preoperatorio:'Preoperatorio pendiente'};
+  var ET={
+    enviado_geclisa:'Confirmado en AnesFact (automatización o marca manual). No consulta Geclisa en vivo. Clic para quitar marca.',
+    enviado_evweb:'Marca local de envío a evweb.',
+    enviado:'Marca local de enviado.'
+  };
   var html='';
   filtradas.slice().reverse().forEach(function(x){
     var c=EC[x.estado]||'#8B949E';var icon=x.san&&x.san.includes('Mayo')?'🏥':x.san&&x.san.includes('Aero')?'✈️':'🏨';
@@ -321,6 +326,9 @@ function renderHome(){
     var inCola=typeof afGeclisaQueueIsQueued==='function'&&afGeclisaQueueIsQueued(x.id);
     var sanCls=afSanatorioCssClass(x.san);
     var safeId=String(x.id||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var viaHint=x.enviadoVia?(' · vía '+x.enviadoVia):'';
+    var estadoTitle=ET[x.estado]||'';
+    if(x.estado==='enviado_geclisa'&&estadoTitle)estadoTitle+=viaHint;
     html+='<div class="inter '+(sanCls||'')+'" onclick="abrirInter(\''+safeId+'\')">'
       +'<div style="width:10px;height:10px;border-radius:50%;background:'+c+';flex-shrink:0"></div>'
       +'<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(x.pac||'Sin nombre')+'</div>'
@@ -339,7 +347,17 @@ function renderHome(){
       +(x.alerta_seguridad
         ?('<span class="badge" style="background:rgba(248,81,73,.22);color:#f85149;border:1px solid rgba(248,81,73,.55);font-size:10px;flex-shrink:0;max-width:140px;text-align:center;line-height:1.25">⚠️ Revisar medicación/alergias</span>')
         :'')
-      +'<span class="badge" style="background:'+c+'22;color:'+c+'">'+(EL[x.estado]||'Borrador')+'</span>'
+      +(esMayo
+        ?(x.estado==='enviado_geclisa'
+          ?('<button type="button" class="badge" title="'+estadoTitle+'" '
+            +'onclick="afToggleEnviadoGeclisaManual(\''+safeId+'\',event,\'manual_lista\')" '
+            +'style="background:'+c+'22;color:'+c+';border:1px solid rgba(56,139,253,.45);cursor:pointer;font-size:10px">'
+            +(EL[x.estado]||'GECLISA ✓✓')+'</button>')
+          :('<button type="button" class="badge" title="Marcar a mano como enviada a GECLISA (no verifica Geclisa en vivo)" '
+            +'onclick="afToggleEnviadoGeclisaManual(\''+safeId+'\',event,\'manual_lista\')" '
+            +'style="border:1px dashed rgba(56,139,253,.5);background:transparent;color:var(--blue);cursor:pointer;font-size:10px;flex-shrink:0">'
+            +'Marcar GECLISA</button>'))
+        :('<span class="badge" style="background:'+c+'22;color:'+c+'"'+(estadoTitle?' title="'+estadoTitle+'"':'')+'>'+(EL[x.estado]||'Borrador')+'</span>'))
       +'<button type="button" class="badge" title="Borrar foja" onclick="borrarIntervencion(\''+safeId+'\',event)" '
       +'style="border:1px solid rgba(248,81,73,.45);background:transparent;color:var(--red);cursor:pointer;font-size:10px;flex-shrink:0">Borrar</button>'
       +'</div>';

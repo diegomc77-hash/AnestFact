@@ -5,9 +5,13 @@
  * - Relay mint on-demand: AFG_MINT_TOKEN_FOR_FOJA → postMessage MINT_TOKEN → page RPC
  */
 (function () {
+  if (window.__AFG_ANESFACT_BRIDGE__) return;
+  window.__AFG_ANESFACT_BRIDGE__ = true;
+
   var lastOkSig = '';
   var lastQueueSig = '';
   var pendingMints = {};
+  var BRIDGE_VERSION = '0.5.10';
 
   function normalize(detail) {
     if (!detail || !detail.token) return null;
@@ -240,6 +244,39 @@
         } catch (e) {}
       });
     }
+    // AnesFact Home → Iniciar / Abortar cola (mismo que el popup)
+    if (d.type === 'QUEUE_START' || d.type === 'QUEUE_RETRY' || d.type === 'QUEUE_ABORT' || d.type === 'QUEUE_NEXT') {
+      var map = {
+        QUEUE_START: 'AFG_QUEUE_START',
+        QUEUE_RETRY: 'AFG_QUEUE_RETRY',
+        QUEUE_ABORT: 'AFG_QUEUE_ABORT',
+        QUEUE_NEXT: 'AFG_QUEUE_NEXT'
+      };
+      var extType = map[d.type];
+      // Asegurar pestaña GECLISA enfocada antes de start/retry
+      var kick = function () {
+        chrome.runtime.sendMessage({ type: extType }, function (res) {
+          var err = chrome.runtime.lastError && chrome.runtime.lastError.message;
+          try {
+            window.postMessage({
+              source: 'AFG_EXT',
+              type: 'QUEUE_ACTION_ACK',
+              action: d.type,
+              result: res || null,
+              error: err || null
+            }, '*');
+          } catch (eAck) {}
+        });
+      };
+      if (d.type === 'QUEUE_START' || d.type === 'QUEUE_RETRY') {
+        chrome.runtime.sendMessage({ type: 'AFG_OPEN_GECLISA' }, function () {
+          void chrome.runtime.lastError;
+          setTimeout(kick, 400);
+        });
+      } else {
+        kick();
+      }
+    }
   });
 
   window.addEventListener('afg-geclisa-token', function (ev) {
@@ -247,6 +284,16 @@
   });
   window.addEventListener('afg-geclisa-queue', function (ev) {
     publishQueue(ev && ev.detail, 'CustomEvent');
+  });
+  window.addEventListener('afg-geclisa-queue-start', function () {
+    try {
+      window.postMessage({ source: 'AFG_ANESFACT', type: 'QUEUE_START' }, '*');
+    } catch (e) {}
+  });
+  window.addEventListener('afg-geclisa-queue-abort', function () {
+    try {
+      window.postMessage({ source: 'AFG_ANESFACT', type: 'QUEUE_ABORT' }, '*');
+    } catch (e) {}
   });
 
   chrome.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
@@ -256,7 +303,7 @@
       sendResponse({
         ok: true,
         href: location.href,
-        version: '0.5.5',
+        version: BRIDGE_VERSION,
         hasBatch: !!readLocalStorageBatch(),
         hasQueue: !!readLocalStorageQueue()
       });
@@ -346,7 +393,7 @@
   setInterval(tick, 800);
 
   try {
-    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: '0.5.5' }, '*');
+    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: BRIDGE_VERSION }, '*');
   } catch (e) {}
   try {
     console.log('[AFG bridge] 0.5.5 inyectado en', location.href);

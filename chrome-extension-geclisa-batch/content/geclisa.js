@@ -150,6 +150,18 @@
       };
     }
 
+    log('Paso 4 inputs paciente', {
+      apellido: apellido,
+      nombre: nombre,
+      nombre1erToken: AFG.quitarAcentos(nombre || '').toLowerCase().split(/\s+/).filter(Boolean)[0] || '',
+      fechaCirugia: fechaCirugia,
+      horaCirugia: horaCirugia,
+      sector: sector,
+      mayo_cama: AFG.norm(paciente.mayo_cama || paciente.cama || ''),
+      dni: AFG.norm(paciente.dni || ''),
+      pacRaw: AFG.norm(paciente.pac || '')
+    });
+
     log('Paso 4: ddlUbicacion = 2 (Sanatorio Mayo)');
     var ddl = await AFG.waitFor(function () {
       return document.getElementById('ddlUbicacion');
@@ -492,9 +504,29 @@
       }
 
       await AFG.sleep(400);
+      await ensurePanelGridRowsLoaded();
       var empty = panelShowsNoRecords();
-      var hits = findPanelPatientRows(apellido, nombre);
-      log('Paso panel resultado', a.tag, 'hits=', hits.length, 'sinRegistros=', empty);
+      var matchInfo = diagnosePanelPatientRows(apellido, nombre);
+      var hits = matchInfo.hits;
+      log('Paso panel resultado', a.tag,
+        'hits=', hits.length,
+        'sinRegistros=', empty,
+        'expectAp=', matchInfo.expectAp,
+        'expectNm1=', matchInfo.expectNm1,
+        'filasVisibles=', matchInfo.visibleCount,
+        'candidatosAp=', matchInfo.withApellido.length,
+        'rechazoNm=', matchInfo.rejectedNombre.length
+      );
+      if (matchInfo.sampleRows && matchInfo.sampleRows.length) {
+        log('Paso panel filas visibles (muestra):', matchInfo.sampleRows);
+      }
+      if (matchInfo.withApellido.length && !hits.length) {
+        log('Paso panel: apellido EN grilla pero nombre 1er token NO matchea. Filas con ap:',
+          matchInfo.withApellido, 'rechazos nm:', matchInfo.rejectedNombre);
+      }
+      if (!matchInfo.visibleCount && !empty) {
+        log('Paso panel: grilla sin filas visibles tras Consultar (filtro sector/fecha/hora probablemente vació el listado)');
+      }
 
       if (hits.length > 1) {
         return {
@@ -506,31 +538,47 @@
           horaUsada: a.hora,
           sectorUsado: a.sector,
           filtrosProbados: tried,
+          diagnose: matchInfo,
           message: 'PAUSA: ' + hits.length + ' filas con ' + apellido + ' en panel (' + a.tag +
             '). Combinaciones: ' + tried.join(' -> ')
         };
       }
       if (hits.length === 1) {
-        log('Paso panel encontrado con', a.tag);
+        log('Paso panel encontrado con', a.tag, 'fila=', AFG.norm(hits[0].innerText || '').slice(0, 160));
         return {
           ok: true,
           rows: hits,
           fechaUsada: a.fecha,
           horaUsada: a.hora,
           sectorUsado: a.sector,
-          filtrosProbados: tried
+          filtrosProbados: tried,
+          diagnose: matchInfo
         };
       }
     }
 
+    var lastDiag = diagnosePanelPatientRows(apellido, nombre);
+    log('Paso panel NOT FOUND — último estado grilla', {
+      expectAp: lastDiag.expectAp,
+      expectNm1: lastDiag.expectNm1,
+      visibleCount: lastDiag.visibleCount,
+      withApellido: lastDiag.withApellido,
+      rejectedNombre: lastDiag.rejectedNombre,
+      sampleRows: lastDiag.sampleRows,
+      filtrosProbados: tried
+    });
     return {
       ok: false,
       paused: true,
       reason: 'panel_not_found',
       count: 0,
       filtrosProbados: tried,
+      diagnose: lastDiag,
       message: 'PAUSA: no aparece ' + apellido + ' en panel con Ubicacion/Sector/Fecha/Hora+Consultar. ' +
-        'Combinaciones: ' + tried.join(' -> ')
+        'Combinaciones: ' + tried.join(' -> ') +
+        ' | visibles=' + lastDiag.visibleCount +
+        ' | conApellido=' + lastDiag.withApellido.length +
+        ' | rechazoNm=' + lastDiag.rejectedNombre.length
     };
   }
 
@@ -543,29 +591,182 @@
     return false;
   }
 
-  /** Filas del grid principal de internados (no modal) que matchean apellido/nombre. */
-  function findPanelPatientRows(apellido, nombre) {
+  /**
+   * Geclisa/jqGrid a menudo virtualiza el body (.ui-jqgrid-bdiv): con scroll arriba
+   * solo existen en el DOM las filas visibles. Si el paciente está "más abajo" en la
+   * misma página, findPanelPatientRows devolvía 0 (panel_not_found) aunque el filtro
+   * sector/fecha/hora fuera correcto — caso Carballo.
+   * Scrollea cada bdiv del panel (no modal) hasta el fondo para forzar render.
+   */
+  async function ensurePanelGridRowsLoaded() {
+    var bdivs = document.querySelectorAll('.ui-jqgrid-bdiv');
+    var scrolled = 0;
+    for (var i = 0; i < bdivs.length; i++) {
+      var bdiv = bdivs[i];
+      if (bdiv.closest && bdiv.closest('.modal, [role="dialog"], .ui-dialog')) continue;
+      if (!bdiv.clientHeight || bdiv.scrollHeight <= bdiv.clientHeight + 4) continue;
+      try {
+        bdiv.scrollTop = 0;
+      } catch (e0) {}
+      await AFG.sleep(40);
+      var prev = -1;
+      var guard = 0;
+      while (guard++ < 50) {
+        var max = bdiv.scrollHeight - bdiv.clientHeight;
+        if (max <= 0) break;
+        var next = Math.min((bdiv.scrollTop || 0) + Math.max(Math.floor(bdiv.clientHeight * 0.85), 80), max);
+        bdiv.scrollTop = next;
+        scrolled++;
+        await AFG.sleep(70);
+        if (bdiv.scrollTop >= max - 2) break;
+        if (bdiv.scrollTop === prev) break;
+        prev = bdiv.scrollTop;
+      }
+    }
+    // API jqGrid (si existe): loguea cuántas filas tiene el modelo vs DOM
+    try {
+      if (typeof window.jQuery === 'function') {
+        window.jQuery('.ui-jqgrid-btable').each(function () {
+          if (this.closest && this.closest('.modal, [role="dialog"], .ui-dialog')) return;
+          try {
+            var $g = window.jQuery(this);
+            var data = $g.jqGrid('getGridParam', 'data');
+            var ids = $g.jqGrid('getDataIDs');
+            var domN = this.querySelectorAll('tr.jqgrow').length;
+            log('jqGrid data vs DOM', this.id || '(sin id)',
+              'dataLen=', data && data.length, 'ids=', ids && ids.length, 'domJqgrow=', domN);
+          } catch (eG) {}
+        });
+      }
+    } catch (eJ) {}
+    if (scrolled) log('ensurePanelGridRowsLoaded: pasos de scroll=', scrolled);
+  }
+
+  /**
+   * Diagnóstico + match de filas del grid internados (no modal).
+   * Match = apellido (substring) + 1er token del nombre (si hay).
+   * Devuelve hits + por qué falló cada candidato (para consola / panel_not_found).
+   */
+  function diagnosePanelPatientRows(apellido, nombre) {
     var ap = AFG.quitarAcentos(apellido || '').toLowerCase();
-    var nm = AFG.quitarAcentos(nombre || '').toLowerCase().split(/\s+/).filter(Boolean)[0] || '';
-    if (!ap) return [];
+    var nmFull = AFG.quitarAcentos(nombre || '').toLowerCase();
+    var nm = nmFull.split(/\s+/).filter(Boolean)[0] || '';
+    var out = {
+      expectAp: ap,
+      expectNmFull: nmFull,
+      expectNm1: nm,
+      visibleCount: 0,
+      skippedDisplayNone: 0,
+      hits: [],
+      withApellido: [],
+      rejectedNombre: [],
+      sampleRows: []
+    };
+    if (!ap) return out;
     var rows = document.querySelectorAll(
       '.ui-jqgrid-btable tbody tr.jqgrow, .ui-jqgrid-btable tbody tr'
     );
-    var hits = [];
     for (var i = 0; i < rows.length; i++) {
       var tr = rows[i];
-      if (tr.style && tr.style.display === 'none') continue;
+      // Solo saltear display:none INLINE vacío de datos — no usar getComputedStyle
+      // (filas scrolleadas fuera de vista NO son display:none en overflow normal).
+      if (tr.style && tr.style.display === 'none') {
+        var rawHidden = AFG.norm(tr.innerText || '');
+        if (!rawHidden || rawHidden.length < 3) {
+          out.skippedDisplayNone++;
+          continue;
+        }
+        // Fila con texto pero display:none: igual la evaluamos (virtualización / bugs UI)
+      }
       if (tr.closest && tr.closest('.modal, [role="dialog"], .ui-dialog')) continue;
       var cells = tr.querySelectorAll('td');
       if (cells.length < 2) continue;
-      var txt = AFG.quitarAcentos(AFG.norm(tr.innerText || '')).toLowerCase();
-      if (!txt || txt.indexOf(ap) < 0) continue;
+      var raw = AFG.norm(tr.innerText || '');
+      var txt = AFG.quitarAcentos(raw).toLowerCase();
+      if (!txt) continue;
       if (/sin registros|cargando|loading|mostrando\s+\d/i.test(txt) && cells.length < 3) continue;
-      if (nm && txt.indexOf(nm) < 0) continue;
-      hits.push(tr);
+      out.visibleCount++;
+      if (out.sampleRows.length < 20) {
+        out.sampleRows.push(raw.slice(0, 140));
+      }
+      if (txt.indexOf(ap) < 0) continue;
+      var rowSnap = raw.slice(0, 140);
+      out.withApellido.push(rowSnap);
+      if (nm && txt.indexOf(nm) < 0) {
+        out.rejectedNombre.push({ row: rowSnap, needNm1: nm, reason: 'nm1_not_in_row_text' });
+        continue;
+      }
+      out.hits.push(tr);
     }
-    return hits.filter(function (el, idx, arr) { return arr.indexOf(el) === idx; });
+    // Fallback: datos del modelo jqGrid (incluye filas no montadas en DOM)
+    if (!out.hits.length) {
+      var fromData = findPanelHitsInJqGridModel(ap, nm);
+      if (fromData.rowIds.length) {
+        log('Match vía jqGrid model (no estaba en DOM visible):', fromData.rowIds, fromData.samples);
+        fromData.rowIds.forEach(function (rid) {
+          var el = document.getElementById(rid) || document.querySelector('tr.jqgrow[id="' + rid + '"]');
+          if (el) out.hits.push(el);
+        });
+        out.withApellido = out.withApellido.concat(fromData.samples);
+      }
+    }
+    out.hits = out.hits.filter(function (el, idx, arr) { return arr.indexOf(el) === idx; });
+    return out;
   }
+
+  /** Busca apellido/nombre en getGridParam('data') / getRowData — útil si el DOM está virtualizado. */
+  function findPanelHitsInJqGridModel(ap, nm) {
+    var found = { rowIds: [], samples: [] };
+    if (typeof window.jQuery !== 'function') return found;
+    try {
+      window.jQuery('.ui-jqgrid-btable').each(function () {
+        if (this.closest && this.closest('.modal, [role="dialog"], .ui-dialog')) return;
+        var $g = window.jQuery(this);
+        var data = null;
+        try { data = $g.jqGrid('getGridParam', 'data'); } catch (e1) {}
+        if (!data || !data.length) {
+          try {
+            var ids = $g.jqGrid('getDataIDs') || [];
+            data = ids.map(function (id) {
+              try { return Object.assign({ _id: id }, $g.jqGrid('getRowData', id)); }
+              catch (e2) { return { _id: id }; }
+            });
+          } catch (e3) { data = []; }
+        }
+        for (var i = 0; i < data.length; i++) {
+          var row = data[i] || {};
+          var blob = AFG.quitarAcentos(AFG.norm(JSON.stringify(row))).toLowerCase();
+          if (!blob || blob.indexOf(ap) < 0) continue;
+          if (nm && blob.indexOf(nm) < 0) continue;
+          var rid = String(row._id || row.id || row.Id || '');
+          if (!rid) {
+            try {
+              var ids2 = $g.jqGrid('getDataIDs') || [];
+              rid = ids2[i] || '';
+            } catch (e4) {}
+          }
+          if (rid) found.rowIds.push(rid);
+          found.samples.push(blob.slice(0, 140));
+        }
+      });
+    } catch (e) {}
+    return found;
+  }
+
+  /** Filas del grid principal de internados (no modal) que matchean apellido/nombre. */
+  function findPanelPatientRows(apellido, nombre) {
+    return diagnosePanelPatientRows(apellido, nombre).hits;
+  }
+
+  // Consola GECLISA (iframe con #ddlUbicacion):
+  //   __AFG_debugPanelMatch('Carballo','Monica')
+  try {
+    window.__AFG_debugPanelMatch = function (ap, nm) {
+      var d = diagnosePanelPatientRows(ap || '', nm || '');
+      log('__AFG_debugPanelMatch', d.expectAp, d.expectNm1, d);
+      return d;
+    };
+  } catch (eDbg) {}
 
   function findConsultarButton() {
     var byId = document.getElementById('btnConsultar')
