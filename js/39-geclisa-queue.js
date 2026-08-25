@@ -30,6 +30,10 @@ function afGeclisaQueueLoad() {
   }
 }
 
+function afGeclisaQueueNotifyCloudSync(){
+  if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+}
+
 function afGeclisaQueueSave(envelope) {
   envelope = envelope || afGeclisaQueueEmpty();
   if (!Array.isArray(envelope.items)) envelope.items = [];
@@ -64,17 +68,19 @@ function afGeclisaQueueSave(envelope) {
     try { console.error('[AFG cola] save verify error', eVer); } catch (eC2) {}
   }
   afPublishGeclisaQueueSync(envelope);
+  afGeclisaQueueNotifyCloudSync();
   try {
     console.log('[AFG cola] save OK v' + envelope.version + ' items=' + envelope.items.length);
   } catch (eL) {}
   return envelope;
 }
 
-/** Publica cola para el bridge (pieza 2 leerá esto). */
-function afPublishGeclisaQueueSync(envelope) {
+/** Publica cola para el bridge (pieza 2 leerá esto). opts.skipCloudPush: no disparar auto-push (p.ej. al aplicar bajada). */
+function afPublishGeclisaQueueSync(envelope, opts) {
   envelope = envelope || afGeclisaQueueLoad();
   try {
     localStorage.setItem(AFG_QUEUE_KEY, JSON.stringify(envelope));
+    if (!(opts && opts.skipCloudPush)) afGeclisaQueueNotifyCloudSync();
   } catch (e1) {}
   try {
     window.postMessage({
@@ -505,6 +511,7 @@ function renderGeclisaQueuePanel() {
         updatedAt: env.updatedAt,
         items: env.items
       }));
+      afGeclisaQueueNotifyCloudSync();
     } catch (e) {}
 
     var pending = env.items.filter(function (it) { return it.status !== 'done'; });

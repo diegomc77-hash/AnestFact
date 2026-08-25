@@ -138,6 +138,13 @@ function exportarDatos(){
     exportado:new Date().toISOString(),
     version:'AnesFact v8'
   };
+  try{
+    if(typeof afGeclisaQueueLoad==='function')data.geclisa_queue=afGeclisaQueueLoad();
+    else if(typeof AFG_QUEUE_KEY==='string'){
+      var rawQ=localStorage.getItem(AFG_QUEUE_KEY);
+      if(rawQ)data.geclisa_queue=JSON.parse(rawQ);
+    }
+  }catch(eQ){}
   var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');a.href=url;a.download='AnesFact_backup_'+new Date().toISOString().slice(0,10)+'.json';
@@ -166,6 +173,9 @@ function importarDatos(input){
         var local=[];try{local=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e2){}
         data.cirujanos.forEach(function(c){if(local.indexOf(c)<0)local.push(c);});
         localStorage.setItem('af_ciru',JSON.stringify(local));
+      }
+      if(data.geclisa_queue&&typeof afSyncApplyGeclisaQueue==='function'){
+        afSyncApplyGeclisaQueue(data.geclisa_queue);
       }
       renderHome();
       if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
@@ -359,12 +369,71 @@ function copiarCodigoScript(){var ta=document.getElementById('script-code-text')
 
 function buildSyncPayload(){
   var intervs=afFilterDeletedIntervs(S.intervs||[]);
-  return{intervs:intervs,cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),key:S.key||'',guardado:new Date().toISOString(),version:'AnesFact v7',total:intervs.length};
+  var data={
+    intervs:intervs,
+    cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),
+    key:S.key||'',
+    guardado:new Date().toISOString(),
+    version:'AnesFact v7',
+    total:intervs.length
+  };
+  try{
+    if(typeof AFG_QUEUE_KEY==='string'&&AFG_QUEUE_KEY){
+      var rawQ=localStorage.getItem(AFG_QUEUE_KEY);
+      if(rawQ){
+        var q=JSON.parse(rawQ);
+        if(q&&typeof q==='object'&&!Array.isArray(q)&&Array.isArray(q.items)){
+          data.geclisa_queue=q;
+        }
+      }
+    }else if(typeof afGeclisaQueueLoad==='function'){
+      data.geclisa_queue=afGeclisaQueueLoad();
+    }
+  }catch(eQ){}
+  return data;
+}
+
+/** LWW cola Geclisa: updatedAt, luego version. No pisa local si remoto viene vacío/viejo. */
+function afSyncApplyGeclisaQueue(remoteQueue){
+  if(!remoteQueue||typeof remoteQueue!=='object'||Array.isArray(remoteQueue)||!Array.isArray(remoteQueue.items))return;
+  var key=(typeof AFG_QUEUE_KEY==='string'&&AFG_QUEUE_KEY)?AFG_QUEUE_KEY:'afg_geclisa_queue';
+  var local={version:0,updatedAt:0,items:[]};
+  try{
+    var raw=localStorage.getItem(key);
+    if(raw){
+      var p=JSON.parse(raw);
+      if(p&&typeof p==='object'&&!Array.isArray(p)&&Array.isArray(p.items))local=p;
+    }
+  }catch(e1){}
+  var rAt=Number(remoteQueue.updatedAt)||0;
+  var lAt=Number(local.updatedAt)||0;
+  var rV=Number(remoteQueue.version)||0;
+  var lV=Number(local.version)||0;
+  if(rAt<lAt||(rAt===lAt&&rV<=lV&&(local.items||[]).length))return;
+  var envelope={
+    version:rV||1,
+    updatedAt:rAt||Date.now(),
+    items:remoteQueue.items.slice()
+  };
+  try{
+    localStorage.setItem(key,JSON.stringify(envelope));
+  }catch(e2){
+    try{console.warn('[AFG sync] geclisa_queue setItem fail',e2);}catch(e3){}
+    return;
+  }
+  try{
+    if(typeof afPublishGeclisaQueueSync==='function')afPublishGeclisaQueueSync(envelope,{skipCloudPush:true});
+  }catch(e4){}
+  try{
+    if(typeof renderGeclisaQueuePanel==='function')renderGeclisaQueuePanel();
+  }catch(e5){}
+  try{console.log('[AFG sync] geclisa_queue aplicada v'+envelope.version+' items='+envelope.items.length);}catch(e6){}
 }
 
 function _syncMergeMeta(data){
   if(data.cirujanos&&data.cirujanos.length){var local=[];try{local=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e2){}data.cirujanos.forEach(function(c){if(local.indexOf(c)<0)local.push(c);});localStorage.setItem('af_ciru',JSON.stringify(local));}
   if(data.key&&!S.key){S.key=data.key;localStorage.setItem('af_k',S.key);}
+  if(data.geclisa_queue)afSyncApplyGeclisaQueue(data.geclisa_queue);
 }
 
 function aplicarSyncData(data,reemplazar,silent){
