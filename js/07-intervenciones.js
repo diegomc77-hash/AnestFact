@@ -209,11 +209,109 @@ function afSanatorioCssClass(san){
   return '';
 }
 
+function afIsAeroInterv(i){
+  if(!i)return false;
+  var s=String(i.san||'').toLowerCase();
+  return s.indexOf('aero')>=0||s.indexOf('aeron')>=0;
+}
+
 function afDestinoEnviadoPorSan(i){
   var s=String((i&&i.san)||'').toLowerCase();
   if(s.indexOf('mayo')>=0)return 'enviado_geclisa';
   if(s.indexOf('aero')>=0||s.indexOf('aeron')>=0)return 'enviado_evweb';
   return null;
+}
+
+/**
+ * Saca una foja de "preoperatorio" → borrador (marca local explícita).
+ * Misma idea que desmarcar GECLISA/evweb: no borra datos clínicos.
+ */
+function afSalirPreoperatorio(intervId, ev){
+  if(ev){try{ev.stopPropagation();ev.preventDefault();}catch(e){}}
+  var id=String(intervId||(S.cur&&S.cur.id)||'').trim();
+  if(!id||!S.intervs){if(typeof toast==='function')toast('Sin foja');return false;}
+  var idx=-1;
+  for(var i=0;i<S.intervs.length;i++){
+    if(String(S.intervs[i].id)===id){idx=i;break;}
+  }
+  if(idx<0){if(typeof toast==='function')toast('Foja no encontrada');return false;}
+  var it=S.intervs[idx];
+  if(it.estado!=='preoperatorio'){
+    if(typeof toast==='function')toast('No está en preoperatorio');
+    return false;
+  }
+  if(!confirm('¿Sacar de “Preoperatorio pendiente”?\nPasará a Borrador (podés seguir cargando o marcar Listo/enviado después).'))return false;
+  it.estado='borrador';
+  it._ts=Date.now();
+  if(S.cur&&String(S.cur.id)===id)S.cur.estado='borrador';
+  if(typeof saveIntervsToStorage==='function')saveIntervsToStorage();
+  if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+  if(typeof toast==='function')toast('Ya no está pendiente → Borrador');
+  try{
+    if(typeof renderHome==='function')renderHome();
+    if(typeof afUpdateEstadoAccionesUI==='function')afUpdateEstadoAccionesUI(S.cur);
+  }catch(e2){}
+  return false;
+}
+
+/**
+ * Confirma el diagnóstico del QR: diagnostico_sin_confirmar=false.
+ * Explícito (no se limpia al editar el texto del diagnóstico).
+ */
+function afConfirmarDiagnostico(intervId, ev){
+  if(ev){try{ev.stopPropagation();ev.preventDefault();}catch(e){}}
+  var id=String(intervId||(S.cur&&S.cur.id)||'').trim();
+  if(!id||!S.intervs){if(typeof toast==='function')toast('Sin foja');return false;}
+  var idx=-1;
+  for(var i=0;i<S.intervs.length;i++){
+    if(String(S.intervs[i].id)===id){idx=i;break;}
+  }
+  if(idx<0){if(typeof toast==='function')toast('Foja no encontrada');return false;}
+  var it=S.intervs[idx];
+  if(!it.diagnostico_sin_confirmar){
+    if(typeof toast==='function')toast('Diagnóstico ya confirmado');
+    return false;
+  }
+  if(!confirm('¿Confirmar diagnóstico?\nQuitará el aviso “sin confirmar” (marca local; no cambia el texto del diagnóstico).'))return false;
+  it.diagnostico_sin_confirmar=false;
+  it._ts=Date.now();
+  if(S.cur&&String(S.cur.id)===id)S.cur.diagnostico_sin_confirmar=false;
+  if(typeof saveIntervsToStorage==='function')saveIntervsToStorage();
+  if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+  if(typeof toast==='function')toast('Diagnóstico confirmado ✓');
+  try{
+    if(typeof renderHome==='function')renderHome();
+    if(typeof afUpdateDiagConfirmUI==='function')afUpdateDiagConfirmUI(S.cur);
+  }catch(e2){}
+  return false;
+}
+
+/** Muestra/oculta fila “Confirmar diagnóstico” junto a f-diag. */
+function afUpdateDiagConfirmUI(i){
+  var row=document.getElementById('diag-sin-confirmar-row');
+  if(!row)return;
+  var show=!!(i&&i.diagnostico_sin_confirmar);
+  row.style.display=show?'block':'none';
+}
+
+/**
+ * Actualiza botones de estado en ficha (preop / labels Marcar GECLISA|evweb).
+ */
+function afUpdateEstadoAccionesUI(i){
+  var preop=document.getElementById('preop-estado-row');
+  if(preop)preop.style.display=(i&&i.estado==='preoperatorio')?'block':'none';
+  var btnG=document.getElementById('btn-mark-enviado-geclisa');
+  if(btnG){
+    btnG.textContent=i&&i.estado==='enviado_geclisa'
+      ?'✕ Quitar marca GECLISA'
+      :'✓ Marcar enviado GECLISA';
+  }
+  var btnE=document.getElementById('btn-mark-enviado-evweb');
+  if(btnE){
+    btnE.textContent=i&&i.estado==='enviado_evweb'
+      ?'✕ Quitar marca evweb'
+      :'✓ Marcar enviado evweb';
+  }
 }
 
 /**
@@ -311,29 +409,70 @@ function renderHome(){
   var lst=document.getElementById('inter-list');
   if(!total){lst.innerHTML='<div style="text-align:center;padding:48px 16px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px">🏥</div><div>Sin intervenciones</div><div style="font-size:12px;margin-top:6px">Tocá + Nueva para empezar</div></div>';return;}
   if(!n){lst.innerHTML='<div style="text-align:center;padding:32px 16px;color:var(--text3)"><div style="font-size:14px">Ninguna foja coincide con el filtro</div><button class="btn btn-s" style="width:auto;margin-top:12px;padding:8px 14px;font-size:12px" onclick="limpiarFiltrosHome()">Limpiar filtros</button></div>';return;}
-  // Estado GECLISA: marca LOCAL (auto o manual) — no verifica Geclisa en vivo
+  // Estado GECLISA/evweb: marca LOCAL (auto o manual) — no verifica destino en vivo
   var EC={borrador:'#E3B341',listo:'#1DB954',enviado:'#388BFD',enviado_geclisa:'#388BFD',enviado_evweb:'#14B8A6',preoperatorio:'#A78BFA'};
-  var EL={borrador:'Borrador',listo:'Listo ✓',enviado:'Enviado ✓✓',enviado_geclisa:'GECLISA ✓✓',enviado_evweb:'Enviado a evweb ✓✓',preoperatorio:'Preoperatorio pendiente'};
+  var EL={borrador:'Borrador',listo:'Listo ✓',enviado:'Enviado ✓✓',enviado_geclisa:'GECLISA ✓✓',enviado_evweb:'evweb ✓✓',preoperatorio:'Preoperatorio pendiente'};
   var ET={
     enviado_geclisa:'Confirmado en AnesFact (automatización o marca manual). No consulta Geclisa en vivo. Clic para quitar marca.',
-    enviado_evweb:'Marca local de envío a evweb.',
-    enviado:'Marca local de enviado.'
+    enviado_evweb:'Confirmado en AnesFact (marca manual). No consulta evweb/ADAARC en vivo. Clic para quitar marca.',
+    enviado:'Marca local de enviado.',
+    preoperatorio:'Vino del QR y sigue marcada pendiente. Clic para pasar a Borrador.'
   };
   var html='';
   filtradas.slice().reverse().forEach(function(x){
     var c=EC[x.estado]||'#8B949E';var icon=x.san&&x.san.includes('Mayo')?'🏥':x.san&&x.san.includes('Aero')?'✈️':'🏨';
     var esMayo=typeof afIsMayoInterv==='function'?afIsMayoInterv(x):(x.san&&x.san.indexOf('Mayo')>=0);
+    var esAero=typeof afIsAeroInterv==='function'?afIsAeroInterv(x):(String(x.san||'').toLowerCase().indexOf('aero')>=0);
     var inCola=typeof afGeclisaQueueIsQueued==='function'&&afGeclisaQueueIsQueued(x.id);
     var sanCls=afSanatorioCssClass(x.san);
     var safeId=String(x.id||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     var viaHint=x.enviadoVia?(' · vía '+x.enviadoVia):'';
     var estadoTitle=ET[x.estado]||'';
-    if(x.estado==='enviado_geclisa'&&estadoTitle)estadoTitle+=viaHint;
+    if((x.estado==='enviado_geclisa'||x.estado==='enviado_evweb')&&estadoTitle)estadoTitle+=viaHint;
+    var estadoBadgeHtml='';
+    if(x.estado==='preoperatorio'){
+      estadoBadgeHtml='<button type="button" class="badge" title="'+estadoTitle+'" '
+        +'onclick="afSalirPreoperatorio(\''+safeId+'\',event)" '
+        +'style="background:'+c+'22;color:'+c+';border:1px solid rgba(167,139,250,.55);cursor:pointer;font-size:10px;flex-shrink:0">'
+        +'Preop. · Ya no pendiente</button>';
+    }else if(esMayo&&x.estado==='enviado_geclisa'){
+      estadoBadgeHtml='<button type="button" class="badge" title="'+estadoTitle+'" '
+        +'onclick="afToggleEnviadoGeclisaManual(\''+safeId+'\',event,\'manual_lista\')" '
+        +'style="background:'+c+'22;color:'+c+';border:1px solid rgba(56,139,253,.45);cursor:pointer;font-size:10px">'
+        +(EL[x.estado]||'GECLISA ✓✓')+'</button>';
+    }else if(esAero&&x.estado==='enviado_evweb'){
+      estadoBadgeHtml='<button type="button" class="badge" title="'+estadoTitle+'" '
+        +'onclick="afToggleEnviadoEvwebManual(\''+safeId+'\',event,\'manual_lista\')" '
+        +'style="background:'+c+'22;color:'+c+';border:1px solid rgba(20,184,166,.5);cursor:pointer;font-size:10px">'
+        +(EL[x.estado]||'evweb ✓✓')+'</button>';
+    }else{
+      estadoBadgeHtml='<span class="badge" style="background:'+c+'22;color:'+c+'"'+(estadoTitle?' title="'+estadoTitle+'"':'')+'>'+(EL[x.estado]||'Borrador')+'</span>';
+    }
+    var markExtraHtml='';
+    if(esMayo&&x.estado!=='enviado_geclisa'){
+      markExtraHtml+='<button type="button" class="badge" title="Marcar a mano como enviada a GECLISA (no verifica Geclisa en vivo)" '
+        +'onclick="afToggleEnviadoGeclisaManual(\''+safeId+'\',event,\'manual_lista\')" '
+        +'style="border:1px dashed rgba(56,139,253,.5);background:transparent;color:var(--blue);cursor:pointer;font-size:10px;flex-shrink:0">'
+        +'Marcar GECLISA</button>';
+    }
+    if(esAero&&x.estado!=='enviado_evweb'){
+      markExtraHtml+='<button type="button" class="badge" title="Marcar a mano como enviada a evweb (no verifica ADAARC/evweb en vivo)" '
+        +'onclick="afToggleEnviadoEvwebManual(\''+safeId+'\',event,\'manual_lista\')" '
+        +'style="border:1px dashed rgba(20,184,166,.55);background:transparent;color:#14B8A6;cursor:pointer;font-size:10px;flex-shrink:0">'
+        +'Marcar evweb</button>';
+    }
+    var diagSinHtml='';
+    if(x.diagnostico_sin_confirmar){
+      diagSinHtml=' · <button type="button" title="Confirmar diagnóstico (quita el aviso; no cambia el texto)" '
+        +'onclick="afConfirmarDiagnostico(\''+safeId+'\',event)" '
+        +'style="border:none;background:transparent;color:#e3b341;cursor:pointer;font-size:11px;padding:0;text-decoration:underline">'
+        +'sin confirmar · confirmar</button>';
+    }
     html+='<div class="inter '+(sanCls||'')+'" onclick="abrirInter(\''+safeId+'\')">'
       +'<div style="width:10px;height:10px;border-radius:50%;background:'+c+';flex-shrink:0"></div>'
       +'<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(x.pac||'Sin nombre')+'</div>'
       +'<div style="font-size:12px;color:var(--text2);margin-top:2px">'+fmt(x.fecha)+' · '+icon+' '+(x.san||'—')+(x.dni?' · DNI '+x.dni:'')+'</div>'
-      +(x.diag?'<div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+x.diag+(x.diagnostico_sin_confirmar?' · <span style="color:#e3b341">sin confirmar</span>':'')+(x.diagnostico_paciente&&x.diagnostico_paciente!==x.diag?' · “'+x.diagnostico_paciente+'”':'')+'</div>':'')
+      +(x.diag?'<div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+x.diag+diagSinHtml+(x.diagnostico_paciente&&x.diagnostico_paciente!==x.diag?' · “'+x.diagnostico_paciente+'”':'')+'</div>':'')
       +(x.origen==='qr_valoracion'&&x.foja&&x.foja.antecedentes&&x.foja.antecedentes.length?'<div style="font-size:10px;color:var(--text3);margin-top:2px">Antecedentes: '+x.foja.antecedentes.join(', ')+'</div>':'')
       +'</div>'
       +(esMayo
@@ -347,17 +486,8 @@ function renderHome(){
       +(x.alerta_seguridad
         ?('<span class="badge" style="background:rgba(248,81,73,.22);color:#f85149;border:1px solid rgba(248,81,73,.55);font-size:10px;flex-shrink:0;max-width:140px;text-align:center;line-height:1.25">⚠️ Revisar medicación/alergias</span>')
         :'')
-      +(esMayo
-        ?(x.estado==='enviado_geclisa'
-          ?('<button type="button" class="badge" title="'+estadoTitle+'" '
-            +'onclick="afToggleEnviadoGeclisaManual(\''+safeId+'\',event,\'manual_lista\')" '
-            +'style="background:'+c+'22;color:'+c+';border:1px solid rgba(56,139,253,.45);cursor:pointer;font-size:10px">'
-            +(EL[x.estado]||'GECLISA ✓✓')+'</button>')
-          :('<button type="button" class="badge" title="Marcar a mano como enviada a GECLISA (no verifica Geclisa en vivo)" '
-            +'onclick="afToggleEnviadoGeclisaManual(\''+safeId+'\',event,\'manual_lista\')" '
-            +'style="border:1px dashed rgba(56,139,253,.5);background:transparent;color:var(--blue);cursor:pointer;font-size:10px;flex-shrink:0">'
-            +'Marcar GECLISA</button>'))
-        :('<span class="badge" style="background:'+c+'22;color:'+c+'"'+(estadoTitle?' title="'+estadoTitle+'"':'')+'>'+(EL[x.estado]||'Borrador')+'</span>'))
+      +estadoBadgeHtml
+      +markExtraHtml
       +'<button type="button" class="badge" title="Borrar foja" onclick="borrarIntervencion(\''+safeId+'\',event)" '
       +'style="border:1px solid rgba(248,81,73,.45);background:transparent;color:var(--red);cursor:pointer;font-size:10px;flex-shrink:0">Borrar</button>'
       +'</div>';
@@ -382,6 +512,8 @@ function abrirInter(id){
       toast('Antecedentes QR: '+S.cur.foja.antecedentes.join(', ')+' (ver Foja)');
     }
     if(typeof afUpdateAlertaSeguridadFicha==='function')afUpdateAlertaSeguridadFicha(S.cur);
+    if(typeof afUpdateDiagConfirmUI==='function')afUpdateDiagConfirmUI(S.cur);
+    if(typeof afUpdateEstadoAccionesUI==='function')afUpdateEstadoAccionesUI(S.cur);
     go('nueva');
   }
 }
@@ -392,6 +524,8 @@ function nuevaInter(){
   cargarForm(S.cur);
   if(typeof cargarFojaUI==='function')cargarFojaUI();
   if(typeof afUpdateAlertaSeguridadFicha==='function')afUpdateAlertaSeguridadFicha(null);
+  if(typeof afUpdateDiagConfirmUI==='function')afUpdateDiagConfirmUI(S.cur);
+  if(typeof afUpdateEstadoAccionesUI==='function')afUpdateEstadoAccionesUI(S.cur);
   go('nueva');
 }
 function sv(id,v){var e=document.getElementById(id);if(e)e.value=v||'';}
@@ -453,6 +587,8 @@ function cargarForm(i){
   var ob=document.getElementById('f-ob');if(ob)ob.checked=!!i.ob;
   var en=document.getElementById('f-env');if(en)en.checked=i.env!==false;
   onSanChange();renderPracs();
+  if(typeof afUpdateDiagConfirmUI==='function')afUpdateDiagConfirmUI(i);
+  if(typeof afUpdateEstadoAccionesUI==='function')afUpdateEstadoAccionesUI(i);
 }
 function refreshFacturacionHeader(){
   var el=document.getElementById('fact-pac-badge');

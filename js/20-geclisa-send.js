@@ -552,6 +552,117 @@ function afToggleEnviadoGeclisaManual(intervId, ev, via){
   try{
     if(typeof renderHome==='function')renderHome();
     if(typeof renderGeclisaQueuePanel==='function')renderGeclisaQueuePanel();
+    if(typeof afUpdateEstadoAccionesUI==='function')afUpdateEstadoAccionesUI(S.cur);
+  }catch(e2){}
+  return false;
+}
+
+/**
+ * Marca local "enviado_evweb". No consulta ADAARC/evweb en vivo.
+ */
+function afMarkEnviadoEvweb(intervId, opts){
+  opts=opts||{};
+  var id=String(intervId||'').trim();
+  if(!id)return{ok:false,error:'missing_intervId'};
+  if(typeof S==='undefined'||!S.intervs)return{ok:false,error:'no_state',intervId:id};
+  var idx=-1;
+  for(var i=0;i<S.intervs.length;i++){
+    if(String(S.intervs[i].id)===id){idx=i;break;}
+  }
+  if(idx<0)return{ok:false,error:'interv_not_found',intervId:id};
+  var at=opts.at||new Date().toISOString();
+  var via=opts.via||'manual';
+  var it=S.intervs[idx];
+  it.estado='enviado_evweb';
+  it.enviadoAt=at;
+  it.enviadoVia=via;
+  it.enviadoDestino='evweb';
+  it._ts=Date.now();
+  if(S.cur&&String(S.cur.id)===id){
+    S.cur.estado=it.estado;
+    S.cur.enviadoAt=it.enviadoAt;
+    S.cur.enviadoVia=it.enviadoVia;
+    S.cur.enviadoDestino=it.enviadoDestino;
+  }
+  if(typeof saveIntervsToStorage==='function')saveIntervsToStorage();
+  if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+  if(opts.toast!==false&&typeof toast==='function'){
+    toast('Marcada enviada a evweb (manual) ✓');
+  }
+  try{
+    if(typeof renderHome==='function'&&document.getElementById('view-home')&&
+       document.getElementById('view-home').classList.contains('active')){
+      renderHome();
+    }
+  }catch(eR){}
+  return{ok:true,intervId:id,estado:'enviado_evweb',enviadoAt:at,via:via};
+}
+
+/** Quita la marca local enviado_evweb (vuelve a borrador). No toca evweb. */
+function afUnmarkEnviadoEvweb(intervId, opts){
+  opts=opts||{};
+  var id=String(intervId||'').trim();
+  if(!id||typeof S==='undefined'||!S.intervs)return{ok:false,error:'missing'};
+  var idx=-1;
+  for(var i=0;i<S.intervs.length;i++){
+    if(String(S.intervs[i].id)===id){idx=i;break;}
+  }
+  if(idx<0)return{ok:false,error:'interv_not_found',intervId:id};
+  var it=S.intervs[idx];
+  it.estado='borrador';
+  it.enviadoAt=null;
+  it.enviadoVia=null;
+  it.enviadoDestino=null;
+  it._ts=Date.now();
+  if(S.cur&&String(S.cur.id)===id){
+    S.cur.estado='borrador';
+    S.cur.enviadoAt=null;
+    S.cur.enviadoVia=null;
+    S.cur.enviadoDestino=null;
+  }
+  if(typeof saveIntervsToStorage==='function')saveIntervsToStorage();
+  if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+  if(opts.toast!==false&&typeof toast==='function')toast('Marca evweb quitada (sigue en borrador)');
+  try{
+    if(typeof renderHome==='function'&&document.getElementById('view-home')&&
+       document.getElementById('view-home').classList.contains('active')){
+      renderHome();
+    }
+  }catch(eR){}
+  return{ok:true,intervId:id,estado:'borrador'};
+}
+
+/**
+ * Toggle manual evweb desde lista / foja. Solo estado en AnesFact.
+ */
+function afToggleEnviadoEvwebManual(intervId, ev, via){
+  if(ev){try{ev.stopPropagation();ev.preventDefault();}catch(e){}}
+  var id=String(intervId||(S.cur&&S.cur.id)||'').trim();
+  if(!id){
+    if(typeof toast==='function')toast('Sin foja');
+    return false;
+  }
+  var it=typeof afResolveInterv==='function'?afResolveInterv(id):null;
+  if(!it&&S.intervs){
+    for(var k=0;k<S.intervs.length;k++){
+      if(String(S.intervs[k].id)===id){it=S.intervs[k];break;}
+    }
+  }
+  if(!it){
+    if(typeof toast==='function')toast('Foja no encontrada');
+    return false;
+  }
+  via=via||'manual';
+  if(it.estado==='enviado_evweb'){
+    if(!confirm('¿Quitar la marca “Enviado a evweb”?\n(Solo afecta AnesFact; no borra nada en ADAARC/evweb.)'))return false;
+    afUnmarkEnviadoEvweb(id,{via:via});
+  }else{
+    if(!confirm('¿Marcar como enviada a evweb?\nEs una marca en AnesFact (no verifica evweb en vivo).'))return false;
+    afMarkEnviadoEvweb(id,{via:via,toast:true});
+  }
+  try{
+    if(typeof renderHome==='function')renderHome();
+    if(typeof afUpdateEstadoAccionesUI==='function')afUpdateEstadoAccionesUI(S.cur);
   }catch(e2){}
   return false;
 }

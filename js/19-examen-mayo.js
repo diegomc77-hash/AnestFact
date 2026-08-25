@@ -300,6 +300,10 @@ function renderFojaPorSanatorio(){
   // Acciones GECLISA al final de la foja (no a mitad de pantalla)
   var mga=document.getElementById('mayo-geclisa-actions');
   if(mga)mga.style.display=esMayo?'block':'none';
+  var aea=document.getElementById('aero-evweb-actions');
+  var esAero=san.toLowerCase().indexOf('aero')>=0||san.toLowerCase().indexOf('aeron')>=0;
+  if(aea)aea.style.display=(!esMayo&&esAero)?'block':'none';
+  if(typeof afUpdateEstadoAccionesUI==='function')afUpdateEstadoAccionesUI(S.cur);
   // Imprimir button - hide for Mayo (they use GECLISA)
   var bi=document.getElementById('btn-imprimir-foja');
   if(bi)bi.style.display=esMayo?'none':'block';
