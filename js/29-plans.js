@@ -111,11 +111,19 @@ function assertPlanServer(funcion){
   });
 }
 
+function afSetTileLabel(btn, text){
+  if(!btn) return;
+  var span = btn.querySelector('span');
+  if(span) span.textContent = text;
+  else btn.textContent = text;
+}
 function showPlanModal(title, msg){
   var m = document.getElementById('plan-modal');
   if(!m){ alert(title + '\n\n' + msg); return; }
   document.getElementById('plan-modal-title').textContent = title;
   document.getElementById('plan-modal-msg').textContent = msg;
+  var ask = document.getElementById('plan-modal-ask');
+  if(ask){ ask.disabled=false; afSetTileLabel(ask,'Activar'); }
   m.style.display = 'flex';
 }
 function closePlanModal(){
@@ -148,7 +156,7 @@ function solicitarActivacionPlan(){
   var planLabels={basico:'Básico (Aeronáutico + Mayo)',pro:'Pro (más sanatorios)',consultar:'No sé — que me contacten'};
   var planLabel=planLabels[planPedido]||planPedido;
   var btn=document.getElementById('plan-modal-ask');
-  if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
+  if(btn){ btn.disabled=true; afSetTileLabel(btn,'Enviando…'); }
   var ticket={
     id:Date.now()+'_'+Math.random().toString(36).slice(2,6),
     fecha:new Date().toISOString(),
@@ -179,12 +187,12 @@ function solicitarActivacionPlan(){
       if(typeof saveHelpLocal==='function') saveHelpLocal(list);
     }catch(e){}
     toast('Pedido enviado ✓ — el admin lo ve en el panel');
-    if(btn){ btn.disabled=false; btn.textContent='Pedido enviado ✓'; }
-    setTimeout(function(){ closePlanModal(); if(btn){ btn.textContent='Solicitar activación'; } }, 1200);
+    if(btn){ btn.disabled=false; afSetTileLabel(btn,'Enviado ✓'); }
+    setTimeout(function(){ closePlanModal(); if(btn){ btn.disabled=false; afSetTileLabel(btn,'Activar'); } }, 1200);
   }).catch(function(e){
     console.warn('solicitarActivacionPlan', e);
     toast('No se pudo enviar el pedido. Probá de nuevo o escribinos por WhatsApp.');
-    if(btn){ btn.disabled=false; btn.textContent='Solicitar activación'; }
+    if(btn){ btn.disabled=false; afSetTileLabel(btn,'Activar'); }
   });
 }
 
@@ -302,9 +310,7 @@ function refreshPlanCardUi(){
   if(detail) detail.textContent = texts[plan] || ('Plan: ' + plan);
   if(btn){
     btn.style.display = '';
-    btn.textContent = (plan === 'demo' || plan === 'bloqueado')
-      ? 'Pedir activación de plan'
-      : 'Pedir cambio de plan';
+    afSetTileLabel(btn, (plan === 'demo' || plan === 'bloqueado') ? 'Pedir plan' : 'Cambiar');
   }
 }
 

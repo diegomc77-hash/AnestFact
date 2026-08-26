@@ -17,9 +17,12 @@ function renderResumen(){
     +campo('👤','Paciente',i.pac)+campo('🎂','Edad',i.edad?i.edad+' años':'')+campo('🪪','DNI',i.dni)
     +campo('🔬','Diagnóstico',i.diag)+campo('👨‍⚕️','Cirujano',i.ciru)+campo('🏨','Sanatorio',i.san)+campo('🔖','Afiliado N°',i.afil)+'</div>'
     +pracsHtml+modsHtml
-    +'<div class="brow" style="margin-bottom:8px"><button class="btn btn-s" onclick="go(\'foja\')">📋 Foja</button>'+(i.san&&i.san.includes('Mayo')?'<button class="btn btn-b" onclick="go(\'geclisa\')">🏥 GECLISA</button>':'')+'</div>'
-    +'<button class="btn btn-g" style="margin-bottom:8px" onclick="copiarTodo()">📋 Copiar resumen</button>'
-    +'<button class="btn btn-s" style="margin-bottom:8px" onclick="marcarEnviado()">✅ Marcar enviado</button>'
+    +'<div class="tile-row">'
+    +'<button type="button" class="tile tile-save" onclick="copiarTodo()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copiar</span></button>'
+    +'<button type="button" class="tile tile-foja" onclick="go(\'foja\')"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>Foja</span></button>'
+    +(i.san&&i.san.includes('Mayo')?'<button type="button" class="tile tile-geclisa" onclick="go(\'geclisa\')"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg><span>Geclisa</span></button>':'')
+    +'</div>'
+    +'<button class="btn btn-s" style="margin-bottom:8px" onclick="marcarEnviado()">&#10003; Marcar enviado</button>'
     +'<p style="font-size:11px;color:var(--text3);margin:-4px 0 12px;line-height:1.35">Marca local en AnesFact (Mayo → GECLISA / Aero → evweb). No consulta el sistema destino.</p>'
     +'<button class="btn btn-s" style="margin-bottom:24px;color:var(--red);border-color:rgba(239,68,68,.45)" onclick="borrarIntervencion(S.cur&&S.cur.id)">🗑 Borrar foja</button>';
 }

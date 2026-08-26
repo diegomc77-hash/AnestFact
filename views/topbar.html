@@ -31,8 +31,16 @@
       <option value="consultar">No s&eacute; — que me contacten</option>
     </select>
     <p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.4">El pedido llega al administrador en el panel. La facturaci&oacute;n se coordina despu&eacute;s (no se cobra autom&aacute;tico).</p>
-    <button type="button" class="btn btn-g" style="width:100%;margin-top:10px" id="plan-modal-ask" onclick="solicitarActivacionPlan()">Solicitar activación</button>
-    <button class="btn btn-s" style="width:100%;margin-top:8px" onclick="closePlanModal()">Cerrar</button>
+    <div class="tile-row" style="margin-top:12px;margin-bottom:0">
+      <button type="button" class="tile tile-save" id="plan-modal-ask" onclick="solicitarActivacionPlan()">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span id="plan-modal-ask-lbl">Activar</span>
+      </button>
+      <button type="button" class="tile tile-home" onclick="closePlanModal()">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <span>Cerrar</span>
+      </button>
+    </div>
   </div>
 </div>
 <nav id="af-dock" aria-label="Secciones">
