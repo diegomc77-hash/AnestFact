@@ -208,7 +208,7 @@
         if (!keys.length) { list.innerHTML = ''; return; }
         list.innerHTML = keys.map(function (k) {
           return '<div class="org-sel-item"><span>' + esc(st.selected[k].label) + '</span>' +
-            '<button type="button" class="btn btn-s" style="width:auto;padding:3px 8px;font-size:11px" data-k="' + esc(k) + '">Quitar</button></div>';
+            '<button type="button" class="btn btn-s" style="width:auto;padding:6px 10px;font-size:14px" data-k="' + esc(k) + '">Quitar</button></div>';
         }).join('');
         list.querySelectorAll('button[data-k]').forEach(function (btn) {
           btn.onclick = function () {
@@ -450,7 +450,7 @@
       return p.campo !== 'valoracion_cardiovascular';
     }).slice(0, 6);
     if (otros.length) {
-      bits.push('<span style="font-size:11px;color:var(--text3);display:block;margin-top:4px">Sin leer del PDF: '
+      bits.push('<span style="font-size:14px;color:var(--text2);display:block;margin-top:4px">Sin leer del PDF: '
         + esc(otros.map(function (p) { return p.nombre; }).join(', '))
         + ' — <em>completar manualmente</em></span>');
     }
@@ -470,10 +470,10 @@
         : (item.fuente === 'pdf_parser' ? ' · PDF (parser local)'
           : (item.fuente === 'manual_requerido' ? ' · requiere carga manual' : ''));
       return '<div class="est-res ' + estResClass(ex) + '"><strong>✓ ' + esc(labels[tipo] || tipo) + ' guardado</strong>' +
-        '<span style="font-size:11px;color:var(--text3)">' + esc(via) + '</span><br>' +
+        '<span style="font-size:14px;color:var(--text2)">' + esc(via) + '</span><br>' +
         esc(estResText(ex)) +
         estPendientesHtml(ex) +
-        ' <button type="button" class="btn btn-s" style="width:auto;padding:3px 8px;font-size:11px;margin-top:6px" data-t="' + tipo + '">Quitar</button></div>';
+        ' <button type="button" class="btn btn-s" style="width:auto;padding:6px 10px;font-size:14px;margin-top:6px" data-t="' + tipo + '">Quitar</button></div>';
     }).join('');
     box.querySelectorAll('button[data-t]').forEach(function (btn) {
       btn.onclick = function () {

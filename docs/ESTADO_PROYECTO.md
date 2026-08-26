@@ -2,16 +2,17 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-26:
 
-- PWA `CACHE_V`: **12.35**
+- PWA `CACHE_V`: **12.36**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- Libre. (Un chat a la vez por sección; si tomás una, escribí acá sección + fecha y no pises contrato compartido sin avisar.)
+- 2026-08-26 — Foja-bar fija + contraste valoración paciente (PWA **12.36**). No tocar `S.cur` / `fill.js`.
 
 ## Qué se hizo (más reciente primero)
 
-- 2026-08-26 — Tarjeta QR (PWA **12.35**): lockup AnesFact + nombre del médico + # diario (localStorage, se reinicia a las 00:00 AR) + fecha corta + QR + pie. Imprimir y Guardar imagen. Logo alrededor, no en los módulos. Esperando Pages `cache:'no-store'`.
+- 2026-08-26 — Foja-bar fija + contraste valoración paciente (PWA **12.36**). Barra de acciones `position:fixed` abajo en nueva/foja (dock oculto). Textos de `valoracion.html` subidos de `--text3`/`11px`. Esperando Pages `cache:'no-store'`.
+- 2026-08-26 — Tarjeta QR (PWA **12.35**): lockup AnesFact + nombre del médico + # diario (localStorage, se reinicia a las 00:00 AR) + fecha corta + QR + pie. Imprimir y Guardar imagen. Logo alrededor, no en los módulos. **Cerrado en Pages**.
 - 2026-08-26 — Lote D visual (PWA **12.34**): «Pedir plan» y modal Función no disponible en baldosas; facturación/evweb/resumen CTAs. **Cerrado en Pages**.
 - 2026-08-26 — Dock lote C (PWA **12.33**): toolbar de foja; QR Preop baldosa; 3 tamaños de dock. **Cerrado en Pages**.
 - 2026-08-26 — Dock lote B (PWA **12.32**). **Cerrado en Pages**.
@@ -25,8 +26,8 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 - Badge del módulo QR (ahora en Preop): implementado, sin confirmar visualmente en dispositivo.
 - Ruta alternativa por DNI en GECLISA (pacientes de alta): `chrome-extension-geclisa-batch/NOTES_RUTA_HC_POR_DNI.md` — no implementada.
-- Tarjeta QR (12.35): esperando verificación de Diego en Pages. PWA: reabrir del todo (SW cache-first `ignoreSearch`).
 - Correlativo QR entre equipos (servidor): diferido.
+- Foja-bar fija + contraste valoración (12.36): esperando verificación de Diego en Pages. PWA: reabrir del todo (SW cache-first `ignoreSearch`).
 
 ## Decisiones tomadas (no repreguntar)
 

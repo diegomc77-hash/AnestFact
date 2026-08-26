@@ -5,24 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Valoración preanestésica — AnesFact</title>
 <meta name="theme-color" content="#22c55e">
-<link rel="stylesheet" href="styles.css?v=12.35">
+<link rel="stylesheet" href="styles.css?v=12.36">
 <style>
+/* Lectura paciente: contraste y tamaño (no cambia la app del médico) */
+.lockup-text .tag{font-size:12px;color:var(--text2)}
+.field label{font-size:15px;color:var(--text);margin-bottom:6px}
+.ct{font-size:13px;color:var(--text2)}
+.fi{font-size:16px;padding:12px}
+.fi::placeholder{color:#A8B2BD;opacity:1}
+.chip{font-size:14px;color:var(--text);padding:8px 14px}
+.tog-row{font-size:16px;color:var(--text)}
 .chip.sel{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green)}
+.err-title{font-size:16px}
+.err-msg{font-size:16px;color:#fecaca;font-family:inherit;white-space:normal}
 #val-ok{display:none;text-align:center;padding:40px 16px}
 #val-form-wrap{display:none}
-.val-banner{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.35);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--text2);line-height:1.45}
-.val-hint{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.35}
+.val-banner{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.35);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:15px;color:var(--text);line-height:1.5}
+.val-hint{font-size:14px;color:var(--text2);margin-top:6px;line-height:1.5}
 .med-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;position:relative}
 .med-row .ac-list{left:0;right:0}
 @media(max-width:400px){.med-row{grid-template-columns:1fr}}
 .est-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.est-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:var(--bg3);border:1px dashed var(--border);border-radius:var(--r);cursor:pointer;font-size:12px;color:var(--text2);text-align:center}
+.est-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:var(--bg3);border:1px dashed var(--border);border-radius:var(--r);cursor:pointer;font-size:14px;color:var(--text2);text-align:center}
 .est-btn.has-file{border-style:solid;border-color:var(--green);color:var(--green)}
 .est-btn input{display:none}
-.est-list{font-size:12px;color:var(--text2);margin-top:10px}
+.est-list{font-size:14px;color:var(--text2);margin-top:10px}
 .org-block{margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
 .org-block:last-child{border-bottom:none}
-.org-q{font-size:14px;font-weight:500;margin-bottom:6px}
+.org-q{font-size:16px;font-weight:500;margin-bottom:6px;color:var(--text)}
 .org-yesno{display:flex;gap:8px;margin:8px 0 4px}
 .org-yesno .chip{min-width:64px;text-align:center}
 .org-yesno .chip.sel-no{background:rgba(239,68,68,.12);border-color:var(--red);color:var(--red)}
@@ -31,15 +41,15 @@
 .org-items.open{display:block}
 .org-pick{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:flex-start}
 .org-pick select{flex:1;min-width:160px}
-.org-pick .btn-add{width:auto;padding:10px 12px;font-size:12px;flex-shrink:0}
+.org-pick .btn-add{width:auto;padding:10px 12px;font-size:14px;flex-shrink:0}
 .org-sel-list{margin-top:8px}
-.org-sel-item{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--bg3);border-radius:6px;margin-bottom:4px;font-size:13px}
-.est-res{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:13px;line-height:1.45}
+.org-sel-item{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--bg3);border-radius:6px;margin-bottom:4px;font-size:15px}
+.est-res{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:15px;line-height:1.45}
 .est-res.ok{border-color:rgba(34,197,94,.4)}
 .est-res.warn{border-color:rgba(245,158,11,.5)}
 .est-res.err{border-color:rgba(239,68,68,.4)}
-.est-spin{font-size:12px;color:var(--text3);padding:8px 0}
-.est-manual-tag{display:inline-block;font-size:11px;font-weight:600;color:var(--warn);background:rgba(245,158,11,.18);border:1px solid rgba(245,158,11,.45);border-radius:6px;padding:3px 8px;margin-top:4px}
+.est-spin{font-size:14px;color:var(--text2);padding:8px 0}
+.est-manual-tag{display:inline-block;font-size:13px;font-weight:600;color:var(--warn);background:rgba(245,158,11,.18);border:1px solid rgba(245,158,11,.45);border-radius:6px;padding:3px 8px;margin-top:4px}
 .val-alerta-seg{display:none;position:sticky;top:0;z-index:20;background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.55);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:14px;color:#fecaca;line-height:1.45;font-weight:500}
 .val-alerta-seg.on{display:block}
 </style>
@@ -72,7 +82,7 @@
         <li style="margin-bottom:8px">El enlace o código QR es <strong>temporal</strong> y de <strong>un solo uso</strong>.</li>
         <li style="margin-bottom:8px">La información queda bajo la <strong>confidencialidad del acto médico</strong> con su profesional.</li>
       </ul>
-      <p style="font-size:15px;color:var(--text2);line-height:1.5;margin-bottom:18px">Si completa el formulario por otra persona (por ejemplo, un menor), debe ser su representante o responsable.</p>
+      <p style="font-size:16px;color:var(--text);line-height:1.5;margin-bottom:18px">Si completa el formulario por otra persona (por ejemplo, un menor), debe ser su representante o responsable.</p>
       <button type="button" class="btn btn-g" id="val-privacy-ok" style="font-size:16px;padding:14px">Continuar</button>
     </div>
   </div>
@@ -80,14 +90,14 @@
   <div id="val-ok">
     <div style="font-size:48px;margin-bottom:12px">&#10003;</div>
     <div style="font-size:18px;font-weight:600;margin-bottom:8px">Datos enviados</div>
-    <p style="font-size:14px;color:var(--text2);line-height:1.5">Gracias. Tu anestesiólogo/a revisará la información antes de la cirugía. Podés cerrar esta página.</p>
-    <p id="val-asa" style="font-size:12px;color:var(--text3);margin-top:16px"></p>
+    <p style="font-size:16px;color:var(--text);line-height:1.5">Gracias. Tu anestesiólogo/a revisará la información antes de la cirugía. Podés cerrar esta página.</p>
+    <p id="val-asa" style="font-size:14px;color:var(--text2);margin-top:16px"></p>
   </div>
 
   <div id="val-form-wrap">
     <div id="val-alerta-seg" class="val-alerta-seg" role="alert"></div>
     <div class="val-banner">Completá con calma. Los datos van de forma segura a tu anestesiólogo/a. Si no entendés algo, preguntale a tu médico antes de la cirugía.</div>
-    <p id="val-inst-badge" style="font-size:12px;color:var(--text3);margin-bottom:10px;text-align:center"></p>
+    <p id="val-inst-badge" style="font-size:14px;color:var(--text2);margin-bottom:10px;text-align:center"></p>
     <form id="val-form" autocomplete="off">
 
       <div class="card">
@@ -207,7 +217,7 @@
           </div>
         </details>
         <details style="margin-top:14px">
-          <summary style="font-size:13px;color:var(--text2);cursor:pointer;padding:6px 0">2. Opcional — PDF de texto (parser local, sin IA)</summary>
+          <summary style="font-size:15px;color:var(--text);cursor:pointer;padding:6px 0">2. Opcional — PDF de texto (parser local, sin IA)</summary>
           <p class="val-hint" style="margin-top:8px">Solo PDF con texto seleccionable (laboratorio, ECG del equipo, espirometría). Fotos y ecocardiograma: use el paso 1. No se llama a Gemini/Claude ni a ninguna IA de pago.</p>
         <div class="est-grid" style="margin-top:8px">
           <label class="est-btn" id="est-lab"><span style="font-size:22px">&#128203;</span><span>Laboratorio</span><input type="file" accept="application/pdf,.pdf" data-tipo="laboratorio"></label>
@@ -286,21 +296,21 @@ if (typeof pdfjsLib !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 </script>
-<script src="js/supabase-keepalive.js?v=12.35"></script>
-<script src="js/00-env.js?v=12.35"></script>
-<script src="data/cirujanos-esp.js?v=12.35"></script>
-<script src="data/valoracion/cfg-instituciones.js?v=12.35"></script>
-<script src="data/valoracion/diag-sinonimos-mayo.js?v=12.35"></script>
-<script src="data/valoracion/alergias-comunes.js?v=12.35"></script>
-<script src="data/obras-sociales-ar.js?v=12.35"></script>
-<script src="data/organos-enfermedades.js?v=12.35"></script>
-<script src="data/medicacion-habitual.js?v=12.35"></script>
-<script src="data/valoracion/alertas-seguridad.js?v=12.35"></script>
-<script src="js/estudios/pdf-text.js?v=12.35"></script>
-<script src="js/estudios/lab_parser.js?v=12.35"></script>
-<script src="js/estudios/ecg_parser.js?v=12.35"></script>
-<script src="js/estudios/espirometria_parser.js?v=12.35"></script>
-<script src="js/estudios/estudio-extract-local.js?v=12.35"></script>
-<script src="js/valoracion-form.js?v=12.35"></script>
+<script src="js/supabase-keepalive.js?v=12.36"></script>
+<script src="js/00-env.js?v=12.36"></script>
+<script src="data/cirujanos-esp.js?v=12.36"></script>
+<script src="data/valoracion/cfg-instituciones.js?v=12.36"></script>
+<script src="data/valoracion/diag-sinonimos-mayo.js?v=12.36"></script>
+<script src="data/valoracion/alergias-comunes.js?v=12.36"></script>
+<script src="data/obras-sociales-ar.js?v=12.36"></script>
+<script src="data/organos-enfermedades.js?v=12.36"></script>
+<script src="data/medicacion-habitual.js?v=12.36"></script>
+<script src="data/valoracion/alertas-seguridad.js?v=12.36"></script>
+<script src="js/estudios/pdf-text.js?v=12.36"></script>
+<script src="js/estudios/lab_parser.js?v=12.36"></script>
+<script src="js/estudios/ecg_parser.js?v=12.36"></script>
+<script src="js/estudios/espirometria_parser.js?v=12.36"></script>
+<script src="js/estudios/estudio-extract-local.js?v=12.36"></script>
+<script src="js/valoracion-form.js?v=12.36"></script>
 </body>
 </html>
