@@ -472,28 +472,31 @@ function renderHome(){
         +'sin confirmar · confirmar</button>';
     }
     html+='<div class="inter '+(sanCls||'')+'" onclick="abrirInter(\''+safeId+'\')">'
-      +'<div style="width:10px;height:10px;border-radius:50%;background:'+c+';flex-shrink:0"></div>'
-      +'<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(x.pac||'Sin nombre')+'</div>'
-      +'<div style="font-size:12px;color:var(--text2);margin-top:2px">'+fmt(x.fecha)+' · '+icon+' '+(x.san||'—')+(x.dni?' · DNI '+x.dni:'')+'</div>'
-      +(x.diag?'<div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+x.diag+diagSinHtml+(x.diagnostico_paciente&&x.diagnostico_paciente!==x.diag?' · “'+x.diagnostico_paciente+'”':'')+'</div>':'')
-      +(x.origen==='qr_valoracion'&&x.foja&&x.foja.antecedentes&&x.foja.antecedentes.length?'<div style="font-size:10px;color:var(--text3);margin-top:2px">Antecedentes: '+x.foja.antecedentes.join(', ')+'</div>':'')
-      +'</div>'
+      +'<div class="inter-main">'
+      +'<div class="inter-dot" style="background:'+c+'"></div>'
+      +'<div class="inter-body">'
+      +'<div class="inter-name">'+(x.pac||'Sin nombre')+'</div>'
+      +'<div class="inter-meta">'+fmt(x.fecha)+' · '+icon+' '+(x.san||'—')+(x.dni?' · DNI '+x.dni:'')+'</div>'
+      +(x.diag?'<div class="inter-diag">'+x.diag+diagSinHtml+(x.diagnostico_paciente&&x.diagnostico_paciente!==x.diag?' · “'+x.diagnostico_paciente+'”':'')+'</div>':'')
+      +(x.origen==='qr_valoracion'&&x.foja&&x.foja.antecedentes&&x.foja.antecedentes.length?'<div class="inter-antec">Antecedentes: '+x.foja.antecedentes.join(', ')+'</div>':'')
+      +'</div></div>'
+      +'<div class="inter-actions">'
       +(esMayo
         ?('<button type="button" class="badge" title="'+(inCola?'Sacar de cola GECLISA':'Agregar a cola GECLISA')+'" '
           +'onclick="afToggleColaGeclisa(\''+safeId+'\',event)" '
           +'style="border:1px solid '+(inCola?'rgba(234,179,8,.65)':'rgba(139,148,158,.4)')+';'
           +'background:'+(inCola?'rgba(234,179,8,.18)':'transparent')+';'
-          +'color:'+(inCola?'var(--estado-cola)':'var(--text3)')+';cursor:pointer;font-size:10px;flex-shrink:0">'
+          +'color:'+(inCola?'var(--estado-cola)':'var(--text3)')+';cursor:pointer;font-size:10px">'
           +(inCola?'⏱ En cola':'Cola')+'</button>')
         :'')
       +(x.alerta_seguridad
-        ?('<span class="badge" style="background:rgba(239,68,68,.22);color:var(--red);border:1px solid rgba(239,68,68,.55);font-size:10px;flex-shrink:0;max-width:140px;text-align:center;line-height:1.25">⚠ Revisar medicación/alergias</span>')
+        ?('<span class="badge" style="background:rgba(239,68,68,.22);color:var(--red);border:1px solid rgba(239,68,68,.55);font-size:10px;max-width:140px;text-align:center;line-height:1.25">⚠ Revisar medicación/alergias</span>')
         :'')
       +estadoBadgeHtml
       +markExtraHtml
       +'<button type="button" class="badge" title="Borrar foja" onclick="borrarIntervencion(\''+safeId+'\',event)" '
-      +'style="border:1px solid rgba(239,68,68,.45);background:transparent;color:var(--red);cursor:pointer;font-size:10px;flex-shrink:0">Borrar</button>'
-      +'</div>';
+      +'style="border:1px solid rgba(239,68,68,.45);background:transparent;color:var(--red);cursor:pointer;font-size:10px">Borrar</button>'
+      +'</div></div>';
   });
   lst.innerHTML=html;
 }

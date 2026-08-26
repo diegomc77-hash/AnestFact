@@ -609,22 +609,23 @@ function renderGeclisaQueuePanel() {
         : it.status === 'done' ? 'var(--green)' : 'var(--text2)';
       var fechaTxt = (typeof fmt === 'function' ? fmt(it.fecha) : it.fecha) || '—';
       var safeId = String(it.id || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.18);font-size:12px">';
+      html += '<div class="afg-q-item">';
       html += '<div style="color:var(--text3);width:18px;flex-shrink:0">' + (idx + 1) + '</div>';
-      html += '<div style="flex:1;min-width:0">';
-      html += '<div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (it.pac || 'Sin nombre') + '</div>';
+      html += '<div class="afg-q-item-body">';
+      html += '<div class="afg-q-name">' + (it.pac || 'Sin nombre') + '</div>';
       html += '<div style="color:var(--text3);margin-top:2px">' + fechaTxt + (it.hora ? (' · ' + it.hora) : '') + (it.sector ? (' · ' + it.sector) : '') + '</div>';
       if (it.message) {
         html += '<div style="color:var(--red);margin-top:2px;font-size:11px">' + String(it.message).slice(0, 120) + '</div>';
       }
       html += '</div>';
-      html += '<span style="font-size:10px;font-weight:700;color:' + stColor + ';flex-shrink:0">' + afGeclisaQueueStatusLabel(it.status) + '</span>';
+      html += '<div class="afg-q-item-actions">';
+      html += '<span style="font-size:10px;font-weight:700;color:' + stColor + '">' + afGeclisaQueueStatusLabel(it.status) + '</span>';
       if (it.status !== 'done' && it.status !== 'running') {
         html += '<button type="button" class="btn btn-s" style="width:auto;padding:4px 8px;font-size:11px" title="Subir" onclick="afGeclisaQueueMoveUi(\'' + safeId + '\',-1,event)">↑</button>';
         html += '<button type="button" class="btn btn-s" style="width:auto;padding:4px 8px;font-size:11px" title="Bajar" onclick="afGeclisaQueueMoveUi(\'' + safeId + '\',1,event)">↓</button>';
         html += '<button type="button" class="btn btn-s" style="width:auto;padding:4px 8px;font-size:11px" title="Quitar" onclick="afGeclisaQueueRemoveUi(\'' + safeId + '\',event)">✕</button>';
       }
-      html += '</div>';
+      html += '</div></div>';
     });
 
     html += '</div>';
