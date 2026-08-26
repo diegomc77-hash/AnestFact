@@ -1,6 +1,9 @@
 /** QR valoración preanestésica — crear enlace (requiere login) */
 function _qr$(id) { return document.getElementById(id); }
 
+var _qrCardMeta = { n: 1, fecha: '', nombre: '', pie: '' };
+var _qrPrintBound = false;
+
 function afPublicBaseUrl() {
   var path = location.pathname || '/';
   if (path.indexOf('/AnestFact') >= 0) return location.origin + '/AnestFact/';
@@ -9,30 +12,201 @@ function afPublicBaseUrl() {
   return location.origin + (i >= 0 ? path.slice(0, i + 1) : '/');
 }
 
+function afQrFechaAR() {
+  try {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+      year: 'numeric', month: '2-digit', day: '2-digit'
+    }).format(new Date());
+  } catch (e) {
+    return new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  }
+}
+
+function afQrFechaCorta() {
+  var iso = afQrFechaAR();
+  var p = iso.split('-');
+  return (p[2] || '') + '/' + (p[1] || '');
+}
+
+function afQrOrdenKey() {
+  var suf = (typeof afUserSuffix === 'function' ? afUserSuffix() : '') || '_anon';
+  return 'af_qr_orden_' + afQrFechaAR() + suf;
+}
+
+function afNextQrOrdenDia() {
+  var k = afQrOrdenKey();
+  var n = 0;
+  try { n = parseInt(localStorage.getItem(k) || '0', 10) || 0; } catch (e) {}
+  n += 1;
+  try { localStorage.setItem(k, String(n)); } catch (e) {}
+  return n;
+}
+
+function afQrMedicoNombre() {
+  if (typeof AfIdentidad !== 'undefined' && AfIdentidad.get) {
+    var id = AfIdentidad.get();
+    if (id && id.nombre) return id.nombre;
+  }
+  var local = (localStorage.getItem('af_anest_nombre') || '').toUpperCase();
+  return local || 'ANESTESISTA';
+}
+
+function _qrBindPrintCleanup() {
+  if (_qrPrintBound) return;
+  _qrPrintBound = true;
+  window.addEventListener('afterprint', function () {
+    document.body.classList.remove('af-print-qr');
+  });
+}
+
+function afImprimirTarjetaQr() {
+  _qrBindPrintCleanup();
+  document.body.classList.add('af-print-qr');
+  setTimeout(function () {
+    window.print();
+    setTimeout(function () { document.body.classList.remove('af-print-qr'); }, 800);
+  }, 50);
+}
+
+function afRoundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function afDescargarQrBlob(blob, name) {
+  var file = new File([blob], name, { type: 'image/png' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    navigator.share({ files: [file], title: name }).catch(function () {});
+    return;
+  }
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () {
+    URL.revokeObjectURL(a.href);
+    if (a.parentNode) a.parentNode.removeChild(a);
+  }, 400);
+}
+
+function afGuardarImagenQr() {
+  var img = _qr$('qr-val-img');
+  if (!img || !img.src || img.style.display === 'none') {
+    toast('No hay imagen del QR para guardar');
+    return;
+  }
+  var meta = _qrCardMeta;
+  var w = 720;
+  var h = 1000;
+  var c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  var ctx = c.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = '#22c55e';
+  afRoundRect(ctx, 56, 48, 88, 88, 20);
+  ctx.fill();
+  ctx.font = '42px system-ui,Segoe UI Emoji,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('\uD83D\uDC89', 100, 94);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#0D1117';
+  ctx.font = '800 40px system-ui,sans-serif';
+  ctx.fillText('AnesFact', 164, 88);
+  ctx.fillStyle = '#6E7681';
+  ctx.font = '600 14px system-ui,sans-serif';
+  ctx.fillText('SUITE ANESTÉSICA', 164, 114);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#161B22';
+  ctx.font = '600 22px system-ui,sans-serif';
+  ctx.fillText(meta.nombre || 'ANESTESISTA', w / 2, 186);
+  ctx.fillStyle = '#16a34a';
+  ctx.font = '800 96px system-ui,sans-serif';
+  ctx.fillText('#' + meta.n, w / 2, 300);
+  ctx.fillStyle = '#6E7681';
+  ctx.font = '600 26px system-ui,sans-serif';
+  ctx.fillText(meta.fecha, w / 2, 348);
+  var q = 360;
+  try {
+    ctx.drawImage(img, (w - q) / 2, 390, q, q);
+  } catch (e) {
+    toast('No se pudo dibujar el QR');
+    return;
+  }
+  ctx.fillStyle = '#6E7681';
+  ctx.font = '16px system-ui,sans-serif';
+  var pie = meta.pie || '';
+  if (pie.length > 52) pie = pie.slice(0, 50) + '…';
+  ctx.fillText(pie, w / 2, 790);
+  var fname = 'AnesFact-QR-' + String(meta.fecha || '').replace(/\//g, '-') + '-' + meta.n + '.png';
+  if (c.toBlob) {
+    c.toBlob(function (blob) {
+      if (!blob) { toast('No se pudo armar la imagen'); return; }
+      afDescargarQrBlob(blob, fname);
+      toast('Imagen lista');
+    }, 'image/png');
+  } else {
+    var a = document.createElement('a');
+    a.href = c.toDataURL('image/png');
+    a.download = fname;
+    a.click();
+    toast('Imagen lista');
+  }
+}
+
 function _qrModalEl() {
   var el = document.getElementById('qr-val-modal');
-  if (el) return el;
+  if (el && document.getElementById('qr-val-card')) return el;
+  if (el && el.parentNode) el.parentNode.removeChild(el);
   el = document.createElement('div');
   el.id = 'qr-val-modal';
   el.style.cssText = 'display:none;position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.65);padding:16px;overflow:auto';
   el.innerHTML =
-    '<div style="max-width:400px;margin:40px auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">' +
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">' +
-    '<div style="font-weight:600;font-size:16px">QR valoración</div>' +
+    '<div class="qr-val-sheet">' +
+    '<div class="qr-val-head qr-val-chrome"><div class="ttl">QR valoraci&oacute;n</div>' +
     '<button type="button" id="qr-val-close" style="background:none;border:none;color:var(--text2);font-size:24px;cursor:pointer">&times;</button></div>' +
-    '<p style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.45">Sanatorio Mayo · un solo uso · vence en 48 h. El paciente completa sin login.</p>' +
-    '<div style="text-align:center;margin-bottom:14px"><img id="qr-val-img" alt="QR" width="200" height="200" style="border-radius:8px;background:#fff;padding:8px"></div>' +
-    '<p id="qr-val-img-err" style="display:none;font-size:12px;color:var(--red);text-align:center;margin:0 0 12px;line-height:1.4">No se pudo generar la imagen del QR — usá el enlace de abajo</p>' +
-    '<div class="field"><label style="font-size:11px">Enlace</label><input class="fi" id="qr-val-url" readonly style="font-size:12px"></div>' +
-    '<div style="display:flex;gap:8px;margin-top:12px">' +
+    '<div class="qr-card" id="qr-val-card">' +
+    '<div class="lockup">' +
+    '<div class="syringe-badge" aria-hidden="true">&#128137;</div>' +
+    '<div class="lockup-text"><div class="brand">AnesFact</div><div class="tag">Suite anest&eacute;sica</div></div>' +
+    '</div>' +
+    '<div class="qr-card-doc" id="qr-val-doc"></div>' +
+    '<div class="qr-card-num" id="qr-val-num">#1</div>' +
+    '<div class="qr-card-date" id="qr-val-date"></div>' +
+    '<img id="qr-val-img" alt="QR" width="200" height="200">' +
+    '<p class="qr-card-foot" id="qr-val-exp"></p>' +
+    '</div>' +
+    '<p id="qr-val-img-err" class="qr-val-chrome" style="display:none;font-size:12px;color:var(--red);text-align:center;margin:0 0 12px;line-height:1.4">No se pudo generar la imagen del QR — us&aacute; el enlace de abajo</p>' +
+    '<div class="field qr-val-chrome"><label style="font-size:11px">Enlace</label><input class="fi" id="qr-val-url" readonly style="font-size:12px"></div>' +
+    '<div class="tile-row qr-val-chrome" style="margin-top:12px;margin-bottom:8px">' +
+    '<button type="button" class="tile tile-foja" id="qr-val-print">' +
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>' +
+    '<span>Imprimir</span></button>' +
+    '<button type="button" class="tile tile-save" id="qr-val-save">' +
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+    '<span>Guardar</span></button>' +
+    '</div>' +
+    '<div class="brow qr-val-chrome">' +
     '<button type="button" class="btn btn-g" style="flex:1" id="qr-val-copy">Copiar enlace</button>' +
     '<button type="button" class="btn btn-s" style="flex:1" id="qr-val-share">Compartir</button></div>' +
-    '<p id="qr-val-exp" style="font-size:11px;color:var(--text3);margin-top:12px;text-align:center"></p></div>';
+    '</div>';
   document.body.appendChild(el);
   el.addEventListener('click', function (e) {
     if (e.target === el) cerrarModalQrValoracion();
   });
   _qr$('qr-val-close').onclick = cerrarModalQrValoracion;
+  _qr$('qr-val-print').onclick = afImprimirTarjetaQr;
+  _qr$('qr-val-save').onclick = afGuardarImagenQr;
   _qr$('qr-val-copy').onclick = function () {
     var u = _qr$('qr-val-url').value;
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -57,12 +231,26 @@ function _qrModalEl() {
 function cerrarModalQrValoracion() {
   var el = document.getElementById('qr-val-modal');
   if (el) el.style.display = 'none';
+  document.body.classList.remove('af-print-qr');
 }
 
-function mostrarModalQrValoracion(data) {
+function mostrarModalQrValoracion(data, orden) {
   var url = afPublicBaseUrl() + 'valoracion.html?t=' + encodeURIComponent(data.token);
+  var n = orden || 1;
+  var fecha = afQrFechaCorta();
+  var nombre = afQrMedicoNombre();
+  var exp = data.expires_at ? new Date(data.expires_at).toLocaleString('es-AR') : '';
+  var single = data.single_use || data.max_uses === 1;
+  var pie = single
+    ? (exp ? 'Mayo · un uso · vence ' + exp : 'Sanatorio Mayo · un uso · 48 h')
+    : (exp ? 'Vence el ' + exp : 'Sanatorio Mayo');
+  _qrCardMeta = { n: n, fecha: fecha, nombre: nombre, pie: pie };
   _qrModalEl().style.display = 'block';
   _qr$('qr-val-url').value = url;
+  _qr$('qr-val-doc').textContent = nombre;
+  _qr$('qr-val-num').textContent = '#' + n;
+  _qr$('qr-val-date').textContent = fecha;
+  _qr$('qr-val-exp').textContent = pie;
   var img = _qr$('qr-val-img');
   var imgErr = _qr$('qr-val-img-err');
   function setQrSrc(dataUrl) {
@@ -95,11 +283,6 @@ function mostrarModalQrValoracion(data) {
   } else {
     paint();
   }
-  var exp = data.expires_at ? new Date(data.expires_at).toLocaleString('es-AR') : '';
-  var single = data.single_use || data.max_uses === 1;
-  _qr$('qr-val-exp').textContent = single
-    ? (exp ? 'Un solo uso · vence ' + exp : 'Un solo uso · 48 h')
-    : (exp ? 'Vence el ' + exp : '');
 }
 
 function crearQrValoracion() {
@@ -126,7 +309,8 @@ function crearQrValoracion() {
       if (!res.ok || !res.j.ok || !res.j.token) {
         throw new Error((res.j && res.j.error) || 'No se pudo crear el QR');
       }
-      mostrarModalQrValoracion(res.j);
+      var orden = afNextQrOrdenDia();
+      mostrarModalQrValoracion(res.j, orden);
       toast('QR Mayo listo (un uso)');
     })
     .catch(function (err) {
