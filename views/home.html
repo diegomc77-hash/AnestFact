@@ -4,28 +4,11 @@
     <div style="font-size:12px;color:var(--text2);margin-top:4px">Toc&aacute; para abrir el panel admin y atenderlos.</div>
   </div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <div><div style="font-size:18px;font-weight:600">Intervenciones</div><div style="font-size:12px;color:var(--text3)" id="home-count"></div></div>
+    <div><div style="font-size:18px;font-weight:600">Fojas</div><div style="font-size:12px;color:var(--text3)" id="home-count"></div></div>
     <button class="btn btn-g" style="width:auto;padding:10px 18px" onclick="nuevaInterGuarded()">+ Nueva</button>
   </div>
-  <div style="display:flex;gap:8px;margin-bottom:8px">
-    <button class="btn btn-s" style="flex:1;font-size:13px" onclick="exportarDatos()">&#128228; Exportar</button>
-    <label class="btn btn-s" style="flex:1;font-size:13px;text-align:center;cursor:pointer;margin:0">&#128229; Importar<input type="file" accept=".json" onchange="importarDatos(this)" style="display:none"></label>
-  </div>
-  <div id="sync-status" style="font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:12px;text-align:center;color:var(--text3)"></div>
-  <details style="margin-bottom:16px">
-    <summary style="font-size:12px;color:var(--text3);cursor:pointer;padding:4px 0">Sync manual (opcional)</summary>
-    <div style="display:flex;gap:8px;margin-top:8px;margin-bottom:8px">
-      <button class="btn btn-s" style="flex:1;font-size:12px" onclick="syncGuardar()">&#9729; Subir ahora</button>
-      <button class="btn btn-s" style="flex:1;font-size:12px" onclick="syncCargar()">&#9729; Bajar ahora</button>
-    </div>
-    <button class="btn btn-s" style="width:100%;font-size:11px;color:var(--text2)" onclick="syncTraerTodo()">&#9729; Traer todo (reemplazar)</button>
-  </details>
-  <button class="btn btn-s" style="width:100%;font-size:12px;margin-bottom:12px" onclick="crearQrValoracion()">&#128279; Generar QR valoraci&oacute;n preanest&eacute;sica</button>
-  <button class="btn btn-s" style="width:100%;font-size:12px;margin-bottom:12px" onclick="go('escanear')">&#128247; Escanear documentos (IA)</button>
-  <button class="btn btn-s" style="width:100%;font-size:12px;margin-bottom:12px" onclick="go('ayuda')">&#128736; Ayuda / Reportar problema</button>
   <div class="card" style="margin-bottom:12px;padding:12px 14px">
     <div class="ct" style="margin-bottom:8px">&#128269; Buscar fojas</div>
-    <!-- Input creado por JS (afMountHomeSearch) para romper heurística Chrome de autofill -->
     <div id="home-q-mount" class="field" style="margin-bottom:8px"></div>
     <div class="g2" style="margin-bottom:8px">
       <select class="fi" id="home-san" onchange="renderHome()" style="font-size:13px;padding:9px 10px">
@@ -36,7 +19,6 @@
       </select>
       <select class="fi" id="home-estado" onchange="renderHome()" style="font-size:13px;padding:9px 10px">
         <option value="">Todos los estados</option>
-        <option value="preoperatorio">Preoperatorio pendiente</option>
         <option value="borrador">Borrador</option>
         <option value="listo">Listo</option>
         <option value="enviado">Enviado</option>
@@ -50,8 +32,5 @@
     </div>
     <button class="btn btn-s" style="width:100%;margin-top:10px;font-size:12px;padding:8px" type="button" onclick="limpiarFiltrosHome()">Limpiar filtros</button>
   </div>
-  <div id="geclisa-queue-panel" style="display:none"></div>
   <div id="inter-list"></div>
-  <p style="font-size:10px;color:var(--text3);text-align:center;margin-top:20px;padding:0 12px 8px;line-height:1.4">&copy; 2026 AnesFact &mdash; Diego MC / Dra. Huerta<br>Uso no comercial sin autorizaci&oacute;n escrita</p>
 </div>
-

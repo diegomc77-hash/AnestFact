@@ -1,0 +1,17 @@
+<div id="view-preop" class="view">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div>
+      <div style="font-size:18px;font-weight:600">Preoperatorio</div>
+      <div style="font-size:12px;color:var(--text3)" id="preop-count"></div>
+    </div>
+  </div>
+  <div id="preop-alert-banner" style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:10px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.45)">
+    <div style="font-size:14px;font-weight:700;color:var(--red)">⚠ Hay fojas con medicación/alergias a revisar</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:4px">El badge rojo va en cada tarjeta. No se suspende medicación desde acá.</div>
+  </div>
+  <button class="btn btn-s" style="width:100%;font-size:12px;margin-bottom:12px" onclick="crearQrValoracion()">&#128279; Generar QR valoraci&oacute;n preanest&eacute;sica</button>
+  <div class="field" style="margin-bottom:12px">
+    <input class="fi" type="text" id="preop-q" placeholder="Nombre, DNI..." oninput="renderHome()" autocomplete="off">
+  </div>
+  <div id="preop-list"></div>
+</div>

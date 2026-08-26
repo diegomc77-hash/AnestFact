@@ -1,7 +1,7 @@
 // Carga topbar + vistas HTML y arranca la app (tras Supabase Auth)
 
 (function () {
-  var VIEWS = ['home', 'nueva', 'facturacion', 'escanear', 'config', 'foja', 'nom', 'geclisa', 'resumen', 'ayuda', 'admin'];
+  var VIEWS = ['home', 'preop', 'sanatorios', 'evweb', 'legales', 'herramientas', 'nueva', 'facturacion', 'escanear', 'config', 'foja', 'nom', 'geclisa', 'resumen', 'ayuda', 'admin'];
   // Si agregás vistas o partes de foja, actualizá también STATIC_CORE en sw.js.
   var FOJA_PARTS = [
     'tiempos', 'mayo-quir', 'tecnica', 'drogas', 'metodos', 'mayo-geclisa',
@@ -54,6 +54,7 @@
     afRepairNuevaDom();
     if (typeof afShowView === 'function') afShowView('home');
     if (typeof afSetShellTitle === 'function') afSetShellTitle('home');
+    if (typeof afSyncDock === 'function') afSyncDock('home');
     if (typeof AfSesiones !== 'undefined' && AfSesiones.onAuthReady) {
       AfSesiones.onAuthReady();
     }
@@ -70,7 +71,7 @@
   }
 
   function fetchHtml(url) {
-      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.29';
+      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.30';
     return fetch(bust).then(function (r) {
       if (!r.ok) throw new Error(url + ' HTTP ' + r.status);
       return r.text();

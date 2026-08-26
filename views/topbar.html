@@ -37,3 +37,12 @@
     <button class="btn btn-s" style="width:100%;margin-top:8px" onclick="closePlanModal()">Cerrar</button>
   </div>
 </div>
+<nav id="af-dock" aria-label="Secciones">
+  <button type="button" class="dock-item active" data-dock="home" onclick="goDock('home')"><span class="dock-ico">&#128203;</span><span class="dock-lbl">Fojas</span></button>
+  <button type="button" class="dock-item" data-dock="preop" onclick="goDock('preop')"><span class="dock-ico">&#129657;</span><span class="dock-lbl">Preop</span><span class="dock-alert" id="dock-preop-alert"></span></button>
+  <button type="button" class="dock-item" data-dock="sanatorios" onclick="goDock('sanatorios')"><span class="dock-ico">&#127973;</span><span class="dock-lbl">Sanat.</span></button>
+  <button type="button" class="dock-item" data-dock="geclisa" onclick="goDock('geclisa')"><span class="dock-ico">&#128228;</span><span class="dock-lbl">Geclisa</span></button>
+  <button type="button" class="dock-item" data-dock="evweb" onclick="goDock('evweb')"><span class="dock-ico">&#9992;</span><span class="dock-lbl">evweb</span></button>
+  <button type="button" class="dock-item" data-dock="legales" onclick="goDock('legales')"><span class="dock-ico">&#128196;</span><span class="dock-lbl">Legales</span></button>
+  <button type="button" class="dock-item" data-dock="herramientas" onclick="goDock('herramientas')"><span class="dock-ico">&#128295;</span><span class="dock-lbl">Herram.</span></button>
+</nav>

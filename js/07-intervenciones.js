@@ -180,22 +180,31 @@ function afMatchSearchQuery(blob,q){
   return true;
 }
 function filterIntervs(list){
-  var qEl=document.getElementById('home-q');
+  var mode=(S.listMode==='preop')?'preop':'fojas';
+  var qEl=document.getElementById(mode==='preop'?'preop-q':'home-q');
   var q=(qEl&&qEl.value?qEl.value:'').trim();
   var san=(document.getElementById('home-san')||{value:''}).value;
   var est=(document.getElementById('home-estado')||{value:''}).value;
   var desde=(document.getElementById('home-desde')||{value:''}).value;
   var hasta=(document.getElementById('home-hasta')||{value:''}).value;
   return(list||[]).filter(function(x){
-    if(san){
-      var s=(x.san||'').toLowerCase();
-      if(san==='mayo'&&s.indexOf('mayo')<0)return false;
-      if(san==='aero'&&(s.indexOf('aero')<0&&s.indexOf('aeron')<0))return false;
-      if(san==='otro'&&(s.indexOf('mayo')>=0||s.indexOf('aero')>=0||s.indexOf('aeron')>=0))return false;
+    if(!x)return false;
+    if(mode==='preop'){
+      if(x.estado!=='preoperatorio')return false;
+    }else if(x.estado==='preoperatorio'){
+      return false;
     }
-    if(est&&x.estado!==est)return false;
-    if(desde&&x.fecha&&x.fecha<desde)return false;
-    if(hasta&&x.fecha&&x.fecha>hasta)return false;
+    if(mode==='fojas'){
+      if(san){
+        var s=(x.san||'').toLowerCase();
+        if(san==='mayo'&&s.indexOf('mayo')<0)return false;
+        if(san==='aero'&&(s.indexOf('aero')<0&&s.indexOf('aeron')<0))return false;
+        if(san==='otro'&&(s.indexOf('mayo')>=0||s.indexOf('aero')>=0||s.indexOf('aeron')>=0))return false;
+      }
+      if(est&&x.estado!==est)return false;
+      if(desde&&x.fecha&&x.fecha<desde)return false;
+      if(hasta&&x.fecha&&x.fecha>hasta)return false;
+    }
     if(!q)return true;
     var blob=(x.pac||'')+' '+(x.dni||'')+' '+(x.san||'')+' '+(x.diag||'')+' '+(x.ciru||'')+' '+(x.serv||'');
     return afMatchSearchQuery(blob,q);
@@ -397,21 +406,50 @@ function borrarIntervencion(intervId,ev){
 }
 
 function renderHome(){
-  if(typeof afMountHomeSearch==='function')afMountHomeSearch(false);
-  if(typeof refreshAdminPlanAlerts==='function'&&typeof isAdmin==='function'&&isAdmin()){
+  var mode=(S.listMode==='preop')?'preop':'fojas';
+  if(mode==='fojas'&&typeof afMountHomeSearch==='function')afMountHomeSearch(false);
+  if(mode==='fojas'&&typeof refreshAdminPlanAlerts==='function'&&typeof isAdmin==='function'&&isAdmin()){
     refreshAdminPlanAlerts();
   }
   if(typeof renderGeclisaQueuePanel==='function')renderGeclisaQueuePanel();
-  var total=(S.intervs||[]).length;
+  var curView=(S.hist&&S.hist.length)?S.hist[S.hist.length-1]:'home';
+  if(typeof afSyncDock==='function')afSyncDock(curView);
+  var pool=(S.intervs||[]).filter(function(x){
+    if(!x)return false;
+    return mode==='preop'?(x.estado==='preoperatorio'):(x.estado!=='preoperatorio');
+  });
+  var total=pool.length;
   var filtradas=filterIntervs(S.intervs||[]);
   var n=filtradas.length;
   var countTxt=n+' de '+total+' intervención'+(total!==1?'es':'');
   if(n!==total)countTxt+=' (filtradas)';
-  var hc=document.getElementById('home-count');
+  var hc=document.getElementById(mode==='preop'?'preop-count':'home-count');
   if(hc)hc.textContent=countTxt;
-  var lst=document.getElementById('inter-list');
-  if(!total){lst.innerHTML='<div style="text-align:center;padding:48px 16px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px">🏥</div><div>Sin intervenciones</div><div style="font-size:12px;margin-top:6px">Tocá + Nueva para empezar</div></div>';return;}
-  if(!n){lst.innerHTML='<div style="text-align:center;padding:32px 16px;color:var(--text3)"><div style="font-size:14px">Ninguna foja coincide con el filtro</div><button class="btn btn-s" style="width:auto;margin-top:12px;padding:8px 14px;font-size:12px" onclick="limpiarFiltrosHome()">Limpiar filtros</button></div>';return;}
+  var banner=document.getElementById('preop-alert-banner');
+  if(banner){
+    var anyAlert=false;
+    for(var ai=0;ai<pool.length;ai++){
+      if(pool[ai]&&pool[ai].alerta_seguridad){anyAlert=true;break;}
+    }
+    banner.style.display=(mode==='preop'&&anyAlert)?'block':'none';
+  }
+  var lst=document.getElementById(mode==='preop'?'preop-list':'inter-list');
+  if(!lst)return;
+  if(!total){
+    lst.innerHTML=mode==='preop'
+      ?'<div style="text-align:center;padding:48px 16px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px">🩺</div><div>Sin valoraciones preoperatorias</div><div style="font-size:12px;margin-top:6px">Generá un QR o esperá que el paciente complete el formulario</div></div>'
+      :'<div style="text-align:center;padding:48px 16px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px">🏥</div><div>Sin intervenciones</div><div style="font-size:12px;margin-top:6px">Tocá + Nueva para empezar</div></div>';
+    return;
+  }
+  if(!n){
+    lst.innerHTML=mode==='preop'
+      ?'<div style="text-align:center;padding:32px 16px;color:var(--text3)"><div style="font-size:14px">Ninguna foja preoperatoria coincide</div></div>'
+      :'<div style="text-align:center;padding:32px 16px;color:var(--text3)"><div style="font-size:14px">Ninguna foja coincide con el filtro</div><button class="btn btn-s" style="width:auto;margin-top:12px;padding:8px 14px;font-size:12px" onclick="limpiarFiltrosHome()">Limpiar filtros</button></div>';
+    return;
+  }
+  lst.innerHTML=afInterCardsHtml(filtradas);
+}
+function afInterCardsHtml(filtradas){
   // Estado GECLISA/evweb: marca LOCAL (auto o manual) — no verifica destino en vivo
   var EC={borrador:'#6b7280',listo:'#3b82f6',enviado:'#3b82f6',enviado_geclisa:'#22c55e',enviado_evweb:'#14b8a6',preoperatorio:'#6b7280'};
   var EL={borrador:'Borrador',listo:'Listo ✓',enviado:'Enviado ✓✓',enviado_geclisa:'GECLISA ✓✓',enviado_evweb:'evweb ✓✓',preoperatorio:'Preoperatorio pendiente'};
@@ -422,7 +460,7 @@ function renderHome(){
     preoperatorio:'Vino del QR y sigue marcada pendiente. Clic para pasar a Borrador.'
   };
   var html='';
-  filtradas.slice().reverse().forEach(function(x){
+  (filtradas||[]).slice().reverse().forEach(function(x){
     var c=EC[x.estado]||'#8B949E';var icon=x.san&&x.san.includes('Mayo')?'🏥':x.san&&x.san.includes('Aero')?'✈️':'🏨';
     var esMayo=typeof afIsMayoInterv==='function'?afIsMayoInterv(x):(x.san&&x.san.indexOf('Mayo')>=0);
     var esAero=typeof afIsAeroInterv==='function'?afIsAeroInterv(x):(String(x.san||'').toLowerCase().indexOf('aero')>=0);
@@ -498,7 +536,65 @@ function renderHome(){
       +'style="border:1px solid rgba(239,68,68,.45);background:transparent;color:var(--red);cursor:pointer;font-size:10px">Borrar</button>'
       +'</div></div>';
   });
-  lst.innerHTML=html;
+  return html;
+}
+function afSanFilterKey(san){
+  var s=String(san||'').toLowerCase();
+  if(s.indexOf('mayo')>=0)return 'mayo';
+  if(s.indexOf('aero')>=0||s.indexOf('aeron')>=0)return 'aero';
+  return 'otro';
+}
+function afGoFojasFiltrado(sanKey){
+  var sel=document.getElementById('home-san');
+  if(sel)sel.value=sanKey||'';
+  goDock('home');
+}
+function renderSanatoriosHub(){
+  var host=document.getElementById('sanatorios-hub');
+  if(!host)return;
+  var counts={mayo:0,aero:0,otro:0};
+  (S.intervs||[]).forEach(function(x){
+    if(!x||x.estado==='preoperatorio')return;
+    counts[afSanFilterKey(x.san)]++;
+  });
+  var cards=[
+    {k:'mayo',l:'Sanatorio Mayo',hint:'Cola GECLISA y fojas Mayo',c:'var(--san-mayo)'},
+    {k:'aero',l:'Hospital Aeronáutico',hint:'Facturación evweb / ADAARC',c:'var(--san-aero)'},
+    {k:'otro',l:'Otros',hint:'Resto de instituciones',c:'var(--san-otro)'}
+  ];
+  var html='';
+  for(var i=0;i<cards.length;i++){
+    var t=cards[i];
+    var n=counts[t.k]||0;
+    html+='<div class="card hub-card" style="border-left-color:'+t.c+'" onclick="afGoFojasFiltrado(\''+t.k+'\')">'
+      +'<div class="hub-n">'+n+'</div>'
+      +'<div class="hub-l" style="color:'+t.c+'">'+t.l+'</div>'
+      +'<div class="hub-c">'+t.hint+' · tocá para ver fojas</div>'
+      +'</div>';
+  }
+  host.innerHTML=html;
+}
+function renderEvwebHub(){
+  var abierta=document.getElementById('evweb-abierta');
+  var nom=document.getElementById('evweb-abierta-nom');
+  if(abierta){
+    if(S.cur){
+      abierta.style.display='block';
+      if(nom)nom.textContent=(S.cur.pac||'Sin nombre')+(S.cur.san?(' · '+S.cur.san):'');
+    }else{
+      abierta.style.display='none';
+    }
+  }
+  var list=document.getElementById('evweb-list');
+  if(!list)return;
+  var pending=(S.intervs||[]).filter(function(x){
+    return x&&typeof afIsAeroInterv==='function'&&afIsAeroInterv(x)&&x.estado!=='enviado_evweb'&&x.estado!=='preoperatorio';
+  });
+  if(!pending.length){
+    list.innerHTML='<div class="card" style="color:var(--text3);font-size:13px">No hay fojas Aeronáutico pendientes de marca evweb.</div>';
+    return;
+  }
+  list.innerHTML=afInterCardsHtml(pending);
 }
 function abrirInter(id){
   if(S.cur&&S.cur.id!==id){

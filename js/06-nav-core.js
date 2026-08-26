@@ -48,7 +48,8 @@ function afSetShellTitle(id){
   }
   var sec=document.getElementById('t-section');
   if(!sec)return;
-  if(!id||id==='home'){
+  var dockRoots={home:1,preop:1,sanatorios:1,geclisa:1,evweb:1,legales:1,herramientas:1};
+  if(!id||dockRoots[id]){
     sec.textContent='';
     sec.style.display='none';
     return;
@@ -56,19 +57,64 @@ function afSetShellTitle(id){
   sec.textContent=(typeof TITLES!=='undefined'&&TITLES[id])?TITLES[id]:'';
   sec.style.display=sec.textContent?'block':'none';
 }
+var AF_DOCK_HIDE={foja:1,nueva:1,admin:1};
+var AF_DOCK_MAP={home:'home',preop:'preop',sanatorios:'sanatorios',geclisa:'geclisa',evweb:'evweb',legales:'legales',herramientas:'herramientas',facturacion:'evweb',nom:'evweb',resumen:'evweb',escanear:'herramientas',config:'herramientas',ayuda:'herramientas'};
+function afSyncDock(id){
+  var dock=document.getElementById('af-dock');
+  if(!dock)return;
+  var hide=!!AF_DOCK_HIDE[id];
+  document.body.classList.toggle('has-dock',!hide);
+  var active=AF_DOCK_MAP[id]||'';
+  var items=dock.querySelectorAll('.dock-item');
+  for(var i=0;i<items.length;i++){
+    items[i].classList.toggle('active',items[i].getAttribute('data-dock')===active);
+  }
+  var preopAlert=document.getElementById('dock-preop-alert');
+  if(preopAlert){
+    var n=0;
+    var list=(typeof S!=='undefined'&&S.intervs)?S.intervs:[];
+    for(var j=0;j<list.length;j++){
+      if(list[j]&&list[j].estado==='preoperatorio'&&list[j].alerta_seguridad)n++;
+    }
+    preopAlert.classList.toggle('on',n>0);
+  }
+}
+function goDock(id){
+  try{
+    var cur=(S.hist&&S.hist.length)?S.hist[S.hist.length-1]:'';
+    if(cur==='foja'&&S.cur&&typeof guardarFoja==='function')guardarFoja();
+    else if(S.cur&&typeof guardar==='function')guardar();
+  }catch(e){}
+  var prev=S.hist.slice();
+  S.hist=[id];
+  if(go(id,false)===false){
+    S.hist=prev;
+    var last=prev.length?prev[prev.length-1]:'home';
+    if(typeof afSyncDock==='function')afSyncDock(last);
+  }
+}
 function go(id,addH){
   if(addH===undefined)addH=true;
-  if(id==='facturacion'&&!S.cur){toast('Abrí una intervención primero');return;}
-  if(id==='geclisa'&&typeof checkPlan==='function'&&!checkPlan('geclisa'))return;
-  if(id==='admin'&&(typeof isAdmin!=='function'||!isAdmin())){toast('Acceso denegado');return;}
-  if(!afShowView(id))return;
+  if(id==='facturacion'&&!S.cur){toast('Abrí una intervención primero');return false;}
+  if(id==='geclisa'&&typeof checkPlan==='function'&&!checkPlan('geclisa'))return false;
+  if(id==='admin'&&(typeof isAdmin!=='function'||!isAdmin())){toast('Acceso denegado');return false;}
+  if(!afShowView(id))return false;
   if(addH)S.hist.push(id);
-  document.getElementById('back-btn').style.display=S.hist.length>1?'block':'none';
+  var bb=document.getElementById('back-btn');
+  if(bb)bb.style.display=S.hist.length>1?'block':'none';
   afSetShellTitle(id);
+  if(typeof afSyncDock==='function')afSyncDock(id);
   if(id==='home'){
+    S.listMode='fojas';
     if(S.cur){try{guardar();}catch(e){}}
     renderHome();if(S.hist.length===1)cargarAnestesista();
   }
+  if(id==='preop'){
+    S.listMode='preop';
+    renderHome();
+  }
+  if(id==='sanatorios'&&typeof renderSanatoriosHub==='function')renderSanatoriosHub();
+  if(id==='evweb'&&typeof renderEvwebHub==='function')renderEvwebHub();
   if(id==='resumen')renderResumen();
   if(id==='foja'){
     // Evitar resetear la foja si ya está cargada la misma intervención (pisa sedación/vía/drogas a medias)
@@ -87,7 +133,16 @@ function go(id,addH){
     renderPesoChips();
     renderFojaPorSanatorio();
   }
-  if(id==='geclisa'){window._geclisaTexto='';renderGeclisa();}
+  if(id==='geclisa'){
+    window._geclisaTexto='';
+    var mayo=S.cur&&typeof afIsMayoInterv==='function'&&afIsMayoInterv(S.cur);
+    var guia=document.getElementById('geclisa-guia');
+    var empty=document.getElementById('geclisa-no-foja');
+    if(guia)guia.style.display=mayo?'block':'none';
+    if(empty)empty.style.display=mayo?'none':'block';
+    if(mayo)renderGeclisa();
+    if(typeof renderGeclisaQueuePanel==='function')renderGeclisaQueuePanel();
+  }
   if(id==='admin'&&typeof renderAdmin==='function')renderAdmin();
   if(id==='nom'){document.getElementById('nom-q').value='';document.getElementById('nom-res').innerHTML='<p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Escribí para buscar</p>';}
   if(id==='config'){
@@ -101,6 +156,7 @@ function go(id,addH){
     onSanChange();
   }
   if(id==='ayuda'&&typeof renderAyuda==='function')renderAyuda();
+  return true;
 }
 function goFacturacion(){
   if(!S.cur){toast('Creá o abrí una intervención');return;}
@@ -121,15 +177,7 @@ function goBack(){
 
 /** Salto directo al menú principal (guarda foja/intervención abierta). */
 function irInicio(){
-  try{
-    var cur=(S.hist&&S.hist.length)?S.hist[S.hist.length-1]:'';
-    if(cur==='foja'&&S.cur&&typeof guardarFoja==='function')guardarFoja();
-    else if(S.cur&&typeof guardar==='function')guardar();
-  }catch(e){}
-  S.hist=['home'];
-  var bb=document.getElementById('back-btn');
-  if(bb)bb.style.display='none';
-  go('home',false);
+  goDock('home');
 }
 function guardarAnestesista(){
   var nombre=document.getElementById('cfg-anest-nombre').value.trim().toUpperCase();

@@ -336,25 +336,25 @@ function afGeclisaQueueClearAllUi(ev) {
 }
 
 /**
- * El host puede faltar si el SW sirvió un home.html viejo (sin #geclisa-queue-panel).
- * En ese caso lo inyectamos delante de #inter-list.
+ * Host de la cola: sección Geclisa. Si el HTML cacheado no trae el nodo, se inyecta ahí
+ * (nunca en Home).
  */
 function ensureGeclisaQueuePanelEl() {
   var el = document.getElementById('geclisa-queue-panel');
   if (el) return el;
-  var home = document.getElementById('view-home');
-  if (!home) return null;
+  var host = document.getElementById('view-geclisa');
+  if (!host) return null;
   el = document.createElement('div');
   el.id = 'geclisa-queue-panel';
   el.style.display = 'none';
-  var list = document.getElementById('inter-list');
-  if (list && list.parentNode === home) {
-    home.insertBefore(el, list);
+  var empty = document.getElementById('geclisa-no-foja');
+  if (empty && empty.parentNode === host) {
+    host.insertBefore(el, empty);
   } else {
-    home.appendChild(el);
+    host.appendChild(el);
   }
   try {
-    console.warn('[AFG cola] #geclisa-queue-panel faltaba (HTML cacheado?) → inyectado');
+    console.warn('[AFG cola] #geclisa-queue-panel faltaba (HTML cacheado?) → inyectado en Geclisa');
   } catch (eW) {}
   return el;
 }
@@ -582,9 +582,22 @@ function renderGeclisaQueuePanel() {
     } catch (e) {}
 
     var pending = env.items.filter(function (it) { return it.status !== 'done'; });
+    var onGeclisa = false;
+    try {
+      var vG = document.getElementById('view-geclisa');
+      onGeclisa = !!(vG && vG.classList.contains('active'));
+    } catch (eVis) {}
     if (!pending.length && !env.items.length) {
-      el.style.display = 'none';
-      el.innerHTML = '';
+      if (onGeclisa) {
+        el.style.display = 'block';
+        el.innerHTML = '<div class="card" style="margin-bottom:12px;padding:12px 14px;border-color:rgba(234,179,8,.45);background:rgba(234,179,8,.06)">'
+          + '<div class="ct" style="margin:0 0 6px;color:var(--estado-cola)">Cola GECLISA Mayo</div>'
+          + '<p style="font-size:13px;color:var(--text2);margin:0;line-height:1.45">Sin fojas en cola. En Fojas, en una tarjeta Mayo, tocá <b>Cola</b> para agregar. Iniciar cola, tokens y extensión no cambian.</p>'
+          + '</div>';
+      } else {
+        el.style.display = 'none';
+        el.innerHTML = '';
+      }
       return;
     }
 
