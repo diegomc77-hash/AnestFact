@@ -57,27 +57,39 @@ function afSetShellTitle(id){
   sec.textContent=(typeof TITLES!=='undefined'&&TITLES[id])?TITLES[id]:'';
   sec.style.display=sec.textContent?'block':'none';
 }
-var AF_DOCK_HIDE={foja:1,nueva:1,admin:1};
-var AF_DOCK_MAP={home:'home',preop:'preop',sanatorios:'sanatorios',geclisa:'geclisa',evweb:'evweb',legales:'legales',herramientas:'herramientas',facturacion:'evweb',nom:'evweb',resumen:'evweb',escanear:'herramientas',config:'herramientas',ayuda:'herramientas'};
+var AF_DOCK_HIDE={foja:1,nueva:1,admin:1,facturacion:1,nom:1,resumen:1};
+var AF_DOCK_MAP={home:'home',preop:'preop',sanatorios:'sanatorios',geclisa:'geclisa',evweb:'evweb',legales:'legales',herramientas:'herramientas',escanear:'herramientas',config:'herramientas',ayuda:'herramientas'};
+function afActiveViewId(){
+  var el=document.querySelector('#views-mount .view.active');
+  if(!el||!el.id)return '';
+  return String(el.id).replace(/^view-/,'');
+}
+function afSyncDockAlert(){
+  var preopAlert=document.getElementById('dock-preop-alert');
+  if(!preopAlert)return;
+  var n=0;
+  var list=(typeof S!=='undefined'&&S.intervs)?S.intervs:[];
+  for(var j=0;j<list.length;j++){
+    if(list[j]&&list[j].estado==='preoperatorio'&&list[j].alerta_seguridad)n++;
+  }
+  preopAlert.classList.toggle('on',n>0);
+}
 function afSyncDock(id){
   var dock=document.getElementById('af-dock');
   if(!dock)return;
+  if(!id)id=afActiveViewId();
   var hide=!!AF_DOCK_HIDE[id];
   document.body.classList.toggle('has-dock',!hide);
+  dock.hidden=hide;
+  dock.setAttribute('aria-hidden',hide?'true':'false');
+  if(hide)dock.style.display='none';
+  else dock.style.removeProperty('display');
   var active=AF_DOCK_MAP[id]||'';
   var items=dock.querySelectorAll('.dock-item');
   for(var i=0;i<items.length;i++){
     items[i].classList.toggle('active',items[i].getAttribute('data-dock')===active);
   }
-  var preopAlert=document.getElementById('dock-preop-alert');
-  if(preopAlert){
-    var n=0;
-    var list=(typeof S!=='undefined'&&S.intervs)?S.intervs:[];
-    for(var j=0;j<list.length;j++){
-      if(list[j]&&list[j].estado==='preoperatorio'&&list[j].alerta_seguridad)n++;
-    }
-    preopAlert.classList.toggle('on',n>0);
-  }
+  afSyncDockAlert();
 }
 function goDock(id){
   try{
@@ -248,7 +260,18 @@ function cargarAnestesista(){
 function irConfig(){go('config');}
 function irScan(){go('escanear');}
 var _tt;
-function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(function(){t.classList.remove('show');},2600);}
+function toast(msg){
+  var t=document.getElementById('toast');
+  if(!t)return;
+  t.textContent=msg;
+  t.classList.add('show');
+  t.setAttribute('aria-hidden','false');
+  clearTimeout(_tt);
+  _tt=setTimeout(function(){
+    t.classList.remove('show');
+    t.setAttribute('aria-hidden','true');
+  },2600);
+}
 function _copiarTexto(text,onOk,onFail){
   if(navigator.clipboard&&window.isSecureContext){
     navigator.clipboard.writeText(text).then(onOk).catch(function(){_copiarFallback(text,onOk,onFail);});

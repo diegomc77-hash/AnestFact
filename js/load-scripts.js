@@ -52,7 +52,7 @@
     'js/24-sw-register.js'
   ];
 
-  var CACHE_V = '12.30';
+  var CACHE_V = '12.31';
   window.AF_CACHE_V = CACHE_V;
   try { document.title = 'AnesFact v' + CACHE_V; } catch (eTit) {}
 

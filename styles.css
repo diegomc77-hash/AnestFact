@@ -91,8 +91,9 @@ select.fi option{background:var(--bg2)}
 .inter-san-sucre{border-left-color:var(--san-sucre)}
 .inter-san-privado{border-left-color:var(--san-privado)}
 .inter-san-otro{border-left-color:var(--san-otro)}
-#toast{position:fixed;bottom:108px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg2);border:1px solid var(--green);border-radius:24px;padding:10px 20px;font-size:13px;color:var(--green);transition:transform .3s;z-index:999;white-space:nowrap;pointer-events:none}
-#toast.show{transform:translateX(-50%) translateY(0)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(calc(100% + 130px));background:var(--bg2);border:1px solid var(--green);border-radius:24px;padding:10px 20px;font-size:13px;color:var(--green);transition:transform .3s,opacity .3s,visibility .3s;z-index:999;white-space:nowrap;pointer-events:none;opacity:0;visibility:hidden}
+body.has-dock #toast{bottom:108px}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;visibility:visible}
 .err-panel{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.5);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;display:none}
 .err-panel.on{display:block}
 .err-title{font-size:14px;font-weight:600;color:var(--red);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
@@ -201,6 +202,7 @@ select.fi option{background:var(--bg2)}
 #af-dock{display:none;position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:180;align-items:center;gap:2px;background:rgba(21,23,26,.92);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:6px;box-shadow:0 12px 30px -8px rgba(0,0,0,.6);max-width:calc(100% - 16px);width:max-content;overflow-x:auto;-webkit-overflow-scrolling:touch}
 #af-dock::-webkit-scrollbar{display:none}
 body.has-dock #af-dock{display:flex}
+#af-dock[hidden]{display:none!important}
 body.has-dock #views-mount .view.active{padding-bottom:108px}
 .dock-item{display:flex;flex-direction:column;align-items:center;gap:3px;width:48px;padding:7px 2px 6px;border-radius:14px;flex-shrink:0;color:var(--text3);background:none;border:none;cursor:pointer;font-family:inherit;position:relative}
 .dock-item .dock-ico{font-size:16px;line-height:1}

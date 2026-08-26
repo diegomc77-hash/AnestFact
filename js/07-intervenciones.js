@@ -412,8 +412,7 @@ function renderHome(){
     refreshAdminPlanAlerts();
   }
   if(typeof renderGeclisaQueuePanel==='function')renderGeclisaQueuePanel();
-  var curView=(S.hist&&S.hist.length)?S.hist[S.hist.length-1]:'home';
-  if(typeof afSyncDock==='function')afSyncDock(curView);
+  if(typeof afSyncDockAlert==='function')afSyncDockAlert();
   var pool=(S.intervs||[]).filter(function(x){
     if(!x)return false;
     return mode==='preop'?(x.estado==='preoperatorio'):(x.estado!=='preoperatorio');
