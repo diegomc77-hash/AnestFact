@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded',function(){
   var bar=document.getElementById('topbar-mount');
   if(!bar)return;
   var b=document.createElement('div');
-  b.style.cssText='background:rgba(255,180,0,.15);border:1px solid #ffb400;color:#ffb400;text-align:center;font-size:11px;padding:4px 8px;font-weight:600';
+  b.style.cssText='background:rgba(245,158,11,.15);border:1px solid var(--warn);color:var(--warn);text-align:center;font-size:11px;padding:4px 8px;font-weight:600';
   b.textContent='MODO DESARROLLO — GECLISA usa datos DEV (no afecta a producción)';
   bar.insertBefore(b,bar.firstChild);
 });

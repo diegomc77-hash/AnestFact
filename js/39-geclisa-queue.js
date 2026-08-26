@@ -592,9 +592,9 @@ function renderGeclisaQueuePanel() {
     var show = pending.length ? pending : env.items.slice(-5);
     el.style.display = 'block';
 
-    var html = '<div class="card" style="margin-bottom:12px;padding:12px 14px;border-color:rgba(56,139,253,.4);background:rgba(56,139,253,.06)">';
+    var html = '<div class="card" style="margin-bottom:12px;padding:12px 14px;border-color:rgba(234,179,8,.45);background:rgba(234,179,8,.06)">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">';
-    html += '<div class="ct" style="margin:0;color:var(--blue)">Cola GECLISA Mayo</div>';
+    html += '<div class="ct" style="margin:0;color:var(--estado-cola)">Cola GECLISA Mayo</div>';
     html += '<div style="font-size:12px;color:var(--text2)">' + pending.length + ' pendiente' + (pending.length !== 1 ? 's' : '') + '</div>';
     html += '</div>';
     if (!pending.length) {
@@ -604,9 +604,9 @@ function renderGeclisaQueuePanel() {
 
     show.forEach(function (it, idx) {
       var stColor = it.status === 'paused_error' ? 'var(--red)'
-        : it.status === 'awaiting_save' ? '#e6a800'
+        : it.status === 'awaiting_save' ? 'var(--estado-cola)'
         : it.status === 'running' ? 'var(--blue)'
-        : it.status === 'done' ? 'var(--green,#1DB954)' : 'var(--text2)';
+        : it.status === 'done' ? 'var(--green)' : 'var(--text2)';
       var fechaTxt = (typeof fmt === 'function' ? fmt(it.fecha) : it.fecha) || '—';
       var safeId = String(it.id || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
       html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.18);font-size:12px">';
@@ -639,7 +639,7 @@ function renderGeclisaQueuePanel() {
     if (env.items.some(function (x) { return x.status === 'done'; })) {
       html += '<button type="button" class="btn btn-s" style="flex:1;font-size:12px" onclick="afGeclisaQueueClearDone();renderGeclisaQueuePanel();renderHome();">Limpiar completadas</button>';
     }
-    html += '<button type="button" class="btn btn-s" style="flex:1;font-size:12px;color:var(--red);border-color:rgba(248,81,73,.45)" onclick="afGeclisaQueueClearAllUi(event)">Vaciar cola</button>';
+    html += '<button type="button" class="btn btn-s" style="flex:1;font-size:12px;color:var(--red);border-color:rgba(239,68,68,.45)" onclick="afGeclisaQueueClearAllUi(event)">Vaciar cola</button>';
     html += '</div>';
     html += '</div>';
     el.innerHTML = html;

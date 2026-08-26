@@ -5,7 +5,7 @@ function renderDrogas(){
   c.innerHTML=d.map(function(x,i){
     var vidOpts=VIAS.map(function(v){return'<option'+(v===x.v?' selected':'')+'>'+v+'</option>';}).join('');
     var ev=typeof evaluarReglaDroga==='function'?evaluarReglaDroga(x.n):null;
-    var rowStyle=ev&&ev.nivel==='evitar'?'border-left:3px solid var(--red);padding-left:6px':ev&&ev.nivel==='precaucion'?'border-left:3px solid #ffb400;padding-left:6px':'';
+    var rowStyle=ev&&ev.nivel==='evitar'?'border-left:3px solid var(--red);padding-left:6px':ev&&ev.nivel==='precaucion'?'border-left:3px solid var(--warn);padding-left:6px':'';
     return '<div class="droga-row" id="dr-'+i+'" style="'+rowStyle+'">'
       +'<div class="ac-wrap" style="flex:2;min-width:0">'
         +'<input id="din-'+i+'" value="'+(x.n||'')+'" placeholder="Fármaco" autocomplete="off" oninput="editD('+i+',\'n\',this.value);acDrugRow('+i+',this.value)" onkeydown="acKey(event,\'ac-dr-'+i+'\')">'

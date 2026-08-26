@@ -106,8 +106,8 @@ function showDoseInfo(drug,peso){
     if(ev&&ev.nivel!=='preferir'){showReglaDroga(drug.n);return;}
   }
   bar.style.color='var(--blue)';
-  bar.style.background='rgba(56,139,253,.1)';
-  bar.style.borderColor='rgba(56,139,253,.4)';
+  bar.style.background='rgba(59,130,246,.1)';
+  bar.style.borderColor='rgba(59,130,246,.4)';
   if(!drug.mgKg||!peso){bar.style.display='none';return;}
   var calc=(drug.mgKg*peso).toFixed(1);
   var rango=drug.rangoMgKg?((drug.rangoMgKg[0]*peso).toFixed(0)+' – '+(drug.rangoMgKg[1]*peso).toFixed(0)+' mg'):'';

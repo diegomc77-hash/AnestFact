@@ -173,8 +173,8 @@ function renderAdminPlanRequestsList(items){
     var actual = adminEscape(t.plan_actual || 'demo');
     var pedido = adminEscape(t.plan_pedido || 'consultar');
     var msg = adminEscape(t.mensaje || '');
-    var border = isNew ? 'rgba(248,81,73,.55)' : 'var(--border)';
-    var bg = isNew ? 'rgba(248,81,73,.08)' : 'transparent';
+    var border = isNew ? 'rgba(239,68,68,.55)' : 'var(--border)';
+    var bg = isNew ? 'rgba(239,68,68,.08)' : 'transparent';
     var titleColor = isNew ? 'var(--red)' : 'var(--yellow)';
     return '<div style="padding:10px;margin:0 0 8px;border:1px solid '+border+';border-radius:8px;background:'+bg+'">'
       +'<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">'

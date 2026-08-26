@@ -209,9 +209,9 @@ function getSyncClave(){
 function syncStatus(msg,color){
   var el=document.getElementById('sync-status');if(!el)return;
   el.style.display='block';
-  el.style.background=color==='ok'?'rgba(29,185,84,.1)':color==='err'?'rgba(248,81,73,.1)':'rgba(56,139,253,.1)';
+  el.style.background=color==='ok'?'rgba(34,197,94,.1)':color==='err'?'rgba(239,68,68,.1)':'rgba(59,130,246,.1)';
   el.style.color=color==='ok'?'var(--green)':color==='err'?'var(--red)':'var(--blue)';
-  el.style.border='1px solid '+(color==='ok'?'rgba(29,185,84,.3)':color==='err'?'rgba(248,81,73,.3)':'rgba(56,139,253,.3)');
+  el.style.border='1px solid '+(color==='ok'?'rgba(34,197,94,.3)':color==='err'?'rgba(239,68,68,.3)':'rgba(59,130,246,.3)');
   el.textContent=msg;
 }
 
@@ -345,9 +345,9 @@ function syncPushAfterDelete(deletedId){
 function syncAutoStatusUpdate(){
   var el=document.getElementById('sync-status');if(!el)return;
   el.style.display='block';
-  el.style.background=_lastSyncErr?'rgba(248,81,73,.08)':'rgba(29,185,84,.08)';
+  el.style.background=_lastSyncErr?'rgba(239,68,68,.08)':'rgba(34,197,94,.08)';
   el.style.color=_lastSyncErr?'var(--red)':'var(--text2)';
-  el.style.border='1px solid '+(_lastSyncErr?'rgba(248,81,73,.25)':'var(--border)');
+  el.style.border='1px solid '+(_lastSyncErr?'rgba(239,68,68,.25)':'var(--border)');
   var slug=getSyncUserSlug();
   var who=slug.replace(/_/g,' ');
   var t='';

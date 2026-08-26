@@ -717,7 +717,7 @@ function sugerirDrogas(tipo){
       op.value=it.n+'|'+it.d+'|'+it.u;
       op.textContent=fil.label+' ('+it.d+' '+it.u+')';
       if(fil.ev&&fil.ev.nivel==='evitar')op.style.color='var(--red)';
-      else if(fil.ev&&fil.ev.nivel==='precaucion')op.style.color='#ffb400';
+      else if(fil.ev&&fil.ev.nivel==='precaucion')op.style.color='var(--warn)';
       sel.appendChild(op);
     });
 

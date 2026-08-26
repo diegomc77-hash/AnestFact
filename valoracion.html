@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Valoración preanestésica — AnesFact</title>
-<meta name="theme-color" content="#0284c7">
-<link rel="stylesheet" href="styles.css?v=12.27">
+<meta name="theme-color" content="#22c55e">
+<link rel="stylesheet" href="styles.css?v=12.28">
 <style>
-.chip.sel{background:rgba(29,185,84,.15);border-color:var(--green);color:var(--green)}
+.chip.sel{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green)}
 #val-ok{display:none;text-align:center;padding:40px 16px}
 #val-form-wrap{display:none}
-.val-banner{background:rgba(56,139,253,.12);border:1px solid rgba(56,139,253,.35);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--text2);line-height:1.45}
+.val-banner{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.35);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--text2);line-height:1.45}
 .val-hint{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.35}
 .med-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;position:relative}
 .med-row .ac-list{left:0;right:0}
@@ -25,8 +25,8 @@
 .org-q{font-size:14px;font-weight:500;margin-bottom:6px}
 .org-yesno{display:flex;gap:8px;margin:8px 0 4px}
 .org-yesno .chip{min-width:64px;text-align:center}
-.org-yesno .chip.sel-no{background:rgba(248,81,73,.12);border-color:var(--red);color:var(--red)}
-.org-yesno .chip.sel-yes{background:rgba(29,185,84,.15);border-color:var(--green);color:var(--green)}
+.org-yesno .chip.sel-no{background:rgba(239,68,68,.12);border-color:var(--red);color:var(--red)}
+.org-yesno .chip.sel-yes{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green)}
 .org-items{margin-top:8px;display:none}
 .org-items.open{display:block}
 .org-pick{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:flex-start}
@@ -35,20 +35,25 @@
 .org-sel-list{margin-top:8px}
 .org-sel-item{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--bg3);border-radius:6px;margin-bottom:4px;font-size:13px}
 .est-res{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:13px;line-height:1.45}
-.est-res.ok{border-color:rgba(29,185,84,.4)}
-.est-res.warn{border-color:rgba(227,179,65,.5)}
-.est-res.err{border-color:rgba(248,81,73,.4)}
+.est-res.ok{border-color:rgba(34,197,94,.4)}
+.est-res.warn{border-color:rgba(245,158,11,.5)}
+.est-res.err{border-color:rgba(239,68,68,.4)}
 .est-spin{font-size:12px;color:var(--text3);padding:8px 0}
-.est-manual-tag{display:inline-block;font-size:11px;font-weight:600;color:#b45309;background:rgba(227,179,65,.18);border:1px solid rgba(227,179,65,.45);border-radius:6px;padding:3px 8px;margin-top:4px}
-.val-alerta-seg{display:none;position:sticky;top:0;z-index:20;background:rgba(248,81,73,.14);border:1px solid rgba(248,81,73,.55);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:14px;color:#fecaca;line-height:1.45;font-weight:500}
+.est-manual-tag{display:inline-block;font-size:11px;font-weight:600;color:var(--warn);background:rgba(245,158,11,.18);border:1px solid rgba(245,158,11,.45);border-radius:6px;padding:3px 8px;margin-top:4px}
+.val-alerta-seg{display:none;position:sticky;top:0;z-index:20;background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.55);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:14px;color:#fecaca;line-height:1.45;font-weight:500}
 .val-alerta-seg.on{display:block}
 </style>
 </head>
 <body>
 <div style="padding:16px;max-width:520px;margin:0 auto">
-  <div style="text-align:center;margin-bottom:16px">
-    <div style="font-size:20px;font-weight:600;color:var(--green)">AnesFact</div>
-    <div style="font-size:13px;color:var(--text3);margin-top:4px">Valoración preanestésica</div>
+  <div style="display:flex;justify-content:center;margin-bottom:16px">
+    <div class="lockup lockup-auth" style="margin:0">
+      <div class="syringe-badge" aria-hidden="true">&#128137;</div>
+      <div class="lockup-text">
+        <div class="brand">AnesFact</div>
+        <div class="tag">Valoración preanestésica</div>
+      </div>
+    </div>
   </div>
 
   <div id="val-invalid" class="err-panel on">
@@ -113,7 +118,7 @@
 
       <div class="card">
         <div class="ct">Sus datos</div>
-        <p class="val-hint" style="margin-bottom:10px;color:#e3b341">Nombre, DNI, edad, peso, talla y N° de afiliado son <strong>obligatorios</strong> — un error acá puede afectar la evaluación correcta de su riesgo anestésico. Es por su seguridad. La historia clínica es opcional.</p>
+        <p class="val-hint" style="margin-bottom:10px;color:var(--warn)">Nombre, DNI, edad, peso, talla y N° de afiliado son <strong>obligatorios</strong> — un error acá puede afectar la evaluación correcta de su riesgo anestésico. Es por su seguridad. La historia clínica es opcional.</p>
         <div class="field"><label>Nombre y apellido *</label><input class="fi" id="v-nombre" required autocomplete="name"></div>
         <div class="field"><label>DNI *</label><input class="fi" id="v-dni" required inputmode="numeric" autocomplete="off" maxlength="10"></div>
         <div class="field" id="v-hc-wrap"><label>N° de Historia Clínica (opcional)</label><input class="fi" id="v-hc" placeholder="Si lo tiene a mano" autocomplete="off"></div>
@@ -281,21 +286,21 @@ if (typeof pdfjsLib !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 </script>
-<script src="js/supabase-keepalive.js?v=12.27"></script>
-<script src="js/00-env.js?v=12.27"></script>
-<script src="data/cirujanos-esp.js?v=12.27"></script>
-<script src="data/valoracion/cfg-instituciones.js?v=12.27"></script>
-<script src="data/valoracion/diag-sinonimos-mayo.js?v=12.27"></script>
-<script src="data/valoracion/alergias-comunes.js?v=12.27"></script>
-<script src="data/obras-sociales-ar.js?v=12.27"></script>
-<script src="data/organos-enfermedades.js?v=12.27"></script>
-<script src="data/medicacion-habitual.js?v=12.27"></script>
-<script src="data/valoracion/alertas-seguridad.js?v=12.27"></script>
-<script src="js/estudios/pdf-text.js?v=12.27"></script>
-<script src="js/estudios/lab_parser.js?v=12.27"></script>
-<script src="js/estudios/ecg_parser.js?v=12.27"></script>
-<script src="js/estudios/espirometria_parser.js?v=12.27"></script>
-<script src="js/estudios/estudio-extract-local.js?v=12.27"></script>
-<script src="js/valoracion-form.js?v=12.27"></script>
+<script src="js/supabase-keepalive.js?v=12.28"></script>
+<script src="js/00-env.js?v=12.28"></script>
+<script src="data/cirujanos-esp.js?v=12.28"></script>
+<script src="data/valoracion/cfg-instituciones.js?v=12.28"></script>
+<script src="data/valoracion/diag-sinonimos-mayo.js?v=12.28"></script>
+<script src="data/valoracion/alergias-comunes.js?v=12.28"></script>
+<script src="data/obras-sociales-ar.js?v=12.28"></script>
+<script src="data/organos-enfermedades.js?v=12.28"></script>
+<script src="data/medicacion-habitual.js?v=12.28"></script>
+<script src="data/valoracion/alertas-seguridad.js?v=12.28"></script>
+<script src="js/estudios/pdf-text.js?v=12.28"></script>
+<script src="js/estudios/lab_parser.js?v=12.28"></script>
+<script src="js/estudios/ecg_parser.js?v=12.28"></script>
+<script src="js/estudios/espirometria_parser.js?v=12.28"></script>
+<script src="js/estudios/estudio-extract-local.js?v=12.28"></script>
+<script src="js/valoracion-form.js?v=12.28"></script>
 </body>
 </html>

@@ -113,7 +113,7 @@ function afUpdateAlertaSeguridadFicha(interv) {
     el = document.createElement('div');
     el.id = 'af-alerta-seg-ficha';
     el.setAttribute('role', 'alert');
-    el.style.cssText = 'display:none;margin:0 0 12px;padding:12px 14px;border-radius:8px;background:rgba(248,81,73,.16);border:1px solid rgba(248,81,73,.55);color:#fecaca;font-size:13px;line-height:1.45;font-weight:500';
+    el.style.cssText = 'display:none;margin:0 0 12px;padding:12px 14px;border-radius:8px;background:rgba(239,68,68,.16);border:1px solid rgba(239,68,68,.55);color:#fecaca;font-size:13px;line-height:1.45;font-weight:500';
     host.insertBefore(el, host.firstChild);
   }
   var on = !!(interv && interv.alerta_seguridad);

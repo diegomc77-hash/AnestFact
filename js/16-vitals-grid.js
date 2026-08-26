@@ -111,7 +111,7 @@ function renderVitalsGrid(){
           }
         });
         cell=nearest;
-      }var bt=isMajor?'1.5px solid rgba(100,100,100,.5)':'1px solid rgba(48,54,61,.5)';var bg=cell?'rgba(29,185,84,.12)':'transparent';var sym=cell?('<span style="font-size:13px;font-weight:bold;line-height:1;color:'+cell.color+'">'+cell.sym+'</span>'):'';html+='<div onclick="toggleCell('+ci+','+yval+')" style="width:'+CELL+'px;height:18px;border-left:1px solid rgba(48,54,61,.4);border-top:'+bt+';background:'+bg+';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">'+sym+'</div>';});
+      }var bt=isMajor?'1.5px solid rgba(100,100,100,.5)':'1px solid rgba(48,54,61,.5)';var bg=cell?'rgba(34,197,94,.12)':'transparent';var sym=cell?('<span style="font-size:13px;font-weight:bold;line-height:1;color:'+cell.color+'">'+cell.sym+'</span>'):'';html+='<div onclick="toggleCell('+ci+','+yval+')" style="width:'+CELL+'px;height:18px;border-left:1px solid rgba(48,54,61,.4);border-top:'+bt+';background:'+bg+';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">'+sym+'</div>';});
     html+='</div>';
   });
   html+='<div style="display:flex;margin-top:2px;align-items:stretch"><div style="width:'+LABEL_W+'px;font-size:7px;color:var(--text3);text-align:right;padding-right:4px;flex-shrink:0;line-height:1.2">Hora<br>obs.</div>';

@@ -40,6 +40,22 @@ function afShowView(id){
   window.scrollTo(0,0);
   return true;
 }
+function afSetShellTitle(id){
+  var tag=document.getElementById('lockup-tag');
+  if(tag){
+    var v=(typeof AF_CACHE_V==='string'&&AF_CACHE_V)?AF_CACHE_V:'';
+    tag.textContent=v?('Suite anestésica · v'+v):'Suite anestésica';
+  }
+  var sec=document.getElementById('t-section');
+  if(!sec)return;
+  if(!id||id==='home'){
+    sec.textContent='';
+    sec.style.display='none';
+    return;
+  }
+  sec.textContent=(typeof TITLES!=='undefined'&&TITLES[id])?TITLES[id]:'';
+  sec.style.display=sec.textContent?'block':'none';
+}
 function go(id,addH){
   if(addH===undefined)addH=true;
   if(id==='facturacion'&&!S.cur){toast('Abrí una intervención primero');return;}
@@ -48,7 +64,7 @@ function go(id,addH){
   if(!afShowView(id))return;
   if(addH)S.hist.push(id);
   document.getElementById('back-btn').style.display=S.hist.length>1?'block':'none';
-  document.getElementById('t-title').textContent=TITLES[id]||afHomeTitle();
+  afSetShellTitle(id);
   if(id==='home'){
     if(S.cur){try{guardar();}catch(e){}}
     renderHome();if(S.hist.length===1)cargarAnestesista();

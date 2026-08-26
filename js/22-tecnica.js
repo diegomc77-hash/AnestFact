@@ -163,7 +163,7 @@ function setAldrete(val){
   if(sel&&String(sel.value)!==String(val||''))sel.value=val||'';
   document.querySelectorAll('#aldrete-chips .chip').forEach(function(b){b.style.background='var(--bg3)';b.style.borderColor='var(--border)';b.style.color='var(--text)';});
   if(typeof event!=='undefined'&&event&&event.target&&event.target.classList&&event.target.classList.contains('chip')){
-    event.target.style.background='rgba(29,185,84,.15)';event.target.style.borderColor='var(--green)';event.target.style.color='var(--green)';
+    event.target.style.background='rgba(34,197,94,.15)';event.target.style.borderColor='var(--green)';event.target.style.color='var(--green)';
   }
   actualizarRecup();
 }
@@ -221,11 +221,11 @@ function actualizarRecup(){
 function toggleAntec(btn,val){
   var idx=_antecedentes.indexOf(val);
   if(idx>=0){_antecedentes.splice(idx,1);btn.style.background='var(--bg3)';btn.style.borderColor='var(--border)';btn.style.color='var(--text)';}
-  else{_antecedentes.push(val);btn.style.background='rgba(29,185,84,.15)';btn.style.borderColor='var(--green)';btn.style.color='var(--green)';}
+  else{_antecedentes.push(val);btn.style.background='rgba(34,197,94,.15)';btn.style.borderColor='var(--green)';btn.style.color='var(--green)';}
   document.querySelectorAll('#antec-chips button,#antec-chips-tec button').forEach(function(b){
     if(b.textContent===val||b.getAttribute('data-antec')===val){
       var on=_antecedentes.indexOf(val)>=0;
-      b.style.background=on?'rgba(29,185,84,.15)':'var(--bg3)';
+      b.style.background=on?'rgba(34,197,94,.15)':'var(--bg3)';
       b.style.borderColor=on?'var(--green)':'var(--border)';
       b.style.color=on?'var(--green)':'var(--text)';
     }
@@ -252,7 +252,7 @@ function restaurarAntecedentes(arr){
   document.querySelectorAll('#antec-chips button,#antec-chips-tec button').forEach(function(b){
     var val=b.textContent.trim();
     var on=_antecedentes.indexOf(val)>=0;
-    b.style.background=on?'rgba(29,185,84,.15)':'var(--bg3)';
+    b.style.background=on?'rgba(34,197,94,.15)':'var(--bg3)';
     b.style.borderColor=on?'var(--green)':'var(--border)';
     b.style.color=on?'var(--green)':'var(--text)';
   });

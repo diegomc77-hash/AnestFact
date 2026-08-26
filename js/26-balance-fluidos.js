@@ -203,8 +203,8 @@ function renderBalanceAlertas(){
   }
   box.style.display='block';
   box.innerHTML=msgs.map(function(m){
-    var col=m.n==='warn'?'#ffb400':'var(--blue)';
-    var bg=m.n==='warn'?'rgba(255,180,0,.1)':'rgba(56,139,253,.1)';
+    var col=m.n==='warn'?'var(--warn)':'var(--blue)';
+    var bg=m.n==='warn'?'rgba(245,158,11,.1)':'rgba(59,130,246,.1)';
     return '<div style="padding:6px 10px;margin-bottom:6px;border-radius:8px;font-size:12px;border:1px solid '+col+';background:'+bg+';color:'+col+'">'+(m.n==='warn'?'⚠️ ':'ℹ️ ')+m.t+'</div>';
   }).join('');
 }

@@ -4,9 +4,9 @@ var HELP_CAT_LABELS={plan:'Plan',sync:'Sync',geclisa:'GECLISA',foja:'Foja',scan:
 function helpStatus(msg,color){
   var el=document.getElementById('help-status');if(!el)return;
   el.style.display='block';
-  el.style.background=color==='ok'?'rgba(29,185,84,.1)':color==='err'?'rgba(248,81,73,.1)':'rgba(56,139,253,.1)';
+  el.style.background=color==='ok'?'rgba(34,197,94,.1)':color==='err'?'rgba(239,68,68,.1)':'rgba(59,130,246,.1)';
   el.style.color=color==='ok'?'var(--green)':color==='err'?'var(--red)':'var(--blue)';
-  el.style.border='1px solid '+(color==='ok'?'rgba(29,185,84,.3)':color==='err'?'rgba(248,81,73,.3)':'rgba(56,139,253,.3)');
+  el.style.border='1px solid '+(color==='ok'?'rgba(34,197,94,.3)':color==='err'?'rgba(239,68,68,.3)':'rgba(59,130,246,.3)');
   el.textContent=msg;
 }
 

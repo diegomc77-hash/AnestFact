@@ -21,7 +21,7 @@ function renderResumen(){
     +'<button class="btn btn-g" style="margin-bottom:8px" onclick="copiarTodo()">📋 Copiar resumen</button>'
     +'<button class="btn btn-s" style="margin-bottom:8px" onclick="marcarEnviado()">✅ Marcar enviado</button>'
     +'<p style="font-size:11px;color:var(--text3);margin:-4px 0 12px;line-height:1.35">Marca local en AnesFact (Mayo → GECLISA / Aero → evweb). No consulta el sistema destino.</p>'
-    +'<button class="btn btn-s" style="margin-bottom:24px;color:var(--red);border-color:rgba(248,81,73,.45)" onclick="borrarIntervencion(S.cur&&S.cur.id)">🗑 Borrar foja</button>';
+    +'<button class="btn btn-s" style="margin-bottom:24px;color:var(--red);border-color:rgba(239,68,68,.45)" onclick="borrarIntervencion(S.cur&&S.cur.id)">🗑 Borrar foja</button>';
 }
 function toggleChk(id){var b=document.getElementById(id);if(!b)return;var d=b.classList.contains('checked');b.classList.toggle('checked',!d);b.textContent=d?'':'✓';}
 function calcMods(i){

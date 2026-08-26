@@ -68,7 +68,7 @@ function calcAtbProfilaxis(){
   if(aa){
     if(atbAlerta){
       aa.style.display='block';
-      aa.style.background='rgba(56,139,253,.12)';
+      aa.style.background='rgba(59,130,246,.12)';
       aa.style.borderColor='var(--blue)';
       aa.style.color='var(--blue)';
       aa.textContent='ℹ️ '+atbAlerta;
@@ -133,7 +133,7 @@ function calcPremed(silencioso){
   if(sc){
     var etiq='<span style="font-size:11px;color:var(--text3);margin-right:4px">Agregar:</span>';
     sc.innerHTML=etiq+extras.map(function(c){
-      return '<span class="chip" style="background:rgba(29,185,84,.12);border:1px solid var(--green);color:var(--green);cursor:pointer" onclick="addChipTo(\'fj-premed\',\''+c.replace(/'/g,"\\'")+'\')">'+(c.length>36?c.slice(0,34)+'…':c)+'</span>';
+      return '<span class="chip" style="background:rgba(34,197,94,.12);border:1px solid var(--green);color:var(--green);cursor:pointer" onclick="addChipTo(\'fj-premed\',\''+c.replace(/'/g,"\\'")+'\')">'+(c.length>36?c.slice(0,34)+'…':c)+'</span>';
     }).join('');
   }
   var pa=document.getElementById('premed-alert');

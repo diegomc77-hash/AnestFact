@@ -77,7 +77,7 @@ var AUSC_CV_CTX={
 };
 
 function _auscOn(on){
-  return on?{bg:'rgba(29,185,84,.15)',border:'var(--green)',color:'var(--green)'}
+  return on?{bg:'rgba(34,197,94,.15)',border:'var(--green)',color:'var(--green)'}
          :{bg:'var(--bg3)',border:'var(--border)',color:'var(--text)'};
 }
 

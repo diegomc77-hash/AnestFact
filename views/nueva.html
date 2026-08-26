@@ -84,16 +84,16 @@
         <div class="fr"><input class="fi" type="text" id="f-diag" placeholder="Varias cirug&iacute;as: separ&aacute; con punto (.)" autocomplete="off" oninput="acCirugia('f-diag','ac-diag');sugerirPosicion()" onkeydown="acKey(event,'ac-diag')"><button class="mic" id="m-diag" onclick="mic('f-diag','m-diag')">&#127897;</button></div>
         <div class="ac-list" id="ac-diag"></div>
       </div>
-      <div id="diag-sin-confirmar-row" style="display:none;margin-top:8px;padding:8px 10px;border-radius:8px;border:1px solid rgba(227,179,65,.45);background:rgba(227,179,65,.08)">
-        <div style="font-size:12px;color:#e3b341;margin-bottom:6px">Diagn&oacute;stico del QR sin confirmar m&eacute;dicamente</div>
+      <div id="diag-sin-confirmar-row" style="display:none;margin-top:8px;padding:8px 10px;border-radius:8px;border:1px solid rgba(245,158,11,.45);background:rgba(245,158,11,.08)">
+        <div style="font-size:12px;color:var(--warn);margin-bottom:6px">Diagn&oacute;stico del QR sin confirmar m&eacute;dicamente</div>
         <button type="button" class="btn btn-s" style="width:100%;font-size:12px;padding:8px" onclick="afConfirmarDiagnostico(null,event)">&#10003; Confirmar diagn&oacute;stico</button>
         <div style="font-size:10px;color:var(--text3);margin-top:6px;line-height:1.35">Acci&oacute;n expl&iacute;cita: editar el texto arriba no quita este aviso.</div>
       </div>
     </div>
   </div>
   <div id="preop-estado-row" style="display:none;margin-bottom:12px">
-    <div class="card" style="border-color:rgba(167,139,250,.45);background:rgba(167,139,250,.08);padding:12px 14px;margin:0">
-      <div class="ct" style="color:#A78BFA;margin:0 0 8px">Preoperatorio pendiente</div>
+    <div class="card" style="border-color:rgba(107,114,128,.45);background:rgba(107,114,128,.08);padding:12px 14px;margin:0">
+      <div class="ct" style="color:var(--estado-borrador);margin:0 0 8px">Preoperatorio pendiente</div>
       <p style="font-size:12px;color:var(--text2);margin:0 0 10px;line-height:1.4">Esta foja vino del QR y sigue marcada como pendiente. Si el paciente ya se oper&oacute; (o ya no aplica), sacala a Borrador.</p>
       <button type="button" class="btn btn-s" style="width:100%;font-size:13px;padding:10px" onclick="afSalirPreoperatorio(null,event)">Ya no est&aacute; pendiente &#8594; Borrador</button>
     </div>

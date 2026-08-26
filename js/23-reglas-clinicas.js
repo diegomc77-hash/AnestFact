@@ -119,7 +119,7 @@ function renderAlertasClinicas(){
     panel.innerHTML='';
     return;
   }
-  var html='<div style="font-size:12px;font-weight:600;margin-bottom:6px;color:var(--amber,#ffb400)">&#9888; Contexto: '+a.ctxLabels.join(' · ')+'</div>';
+  var html='<div style="font-size:12px;font-weight:600;margin-bottom:6px;color:var(--warn)">&#9888; Contexto: '+a.ctxLabels.join(' · ')+'</div>';
   if(a.revisar.length){
     html+='<div style="font-size:11px;margin-bottom:6px"><b>Revisar antes:</b><ul style="margin:4px 0 0 16px;padding:0;line-height:1.45">';
     a.revisar.forEach(function(r){html+='<li>'+r+'</li>';});
@@ -150,9 +150,9 @@ function showReglaDroga(nombre){
     else bar.style.display='none';
     return;
   }
-  var color=ev.nivel==='evitar'?'var(--red)':ev.nivel==='preferir'?'var(--green)':'#ffb400';
-  var bg=ev.nivel==='evitar'?'rgba(255,80,80,.12)':ev.nivel==='precaucion'?'rgba(255,180,0,.12)':'rgba(29,185,84,.12)';
-  var border=ev.nivel==='evitar'?'#ff5050':ev.nivel==='precaucion'?'#ffb400':'var(--green)';
+  var color=ev.nivel==='evitar'?'var(--red)':ev.nivel==='preferir'?'var(--green)':'var(--warn)';
+  var bg=ev.nivel==='evitar'?'rgba(239,68,68,.12)':ev.nivel==='precaucion'?'rgba(245,158,11,.12)':'rgba(34,197,94,.12)';
+  var border=ev.nivel==='evitar'?'var(--red)':ev.nivel==='precaucion'?'var(--warn)':'var(--green)';
   var icon=ev.nivel==='evitar'?'&#9940;':ev.nivel==='precaucion'?'&#9888;':'&#10003;';
   bar.style.display='block';
   bar.style.color=color;
