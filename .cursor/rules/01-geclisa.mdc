@@ -1,0 +1,22 @@
+---
+description: Extensión GECLISA, fill.js, cola PWA y navegación chrome.debugger
+globs: "chrome-extension-geclisa-batch/**/*,fill.js,fill-dev.js,js/10-geclisa-ui.js,js/20-geclisa-send.js,js/39-geclisa-queue.js,views/geclisa.html,views/foja/mayo-geclisa.html,geclisa*.js,geclisa*.html"
+alwaysApply: false
+---
+
+# GECLISA
+
+Sistema externo (jQuery, iframes) sin API. Clicks "trusted" con `chrome.debugger` en elementos no nativos (`role=generic`). No `dispatchEvent`.
+
+`fill.js` (raíz) = bookmarklet. `chrome-extension-geclisa-batch/vendor/fill.js` = copia de la extensión. Confirmá cuál estás editando.
+
+## Ya resuelto — no reabrir
+
+- Búsqueda: fecha de **cirugía** + sector, no fecha de ingreso.
+- Verificar nombre en 2 capas (panel + encabezado Evolución) antes de "Nuevo".
+- Nunca clickear Guardar/GRABAR automáticamente.
+- Tokens GECLISA: migraciones `008*` — no reimplementar mint/consume.
+
+Cola PWA: `js/39-geclisa-queue.js`. Sync de cola: `js/17-sync-export.js` (contrato / sync).
+Plan B por DNI: `NOTES_RUTA_HC_POR_DNI.md` — documentado, no implementado.
+Selectores: `chrome-extension-geclisa-batch/SELECTORS_PASOS_1_11.md`.

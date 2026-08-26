@@ -396,6 +396,6 @@
     window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: BRIDGE_VERSION }, '*');
   } catch (e) {}
   try {
-    console.log('[AFG bridge] 0.5.5 inyectado en', location.href);
+    console.log('[AFG bridge]', BRIDGE_VERSION, 'inyectado en', location.href);
   } catch (e2) {}
 })();

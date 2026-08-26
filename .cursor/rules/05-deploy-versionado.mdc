@@ -1,0 +1,23 @@
+---
+description: Service Worker, CACHE_V, precache y bump de versión PWA/extensión
+globs: sw.js,js/24-sw-register.js,js/load-scripts.js,js/load-views.js,index.html,valoracion.html,manifest.json,chrome-extension-geclisa-batch/manifest.json
+alwaysApply: false
+---
+
+# Deploy / versionado
+
+Fuente PWA: `CACHE_V` en `js/load-scripts.js`.
+Fuente extensión: `chrome-extension-geclisa-batch/manifest.json`.
+
+Al bumpear PWA, el mismo número tiene que quedar en:
+
+1. `CACHE_V` (`js/load-scripts.js`)
+2. `CACHE_NAME` (`sw.js` → `anesfact-vN`)
+3. `sw.js?v=` (`js/24-sw-register.js`) — ya nos mordió un hardcode acá
+4. bust `'v='` en `js/load-views.js`
+5. todos los `?v=` **locales** de `index.html` y `valoracion.html`
+
+Script o vista nueva → `SCRIPTS`/`VIEWS`/`FOJA_PARTS` **y** `STATIC_CORE` en `sw.js`.
+
+Cierre: `node tools/check-version-sync.mjs` → `OK`. Sin eso no está listo.
+Títulos UI ("AnesFact v8") no son `CACHE_V`.

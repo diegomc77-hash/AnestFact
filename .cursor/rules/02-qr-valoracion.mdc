@@ -1,0 +1,22 @@
+---
+description: QR valoración preanestésica, formulario paciente, alertas y sync a foja
+globs: "valoracion.html,js/valoracion-form.js,js/31-valoracion-qr.js,js/40-valoracion-preop-sync.js,data/valoracion/**,js/estudios/**,docs/VALORACION_QR.md,docs/DESPLEGAR_QR.md,docs/EJECUTAR_VALORACION_QR.md,supabase/functions/af-qr-create/**,supabase/functions/af-qr-submit/**,supabase/functions/af-estudio-extract/**"
+alwaysApply: false
+---
+
+# QR / valoración
+
+Leé `docs/VALORACION_QR.md` (reglas de oro y mapeo). No las copies acá.
+
+Dependencias compartidas: `data/valoracion/alertas-seguridad.js`, `data/medicacion-habitual.js`, `data/cirujanos-esp.js`. Si las tocás, es contrato — avisá foja + Home.
+
+`?v=` en `valoracion.html` = `CACHE_V`. El checker lo exige.
+
+## No romper fojas
+
+- `paciente_id` / `valoracion_id` en `S.cur` son opcionales.
+- Nunca `resetFojaUIDom()` al importar.
+- Solo campos vacíos, salvo confirmación explícita del anestesista.
+- No tocar `fill.js` ni IDs GECLISA desde este módulo.
+
+Edge `af-qr-*`: diff antes/después y confirmación **aparte** del frontend.

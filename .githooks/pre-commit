@@ -1,0 +1,3 @@
+#!/bin/sh
+# Opt-in: git config core.hooksPath .githooks
+node tools/check-version-sync.mjs

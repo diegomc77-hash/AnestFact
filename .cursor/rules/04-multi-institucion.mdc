@@ -1,0 +1,15 @@
+---
+description: Multi-institución Mayo, Aeronáutico, planes y catálogos por sanatorio
+globs: js/35-sanatorios-plan.js,data/valoracion/cfg-instituciones.js,js/12-imprimir-aero.js,js/19-examen-mayo.js,js/29-plans.js,data/cirujanos-esp.js
+alwaysApply: false
+---
+
+# Multi-institución
+
+Planes filtran sanatorios en cliente (`js/35-sanatorios-plan.js`); el servidor es la fuente.
+QR usa `data/valoracion/cfg-instituciones.js` (Mayo hoy).
+
+`data/cirujanos-esp.js` lo usan foja y QR — contrato compartido.
+
+No mezclar flujos: impresión Aeronáutico (`js/12-imprimir-aero.js`) vs GECLISA Mayo vs examen Mayo (`js/19-examen-mayo.js`).
+Una institución nueva = catálogo + cfg + plan; no copiar lógica Mayo "por las dudas".

@@ -1,0 +1,19 @@
+---
+description: AnesFact — contexto persistente, seguridad y cierre de sesión
+alwaysApply: true
+---
+
+# AnesFact — siempre
+
+Antes de responder: leé `docs/ESTADO_PROYECTO.md` y `docs/MAPA_SECCIONES.md`.
+Al terminar una sesión con cambios reales: actualizá el estado (qué se hizo, pendiente, **En curso**).
+Las versiones las imprime `node tools/check-version-sync.mjs` — no las inventes.
+
+## No negociable
+
+- Datos de pacientes reales: nunca. Prueba con nombre "prueba" y DNI ficticio.
+- No asumas commit/push/deploy. Mostrá el diff y esperá confirmación explícita.
+- Frontend y Edge Functions se publican aparte: confirmar uno no confirma el otro.
+- Partes chicas, resultado intermedio. No "todo junto".
+- Archivos del **contrato compartido** (mapa): antes de tocarlos, listá qué otras secciones se ven y esperá OK.
+- Antes de decir "listo" o de bumpear caché: `node tools/check-version-sync.mjs` tiene que salir `OK`.

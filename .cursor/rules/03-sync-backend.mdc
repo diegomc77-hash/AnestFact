@@ -1,0 +1,19 @@
+---
+description: Supabase, RLS, Edge Functions, auth y sync de fojas
+globs: "supabase/**,js/17-sync-export.js,js/28-auth.js,js/00-env.js,js/supabase-keepalive.js,.github/workflows/**"
+alwaysApply: false
+---
+
+# Sync / backend
+
+`anesfact_datos` guarda `S.cur` completo — no romper compatibilidad hacia atrás.
+Nombre/DNI descifrados solo en memoria de sesión; no `localStorage` en claro.
+
+`supabase/functions/_shared/` es contrato (QR, tokens, CORS, reglas ASA). Diff + impacto en otras secciones antes de cambiar.
+
+## Deploy
+
+- Mostrar diff de Edge Functions y esperar confirmación explícita.
+- Confirmar frontend **no** autoriza `supabase functions deploy`.
+- Migraciones SQL: el usuario las corre en el dashboard; no asumas que están aplicadas.
+- Keepalive: `js/supabase-keepalive.js` + `.github/workflows/supabase-keepalive.yml`.

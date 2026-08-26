@@ -1,0 +1,19 @@
+---
+description: Archivos compartidos entre secciones — SW, estado, alertas, catálogos, Edge shared
+globs: "sw.js,js/load-scripts.js,js/load-views.js,js/24-sw-register.js,js/01-state.js,index.html,valoracion.html,data/valoracion/alertas-seguridad.js,data/medicacion-habitual.js,data/cirujanos-esp.js,supabase/functions/_shared/**"
+alwaysApply: false
+---
+
+# Contrato compartido
+
+Estás en un archivo que usan varias secciones. Lista el mapa (`docs/MAPA_SECCIONES.md`) y esperá OK antes de editar.
+
+Ejemplos de cruce:
+
+- Bump de `CACHE_V` sin `valoracion.html` → pacientes con JS viejo (pasó: 12.21 vs 12.26).
+- Cambiar `afDetectarAlertasSeguridad` → formulario QR + badge Home.
+- Tocar `S.cur` → foja, sync, cola GECLISA, importación QR.
+- Tocar `_shared/rules.ts` → submit QR en servidor, no el banner del paciente.
+
+No dupliques diccionarios ni detectores. Un helper, varios callers.
+Cierre: `node tools/check-version-sync.mjs` si el cambio tocó SW, loaders o `?v=`.
