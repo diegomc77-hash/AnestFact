@@ -324,4 +324,5 @@ function refreshCfgUi(){
   if(ban){ ban.style.display = 'none'; ban.innerHTML = ''; }
   try{ localStorage.removeItem('af_admin_follow'); }catch(e){}
   if(typeof S !== 'undefined') S._adminViewAs = null;
+  if(typeof afSyncDockSizeUi === 'function') afSyncDockSizeUi();
 }

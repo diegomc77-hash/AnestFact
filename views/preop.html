@@ -9,7 +9,12 @@
     <div style="font-size:14px;font-weight:700;color:var(--red)">⚠ Hay fojas con medicación/alergias a revisar</div>
     <div style="font-size:12px;color:var(--text2);margin-top:4px">El badge rojo va en cada tarjeta. No se suspende medicación desde acá.</div>
   </div>
-  <button class="btn btn-s" style="width:100%;font-size:12px;margin-bottom:12px" onclick="crearQrValoracion()">&#128279; Generar QR valoraci&oacute;n preanest&eacute;sica</button>
+  <div class="tile-grid">
+    <button type="button" class="tile" onclick="crearQrValoracion()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/><path d="M18 14h3v3M14 18h3v3M21 21h-3"/></svg>
+      <span>Generar QR</span>
+    </button>
+  </div>
   <div class="field" style="margin-bottom:12px">
     <input class="fi" type="text" id="preop-q" placeholder="Nombre, DNI..." oninput="renderHome()" autocomplete="off">
   </div>

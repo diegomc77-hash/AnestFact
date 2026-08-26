@@ -51,6 +51,7 @@
     }
     if (typeof refreshAdminUi === 'function') refreshAdminUi();
     if (typeof refreshCfgUi === 'function') refreshCfgUi();
+    if (typeof afApplyDockSize === 'function') afApplyDockSize();
     afRepairNuevaDom();
     if (typeof afShowView === 'function') afShowView('home');
     if (typeof afSetShellTitle === 'function') afSetShellTitle('home');
@@ -71,7 +72,7 @@
   }
 
   function fetchHtml(url) {
-      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.32';
+      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.33';
     return fetch(bust).then(function (r) {
       if (!r.ok) throw new Error(url + ' HTTP ' + r.status);
       return r.text();

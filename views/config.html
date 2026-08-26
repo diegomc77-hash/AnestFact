@@ -11,6 +11,15 @@
     <button type="button" class="btn btn-g" id="cfg-plan-ask-btn" style="width:100%" onclick="pedirCambioPlan()">Pedir o cambiar plan</button>
     <p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.4">Pod&eacute;s pedir cuando quieras (no es solo una vez). El admin ve el pedido y activa el plan; la facturaci&oacute;n se coordina afuera.</p>
   </div>
+  <div class="card" id="cfg-dock-size-card">
+    <div class="ct">Tama&ntilde;o del men&uacute;</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Tres tama&ntilde;os para el men&uacute; inferior. Mediano es el default.</p>
+    <div class="dock-size-row">
+      <button type="button" class="btn btn-s" id="cfg-dock-s" onclick="afSetDockSize('s')">Chico</button>
+      <button type="button" class="btn btn-s" id="cfg-dock-m" onclick="afSetDockSize('m')">Mediano</button>
+      <button type="button" class="btn btn-s" id="cfg-dock-l" onclick="afSetDockSize('l')">Grande</button>
+    </div>
+  </div>
   <div class="card">
     <div class="ct">&#128100; Datos del Anestesista (titular del plan)</div>
     <p style="font-size:12px;color:var(--text2);margin-bottom:6px">Un plan es personal: estos datos salen en la foja impresa y GECLISA. No se presta la cuenta a otro profesional.</p>

@@ -258,6 +258,33 @@ function cargarAnestesista(){
 }
 
 function irConfig(){go('config');}
+function afGetDockSize(){
+  try{
+    var s=localStorage.getItem('af_dock_size');
+    if(s==='s'||s==='l')return s;
+  }catch(e){}
+  return 'm';
+}
+function afSyncDockSizeUi(){
+  var cur=afGetDockSize();
+  ['s','m','l'].forEach(function(k){
+    var el=document.getElementById('cfg-dock-'+k);
+    if(el)el.classList.toggle('on',k===cur);
+  });
+}
+function afApplyDockSize(size){
+  var s=(size==='s'||size==='m'||size==='l')?size:afGetDockSize();
+  document.body.classList.remove('dock-size-s','dock-size-m','dock-size-l');
+  document.body.classList.add('dock-size-'+s);
+  afSyncDockSizeUi();
+}
+function afSetDockSize(size){
+  var s=(size==='s'||size==='l')?size:'m';
+  try{localStorage.setItem('af_dock_size',s);}catch(e){}
+  afApplyDockSize(s);
+  toast(s==='s'?'Menú chico':s==='l'?'Menú grande':'Menú mediano');
+}
+afApplyDockSize();
 function irScan(){go('escanear');}
 var _tt;
 function toast(msg){
