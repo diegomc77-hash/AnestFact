@@ -31,7 +31,7 @@ Tres detectores de alertas distintos — no fusionarlos sin listar impacto:
 | QR / valoración | `valoracion.html`, `js/valoracion-form.js`, `js/31-valoracion-qr.js`, `js/40-valoracion-preop-sync.js`, `data/valoracion/**`, `js/estudios/**`, `supabase/functions/af-qr-*`. Doc: `docs/VALORACION_QR.md` | Importar a foja: solo campos vacíos, nunca `resetFojaUIDom()`. |
 | Sync / backend | `supabase/**`, `js/17-sync-export.js`, `js/28-auth.js`, `js/00-env.js`, `js/supabase-keepalive.js` | Deploy Edge ≠ push frontend. Confirmación por separado. |
 | Multi-institución | `js/35-sanatorios-plan.js`, `data/valoracion/cfg-instituciones.js`, `js/12-imprimir-aero.js`, `js/19-examen-mayo.js`, `js/29-plans.js` | Cirujanos (`data/cirujanos-esp.js`) es contrato compartido. |
-| Deploy / versionado | bump de `CACHE_V` y listas SW. Checker obligatorio. | Títulos UI (`AnesFact v8`) no son `CACHE_V`. |
+| Deploy / versionado | bump de `CACHE_V` y listas SW. Checker obligatorio. Home lee `AF_CACHE_V`. | `version:` de export/sync, tickets y planes no son `CACHE_V`. |
 | Foja / PWA core | `js/08-foja.js`, `js/07-intervenciones.js`, `views/foja/**`, drogas/vitals/nomenclador/técnica | `S.cur` vive en `js/01-state.js` (contrato). |
 
 ## Semáforo

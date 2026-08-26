@@ -74,6 +74,21 @@ if (!cacheVMatch) {
 }
 const CACHE_V = cacheVMatch ? cacheVMatch[1] : '';
 
+if (!/window\.AF_CACHE_V\s*=\s*CACHE_V/.test(loadScripts)) {
+  fail('js/load-scripts.js debe exponer window.AF_CACHE_V = CACHE_V (título Home)');
+}
+const stateSrc = read('js/01-state.js');
+if (/TITLES\s*=\s*\{[^}]*home:\s*['"]AnesFact v[0-9]/.test(stateSrc)) {
+  fail('js/01-state.js TITLES.home no debe hardcodear versión; usá afHomeTitle()/AF_CACHE_V');
+}
+if (!/function\s+afHomeTitle\s*\(/.test(stateSrc)) {
+  fail('js/01-state.js falta afHomeTitle() para el título de Home');
+}
+const topbar = read('views/topbar.html');
+if (/id="t-title"[^>]*>[\s\S]*?v8/.test(topbar)) {
+  fail('views/topbar.html #t-title no debe hardcodear v8; lo pinta JS con CACHE_V');
+}
+
 const swSrc = read('sw.js');
 const cacheNameMatch = swSrc.match(/var\s+CACHE_NAME\s*=\s*['"]([^'"]+)['"]/);
 const expectedCacheName = 'anesfact-v' + CACHE_V;

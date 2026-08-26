@@ -20,4 +20,5 @@ Al bumpear PWA, el mismo número tiene que quedar en:
 Script o vista nueva → `SCRIPTS`/`VIEWS`/`FOJA_PARTS` **y** `STATIC_CORE` en `sw.js`.
 
 Cierre: `node tools/check-version-sync.mjs` → `OK`. Sin eso no está listo.
-Títulos UI ("AnesFact v8") no son `CACHE_V`.
+Título de Home / `document.title`: salen de `AF_CACHE_V` (`CACHE_V`). No hardcodear "v8".
+Export/sync, tickets y planes tienen `version:` propios — no amarrarlos a `CACHE_V`.

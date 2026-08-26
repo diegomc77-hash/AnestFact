@@ -53,6 +53,8 @@
     if (typeof refreshCfgUi === 'function') refreshCfgUi();
     afRepairNuevaDom();
     if (typeof afShowView === 'function') afShowView('home');
+    var tTitle = document.getElementById('t-title');
+    if (tTitle && typeof TITLES !== 'undefined' && TITLES.home) tTitle.textContent = TITLES.home;
     if (typeof AfSesiones !== 'undefined' && AfSesiones.onAuthReady) {
       AfSesiones.onAuthReady();
     }
@@ -69,7 +71,7 @@
   }
 
   function fetchHtml(url) {
-      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.26';
+      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.27';
     return fetch(bust).then(function (r) {
       if (!r.ok) throw new Error(url + ' HTTP ' + r.status);
       return r.text();

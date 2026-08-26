@@ -48,7 +48,7 @@ function go(id,addH){
   if(!afShowView(id))return;
   if(addH)S.hist.push(id);
   document.getElementById('back-btn').style.display=S.hist.length>1?'block':'none';
-  document.getElementById('t-title').textContent=TITLES[id]||'AnesFact v5';
+  document.getElementById('t-title').textContent=TITLES[id]||afHomeTitle();
   if(id==='home'){
     if(S.cur){try{guardar();}catch(e){}}
     renderHome();if(S.hist.length===1)cargarAnestesista();
