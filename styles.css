@@ -21,8 +21,6 @@ html,body{background:var(--bg);color:var(--text);font-family:system-ui,sans-seri
 #t-section{font-size:12px;font-weight:600;color:var(--text2);display:none}
 .logo{font-size:18px;font-weight:600;color:var(--green)}.logo span{font-size:11px;color:var(--text3);font-weight:400}
 #back-btn{display:none;background:none;border:none;color:var(--text2);font-size:26px;cursor:pointer;padding:0 6px 0 0;flex-shrink:0}
-#cfg-btn{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:color .15s,border-color .15s,background .15s,box-shadow .15s}
-#cfg-btn:active{color:var(--green);border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.07);box-shadow:0 0 0 3px rgba(34,197,94,.1)}
 #views-mount{position:relative}
 /* Solo una vista visible; huérfanos fuera de .view nunca se muestran */
 #views-mount > :not(.view){display:none!important}
@@ -199,17 +197,23 @@ body.has-dock #toast{bottom:108px}
 .gases-out small{display:block;font-size:11px;color:var(--text3);margin-top:2px}
 .gases-alert{margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:var(--red);font-size:12px}
 
-#af-dock{display:none;position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:180;align-items:center;gap:2px;background:rgba(21,23,26,.92);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:6px;box-shadow:0 12px 30px -8px rgba(0,0,0,.6);max-width:calc(100% - 16px);width:max-content;overflow-x:auto;-webkit-overflow-scrolling:touch}
+#af-dock{display:none;position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:180;align-items:center;gap:3px;background:rgba(21,23,26,.92);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:7px;box-shadow:0 12px 30px -8px rgba(0,0,0,.6);max-width:calc(100% - 16px);width:max-content;overflow-x:auto;-webkit-overflow-scrolling:touch}
 #af-dock::-webkit-scrollbar{display:none}
 body.has-dock #af-dock{display:flex}
 #af-dock[hidden]{display:none!important}
 body.has-dock #views-mount .view.active{padding-bottom:108px}
-.dock-item{display:flex;flex-direction:column;align-items:center;gap:3px;width:48px;padding:7px 2px 6px;border-radius:14px;flex-shrink:0;color:var(--text3);background:none;border:none;cursor:pointer;font-family:inherit;position:relative}
-.dock-item .dock-ico{font-size:16px;line-height:1}
-.dock-item .dock-lbl{font-size:8px;font-weight:600;letter-spacing:.01em;white-space:nowrap}
+.dock-item{display:flex;flex-direction:column;align-items:center;gap:3px;width:var(--dock-item,52px);padding:7px 4px 6px;border-radius:14px;flex-shrink:0;color:var(--text3);background:none;border:none;cursor:pointer;font-family:inherit;position:relative}
+.dock-item svg{width:var(--dock-ico,19px);height:var(--dock-ico,19px);stroke-width:1.8;flex-shrink:0}
+.dock-item .dock-lbl{font-size:var(--dock-lbl,8.3px);font-weight:600;letter-spacing:.01em;white-space:nowrap}
 .dock-item.active{background:rgba(34,197,94,.14);color:var(--green)}
+.dock-item.active svg{stroke:currentColor}
 .dock-item .dock-alert{display:none;position:absolute;top:4px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--red);border:1px solid var(--bg)}
 .dock-item .dock-alert.on{display:block}
+.tile-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;aspect-ratio:1;min-height:0;background:var(--bg2);border:1px solid var(--border);border-radius:12px;color:var(--text);cursor:pointer;font-family:inherit;padding:10px 6px;margin:0}
+.tile svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.tile span{font-size:11px;font-weight:600;text-align:center;line-height:1.2;color:var(--text2)}
+.tile:active{border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.07)}
 .hub-card{cursor:pointer;border-left-width:4px;border-left-style:solid}
 .hub-card .hub-n{font-size:22px;font-weight:700;color:var(--text)}
 .hub-card .hub-l{font-size:13px;font-weight:600}

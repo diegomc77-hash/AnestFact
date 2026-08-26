@@ -10,9 +10,7 @@
     </div>
     <div class="topbar-actions">
       <button id="admin-btn" onclick="goAdminGuarded()" title="Panel admin" aria-label="Panel admin" style="display:none;position:relative;font-size:16px;margin-right:4px;background:none;border:none;color:var(--warn);cursor:pointer;padding:4px 6px">&#9733;<span id="admin-btn-badge" style="display:none;position:absolute;top:-2px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:var(--red);color:#fff;font-size:10px;font-weight:700;line-height:16px;text-align:center"></span></button>
-      <button class="btn btn-s" style="font-size:11px;padding:6px 10px;margin-right:4px;width:auto" onclick="authLogout()" title="Cerrar sesi&oacute;n">Salir</button>
-      <button id="help-btn" onclick="go('ayuda')" title="Ayuda" aria-label="Ayuda" style="font-size:18px;margin-right:4px;background:none;border:none;color:var(--text2);cursor:pointer">&#128736;</button>
-      <button id="cfg-btn" onclick="irConfig()" title="Configuraci&oacute;n" aria-label="Configuraci&oacute;n">&#9881;</button>
+      <button class="btn btn-s" style="font-size:11px;padding:6px 10px;width:auto" onclick="authLogout()" title="Cerrar sesi&oacute;n">Salir</button>
     </div>
   </div>
   <div class="user-line">
@@ -38,11 +36,11 @@
   </div>
 </div>
 <nav id="af-dock" aria-label="Secciones">
-  <button type="button" class="dock-item active" data-dock="home" onclick="goDock('home')"><span class="dock-ico">&#128203;</span><span class="dock-lbl">Fojas</span></button>
-  <button type="button" class="dock-item" data-dock="preop" onclick="goDock('preop')"><span class="dock-ico">&#129657;</span><span class="dock-lbl">Preop</span><span class="dock-alert" id="dock-preop-alert"></span></button>
-  <button type="button" class="dock-item" data-dock="sanatorios" onclick="goDock('sanatorios')"><span class="dock-ico">&#127973;</span><span class="dock-lbl">Sanat.</span></button>
-  <button type="button" class="dock-item" data-dock="geclisa" onclick="goDock('geclisa')"><span class="dock-ico">&#128228;</span><span class="dock-lbl">Geclisa</span></button>
-  <button type="button" class="dock-item" data-dock="evweb" onclick="goDock('evweb')"><span class="dock-ico">&#9992;</span><span class="dock-lbl">evweb</span></button>
-  <button type="button" class="dock-item" data-dock="legales" onclick="goDock('legales')"><span class="dock-ico">&#128196;</span><span class="dock-lbl">Legales</span></button>
-  <button type="button" class="dock-item" data-dock="herramientas" onclick="goDock('herramientas')"><span class="dock-ico">&#128295;</span><span class="dock-lbl">Herram.</span></button>
+  <button type="button" class="dock-item active" data-dock="home" onclick="goDock('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span class="dock-lbl">Fojas</span></button>
+  <button type="button" class="dock-item" data-dock="preop" onclick="goDock('preop')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg><span class="dock-lbl">Preop.</span><span class="dock-alert" id="dock-preop-alert"></span></button>
+  <button type="button" class="dock-item" data-dock="sanatorios" onclick="goDock('sanatorios')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1M9 13h1M14 9h1M14 13h1"/></svg><span class="dock-lbl">Sanat.</span></button>
+  <button type="button" class="dock-item" data-dock="geclisa" onclick="goDock('geclisa')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg><span class="dock-lbl">Geclisa</span></button>
+  <button type="button" class="dock-item" data-dock="evweb" onclick="goDock('evweb')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span class="dock-lbl">evweb</span></button>
+  <button type="button" class="dock-item" data-dock="legales" onclick="goDock('legales')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg><span class="dock-lbl">Legales</span></button>
+  <button type="button" class="dock-item" data-dock="herramientas" onclick="goDock('herramientas')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0 1 1.55V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg><span class="dock-lbl">Herram.</span></button>
 </nav>

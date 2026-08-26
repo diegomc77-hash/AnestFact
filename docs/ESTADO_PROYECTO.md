@@ -2,7 +2,7 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-26:
 
-- PWA `CACHE_V`: **12.31**
+- PWA `CACHE_V`: **12.32**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
@@ -11,6 +11,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## Qué se hizo (más reciente primero)
 
+- 2026-08-26 — Dock lote B (PWA **12.32**): íconos SVG del mockup; header solo Salir + estrella admin; Herramientas en baldosas cuadradas (scan/export/import/ajustes/ayuda + sync).
 - 2026-08-26 — Dock lote A bugs (PWA **12.31**): toast se oculta de verdad (`opacity`/`visibility` + translate fuera de pantalla). Dock se oculta en foja/nueva/facturación/nom/resumen según la vista activa (no el hist); `renderHome` ya no lo vuelve a mostrar. Verificación: `getBoundingClientRect` + `getComputedStyle`.
 - 2026-08-26 — Dock visual B+C (PWA **12.30**): 7 secciones. Fojas/Preop comparten `renderHome` + `S.listMode`. Cola GECLISA vive en la sección Geclisa (misma lógica).
 - 2026-08-26 — Home: tarjetas `.inter` **cerrado en Pages** (v12.29, celular ~400px). Nombre completo sin ellipsis; chips wrappean. Cola GECLISA igual.
@@ -24,7 +25,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 - Badge del módulo QR (ahora en Preop): implementado, sin confirmar visualmente en dispositivo.
 - Ruta alternativa por DNI en GECLISA (pacientes de alta): `chrome-extension-geclisa-batch/NOTES_RUTA_HC_POR_DNI.md` — no implementada.
-- Dock lote A (12.31): esperando verificación de Diego en Pages (`cache:'no-store'`). Lotes B (SVG/header) y C (zoom + toolbar foja) pendientes.
+- Dock lote B (12.32): esperando verificación de Diego en Pages (`cache:'no-store'`). Lote C (3 tamaños de dock + toolbar de foja) pendiente.
 
 ## Decisiones tomadas (no repreguntar)
 

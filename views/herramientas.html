@@ -1,19 +1,42 @@
 <div id="view-herramientas" class="view">
   <div style="font-size:18px;font-weight:600;margin-bottom:14px">Herramientas</div>
-  <button class="btn btn-s" style="width:100%;font-size:13px;margin-bottom:10px" onclick="go('escanear')">&#128247; Escanear documentos (IA)</button>
-  <div style="display:flex;gap:8px;margin-bottom:10px">
-    <button class="btn btn-s" style="flex:1;font-size:13px" onclick="exportarDatos()">&#128228; Exportar</button>
-    <label class="btn btn-s" style="flex:1;font-size:13px;text-align:center;cursor:pointer;margin:0">&#128229; Importar<input type="file" accept=".json" onchange="importarDatos(this)" style="display:none"></label>
+  <div class="tile-grid">
+    <button type="button" class="tile" onclick="go('escanear')">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <span>Escanear IA</span>
+    </button>
+    <button type="button" class="tile" onclick="exportarDatos()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span>Exportar</span>
+    </button>
+    <label class="tile">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>Importar</span>
+      <input type="file" accept=".json" onchange="importarDatos(this)" style="display:none">
+    </label>
+    <button type="button" class="tile" onclick="irConfig()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0 1 1.55V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>
+      <span>Ajustes</span>
+    </button>
+    <button type="button" class="tile" onclick="go('ayuda')">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>Ayuda</span>
+    </button>
   </div>
   <div id="sync-status" style="font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:12px;text-align:center;color:var(--text3)"></div>
-  <details style="margin-bottom:16px">
-    <summary style="font-size:12px;color:var(--text3);cursor:pointer;padding:4px 0">Sync manual (opcional)</summary>
-    <div style="display:flex;gap:8px;margin-top:8px;margin-bottom:8px">
-      <button class="btn btn-s" style="flex:1;font-size:12px" onclick="syncGuardar()">&#9729; Subir ahora</button>
-      <button class="btn btn-s" style="flex:1;font-size:12px" onclick="syncCargar()">&#9729; Bajar ahora</button>
-    </div>
-    <button class="btn btn-s" style="width:100%;font-size:11px;color:var(--text2)" onclick="syncTraerTodo()">&#9729; Traer todo (reemplazar)</button>
-  </details>
-  <button class="btn btn-s" style="width:100%;font-size:13px;margin-bottom:10px" onclick="irConfig()">&#9881; Ajustes</button>
-  <button class="btn btn-s" style="width:100%;font-size:13px;margin-bottom:10px" onclick="go('ayuda')">&#128736; Ayuda / Reportar problema</button>
+  <div class="ct">Sync manual</div>
+  <div class="tile-grid">
+    <button type="button" class="tile" onclick="syncGuardar()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M5 19h14"/></svg>
+      <span>Subir</span>
+    </button>
+    <button type="button" class="tile" onclick="syncCargar()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V9"/><polyline points="7 14 12 9 17 14"/><path d="M5 5h14"/></svg>
+      <span>Bajar</span>
+    </button>
+    <button type="button" class="tile" onclick="syncTraerTodo()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15A9 9 0 1 1 21 12"/></svg>
+      <span>Traer todo</span>
+    </button>
+  </div>
 </div>
