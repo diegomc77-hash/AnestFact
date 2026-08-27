@@ -63,9 +63,44 @@ function _splitObsContinuation(text, chunkSize){
   return parts;
 }
 
+var _afPrintFirmaOpts={};
+var AF_PRINT_GOV_STRIP='assets/foja-headers/provincia-cba-salud-escudo.png';
+
+function _printAbs(rel){
+  try{return new URL(rel,window.location.href).href;}catch(e){return rel;}
+}
+
+function _printHasHeader(i){
+  var inst=typeof afFojaInst==='function'?afFojaInst(i&&i.san):null;
+  return !!(inst&&inst.header&&inst.header.mode&&inst.header.mode!=='none');
+}
+
+function _printHeaderHtml(i){
+  var inst=typeof afFojaInst==='function'?afFojaInst(i&&i.san):null;
+  if(!inst||!inst.header||inst.header.mode==='none')return '';
+  if(inst.header.mode==='png'&&inst.header.asset){
+    return '<div class="af-ph af-ph-png"><img alt="" src="'+_printEsc(_printAbs(inst.header.asset))+'"></div>';
+  }
+  if(inst.header.mode==='compose'){
+    var lineas=inst.header.lineas&&inst.header.lineas.length?inst.header.lineas:[String((i&&i.san)||'')];
+    var name=lineas.map(function(l){return _printEsc(l);}).join('<br>');
+    return '<div class="af-ph"><div class="af-ph-name">'+name+'</div>'
+      +'<img class="af-ph-gov" alt="" src="'+_printEsc(_printAbs(AF_PRINT_GOV_STRIP))+'"></div>';
+  }
+  return '';
+}
+
+function _printPgOpen(i){
+  return '<div class="pg'+(_printHasHeader(i)?' af-pg-hdr':'')+'">'+_printHeaderHtml(i);
+}
+
+function _printChartH(i,base){
+  return _printHasHeader(i)?Math.max(100,base-22):base;
+}
+
 function _buildSignBlock(signImg){
-  var firma=(typeof AfIdentidad!=='undefined'&&AfIdentidad.firmaHtml)?AfIdentidad.firmaHtml()
-    :('<b>'+((localStorage.getItem('af_anest_nombre')||'ANESTESISTA').replace(/</g,''))+'</b><br>Anestesiólogo/a · ADAARC');
+  var firma=(typeof AfIdentidad!=='undefined'&&AfIdentidad.firmaHtml)?AfIdentidad.firmaHtml(_afPrintFirmaOpts)
+    :('<b>'+((localStorage.getItem('af_anest_nombre')||'ANESTESISTA').replace(/</g,''))+'</b><br>Anestesiólogo/a'+((_afPrintFirmaOpts&&_afPrintFirmaOpts.colegio===false)?'':' · ADAARC'));
   return '<div style="flex:0 0 138px;display:flex;flex-direction:column;justify-content:flex-end;text-align:center">'+signImg
     +'<div style="border-top:1.5px solid #000;padding-top:3px;font-size:8px">'+firma+'</div></div>';
 }
@@ -99,6 +134,13 @@ function _buildPrintStyles(){
     +'.pg-footer{flex-shrink:0}'
     +'.hoja-n{text-align:right;font-size:8px;font-weight:bold;color:#333;margin:-2px 0 4px}'
     +'h1{font-size:14px;text-align:center;font-weight:bold;border-bottom:2px solid #000;padding-bottom:5px;margin-bottom:7px;letter-spacing:.07em}'
+    +'.af-pg-hdr{padding-top:4mm}'
+    +'.af-pg-hdr h1{font-size:13px;margin-bottom:4px;padding-bottom:3px}'
+    +'.af-ph{display:flex;align-items:stretch;height:13.5mm;margin:0 0 2.5mm;flex-shrink:0;overflow:hidden}'
+    +'.af-ph-png{display:block}'
+    +'.af-ph-png img{height:13.5mm;width:auto;max-width:100%;display:block;object-fit:contain}'
+    +'.af-ph-name{flex:0 0 34%;border:0.3mm solid #555;display:flex;flex-direction:column;justify-content:center;padding:0 2mm;font-weight:700;font-size:9px;letter-spacing:.05em;color:#444;line-height:1.12;text-transform:uppercase}'
+    +'.af-ph-gov{flex:1;min-width:0;height:13.5mm;object-fit:contain;object-position:left center}'
     +'.r{display:flex;gap:5px;margin-bottom:5px;align-items:flex-end}'
     +'.f{border-bottom:1.5px solid #000;padding:0 2px 1px;min-height:17px;flex:1;font-size:10.5px;word-wrap:break-word}'
     +'.l{font-size:8px;color:#333;font-weight:bold;text-transform:uppercase;display:block;margin-bottom:1px}'
@@ -192,7 +234,7 @@ function _buildChartBlock(chartInner, minHeight){
 }
 
 function _buildFojaSheet(i,f,drogaLines,signImg,obsMain,obsFs,chartInner){
-  return '<div class="pg"><h1>FOJA DE ANESTESIA</h1><div class="pg-fill">'
+  return _printPgOpen(i)+'<h1>FOJA DE ANESTESIA</h1><div class="pg-fill">'
     +'<div class="r"><div style="flex:3"><span class="l">Apellido y nombres</span><div class="f">'+_printEsc(i.pac)+'</div></div>'
     +'<div style="flex:0 0 118px"><span class="l">D.N.I. N&#176;</span><div class="f">'+_printEsc(i.dni)+'</div></div></div>'
     +'<div class="r"><div style="flex:2"><span class="l">Servicio</span><div class="f">'+_printEsc(i.serv)+'</div></div>'
@@ -213,7 +255,7 @@ function _buildFojaSheet(i,f,drogaLines,signImg,obsMain,obsFs,chartInner){
     +'<span class="chk">'+(f.ind==='Tormentosa'?'&#10003;':'')+'</span>Tormentosa</div>'
     +'<div class="r"><div style="flex:1"><span class="l">Inicio anestesia/intub.</span><div class="f">'+_printEsc(f.hint)+'</div></div>'
     +'<div style="flex:2"></div><div style="flex:1"><span class="l">Fin anestesia/extub.</span><div class="f">'+_printEsc(f.hext)+'</div></div></div>'
-    +_buildChartBlock(chartInner,140)
+    +_buildChartBlock(chartInner,_printChartH(i,140))
     +'<div class="s" style="margin-top:3px">Agentes Anest&#233;sicos:</div><div style="border-bottom:1px solid #ccc;padding:1px 3px;min-height:16px;font-size:9.5px;line-height:1.25">'+_printEsc(drogaLines)+'</div>'
     +'<div class="s" style="margin-top:3px">M&#233;todos Anest&#233;sicos:</div><div style="border-bottom:1px solid #ccc;padding:1px 3px;min-height:16px;font-size:9.5px;line-height:1.25">'+_printEsc(f.metodos)+'</div>'
     +'<div class="s" style="margin-top:3px">Recuperaci&#243;n:</div><div style="border-bottom:1px solid #ccc;padding:1px 3px;min-height:16px;font-size:9.5px;line-height:1.25">'+_printEsc(f.recup)+'</div>'
@@ -240,7 +282,7 @@ function _buildChartContinuationSheet(i,f,chartInner,pageNum,obsOverflow,signImg
   var signHtml='<div style="display:flex;gap:8px;margin-top:6px;justify-content:flex-end;align-items:flex-end">'
     +'<div style="flex:1;text-align:right;font-size:7.5px;font-weight:bold;padding-bottom:4px">FIRMA Y SELLO DEL ANESTESISTA</div>'
     +_buildSignBlock(signImg)+'</div>';
-  return '<div class="pg"><h1>FOJA DE ANESTESIA</h1>'
+  return _printPgOpen(i)+'<h1>FOJA DE ANESTESIA</h1>'
     +'<div class="hoja-n">Hoja '+pageNum+' — Signos vitales (continuaci&#243;n)</div>'
     +'<div class="r"><div style="flex:3"><span class="l">Apellido y nombres</span><div class="f">'+_printEsc(i.pac)+'</div></div>'
     +'<div style="flex:0 0 118px"><span class="l">D.N.I. N&#176;</span><div class="f">'+_printEsc(i.dni)+'</div></div></div>'
@@ -248,14 +290,14 @@ function _buildChartContinuationSheet(i,f,chartInner,pageNum,obsOverflow,signImg
     +'<div style="flex:3"><span class="l">Procedimiento</span><div class="f">'+_printEsc(i.diag)+'</div></div>'
     +'<div style="flex:0 0 64px"><span class="l">Fecha</span><div class="f">'+fmt(i.fecha)+'</div></div>'
     +'<div style="flex:0 0 72px"><span class="l">Sala</span><div class="f">'+_printEsc(i.sala)+'</div></div></div>'
-    +_buildChartBlock(chartInner,120)
+    +_buildChartBlock(chartInner,_printChartH(i,120))
     +obsHtml
     +signHtml
     +'</div>';
 }
 
 function _buildObsAdicionalSheet(i,obsText,signImg,pageNum){
-  return '<div class="pg"><h1>FOJA DE ANESTESIA</h1>'
+  return _printPgOpen(i)+'<h1>FOJA DE ANESTESIA</h1>'
     +'<div class="hoja-n">Observaciones — Hoja '+pageNum+'</div>'
     +'<div class="r"><div style="flex:3"><span class="l">Apellido y nombres</span><div class="f">'+_printEsc(i.pac)+'</div></div>'
     +'<div style="flex:0 0 118px"><span class="l">D.N.I. N&#176;</span><div class="f">'+_printEsc(i.dni)+'</div></div></div>'
@@ -267,7 +309,7 @@ function _buildObsAdicionalSheet(i,obsText,signImg,pageNum){
     +'<div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">'
     +'<div style="width:180px;text-align:center">'+signImg
     +'<div style="border-top:1.5px solid #000;padding-top:3px;font-size:8px">'
-    +((typeof AfIdentidad!=='undefined'&&AfIdentidad.firmaHtml)?AfIdentidad.firmaHtml():'')
+    +((typeof AfIdentidad!=='undefined'&&AfIdentidad.firmaHtml)?AfIdentidad.firmaHtml(_afPrintFirmaOpts):'')
     +'</div></div></div>'
     +'</div>';
 }
@@ -279,6 +321,7 @@ function imprimirFoja(){
   if(document.getElementById('fj-tec'))guardarFoja();
   var i=S.cur;if(!i){toast('Complet\u00e1 los datos primero');return;}
   var f=i.foja||{};
+  _afPrintFirmaOpts={colegio:!(typeof afFojaEsSisalud==='function'&&afFojaEsSisalud(i.san))};
   // La ventana de impresión NO incluye overlay de secreto médico (solo pantalla app)
   var signSrc=(typeof AfFirma!=='undefined'&&AfFirma.getPng&&AfFirma.getPng())||f.sign||S.signData||'';
   var signImg=signSrc?('<img src="'+signSrc+'" style="max-height:46px;max-width:130px;display:block;margin:0 auto 3px;filter:grayscale(1) brightness(0) contrast(2)">'):('<div style="height:46px"></div>');

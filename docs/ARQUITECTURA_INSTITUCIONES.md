@@ -67,19 +67,20 @@ A dónde se **entrega** (marca local hoy; integración después):
 }
 ```
 
-`meta` ejemplo print A4 (`sin_sistema`):
+`meta` print A4 (SQL **012**, PWA **12.39**). Misericordia usa PNG oficial; Córdoba / San Roque componen caja de nombre + franja Ministerio/escudo (`oficial: false` hasta PNG propio):
 
 ```json
 {
   "plantilla": "a4_papel",
   "header": {
-    "logo_id": "provincia_cba",
-    "titulo": "Hospital Córdoba"
+    "mode": "png",
+    "asset": "assets/foja-headers/hospital-misericordia-header.png",
+    "oficial": true
   }
 }
 ```
 
-Aero puede usar el mismo `plantilla: a4_papel` con `logo_id` propio o null + `titulo: "Hospital Aeronáutico"`.
+Compose: `"mode": "compose", "oficial": false, "lineas": ["HOSPITAL", "CÓRDOBA"]`. Aero: `header.mode = none` (sin banner provincial). La PWA lee el espejo `data/instituciones-foja.js`, no la tabla en vivo.
 
 ## ¿El header de la A4 alcanza? (hospitales públicos)
 
@@ -87,9 +88,8 @@ Aero puede usar el mismo `plantilla: a4_papel` con `logo_id` propio o null + `ti
 
 Lo que **no** es “solo el header” y conviene tenerlo en `meta` / `destino_final`, sin tocar el cuerpo clínico:
 
-- El pie de firma dice **«Anestesiólogo/a · ADAARC»** (`js/36-identidad-anestesista.js`). ADAARC es el circuito evweb; en SISalud probablemente no va. Eso es una línea del pie, no otra foja.
-- Sala/cama de Aero están hardcodeadas en `views/nueva.html`. Un público puede usar los mismos campos libres o un catálogo chico por institución; no obliga a otra plantilla A4.
-- Logo: un archivo Provincia de Córdoba + el **nombre** del hospital cubre el listado público. No hace falta un SVG por hospital para arrancar.
+- Pie impreso: ADAARC solo si `destino_final !== sisalud`. El lockup de la app no cambia.
+- Sala/cama: selects Aero intactos; texto libre (`#f-sala-sisalud` / `#f-cama-sisalud`) si SISalud. Siguen yendo a `S.cur.sala` / `S.cur.cama`.
 
 Conclusión: **misma plantilla A4**, header parametrizable + pie/colegio según `destino_final`. No clonar `imprimir-aero.js` por hospital.
 
@@ -99,7 +99,7 @@ Conclusión: **misma plantilla A4**, header parametrizable + pie/colegio según 
 
 ## Semilla de catálogo (todas Córdoba)
 
-`desarrollado=false` salvo Mayo y Aero. Allende: patrón confirmado, flujo **no** desarrollado.
+`desarrollado=true`: Mayo, Aero, Misericordia, Córdoba, San Roque. Allende: patrón confirmado, flujo **no** desarrollado. El select de la PWA **no** lista los 3 públicos hasta el lote 2 (`#f-san` ∩ `sanatorios_permitidos`).
 
 ### Públicos Capital — patrón SISalud (`sin_sistema` / `sisalud` cuando se confirme)
 

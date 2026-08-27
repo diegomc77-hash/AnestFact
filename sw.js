@@ -2,7 +2,7 @@
 // STATIC_CORE: shell + SCRIPTS (js/load-scripts.js) + vistas (js/load-views.js).
 // Si agregás un script o vista nueva, actualizá AMBOS lados (lista acá + SCRIPTS/VIEWS/FOJA_PARTS).
 // No incluir scripts propios de valoracion.html ni CDNs (QR paciente = online).
-var CACHE_NAME = 'anesfact-v12.38';
+var CACHE_NAME = 'anesfact-v12.39';
 var STATIC_CORE = [
   'index.html',
   'valoracion.html',
@@ -19,6 +19,7 @@ var STATIC_CORE = [
   'data/cirugias.js',
   'data/drogas-catalogo.js',
   'data/reglas-clinicas.js',
+  'data/instituciones-foja.js',
   'js/01-state.js',
   'js/02-premed.js',
   'js/03-autocomplete.js',
@@ -63,6 +64,8 @@ var STATIC_CORE = [
   'js/load-views.js',
   'js/24-sw-register.js',
   'js/load-scripts.js',
+  'assets/foja-headers/hospital-misericordia-header.png',
+  'assets/foja-headers/provincia-cba-salud-escudo.png',
   // --- vistas (js/load-views.js: topbar, auth, VIEWS, foja + FOJA_PARTS) ---
   'views/topbar.html',
   'views/auth.html',

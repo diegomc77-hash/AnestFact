@@ -27,15 +27,16 @@
     };
   }
 
-  function firmaHtmlBlock() {
+  function firmaHtmlBlock(opts) {
     var id = getAnestesistaIdentidad();
     var nom = id.nombre || 'ANESTESISTA (CONFIGURAR EN AJUSTES)';
     var mats = [];
     if (id.mp) mats.push('M.P. ' + id.mp);
     if (id.me) mats.push('M.E. ' + id.me);
+    var colegio = (opts && opts.colegio === false) ? '' : ' · ADAARC';
     return '<b>' + esc(nom) + '</b><br>'
       + (mats.length ? esc(mats.join(' &nbsp; ')) + '<br>' : '')
-      + 'Anestesiólogo/a · ADAARC';
+      + 'Anestesiólogo/a' + colegio;
   }
 
   function syncIdentidadToLocal(id) {

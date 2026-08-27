@@ -355,6 +355,8 @@ function onSanChange(){
   setTimeout(renderFojaPorSanatorio,50);
   var aw=document.getElementById('f-aero-wrap');
   if(aw)aw.style.display=s==='Hospital Aeronáutico'?'block':'none';
+  var sw=document.getElementById('f-sisalud-ubic-wrap');
+  if(sw)sw.style.display=(typeof afFojaEsSisalud==='function'&&afFojaEsSisalud(s))?'block':'none';
   var mw=document.getElementById('f-mayo-wrap');if(mw)mw.style.display=s==='Sanatorio Mayo'?'block':'none';
   var mb=document.getElementById('btn-mayo-wrap');if(mb)mb.style.display=s==='Sanatorio Mayo'?'block':'none';
   if(s==='Sanatorio Mayo')updateMayoCamas();
