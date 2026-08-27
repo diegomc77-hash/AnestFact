@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Valoración preanestésica — AnesFact</title>
 <meta name="theme-color" content="#22c55e">
-<link rel="stylesheet" href="styles.css?v=12.36">
+<link rel="stylesheet" href="styles.css?v=12.37">
 <style>
 /* Lectura paciente: contraste y tamaño (no cambia la app del médico) */
 .lockup-text .tag{font-size:12px;color:var(--text2)}
-.field label{font-size:15px;color:var(--text);margin-bottom:6px}
+.field label{font-size:15px;color:var(--text);margin-bottom:6px;font-weight:600}
 .ct{font-size:13px;color:var(--text2)}
 .fi{font-size:16px;padding:12px}
 .fi::placeholder{color:#A8B2BD;opacity:1}
@@ -19,7 +19,7 @@
 .err-title{font-size:16px}
 .err-msg{font-size:16px;color:#fecaca;font-family:inherit;white-space:normal}
 #val-ok{display:none;text-align:center;padding:40px 16px}
-#val-form-wrap{display:none}
+#val-form-wrap{display:none;padding-bottom:108px}
 .val-banner{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.35);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:15px;color:var(--text);line-height:1.5}
 .val-hint{font-size:14px;color:var(--text2);margin-top:6px;line-height:1.5}
 .med-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;position:relative}
@@ -34,7 +34,7 @@
 .org-block:last-child{border-bottom:none}
 .org-q{font-size:16px;font-weight:500;margin-bottom:6px;color:var(--text)}
 .org-yesno{display:flex;gap:8px;margin:8px 0 4px}
-.org-yesno .chip{min-width:64px;text-align:center}
+.org-yesno .chip{min-width:64px;text-align:center;flex:1;padding:12px 14px;font-size:15px;font-weight:700}
 .org-yesno .chip.sel-no{background:rgba(239,68,68,.12);border-color:var(--red);color:var(--red)}
 .org-yesno .chip.sel-yes{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green)}
 .org-items{margin-top:8px;display:none}
@@ -52,6 +52,44 @@
 .est-manual-tag{display:inline-block;font-size:13px;font-weight:600;color:var(--warn);background:rgba(245,158,11,.18);border:1px solid rgba(245,158,11,.45);border-radius:6px;padding:3px 8px;margin-top:4px}
 .val-alerta-seg{display:none;position:sticky;top:0;z-index:20;background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.55);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:14px;color:#fecaca;line-height:1.45;font-weight:500}
 .val-alerta-seg.on{display:block}
+
+/* Wizard */
+.val-wiz-top{position:sticky;top:0;z-index:50;background:rgba(13,17,23,.97);padding:10px 0 12px;margin:0 -4px 8px;border-bottom:1px solid var(--border)}
+.val-progress-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.val-progress-track{flex:1;height:6px;background:#232a32;border-radius:3px;overflow:hidden}
+.val-progress-fill{height:100%;width:16.6%;background:var(--green);border-radius:3px;transition:width .2s}
+.val-progress-label{font-size:12px;color:var(--text2);font-weight:600;white-space:nowrap}
+.val-step-title{font-size:20px;font-weight:800;color:#fff;margin:4px 0 0}
+.val-step-sub{font-size:14px;color:var(--text2);margin-top:4px;line-height:1.4}
+.val-step{display:none}
+.val-step.on{display:block}
+.sys-block{margin-bottom:22px}
+.sys-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.val-choice{background:var(--bg3);border:1.5px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;font-family:inherit}
+.val-choice.selected{border-color:var(--green);background:rgba(34,197,94,.12);color:var(--green)}
+.mic-field{position:relative}
+.mic-field .fi,.mic-field textarea.fi{padding-right:46px}
+.mic-field > .mic{position:absolute;right:6px;top:8px}
+.field.mic-field > .mic{top:34px}
+.attach-row{display:flex;gap:10px;margin-top:10px;align-items:center}
+.attach-btn{flex:1;background:var(--bg3);border:1.5px dashed var(--border);border-radius:12px;padding:12px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:700;color:var(--green);cursor:pointer;font-family:inherit}
+.attach-btn input{display:none}
+.attach-name{font-size:13px;color:var(--text2);margin-top:6px}
+.val-wiz-nav{display:flex;gap:10px;position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:170;width:calc(100% - 16px);max-width:504px;box-sizing:border-box;padding:12px;background:rgba(13,17,23,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.1);border-radius:16px;box-shadow:0 12px 30px -8px rgba(0,0,0,.6)}
+.val-btn-back{flex:0 0 96px;background:var(--bg3);border:1.5px solid var(--border);color:var(--text);border-radius:14px;font-size:15px;font-weight:700;padding:12px 8px;cursor:pointer;font-family:inherit}
+.val-btn-back[disabled]{opacity:.4;cursor:default}
+.val-btn-next{flex:1;background:var(--green);color:var(--green-ink);border:none;border-radius:14px;font-size:16px;font-weight:800;padding:12px 8px;cursor:pointer;font-family:inherit}
+.review-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.review-card h4{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--green);margin-bottom:10px;font-weight:800}
+.review-row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:14.5px}
+.review-row:last-child{border-bottom:none}
+.review-row .k{color:var(--text2)}
+.review-row .v{color:#fff;font-weight:600;text-align:right;word-break:break-word}
+.review-edit{display:block;margin-top:8px;background:none;border:none;color:var(--green);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;padding:0}
+#val-submit{display:none}
+.otro-input{margin-top:10px;display:none}
+.otro-input.on{display:block}
 </style>
 </head>
 <body>
@@ -95,43 +133,30 @@
   </div>
 
   <div id="val-form-wrap">
+    <div class="val-wiz-top">
+      <div class="val-progress-row">
+        <div class="val-progress-track"><div class="val-progress-fill" id="val-progress-fill"></div></div>
+        <div class="val-progress-label" id="val-progress-label">Paso 1 de 6</div>
+      </div>
+      <div class="val-step-title" id="val-step-title">Tus datos</div>
+      <div class="val-step-sub" id="val-step-sub">Completá con calma. Podés volver atrás cuando quieras.</div>
+    </div>
     <div id="val-alerta-seg" class="val-alerta-seg" role="alert"></div>
-    <div class="val-banner">Completá con calma. Los datos van de forma segura a tu anestesiólogo/a. Si no entendés algo, preguntale a tu médico antes de la cirugía.</div>
     <p id="val-inst-badge" style="font-size:14px;color:var(--text2);margin-bottom:10px;text-align:center"></p>
     <form id="val-form" autocomplete="off">
 
-      <div class="card">
-        <div class="ct">Cirugía programada</div>
-        <div class="field ac-wrap"><label>¿Cuál es el diagnóstico o el motivo por el que lo van a operar? *</label>
-          <input class="fi" id="v-dx" required placeholder="Ej. piedras en la vesícula, hernia, rodilla" autocomplete="off">
-          <div class="ac-list" id="ac-v-dx"></div>
-          <p class="val-hint">Si aparece una sugerencia en sus palabras, puede elegirla.</p>
+      <!-- PASO 1 -->
+      <div class="val-step on" data-step="1">
+        <p class="val-hint" style="margin-bottom:12px;color:var(--warn)">Nombre, DNI, edad, peso, talla y N° de afiliado son <strong>obligatorios</strong> — un error acá puede afectar la evaluación correcta de su riesgo anestésico. Es por su seguridad. La historia clínica es opcional.</p>
+        <div class="field mic-field"><label>Nombre y apellido *</label>
+          <input class="fi" id="v-nombre" required autocomplete="name">
+          <button type="button" class="mic val-mic" data-for="v-nombre" aria-label="Dictar">&#127897;</button>
         </div>
-        <div class="field"><label>Motivo de este formulario</label>
-          <select class="fi" id="v-motivo">
-            <option value="primera">Es la primera vez que lo completo</option>
-            <option value="reprogramacion">Cambiaron la fecha de la cirugía</option>
-            <option value="no_presentacion">La vez anterior no me operaron</option>
-            <option value="nueva_cirugia">Es otra operación distinta</option>
-            <option value="control">Actualizar mis datos</option>
-          </select>
-        </div>
-        <div class="field"><label>Fecha de la cirugía (si la sabe)</label><input class="fi" type="date" id="v-fecha-cx"></div>
-        <div class="field" id="v-serv-wrap"><label>Especialidad / servicio *</label>
-          <select class="fi" id="v-serv" required><option value="">Seleccionar…</option></select>
-        </div>
-        <div class="field ac-wrap" id="v-ciru-wrap"><label>Cirujano/a *</label>
-          <input class="fi" id="v-ciru" required placeholder="Primero elegí especialidad" autocomplete="off">
-          <div class="ac-list" id="ac-v-ciru"></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="ct">Sus datos</div>
-        <p class="val-hint" style="margin-bottom:10px;color:var(--warn)">Nombre, DNI, edad, peso, talla y N° de afiliado son <strong>obligatorios</strong> — un error acá puede afectar la evaluación correcta de su riesgo anestésico. Es por su seguridad. La historia clínica es opcional.</p>
-        <div class="field"><label>Nombre y apellido *</label><input class="fi" id="v-nombre" required autocomplete="name"></div>
         <div class="field"><label>DNI *</label><input class="fi" id="v-dni" required inputmode="numeric" autocomplete="off" maxlength="10"></div>
-        <div class="field" id="v-hc-wrap"><label>N° de Historia Clínica (opcional)</label><input class="fi" id="v-hc" placeholder="Si lo tiene a mano" autocomplete="off"></div>
+        <div class="field mic-field" id="v-hc-wrap"><label>N° de Historia Clínica (opcional)</label>
+          <input class="fi" id="v-hc" placeholder="Si lo tiene a mano" autocomplete="off">
+          <button type="button" class="mic val-mic" data-for="v-hc" aria-label="Dictar">&#127897;</button>
+        </div>
         <div class="g2">
           <div class="field"><label>Edad (años) *</label><input class="fi" type="number" id="v-edad" required min="0" max="120"></div>
           <div class="field"><label>Sexo</label>
@@ -146,118 +171,147 @@
         <div class="field"><label>Provincia donde vive o tiene la cobertura</label>
           <select class="fi" id="v-prov-obra"></select>
         </div>
-        <div class="field ac-wrap"><label>Obra social, mutual o prepaga</label>
+        <div class="field ac-wrap mic-field"><label>Obra social, mutual o prepaga</label>
           <input class="fi" id="v-obra" placeholder="Escriba: OSDE, PAMI, IOMA, APROSS..." autocomplete="off">
           <div class="ac-list" id="ac-v-obra"></div>
+          <button type="button" class="mic val-mic" data-for="v-obra" aria-label="Dictar">&#127897;</button>
           <p class="val-hint">Primero elija provincia. Después escriba y elija de la lista.</p>
         </div>
-        <div class="field"><label>N° de afiliado / credencial *</label><input class="fi" id="v-afil" required autocomplete="off"></div>
-      </div>
-
-      <div class="card">
-        <div class="ct">Sus enfermedades (por partes del cuerpo)</div>
-        <p class="val-hint">Para cada parte del cuerpo: tocá <strong>No</strong> o <strong>Sí</strong>. Si es Sí, elegí lo que le dijo un médico.</p>
-        <div id="v-organos"></div>
-        <div class="field" style="margin-top:10px"><label>Otra enfermedad que no esté en la lista</label>
-          <input class="fi" id="v-enf-otra" placeholder="Ej. lupus, artritis">
+        <div class="field mic-field"><label>N° de afiliado / credencial *</label>
+          <input class="fi" id="v-afil" required autocomplete="off">
+          <button type="button" class="mic val-mic" data-for="v-afil" aria-label="Dictar">&#127897;</button>
         </div>
-        <hr class="hr">
-        <div class="field"><label>¿Toma algo para <strong>fluidificar la sangre</strong>? (aspirina, Plavix, Sintrom, etc.)</label>
-          <div class="ac-wrap">
-            <input class="fi" id="v-anticoag-farm" placeholder="Ej. Aspirineta, Plavix, Xarelto..." autocomplete="off">
-            <div class="ac-list" id="ac-v-anticoag"></div>
+        <div class="field ac-wrap mic-field"><label>¿Cuál es el diagnóstico o el motivo por el que lo van a operar? *</label>
+          <input class="fi" id="v-dx" required placeholder="Ej. piedras en la vesícula, hernia, rodilla" autocomplete="off">
+          <div class="ac-list" id="ac-v-dx"></div>
+          <button type="button" class="mic val-mic" data-for="v-dx" aria-label="Dictar">&#127897;</button>
+          <p class="val-hint">Si aparece una sugerencia en sus palabras, puede elegirla.</p>
+        </div>
+        <div class="field"><label>Motivo de este formulario</label>
+          <select class="fi" id="v-motivo">
+            <option value="primera">Es la primera vez que lo completo</option>
+            <option value="reprogramacion">Cambiaron la fecha de la cirugía</option>
+            <option value="no_presentacion">La vez anterior no me operaron</option>
+            <option value="nueva_cirugia">Es otra operación distinta</option>
+            <option value="control">Actualizar mis datos</option>
+          </select>
+        </div>
+        <div class="field"><label>Fecha de la cirugía (si la sabe)</label><input class="fi" type="date" id="v-fecha-cx"></div>
+        <div class="field" id="v-serv-wrap"><label>Especialidad / servicio *</label>
+          <p class="val-hint">Esto se usa para sugerir el cirujano y va a la foja.</p>
+          <select class="fi" id="v-serv" required><option value="">Seleccionar…</option></select>
+        </div>
+        <div class="field ac-wrap mic-field" id="v-ciru-wrap"><label>Cirujano/a *</label>
+          <input class="fi" id="v-ciru" required placeholder="Primero elegí especialidad" autocomplete="off">
+          <div class="ac-list" id="ac-v-ciru"></div>
+          <button type="button" class="mic val-mic" data-for="v-ciru" aria-label="Dictar">&#127897;</button>
+        </div>
+        <div class="card" style="margin-top:8px">
+          <div class="ct">Actividad física y urgencia</div>
+          <div class="tog-row"><span>¿Puede subir 2 pisos de escalera sin parar?</span>
+            <label class="tog"><input type="checkbox" id="v-func-escalera"><span class="ts"></span></label>
           </div>
-          <p class="val-hint">Incluye aspirina protectora, clopidogrel, rivaroxabán, warfarina/sintrom.</p>
-        </div>
-        <div class="field ac-wrap"><label>¿Cuándo tomó la última dosis o cuándo la dejó?</label>
-          <input class="fi" id="v-anticoag-dosis" placeholder="Ej. 100 mg / ayer a la noche" autocomplete="off">
-          <div class="ac-list" id="ac-v-anticoag-dosis"></div>
-        </div>
-        <div class="field"><label>Alergias (medicamentos, yodo, látex, etc.)</label>
-          <div id="v-alerg-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0"></div>
-          <input class="fi" id="v-alerg-otro" placeholder="Si eligió Otro, escriba acá" style="display:none;margin-top:6px" autocomplete="off">
-          <p class="val-hint">Tocá una o más opciones. Podés elegir Otro y completar.</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="ct">Medicamentos que toma todos los días</div>
-        <p class="val-hint">Escriba el nombre comercial (Plavix, Enertiv) o la droga (clopidogrel). Elija de la lista.</p>
-        <div id="v-meds"></div>
-        <button type="button" class="btn btn-s" style="margin-top:6px;font-size:13px;padding:10px" id="v-med-add">+ Agregar otro medicamento</button>
-      </div>
-
-      <div class="card">
-        <div class="ct">Estudios (laboratorio, electro, etc.)</div>
-        <p class="val-hint"><strong>Recomendado:</strong> escriba el resultado a mano. Opcional: PDF de texto de lab / ECG / espirometría (lectura local, sin IA de pago). La valoración cardiovascular narrativa siempre queda para completar manualmente.</p>
-        <details open style="margin-top:8px">
-          <summary style="font-size:14px;font-weight:600;color:var(--text);cursor:pointer;padding:6px 0">1. Cargar resultado (siempre funciona)</summary>
-          <div style="margin-top:10px">
-            <div class="field"><label>Tipo de estudio</label>
-              <select class="fi" id="est-man-tipo">
-                <option value="laboratorio">Laboratorio</option>
-                <option value="ecg">Electrocardiograma</option>
-                <option value="ecocardiograma">Ecocardiograma</option>
-                <option value="espirometria">Espirometría</option>
-                <option value="otro">Otro</option>
-              </select>
-            </div>
-            <div class="field"><label>Resultado</label>
-              <select class="fi" id="est-man-res">
-                <option value="normal">Me dijeron que está normal</option>
-                <option value="alterado">Tiene algo alterado / anormal</option>
-                <option value="desconocido">No sé / no tengo el informe</option>
-              </select>
-            </div>
-            <div class="field"><label>Detalle (si sabe algo)</label>
-              <textarea class="fi" id="est-man-txt" placeholder="Ej. hemoglobina 10, creatinina normal, electro sin cambios"></textarea>
-            </div>
-            <button type="button" class="btn btn-g" style="font-size:13px;padding:10px" id="est-man-save">Guardar estudio</button>
-            <p class="val-hint" id="est-man-hint" style="display:none;color:var(--green);margin-top:8px"></p>
+          <div class="tog-row" style="margin-top:8px"><span>Es cirugía de urgencia (hoy / ahora)</span>
+            <label class="tog"><input type="checkbox" id="v-urgencia"><span class="ts"></span></label>
           </div>
-        </details>
-        <details style="margin-top:14px">
-          <summary style="font-size:15px;color:var(--text);cursor:pointer;padding:6px 0">2. Opcional — PDF de texto (parser local, sin IA)</summary>
-          <p class="val-hint" style="margin-top:8px">Solo PDF con texto seleccionable (laboratorio, ECG del equipo, espirometría). Fotos y ecocardiograma: use el paso 1. No se llama a Gemini/Claude ni a ninguna IA de pago.</p>
-        <div class="est-grid" style="margin-top:8px">
-          <label class="est-btn" id="est-lab"><span style="font-size:22px">&#128203;</span><span>Laboratorio</span><input type="file" accept="application/pdf,.pdf" data-tipo="laboratorio"></label>
-          <label class="est-btn" id="est-ecg"><span style="font-size:22px">&#128147;</span><span>ECG (PDF equipo)</span><input type="file" accept="application/pdf,.pdf" data-tipo="ecg"></label>
-          <label class="est-btn" id="est-eco"><span style="font-size:22px">&#128266;</span><span>Eco (manual)</span><input type="file" accept="application/pdf,.pdf" data-tipo="ecocardiograma"></label>
-          <label class="est-btn" id="est-espi"><span style="font-size:22px">&#127788;</span><span>Espirometría</span><input type="file" accept="application/pdf,.pdf" data-tipo="espirometria"></label>
         </div>
-        <label class="est-btn" style="margin-top:8px;width:100%" id="est-otro"><span style="font-size:22px">&#128247;</span><span>Otro (solo manual)</span><input type="file" accept="application/pdf,.pdf" data-tipo="otro"></label>
-        </details>
-        <div class="est-list" id="v-est-list"></div>
-        <p class="val-hint" id="est-resumen-count" style="display:none;margin-top:8px;color:var(--green);font-weight:600"></p>
-      </div>
-
-      <div class="card">
-        <div class="ct">Operaciones y anestesias anteriores</div>
-        <div class="field"><label>¿Se operó antes? ¿De qué?</label><textarea class="fi" id="v-cx-prev" placeholder="Ej. apendicitis en 2010"></textarea></div>
-        <div class="field"><label>¿Lo durmieron con anestesia? ¿Cómo le fue?</label><textarea class="fi" id="v-an-prev" placeholder="Ej. bien, sin problemas"></textarea></div>
-        <div class="field"><label>¿Tuvo problemas con anestesia o al despertar?</label><textarea class="fi" id="v-prob-an" placeholder="Ej. vómitos, le costó despertar, alergia a algún medicamento"></textarea></div>
-      </div>
-
-      <div class="card" id="v-ayuno-card" style="display:none">
-        <div class="ct">Ayuno (solo urgencia)</div>
-        <div class="field"><label>Última comida sólida</label><input class="fi" type="datetime-local" id="v-ayuno-solido"></div>
-        <div class="field"><label>Último líquido claro (agua, mate cocido)</label><input class="fi" type="datetime-local" id="v-ayuno-liq"></div>
-      </div>
-      <div class="card">
-        <div class="ct">Actividad física</div>
-        <div class="tog-row"><span>¿Puede subir 2 pisos de escalera sin parar?</span>
-          <label class="tog"><input type="checkbox" id="v-func-escalera"><span class="ts"></span></label>
-        </div>
-        <div class="tog-row" style="margin-top:8px"><span>Es cirugía de urgencia (hoy / ahora)</span>
-          <label class="tog"><input type="checkbox" id="v-urgencia"><span class="ts"></span></label>
+        <div class="card" id="v-ayuno-card" style="display:none">
+          <div class="ct">Ayuno (solo urgencia)</div>
+          <div class="field"><label>Última comida sólida</label><input class="fi" type="datetime-local" id="v-ayuno-solido"></div>
+          <div class="field"><label>Último líquido claro (agua, mate cocido)</label><input class="fi" type="datetime-local" id="v-ayuno-liq"></div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="ct">Otros</div>
-        <div class="g2">
-          <div class="field"><label>¿Fuma?</label><input class="fi" id="v-tabaco" placeholder="No / cuántos por día"></div>
-          <div class="field"><label>¿Toma alcohol?</label><input class="fi" id="v-alcohol" placeholder="No / cuánto"></div>
+      <!-- PASO 2 -->
+      <div class="val-step" data-step="2">
+        <p class="val-hint" style="margin-bottom:14px">Para cada parte del cuerpo: tocá <strong>No</strong> o <strong>Sí</strong>. Si es Sí, elegí lo que le dijo un médico. Podés agregar varias.</p>
+        <div class="sys-block">
+          <div class="sys-title">Cardiovascular</div>
+          <div id="v-org-cv"></div>
+        </div>
+        <div class="sys-block">
+          <div class="sys-title">Respiratorio</div>
+          <div id="v-org-resp"></div>
+        </div>
+        <div class="sys-block">
+          <div class="sys-title">Neurológico</div>
+          <div id="v-org-neuro"></div>
+        </div>
+        <div class="sys-block">
+          <div class="sys-title">Renal / metabólico</div>
+          <div id="v-org-renal"></div>
+        </div>
+        <div class="sys-block">
+          <div class="sys-title">Otras situaciones</div>
+          <div id="v-org-otras"></div>
+          <div class="field mic-field" style="margin-top:10px"><label>Otra enfermedad que no esté en la lista</label>
+            <input class="fi" id="v-enf-otra" placeholder="Ej. lupus, artritis">
+            <button type="button" class="mic val-mic" data-for="v-enf-otra" aria-label="Dictar">&#127897;</button>
+          </div>
+          <div class="field mic-field" style="margin-top:14px"><label>Marcapasos o desfibrilador (DAI)</label>
+            <input class="fi" id="v-mcp" placeholder="Si no tiene, dejar vacío">
+            <button type="button" class="mic val-mic" data-for="v-mcp" aria-label="Dictar">&#127897;</button>
+          </div>
+          <div class="field mic-field"><label>¿Fiebre o infección en los últimos días?</label>
+            <input class="fi" id="v-fiebre" placeholder="Ej. gripe hace 1 semana">
+            <button type="button" class="mic val-mic" data-for="v-fiebre" aria-label="Dictar">&#127897;</button>
+          </div>
+          <div class="field mic-field"><label>¿Viajó lejos o tuvo trombosis antes?</label>
+            <input class="fi" id="v-tvp" placeholder="Si no, dejar vacío">
+            <button type="button" class="mic val-mic" data-for="v-tvp" aria-label="Dictar">&#127897;</button>
+          </div>
+        </div>
+        <div id="v-organos" hidden></div>
+      </div>
+
+      <!-- PASO 3 -->
+      <div class="val-step" data-step="3">
+        <div class="sys-block">
+          <div class="sys-title">Anestesias previas</div>
+          <div id="v-org-anestesia"></div>
+        </div>
+        <div class="field">
+          <label>¿Te dieron anestesia general antes?</label>
+          <div class="choice-grid" data-choice="v-ag-previa" data-exclusive="1">
+            <button type="button" class="val-choice" data-val="si">Sí</button>
+            <button type="button" class="val-choice" data-val="no">No</button>
+          </div>
+          <input type="hidden" id="v-ag-previa">
+        </div>
+        <div class="field mic-field"><label>¿Se operó antes? ¿De qué?</label>
+          <textarea class="fi" id="v-cx-prev" placeholder="Ej. apendicitis en 2010"></textarea>
+          <button type="button" class="mic val-mic" data-for="v-cx-prev" aria-label="Dictar">&#127897;</button>
+        </div>
+        <div class="field mic-field"><label>¿Lo durmieron con anestesia? ¿Cómo le fue?</label>
+          <textarea class="fi" id="v-an-prev" placeholder="Ej. bien, sin problemas"></textarea>
+          <button type="button" class="mic val-mic" data-for="v-an-prev" aria-label="Dictar">&#127897;</button>
+        </div>
+        <div class="field">
+          <label>¿Te costó o tuvieron dificultad para intubarte?</label>
+          <p class="val-hint">Si no lo sabés, marcá “No sé”.</p>
+          <div class="choice-grid" data-choice="v-intub" data-exclusive="1">
+            <button type="button" class="val-choice" data-val="si">Sí</button>
+            <button type="button" class="val-choice" data-val="no">No</button>
+            <button type="button" class="val-choice" data-val="no_se">No sé</button>
+            <button type="button" class="val-choice" data-val="otro" data-otro="v-intub-otro-wrap">Otro</button>
+          </div>
+          <input type="hidden" id="v-intub">
+          <div class="otro-input mic-field" id="v-intub-otro-wrap">
+            <input class="fi" id="v-intub-otro" placeholder="Contanos qué pasó" autocomplete="off">
+            <button type="button" class="mic val-mic" data-for="v-intub-otro" aria-label="Dictar">&#127897;</button>
+          </div>
+        </div>
+        <div class="field mic-field"><label>¿Tuvo problemas con anestesia o al despertar?</label>
+          <textarea class="fi" id="v-prob-an" placeholder="Ej. vómitos, le costó despertar, alergia a algún medicamento"></textarea>
+          <button type="button" class="mic val-mic" data-for="v-prob-an" aria-label="Dictar">&#127897;</button>
+        </div>
+        <div class="field">
+          <label>¿Roncás fuerte o te dijeron que dejás de respirar al dormir?</label>
+          <div class="choice-grid" data-choice="v-ronca" data-exclusive="1">
+            <button type="button" class="val-choice" data-val="si">Sí</button>
+            <button type="button" class="val-choice" data-val="no">No</button>
+          </div>
+          <input type="hidden" id="v-ronca">
         </div>
         <div class="field"><label>Prótesis dentales / cuerpos extraños</label>
           <div id="v-protesis-dental" style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
@@ -280,14 +334,132 @@
             <label class="tog-row" style="justify-content:flex-start;gap:10px"><input type="checkbox" id="v-cuello-ninguno" value="Ninguno"> Ninguno</label>
           </div>
         </div>
-        <div class="field" style="margin-top:14px"><label>Marcapasos o desfibrilador (DAI)</label><input class="fi" id="v-mcp" placeholder="Si no tiene, dejar vacío"></div>
-        <div class="field"><label>¿Fiebre o infección en los últimos días?</label><input class="fi" id="v-fiebre" placeholder="Ej. gripe hace 1 semana"></div>
-        <div class="field"><label>¿Viajó lejos o tuvo trombosis antes?</label><input class="fi" id="v-tvp" placeholder="Si no, dejar vacío"></div>
+      </div>
+
+      <!-- PASO 4 -->
+      <div class="val-step" data-step="4">
+        <div class="field"><label>Medicamentos que toma todos los días</label>
+          <p class="val-hint">Escriba el nombre comercial (Plavix, Enertiv) o la droga (clopidogrel). Elija de la lista. Podés dictar por voz.</p>
+          <div id="v-meds"></div>
+          <button type="button" class="btn btn-s" style="margin-top:6px;font-size:14px;padding:10px" id="v-med-add">+ Agregar otro medicamento</button>
+        </div>
+        <div class="field"><label>¿Toma algo para <strong>fluidificar la sangre</strong>? (aspirina, Plavix, Sintrom, etc.)</label>
+          <div class="ac-wrap mic-field">
+            <input class="fi" id="v-anticoag-farm" placeholder="Ej. Aspirineta, Plavix, Xarelto..." autocomplete="off">
+            <div class="ac-list" id="ac-v-anticoag"></div>
+            <button type="button" class="mic val-mic" data-for="v-anticoag-farm" aria-label="Dictar">&#127897;</button>
+          </div>
+          <p class="val-hint">Incluye aspirina protectora, clopidogrel, rivaroxabán, warfarina/sintrom.</p>
+        </div>
+        <div class="field ac-wrap mic-field"><label>¿Cuándo tomó la última dosis o cuándo la dejó?</label>
+          <input class="fi" id="v-anticoag-dosis" placeholder="Ej. 100 mg / ayer a la noche" autocomplete="off">
+          <div class="ac-list" id="ac-v-anticoag-dosis"></div>
+          <button type="button" class="mic val-mic" data-for="v-anticoag-dosis" aria-label="Dictar">&#127897;</button>
+        </div>
+        <div class="field"><label>Alergias (medicamentos, yodo, látex, etc.)</label>
+          <div id="v-alerg-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0"></div>
+          <div class="otro-input mic-field" id="v-alerg-otro-wrap">
+            <input class="fi" id="v-alerg-otro" placeholder="Si eligió Otro, escriba acá" autocomplete="off">
+            <button type="button" class="mic val-mic" data-for="v-alerg-otro" aria-label="Dictar">&#127897;</button>
+          </div>
+          <p class="val-hint">Tocá una o más opciones. Podés elegir Otro y completar.</p>
+        </div>
+        <div class="g2">
+          <div class="field mic-field"><label>¿Fuma?</label>
+            <input class="fi" id="v-tabaco" placeholder="No / cuántos por día">
+            <button type="button" class="mic val-mic" data-for="v-tabaco" aria-label="Dictar">&#127897;</button>
+          </div>
+          <div class="field mic-field"><label>¿Toma alcohol?</label>
+            <input class="fi" id="v-alcohol" placeholder="No / cuánto">
+            <button type="button" class="mic val-mic" data-for="v-alcohol" aria-label="Dictar">&#127897;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 5 -->
+      <div class="val-step" data-step="5">
+        <p class="val-hint" style="margin-bottom:14px">Si tenés algún estudio a mano, escribí qué decía. Podés adjuntar foto o PDF (queda el nombre del archivo; no se sube el archivo en este paso).</p>
+        <div class="field mic-field"><label>Laboratorio</label>
+          <p class="val-hint">Fecha y valores que recuerdes, o adjuntá foto/PDF</p>
+          <input class="fi" id="v-est-lab-txt" placeholder="Ej: hace 2 semanas, todo normal" autocomplete="off">
+          <button type="button" class="mic val-mic" data-for="v-est-lab-txt" aria-label="Dictar">&#127897;</button>
+          <div class="attach-row">
+            <label class="attach-btn">&#128206; Subir foto o PDF<input type="file" id="v-est-lab-file" accept="image/*,application/pdf,.pdf" data-est="laboratorio"></label>
+          </div>
+          <p class="attach-name" id="v-est-lab-name"></p>
+        </div>
+        <div class="field mic-field"><label>Electrocardiograma (ECG)</label>
+          <input class="fi" id="v-est-ecg-txt" placeholder="Fecha y resultado si lo sabés" autocomplete="off">
+          <button type="button" class="mic val-mic" data-for="v-est-ecg-txt" aria-label="Dictar">&#127897;</button>
+          <div class="attach-row">
+            <label class="attach-btn">&#128206; Subir foto o PDF<input type="file" id="v-est-ecg-file" accept="image/*,application/pdf,.pdf" data-est="ecg"></label>
+          </div>
+          <p class="attach-name" id="v-est-ecg-name"></p>
+        </div>
+        <div class="field mic-field"><label>Radiografía de tórax</label>
+          <input class="fi" id="v-est-rx-txt" placeholder="Fecha y resultado" autocomplete="off">
+          <button type="button" class="mic val-mic" data-for="v-est-rx-txt" aria-label="Dictar">&#127897;</button>
+          <div class="attach-row">
+            <label class="attach-btn">&#128206; Subir foto o PDF<input type="file" id="v-est-rx-file" accept="image/*,application/pdf,.pdf" data-est="radiografia_torax"></label>
+          </div>
+          <p class="attach-name" id="v-est-rx-name"></p>
+        </div>
+        <div class="field mic-field"><label>Valoración cardiológica</label>
+          <p class="val-hint">¿Te vio un cardiólogo? ¿Qué te dijo?</p>
+          <input class="fi" id="v-est-cardio-txt" placeholder="Ej: apto quirúrgico, sin observaciones" autocomplete="off">
+          <button type="button" class="mic val-mic" data-for="v-est-cardio-txt" aria-label="Dictar">&#127897;</button>
+          <div class="attach-row">
+            <label class="attach-btn">&#128206; Subir foto o PDF<input type="file" id="v-est-cardio-file" accept="image/*,application/pdf,.pdf" data-est="valoracion_cardiologica"></label>
+          </div>
+          <p class="attach-name" id="v-est-cardio-name"></p>
+        </div>
+
+        <div id="val-parsers-legacy" hidden>
+          <div class="field"><label>Tipo de estudio</label>
+            <select class="fi" id="est-man-tipo">
+              <option value="laboratorio">Laboratorio</option>
+              <option value="ecg">Electrocardiograma</option>
+              <option value="ecocardiograma">Ecocardiograma</option>
+              <option value="espirometria">Espirometría</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="field"><label>Resultado</label>
+            <select class="fi" id="est-man-res">
+              <option value="normal">Me dijeron que está normal</option>
+              <option value="alterado">Tiene algo alterado / anormal</option>
+              <option value="desconocido">No sé / no tengo el informe</option>
+            </select>
+          </div>
+          <div class="field"><label>Detalle (si sabe algo)</label>
+            <textarea class="fi" id="est-man-txt" placeholder="Ej. hemoglobina 10"></textarea>
+          </div>
+          <button type="button" class="btn btn-g" id="est-man-save">Guardar estudio</button>
+          <p class="val-hint" id="est-man-hint" style="display:none;color:var(--green);margin-top:8px"></p>
+          <div class="est-grid" style="margin-top:8px">
+            <label class="est-btn" id="est-lab"><span>Laboratorio</span><input type="file" accept="application/pdf,.pdf" data-tipo="laboratorio"></label>
+            <label class="est-btn" id="est-ecg"><span>ECG (PDF equipo)</span><input type="file" accept="application/pdf,.pdf" data-tipo="ecg"></label>
+            <label class="est-btn" id="est-eco"><span>Eco (manual)</span><input type="file" accept="application/pdf,.pdf" data-tipo="ecocardiograma"></label>
+            <label class="est-btn" id="est-espi"><span>Espirometría</span><input type="file" accept="application/pdf,.pdf" data-tipo="espirometria"></label>
+          </div>
+          <label class="est-btn" id="est-otro"><span>Otro (solo manual)</span><input type="file" accept="application/pdf,.pdf" data-tipo="otro"></label>
+          <div class="est-list" id="v-est-list"></div>
+          <p class="val-hint" id="est-resumen-count" style="display:none;margin-top:8px;color:var(--green);font-weight:600"></p>
+        </div>
+      </div>
+
+      <!-- PASO 6 -->
+      <div class="val-step" data-step="6">
+        <div id="val-review"></div>
       </div>
 
       <div class="err-panel" id="val-err"><div class="err-title">Error</div><div class="err-msg" id="val-err-msg"></div></div>
       <button type="submit" class="btn btn-g" id="val-submit">Enviar valoración</button>
     </form>
+    <div class="val-wiz-nav" role="toolbar" aria-label="Navegación del formulario">
+      <button type="button" class="val-btn-back" id="val-wiz-back" disabled>Atrás</button>
+      <button type="button" class="val-btn-next" id="val-wiz-next">Continuar →</button>
+    </div>
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -296,21 +468,21 @@ if (typeof pdfjsLib !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 </script>
-<script src="js/supabase-keepalive.js?v=12.36"></script>
-<script src="js/00-env.js?v=12.36"></script>
-<script src="data/cirujanos-esp.js?v=12.36"></script>
-<script src="data/valoracion/cfg-instituciones.js?v=12.36"></script>
-<script src="data/valoracion/diag-sinonimos-mayo.js?v=12.36"></script>
-<script src="data/valoracion/alergias-comunes.js?v=12.36"></script>
-<script src="data/obras-sociales-ar.js?v=12.36"></script>
-<script src="data/organos-enfermedades.js?v=12.36"></script>
-<script src="data/medicacion-habitual.js?v=12.36"></script>
-<script src="data/valoracion/alertas-seguridad.js?v=12.36"></script>
-<script src="js/estudios/pdf-text.js?v=12.36"></script>
-<script src="js/estudios/lab_parser.js?v=12.36"></script>
-<script src="js/estudios/ecg_parser.js?v=12.36"></script>
-<script src="js/estudios/espirometria_parser.js?v=12.36"></script>
-<script src="js/estudios/estudio-extract-local.js?v=12.36"></script>
-<script src="js/valoracion-form.js?v=12.36"></script>
+<script src="js/supabase-keepalive.js?v=12.37"></script>
+<script src="js/00-env.js?v=12.37"></script>
+<script src="data/cirujanos-esp.js?v=12.37"></script>
+<script src="data/valoracion/cfg-instituciones.js?v=12.37"></script>
+<script src="data/valoracion/diag-sinonimos-mayo.js?v=12.37"></script>
+<script src="data/valoracion/alergias-comunes.js?v=12.37"></script>
+<script src="data/obras-sociales-ar.js?v=12.37"></script>
+<script src="data/organos-enfermedades.js?v=12.37"></script>
+<script src="data/medicacion-habitual.js?v=12.37"></script>
+<script src="data/valoracion/alertas-seguridad.js?v=12.37"></script>
+<script src="js/estudios/pdf-text.js?v=12.37"></script>
+<script src="js/estudios/lab_parser.js?v=12.37"></script>
+<script src="js/estudios/ecg_parser.js?v=12.37"></script>
+<script src="js/estudios/espirometria_parser.js?v=12.37"></script>
+<script src="js/estudios/estudio-extract-local.js?v=12.37"></script>
+<script src="js/valoracion-form.js?v=12.37"></script>
 </body>
 </html>

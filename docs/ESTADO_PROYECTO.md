@@ -2,16 +2,17 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-26:
 
-- PWA `CACHE_V`: **12.36**
+- PWA `CACHE_V`: **12.37**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-26 — Foja-bar fija + contraste valoración paciente (PWA **12.36**). No tocar `S.cur` / `fill.js`.
+- 2026-08-26 — Wizard valoración paciente (PWA **12.37**). QR / `valoracion.html`. No tocar `S.cur` / `fill.js` / Edge.
 
 ## Qué se hizo (más reciente primero)
 
-- 2026-08-26 — Foja-bar fija + contraste valoración paciente (PWA **12.36**). Barra de acciones `position:fixed` abajo en nueva/foja (dock oculto). Textos de `valoracion.html` subidos de `--text3`/`11px`. Esperando Pages `cache:'no-store'`.
+- 2026-08-26 — Wizard de 6 pasos en `valoracion.html` (PWA **12.37**). IDs y payload iguales; parsers ocultos; adjuntos solo `{nombre,mime,size}`. Esperando Pages.
+- 2026-08-26 — Foja-bar fija + contraste valoración paciente (PWA **12.36**). Barra `position:fixed` (top 357.1875px en scroll 0/400/900). Disclaimer y labels `#E6EDF3`. **Cerrado en Pages**.
 - 2026-08-26 — Tarjeta QR (PWA **12.35**): lockup AnesFact + nombre del médico + # diario (localStorage, se reinicia a las 00:00 AR) + fecha corta + QR + pie. Imprimir y Guardar imagen. Logo alrededor, no en los módulos. **Cerrado en Pages**.
 - 2026-08-26 — Lote D visual (PWA **12.34**): «Pedir plan» y modal Función no disponible en baldosas; facturación/evweb/resumen CTAs. **Cerrado en Pages**.
 - 2026-08-26 — Dock lote C (PWA **12.33**): toolbar de foja; QR Preop baldosa; 3 tamaños de dock. **Cerrado en Pages**.
@@ -24,10 +25,10 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## Pendiente / conocido
 
-- Badge del módulo QR (ahora en Preop): implementado, sin confirmar visualmente en dispositivo.
+- Foja-bar fija + contraste valoración (12.36): **cerrado en Pages**.
+- Wizard valoración 6 pasos (12.37): esperando verificación de Diego en Pages. PWA: reabrir del todo (SW cache-first `ignoreSearch`). Token de prueba propio para e2e.
 - Ruta alternativa por DNI en GECLISA (pacientes de alta): `chrome-extension-geclisa-batch/NOTES_RUTA_HC_POR_DNI.md` — no implementada.
 - Correlativo QR entre equipos (servidor): diferido.
-- Foja-bar fija + contraste valoración (12.36): esperando verificación de Diego en Pages. PWA: reabrir del todo (SW cache-first `ignoreSearch`).
 
 ## Decisiones tomadas (no repreguntar)
 

@@ -3,7 +3,9 @@
   var SANATORIO = 'Sanatorio Mayo'; // Etapa 1
   var organState = {};
   var estudiosExtraidos = {};
+  var estudiosAdjuntos = {};
   var MAX_ESTUDIOS = 5;
+  var wizStep = 1;
   var dxMedicoSugerido = null;
   var dxElegidoDiccionario = false;
   var alergiasSel = {};
@@ -119,6 +121,8 @@
             c.classList.toggle('sel', c.getAttribute('data-al') === 'Ninguna');
           });
           if (otro) { otro.style.display = 'none'; otro.value = ''; }
+          var otroWrap = $('v-alerg-otro-wrap');
+          if (otroWrap) otroWrap.classList.remove('on');
           return;
         }
         if (alergiasSel.Ninguna) delete alergiasSel.Ninguna;
@@ -129,6 +133,8 @@
           c.classList.toggle('sel', !!alergiasSel[k]);
         });
         if (otro) otro.style.display = alergiasSel.Otro ? 'block' : 'none';
+        var otroWrap2 = $('v-alerg-otro-wrap');
+        if (otroWrap2) otroWrap2.classList.toggle('on', !!alergiasSel.Otro);
       };
       box.appendChild(b);
     });
@@ -176,10 +182,24 @@
     });
   }
 
+  var ORG_MOUNTS = {
+    corazon: 'v-org-cv',
+    pulmones: 'v-org-resp',
+    cerebro: 'v-org-neuro',
+    rinones: 'v-org-renal',
+    metabolismo: 'v-org-renal',
+    digestivo: 'v-org-otras',
+    sangre: 'v-org-otras',
+    otros: 'v-org-otras',
+    anestesia: 'v-org-anestesia'
+  };
+
   function renderOrganos() {
-    var box = $('v-organos');
-    if (!box || typeof ORGANOS_ENF === 'undefined') return;
-    box.innerHTML = '';
+    if (typeof ORGANOS_ENF === 'undefined') return;
+    ['v-org-cv', 'v-org-resp', 'v-org-neuro', 'v-org-renal', 'v-org-otras', 'v-org-anestesia', 'v-organos'].forEach(function (id) {
+      var el = $(id);
+      if (el) el.innerHTML = '';
+    });
     ORGANOS_ENF.forEach(function (org) {
       organState[org.id] = { answer: null, selected: {} };
       var opts = org.items.map(function (it, idx) {
@@ -248,7 +268,8 @@
           }
         };
       });
-      box.appendChild(block);
+      var mount = $(ORG_MOUNTS[org.id] || 'v-organos') || $('v-organos');
+      if (mount) mount.appendChild(block);
     });
   }
 
@@ -296,8 +317,9 @@
     wrap.className = 'med-row';
     var uid = 'med-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
     wrap.innerHTML =
-      '<div class="ac-wrap" style="grid-column:1/-1"><input class="fi med-n" placeholder="Nombre comercial o droga" value="' + esc(data && data.nombre) + '" autocomplete="off">' +
-      '<div class="ac-list" id="ac-' + uid + '"></div></div>' +
+      '<div class="ac-wrap mic-field" style="grid-column:1/-1"><input class="fi med-n" placeholder="Nombre comercial o droga" value="' + esc(data && data.nombre) + '" autocomplete="off">' +
+      '<div class="ac-list" id="ac-' + uid + '"></div>' +
+      '<button type="button" class="mic val-mic" aria-label="Dictar">&#127897;</button></div>' +
       '<div class="ac-wrap"><input class="fi med-d" placeholder="Dosis (ej. 100 mg)" value="' + esc(data && data.dosis) + '" autocomplete="off">' +
       '<div class="ac-list" id="ac-d-' + uid + '"></div></div>' +
       '<input class="fi med-h" placeholder="Horario" value="' + esc(data && data.horario) + '">' +
@@ -558,9 +580,41 @@
     });
   }
 
+  function collectEstudioAdjuntos() {
+    var specs = [
+      { tipo: 'laboratorio', txt: 'v-est-lab-txt' },
+      { tipo: 'ecg', txt: 'v-est-ecg-txt' },
+      { tipo: 'radiografia_torax', txt: 'v-est-rx-txt' },
+      { tipo: 'valoracion_cardiologica', txt: 'v-est-cardio-txt' }
+    ];
+    var out = {};
+    specs.forEach(function (s) {
+      var texto = ($(s.txt) && $(s.txt).value.trim()) || '';
+      var file = estudiosAdjuntos[s.tipo] || null;
+      if (!texto && !file) return;
+      out[s.tipo] = { texto: texto || null, archivo: file };
+      estudiosExtraidos[s.tipo] = {
+        extracted: {
+          tipo: s.tipo,
+          resultado_general: texto ? 'desconocido' : 'no_legible',
+          resumen_paciente: texto || (file && file.nombre ? ('Adjunto: ' + file.nombre) : ''),
+          fuente: 'manual_paciente',
+          archivo: file,
+          confianza: 'baja'
+        },
+        leido_at: new Date().toISOString(),
+        fuente: 'manual'
+      };
+    });
+    return out;
+  }
+
   function buildPayload() {
     var urg = $('v-urgencia').checked;
     var org = collectOrganos();
+    if ($('v-ronca') && $('v-ronca').value === 'si' && org.chips.indexOf('SAOS') < 0) org.chips.push('SAOS');
+    if ($('v-intub') && $('v-intub').value === 'si' && org.chips.indexOf('Vía difícil') < 0) org.chips.push('Vía difícil');
+    var adjuntos = collectEstudioAdjuntos();
     var provEl = $('v-prov-obra');
     var cfg = afValoracionCfg(SANATORIO);
     var nombre = $('v-nombre').value.trim();
@@ -622,6 +676,7 @@
         estudios: estudiosExtraidos,
         cantidad: Object.keys(estudiosExtraidos).length,
         imagen_guardada: false,
+        adjuntos: adjuntos
       },
       extras: {
         es_urgencia: urg,
@@ -641,7 +696,11 @@
         diagnostico_sugerido: !!mapped,
         diagnostico_sin_confirmar: sinConfirmar || !mapped,
         diagnostico_confirmado: false,
-        etiqueta_lista: nombre + ' · DNI ' + (dniCanon || dniRaw) + ' · ' + (diagPrincipal || 'Sin diagnóstico')
+        etiqueta_lista: nombre + ' · DNI ' + (dniCanon || dniRaw) + ' · ' + (diagPrincipal || 'Sin diagnóstico'),
+        anestesia_general_previa: ($('v-ag-previa') && $('v-ag-previa').value) || null,
+        intubacion_dificil: ($('v-intub') && $('v-intub').value) || null,
+        intubacion_dificil_otro: ($('v-intub-otro') && $('v-intub-otro').value.trim()) || null,
+        ronca_saos: ($('v-ronca') && $('v-ronca').value) || null
       },
     };
     var alerta = typeof afDetectarAlertasSeguridad === 'function'
@@ -771,9 +830,9 @@
     var errs = validateCriticos();
     if (errs.length) {
       showErr('Faltan o están mal datos obligatorios: ' + errs.join('; ') + '.');
+      showWizStep(1);
       return;
     }
-    if (!confirmCriticos()) return;
     var payload = buildPayload();
     var btn = $('val-submit');
     btn.disabled = true;
@@ -793,6 +852,8 @@
         $('val-form-wrap').style.display = 'none';
         $('val-privacy').style.display = 'none';
         $('val-ok').style.display = 'block';
+        var nav = document.querySelector('.val-wiz-nav');
+        if (nav) nav.style.display = 'none';
         if (res.j.asa_sugerido) $('val-asa').textContent = 'Clasificación sugerida (orientativa): ASA ' + res.j.asa_sugerido;
         window.scrollTo(0, 0);
       })
@@ -899,6 +960,209 @@
     inp.addEventListener('blur', function () { setTimeout(closeAllAc, 150); });
   }
 
+  var valRecog = null;
+  function valMicFor(field, btn) {
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { alert('El dictado por voz requiere Chrome o Safari.'); return; }
+    if (valRecog) {
+      try { valRecog.stop(); } catch (eStop) {}
+      valRecog = null;
+    }
+    var rec = new SR();
+    rec.lang = 'es-AR';
+    rec.continuous = false;
+    rec.interimResults = false;
+    valRecog = rec;
+    if (btn) btn.classList.add('rec');
+    rec.onresult = function (e) {
+      var txt = (e.results[0] && e.results[0][0] && e.results[0][0].transcript) || '';
+      if (!txt) return;
+      if (field.tagName === 'TEXTAREA') field.value += (field.value ? '\n' : '') + txt;
+      else field.value = (field.value ? (field.value + ' ') : '') + txt;
+      try { field.dispatchEvent(new Event('input', { bubbles: true })); } catch (eIn) {}
+    };
+    rec.onerror = function () { if (btn) btn.classList.remove('rec'); valRecog = null; };
+    rec.onend = function () { if (btn) btn.classList.remove('rec'); valRecog = null; };
+    try { rec.start(); } catch (eStart) {
+      if (btn) btn.classList.remove('rec');
+      valRecog = null;
+    }
+  }
+  function wireValMic() {
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      var btn = t && t.closest ? t.closest('.val-mic') : null;
+      if (!btn) return;
+      e.preventDefault();
+      var id = btn.getAttribute('data-for');
+      var field = id ? $(id) : (btn.parentNode && btn.parentNode.querySelector('.fi, .med-n, textarea'));
+      if (field) valMicFor(field, btn);
+    });
+  }
+
+  function wireValChoices() {
+    document.querySelectorAll('[data-choice]').forEach(function (grid) {
+      var hidId = grid.getAttribute('data-choice');
+      var exclusive = grid.getAttribute('data-exclusive') === '1';
+      grid.querySelectorAll('.val-choice').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          if (exclusive) {
+            grid.querySelectorAll('.val-choice').forEach(function (b) { b.classList.remove('selected'); });
+            btn.classList.add('selected');
+          } else {
+            btn.classList.toggle('selected');
+          }
+          var hid = $(hidId);
+          if (hid) hid.value = btn.classList.contains('selected') ? (btn.getAttribute('data-val') || '') : '';
+          grid.querySelectorAll('.val-choice[data-otro]').forEach(function (b) {
+            var wrap = $(b.getAttribute('data-otro'));
+            if (wrap) wrap.classList.toggle('on', b.classList.contains('selected') && b.getAttribute('data-val') === 'otro');
+          });
+        });
+      });
+    });
+  }
+
+  function wireEstudioAdjuntos() {
+    document.querySelectorAll('input[type=file][data-est]').forEach(function (inp) {
+      inp.addEventListener('change', function () {
+        var file = inp.files && inp.files[0];
+        var tipo = inp.getAttribute('data-est');
+        var nameEl = $(inp.id.replace('-file', '-name'));
+        if (!file) {
+          delete estudiosAdjuntos[tipo];
+          if (nameEl) nameEl.textContent = '';
+          return;
+        }
+        estudiosAdjuntos[tipo] = {
+          nombre: file.name,
+          mime: file.type || 'application/octet-stream',
+          size: file.size
+        };
+        if (nameEl) nameEl.textContent = file.name + ' (' + Math.round(file.size / 1024) + ' KB)';
+      });
+    });
+  }
+
+  function rv(s) { return (s && String(s).trim()) ? String(s).trim() : '—'; }
+
+  function fillValReview() {
+    var box = $('val-review');
+    if (!box) return;
+    var org = collectOrganos();
+    var chips = (org.chips || []).join(', ') || (org.otra_texto || 'Ninguno marcado');
+    var meds = collectMeds().map(function (m) { return m.nombre + (m.dosis ? (' ' + m.dosis) : ''); }).join('; ') || '—';
+    var al = collectAlergias();
+    var adj = collectEstudioAdjuntos();
+    function estLine(tipo, label) {
+      var a = adj[tipo];
+      if (!a) return '—';
+      var bits = [];
+      if (a.texto) bits.push(a.texto);
+      if (a.archivo && a.archivo.nombre) bits.push('📎 ' + a.archivo.nombre);
+      return bits.join(' · ') || '—';
+    }
+    var intub = ($('v-intub') && $('v-intub').value) || '';
+    var intubLab = intub === 'si' ? 'Sí' : (intub === 'no' ? 'No' : (intub === 'no_se' ? 'No sé' : (intub === 'otro' ? ('Otro: ' + rv($('v-intub-otro') && $('v-intub-otro').value)) : '—')));
+    box.innerHTML =
+      '<div class="review-card"><h4>Tus datos</h4>' +
+      '<div class="review-row"><span class="k">Nombre</span><span class="v">' + esc($('v-nombre').value) + '</span></div>' +
+      '<div class="review-row"><span class="k">DNI</span><span class="v">' + esc($('v-dni').value) + '</span></div>' +
+      '<div class="review-row"><span class="k">Edad / sexo</span><span class="v">' + esc(rv($('v-edad').value) + ' / ' + rv($('v-sexo').value)) + '</span></div>' +
+      '<div class="review-row"><span class="k">Peso / talla</span><span class="v">' + esc(rv($('v-peso').value) + ' kg / ' + rv($('v-talla').value) + ' cm') + '</span></div>' +
+      '<div class="review-row"><span class="k">Obra social</span><span class="v">' + esc(rv($('v-obra').value)) + '</span></div>' +
+      '<div class="review-row"><span class="k">Afiliado</span><span class="v">' + esc(rv($('v-afil').value)) + '</span></div>' +
+      '<div class="review-row"><span class="k">Cirugía</span><span class="v">' + esc(rv($('v-dx').value)) + '</span></div>' +
+      '<div class="review-row"><span class="k">Especialidad</span><span class="v">' + esc(rv($('v-serv').value)) + '</span></div>' +
+      '<div class="review-row"><span class="k">Cirujano/a</span><span class="v">' + esc(rv($('v-ciru').value)) + '</span></div>' +
+      '<button type="button" class="review-edit" data-goto="1">Editar</button></div>' +
+      '<div class="review-card"><h4>Antecedentes</h4>' +
+      '<div class="review-row"><span class="k">Condiciones</span><span class="v">' + esc(chips) + '</span></div>' +
+      '<button type="button" class="review-edit" data-goto="2">Editar</button></div>' +
+      '<div class="review-card"><h4>Vía aérea</h4>' +
+      '<div class="review-row"><span class="k">Anestesia general previa</span><span class="v">' + esc(($('v-ag-previa') && $('v-ag-previa').value === 'si') ? 'Sí' : (($('v-ag-previa') && $('v-ag-previa').value === 'no') ? 'No' : '—')) + '</span></div>' +
+      '<div class="review-row"><span class="k">Intubación difícil</span><span class="v">' + esc(intubLab) + '</span></div>' +
+      '<div class="review-row"><span class="k">Ronca / apnea</span><span class="v">' + esc(($('v-ronca') && $('v-ronca').value === 'si') ? 'Sí' : (($('v-ronca') && $('v-ronca').value === 'no') ? 'No' : '—')) + '</span></div>' +
+      '<div class="review-row"><span class="k">Cirugías previas</span><span class="v">' + esc(rv($('v-cx-prev').value)) + '</span></div>' +
+      '<button type="button" class="review-edit" data-goto="3">Editar</button></div>' +
+      '<div class="review-card"><h4>Medicación y alergias</h4>' +
+      '<div class="review-row"><span class="k">Toma habitualmente</span><span class="v">' + esc(meds) + '</span></div>' +
+      '<div class="review-row"><span class="k">Anticoag / antiagregante</span><span class="v">' + esc(rv($('v-anticoag-farm') && $('v-anticoag-farm').value)) + '</span></div>' +
+      '<div class="review-row"><span class="k">Alergias</span><span class="v">' + esc(al.texto || '—') + '</span></div>' +
+      '<div class="review-row"><span class="k">Tabaco / alcohol</span><span class="v">' + esc(rv($('v-tabaco').value) + ' / ' + rv($('v-alcohol').value)) + '</span></div>' +
+      '<button type="button" class="review-edit" data-goto="4">Editar</button></div>' +
+      '<div class="review-card"><h4>Estudios</h4>' +
+      '<div class="review-row"><span class="k">Laboratorio</span><span class="v">' + esc(estLine('laboratorio')) + '</span></div>' +
+      '<div class="review-row"><span class="k">ECG</span><span class="v">' + esc(estLine('ecg')) + '</span></div>' +
+      '<div class="review-row"><span class="k">Rx tórax</span><span class="v">' + esc(estLine('radiografia_torax')) + '</span></div>' +
+      '<div class="review-row"><span class="k">Val. cardiológica</span><span class="v">' + esc(estLine('valoracion_cardiologica')) + '</span></div>' +
+      '<button type="button" class="review-edit" data-goto="5">Editar</button></div>';
+    box.querySelectorAll('.review-edit').forEach(function (b) {
+      b.onclick = function () { showWizStep(parseInt(b.getAttribute('data-goto'), 10)); };
+    });
+  }
+
+  var WIZ_META = [
+    null,
+    { title: 'Tus datos', sub: 'Completá con calma. Podés volver atrás cuando quieras.' },
+    { title: 'Antecedentes por sistema', sub: 'Marcá lo que corresponda en cada área.' },
+    { title: 'Anestesias previas', sub: 'Esto nos ayuda a preparar la vía aérea.' },
+    { title: 'Medicación y alergias', sub: 'Ya vamos por la mitad.' },
+    { title: 'Estudios recientes', sub: 'Si tenés alguno a mano, contanos qué decía.' },
+    { title: 'Revisá antes de enviar', sub: 'Si algo está mal, tocá Editar.' }
+  ];
+
+  function showWizStep(n) {
+    if (n < 1) n = 1;
+    if (n > 6) n = 6;
+    wizStep = n;
+    document.querySelectorAll('.val-step').forEach(function (el) {
+      el.classList.toggle('on', parseInt(el.getAttribute('data-step'), 10) === n);
+    });
+    var fill = $('val-progress-fill');
+    if (fill) fill.style.width = (Math.round((n / 6) * 1000) / 10) + '%';
+    var lab = $('val-progress-label');
+    if (lab) lab.textContent = 'Paso ' + n + ' de 6';
+    var meta = WIZ_META[n];
+    if (meta) {
+      if ($('val-step-title')) $('val-step-title').textContent = meta.title;
+      if ($('val-step-sub')) $('val-step-sub').textContent = meta.sub;
+    }
+    var back = $('val-wiz-back');
+    var next = $('val-wiz-next');
+    if (back) {
+      back.disabled = n === 1;
+      back.textContent = n === 6 ? '← Atrás' : '← Atrás';
+    }
+    if (next) next.textContent = n === 6 ? 'Enviar ✓' : 'Continuar →';
+    hideErr();
+    if (n === 6) fillValReview();
+    window.scrollTo(0, 0);
+  }
+
+  function wireWizard() {
+    var next = $('val-wiz-next');
+    var back = $('val-wiz-back');
+    if (next) next.onclick = function () {
+      if (wizStep === 1) {
+        var errs = validateCriticos();
+        if (errs.length) {
+          showErr('Faltan o están mal datos obligatorios: ' + errs.join('; ') + '.');
+          return;
+        }
+      }
+      if (wizStep === 6) {
+        if ($('val-form') && $('val-form').requestSubmit) $('val-form').requestSubmit();
+        else submitForm({ preventDefault: function () {} });
+        return;
+      }
+      showWizStep(wizStep + 1);
+    };
+    if (back) back.onclick = function () {
+      if (wizStep > 1) showWizStep(wizStep - 1);
+    };
+  }
+
   function showPrivacyThenForm() {
     $('val-invalid').classList.remove('on');
     $('val-form-wrap').style.display = 'none';
@@ -908,6 +1172,7 @@
       ok.onclick = function () {
         $('val-privacy').style.display = 'none';
         $('val-form-wrap').style.display = 'block';
+        showWizStep(1);
         window.scrollTo(0, 0);
       };
     }
@@ -928,8 +1193,11 @@
     wireCirujanoAc();
     wireDiagSinonimos();
     wireAlertaSeguridadLive();
-    wireEstudios();
     wireManualEstudios();
+    wireValMic();
+    wireValChoices();
+    wireEstudioAdjuntos();
+    wireWizard();
     $('v-meds').appendChild(medRow(null));
     $('v-med-add').onclick = function () { $('v-meds').appendChild(medRow(null)); refreshAlertaSeguridadPaciente(); };
     refreshAlertaSeguridadPaciente();
