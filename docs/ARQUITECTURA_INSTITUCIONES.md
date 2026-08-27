@@ -99,7 +99,7 @@ Conclusión: **misma plantilla A4**, header parametrizable + pie/colegio según 
 
 ## Semilla de catálogo (todas Córdoba)
 
-`desarrollado=true`: Mayo, Aero, Misericordia, Córdoba, San Roque. Allende: patrón confirmado, flujo **no** desarrollado. El select de la PWA **no** lista los 3 públicos hasta el lote 2 (`#f-san` ∩ `sanatorios_permitidos`).
+`desarrollado=true`: Mayo, Aero, Misericordia, Córdoba, San Roque. Allende: patrón confirmado, flujo **no** desarrollado. Select PWA **12.40**: esos 5 ∩ `sanatorios_permitidos` (admin ve los 5). Los 3 públicos se appendaron **solo** al array de Huerta (SQL **013**).
 
 ### Públicos Capital — patrón SISalud (`sin_sistema` / `sisalud` cuando se confirme)
 

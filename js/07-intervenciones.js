@@ -683,6 +683,7 @@ function cargarForm(i){
   sv('f-fecha',i.fecha);sv('f-pac',i.pac);
   sv('f-edad',i.edad);sv('f-sexo',i.sexo||'');sv('f-dni',i.dni);
   sv('f-peso',i.peso||'');sv('f-ciru',i.ciru);sv('f-serv',i.serv||'');sv('f-diag',i.diag||'');
+  if(typeof AfSanatoriosPlan!=='undefined')AfSanatoriosPlan.filterSelect();
   sv('f-san',i.san);onSanChange();sv('f-mayo-sector',i.mayo_sector||'');sv('f-mayo-quir',i.mayo_quir||'');sv('f-mayo-tipociru',i.mayo_tipociru||'');sv('f-mayo-posicion',i.mayo_posicion||'');if(i.mayo_sector)setTimeout(function(){updateMayoCamas();sv('f-mayo-cama',i.mayo_cama||'');},50);sv('f-sala',i.sala||'');sv('f-cama',i.cama||'');sv('f-sala-sisalud',i.sala||'');sv('f-cama-sisalud',i.cama||'');
   sv('f-obra',i.obra);sv('f-afil',sanitizeAfil(i.afil));
   var ob=document.getElementById('f-ob');if(ob)ob.checked=!!i.ob;
