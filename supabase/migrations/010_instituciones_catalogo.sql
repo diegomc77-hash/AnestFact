@@ -98,7 +98,8 @@ INSERT INTO public.anesfact_destino_final (id, label, sort) VALUES
 ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, sort = EXCLUDED.sort;
 
 INSERT INTO public.anesfact_redes (id, nombre) VALUES
-  ('canada', 'Sanatorio de la Cañada')
+  ('canada', 'Sanatorio de la Cañada'),
+  ('allende', 'Sanatorio Allende')
 ON CONFLICT (id) DO UPDATE SET nombre = EXCLUDED.nombre;
 
 -- ═══════════════════════════════════════════════════════════
@@ -124,9 +125,9 @@ VALUES
     true
   ),
   (
-    'allende',
-    'Sanatorio Allende',
-    ARRAY['Clínica Allende'],
+    'allende_cerro',
+    'Sanatorio Allende — Cerro de las Rosas',
+    '{}',
     'sistema_propio',
     'sistema_propio',
     jsonb_build_object(
@@ -135,7 +136,27 @@ VALUES
       'inyeccion', 'a_confirmar',
       'flujo', 'Foja en ejecutable Windows legado; el informe se inyecta después en la app web del sanatorio.'
     ),
-    NULL, NULL,
+    'allende',
+    'Cerro de las Rosas',
+    'privado',
+    'Córdoba Capital',
+    true,
+    false
+  ),
+  (
+    'allende_nueva_cordoba',
+    'Sanatorio Allende — Nueva Córdoba',
+    '{}',
+    'sistema_propio',
+    'sistema_propio',
+    jsonb_build_object(
+      'portal_url', 'https://app.sanatorioallende.com',
+      'carga_local', 'exe_legacy',
+      'inyeccion', 'a_confirmar',
+      'flujo', 'Foja en ejecutable Windows legado; el informe se inyecta después en la app web del sanatorio.'
+    ),
+    'allende',
+    'Nueva Córdoba',
     'privado',
     'Córdoba Capital',
     true,

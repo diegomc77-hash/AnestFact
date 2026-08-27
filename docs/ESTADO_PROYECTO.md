@@ -11,7 +11,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## Qué se hizo (más reciente primero)
 
-- 2026-08-27 — Catálogo `anesfact_instituciones` (migración `010_instituciones_catalogo.sql`): 39 filas. Mayo geclisa/geclisa, Allende sistema_propio + meta exe→app, Aeronáutico sin_sistema/evweb. Incluye Clínica Privada Córdoba (`a_confirmar`). La Cañada `red_id=canada` + 6 sedes. **No** se tocó JS, planes ni `imprimir-aero.js`.
+- 2026-08-27 — Allende: 2 sedes (Cerro de las Rosas, Nueva Córdoba), `red_id=allende`. Nombre **Sanatorio Allende** (no Clínica Allende). SQL **011**. Catálogo 40 filas.
 - 2026-08-27 — Brief instituciones (3 patrones). Doc `docs/ARQUITECTURA_INSTITUCIONES.md`.
 
 - 2026-08-27 — Dock 2 filas (PWA **12.38**): 4 arriba (Fojas, Preop, Geclisa, evweb) + 3 abajo (Sanatorios, Legales, Herramientas). Tamaños Chico 52/20/10, Mediano 64/26/12, Grande 76/32/14. En Pages: dock 336×164, `scrollWidth === clientWidth`, 7 íconos visibles. **Cerrado en Pages**.
@@ -34,7 +34,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - Foja-bar fija + contraste valoración (12.36): **cerrado en Pages**.
 - Ruta alternativa por DNI en GECLISA (pacientes de alta): `chrome-extension-geclisa-batch/NOTES_RUTA_HC_POR_DNI.md` — no implementada.
 - Correlativo QR entre equipos (servidor): diferido.
-- Instituciones: catálogo en base (**010** aplicada, 39 filas). UI y flujos nuevos: no. Plan Huerta cubierto (Mayo, Aero, Allende vía alias, Clínica Privada Córdoba).
+- Instituciones: catálogo permanente en git + Supabase (**010** + **011**). Habilitar después = `sanatorios_permitidos`, no re-sembrar. Plan Huerta aún dice `Clínica Allende` (string legado; no tocado).
 - SISalud: cómo se sube la foja/PDF — **no investigar todavía**.
 - Header A4 / pie ADAARC: siguiente frente; no tocado.
 

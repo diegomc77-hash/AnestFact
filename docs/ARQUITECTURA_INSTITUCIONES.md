@@ -114,7 +114,7 @@ Hospital Domingo Funes (Punilla), Hospital Romagosa (Deán Funes), Hospital Artu
 | Nombre | tipo / destino hoy |
 |---|---|
 | Sanatorio Mayo | `geclisa` / `geclisa` (desarrollado) |
-| Sanatorio Allende | `sistema_propio` / `sistema_propio` (patrón sí, flujo no) |
+| Sanatorio Allende | `sistema_propio` / `sistema_propio` (patrón sí, flujo no). Red `allende`: sedes **Cerro de las Rosas** y **Nueva Córdoba**. Nombre: Sanatorio Allende (no «Clínica Allende»). |
 | Hospital Privado Universitario | `a_confirmar` |
 | Clínica Reina Fabiola | `a_confirmar` |
 | Clínica Vélez Sarsfield | `a_confirmar` |
@@ -132,6 +132,8 @@ Más: Hospital Aeronáutico = `sin_sistema` / `evweb` (desarrollado para print +
 ### Red interior — sistema a confirmar
 
 Sanatorio de la Cañada: Córdoba Capital, Villa María, Río Tercero, Cruz del Eje, Cosquín, Capilla del Monte. Una `red_id`, una fila por sede.
+
+Sanatorio Allende: Cerro de las Rosas y Nueva Córdoba. Misma `red_id`, mismo `meta` (exe → app.sanatorioallende.com) en ambas sedes.
 
 ## Qué no hacer todavía
 
