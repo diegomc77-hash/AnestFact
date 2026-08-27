@@ -7,11 +7,14 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- 2026-08-27 — Dock 2 filas (4+3) + tamaños grandes. Visual PWA **12.38**. Esperando Pages (`cache:'no-store'`). No tocar `S.cur` / `fill.js`.
+- 2026-08-27 — Semilla catálogo instituciones (SQL **010**). Sin UI. PWA 12.38 no lee esta tabla.
 
 ## Qué se hizo (más reciente primero)
 
-- 2026-08-27 — Dock 2 filas (PWA **12.38**): 4 arriba (Fojas, Preop, Geclisa, evweb) + 3 abajo (Sanatorios, Legales, Herramientas). Tamaños Chico 52/20/10, Mediano 64/26/12, Grande 76/32/14. Toast y padding-bottom vía `--dock-clear` (148 / 162 / 190). Medido a 390px: Grande SVG 32×32, dock 336×164, 7 ítems sin scroll, toast 12px encima del dock.
+- 2026-08-27 — Catálogo `anesfact_instituciones` (migración `010_instituciones_catalogo.sql`): 39 filas. Mayo geclisa/geclisa, Allende sistema_propio + meta exe→app, Aeronáutico sin_sistema/evweb. Incluye Clínica Privada Córdoba (`a_confirmar`). La Cañada `red_id=canada` + 6 sedes. **No** se tocó JS, planes ni `imprimir-aero.js`.
+- 2026-08-27 — Brief instituciones (3 patrones). Doc `docs/ARQUITECTURA_INSTITUCIONES.md`.
+
+- 2026-08-27 — Dock 2 filas (PWA **12.38**): 4 arriba (Fojas, Preop, Geclisa, evweb) + 3 abajo (Sanatorios, Legales, Herramientas). Tamaños Chico 52/20/10, Mediano 64/26/12, Grande 76/32/14. En Pages: dock 336×164, `scrollWidth === clientWidth`, 7 íconos visibles. **Cerrado en Pages**.
 - 2026-08-26 — Wizard de 6 pasos en `valoracion.html` (PWA **12.37**). IDs y payload iguales; parsers ocultos; adjuntos solo `{nombre,mime,size}`. Esperando Pages.
 - 2026-08-26 — Foja-bar fija + contraste valoración paciente (PWA **12.36**). Barra `position:fixed` (top 357.1875px en scroll 0/400/900). Disclaimer y labels `#E6EDF3`. **Cerrado en Pages**.
 - 2026-08-26 — Tarjeta QR (PWA **12.35**): lockup AnesFact + nombre del médico + # diario (localStorage, se reinicia a las 00:00 AR) + fecha corta + QR + pie. Imprimir y Guardar imagen. Logo alrededor, no en los módulos. **Cerrado en Pages**.
@@ -26,11 +29,14 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## Pendiente / conocido
 
-- Dock 2 filas + tamaños (12.38): esperando verificación de Diego en Pages. PWA: reabrir del todo (SW cache-first `ignoreSearch`).
-- Wizard valoración 6 pasos (12.37): esperando verificación de Diego en Pages (viaja en el mismo SW 12.38). Token de prueba propio para e2e.
+- Dock 2 filas + tamaños (12.38): **cerrado en Pages**.
+- Wizard valoración 6 pasos (12.37): esperando e2e de Diego en Pages (viaja en el SW 12.38). Token de prueba propio.
 - Foja-bar fija + contraste valoración (12.36): **cerrado en Pages**.
 - Ruta alternativa por DNI en GECLISA (pacientes de alta): `chrome-extension-geclisa-batch/NOTES_RUTA_HC_POR_DNI.md` — no implementada.
 - Correlativo QR entre equipos (servidor): diferido.
+- Instituciones: catálogo en base (**010** aplicada, 39 filas). UI y flujos nuevos: no. Plan Huerta cubierto (Mayo, Aero, Allende vía alias, Clínica Privada Córdoba).
+- SISalud: cómo se sube la foja/PDF — **no investigar todavía**.
+- Header A4 / pie ADAARC: siguiente frente; no tocado.
 
 ## Decisiones tomadas (no repreguntar)
 
