@@ -7,11 +7,11 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- 2026-08-28 — SQL **020** + PWA **12.45**: Punto 3 A+B (guardar fail-closed + trigger sync Demo). Esperando Pages (`cache:'no-store'`).
+- Nada de planes pendiente. Punto 3 **cerrado en Pages.**
 
 ## Qué se hizo (más reciente primero)
 
-- 2026-08-28 — SQL **020** + PWA **12.45**: `guardar()` espera assert + consume Demo antes de localStorage/sync. RPC caída → toast «No se pudo verificar el plan. Reintentá.» (no deja pasar). Trigger en `anesfact_datos` rechaza INSERT/UPDATE `anesfact_sync_*` de Demo vencida o `fojas_semana >= 5`. SELECT/pull intacto. `nuevaInter()` no consume.
+- 2026-08-28 — SQL **020** + PWA **12.45**: Punto 3 A+B. **Cerrado en Pages.** Guardar Pro igual que siempre; `AF_TEST_RPC_FAIL` → toast fail-closed y no persiste; al bajar el flag vuelve «Guardado ✓». Trigger sync Demo vencida / `fojas_semana >= 5`. `nuevaInter()` no consume.
 - 2026-08-28 — SQL **019** + PWA **12.44**: INSERT Demo no inflable + M.P. única. **Cerrado en Pages.**
 - 2026-08-28 — SQL **018** + PWA **12.43**: plan **max** (2 lugares). **Cerrado en Pages.**
 - 2026-08-28 — SQL **017** + PWA **12.42** (lote 3 planes): validación 1 público / N no-públicos (Aero cuenta). Rechaza, no recorta. `af_admin_set_sanatorios` + override `privados_max_override` auditado. `af_assert_plan(..., p_sanatorio)`. DEFAULTS.pro vacío. Guardar plan ya no une el paquete de 4.
