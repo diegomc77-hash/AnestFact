@@ -2,14 +2,16 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
-- PWA `CACHE_V`: **12.50**
+- PWA `CACHE_V`: **12.51**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-29 — PWA **12.50**: catálogo cirujanos + quirófanos Hospital Córdoba. Esperando Pages (`cache:'no-store'`).
+- 2026-08-29 — PWA **12.51**: 4 quirófanos Hospital Misericordia. Esperando Pages (`cache:'no-store'`).
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-08-29 — PWA **12.51**: Misericordia `Quirófano 1–4` (select). San Roque sigue texto. Sin nómina de cirujanos. Córdoba 9 / Mayo / Aero intactos.
 
 - 2026-08-29 — PWA **12.50**: `CIRUJANOS_POR_LUGAR['Hospital Córdoba']` (sin Jefe; Clara Huerta queda). 9 quirófanos en `AF_FOJA_INST` → select `#f-sala-inst`. Misericordia/San Roque sin catálogo. Mayo/Aero intactos.
 

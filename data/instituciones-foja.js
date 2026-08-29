@@ -45,7 +45,13 @@ var AF_FOJA_INST = {
       mode: 'png',
       asset: 'assets/foja-headers/hospital-misericordia-header.png',
       oficial: true
-    }
+    },
+    quirofanos: [
+      'Quirófano 1',
+      'Quirófano 2',
+      'Quirófano 3',
+      'Quirófano 4'
+    ]
   },
   'Hospital San Roque': {
     id: 'h_san_roque',

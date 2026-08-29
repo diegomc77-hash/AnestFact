@@ -1,6 +1,6 @@
 /**
  * Catálogo Hospital Córdoba: cirujanos + quirófanos.
- * Mayo/Aero intactos; Misericordia y San Roque sin catálogo.
+ * Mayo/Aero intactos; Misericordia 4 quirófanos sin nómina; San Roque sin catálogo.
  */
 import fs from 'fs';
 import path from 'path';
@@ -63,12 +63,15 @@ if (q.length !== 9) fail('Córdoba debe tener 9 quirófanos, tiene ' + q.length)
 if (q.indexOf('Quirófano 6') < 0 || q.indexOf('Quirófano Quemados 2') < 0 || q.indexOf('Quirófano Oftalmología') < 0) {
   fail('etiquetas de quirófano: ' + q.join(', '));
 }
-if (context.afFojaQuirofanos('Hospital Misericordia').length) fail('Misericordia sin select de quirófano');
+if (context.afFojaQuirofanos('Hospital Misericordia').length !== 4) fail('Misericordia debe tener 4 quirófanos');
+if (context.afFojaQuirofanos('Hospital Misericordia').indexOf('Quirófano 4') < 0) fail('Misericordia Quirófano 4');
 if (context.afFojaQuirofanos('Hospital San Roque').length) fail('San Roque sin select de quirófano');
+if (context.afFojaQuirofanos('Sanatorio Mayo').length) fail('Mayo no usa quirofanos de AF_FOJA_INST');
+if (context.afFojaQuirofanos('Hospital Aeronáutico').length) fail('Aero no usa quirofanos de AF_FOJA_INST');
 
 const nueva = read('views/nueva.html');
 if (nueva.indexOf('Instituto del Quemado') < 0) fail('#f-serv sin Instituto del Quemado');
 if (nueva.indexOf('Cirugía de Tórax y Cardiovascular') < 0) fail('#f-serv sin Tórax y Cardiovascular');
 if (nueva.indexOf('id="f-sala-inst"') < 0) fail('falta select f-sala-inst');
 
-process.stdout.write('OK    Córdoba catálogo + 9 quirófanos; Mayo intacto; Misericordia/Roque sin nómina\n');
+process.stdout.write('OK    Córdoba 9 + Misericordia 4 quirófanos; Roque/Mayo/Aero sin este select; sin nómina Misericordia\n');

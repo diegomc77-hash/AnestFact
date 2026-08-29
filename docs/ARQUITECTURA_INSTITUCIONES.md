@@ -89,12 +89,13 @@ Compose: `"mode": "compose", "oficial": false, "lineas": ["HOSPITAL", "CÓRDOBA"
 Lo que **no** es “solo el header” y conviene tenerlo en `meta` / `destino_final`, sin tocar el cuerpo clínico:
 
 - Pie impreso: ADAARC solo si `destino_final !== sisalud`. El lockup de la app no cambia.
-- Sala/cama: selects Aero intactos; texto libre (`#f-sala-sisalud` / `#f-cama-sisalud`) si SISalud **sin** catálogo de quirófanos. Si `AF_FOJA_INST[lugar].quirofanos` existe (hoy Hospital Córdoba), `#f-sala-inst` select → `S.cur.sala`. Misericordia y San Roque siguen texto.
+- Sala/cama: selects Aero intactos; texto libre (`#f-sala-sisalud` / `#f-cama-sisalud`) si SISalud **sin** catálogo de quirófanos. Si `AF_FOJA_INST[lugar].quirofanos` existe (Córdoba, Misericordia), `#f-sala-inst` select → `S.cur.sala`. San Roque sigue texto.
 
 ### Quirófanos por institución (dato de uso, no web)
 
 - **Hospital Córdoba** (9, siempre visibles, sin filtrar por especialidad): Quirófano 1–6, Quirófano Quemados 1, Quirófano Quemados 2, Quirófano Oftalmología.
-- **Hospital Misericordia** (anotado, **no implementado**): 4 quirófanos numerados 1, 2, 3 y 4.
+- **Hospital Misericordia** (4, siempre visibles): Quirófano 1, 2, 3 y 4.
+- **Hospital San Roque**: sin dato; campo texto libre.
 
 Conclusión: **misma plantilla A4**, header parametrizable + pie/colegio según `destino_final`. No clonar `imprimir-aero.js` por hospital.
 
