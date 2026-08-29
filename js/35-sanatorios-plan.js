@@ -1,19 +1,19 @@
 /**
  * Sanatorios permitidos según plan (servidor = fuente; cliente filtra UI).
  * Select: catálogo desarrollado ∩ permitidos (match exacto de nombre).
- * Admin: todos los desarrollado. DEFAULTS.pro no se amplía (lote 2 = solo Huerta).
+ * Admin: todos los desarrollado. DEFAULTS.pro arranca vacío (admin carga lugar por lugar).
  */
 (function (global) {
   var DEFAULTS = {
     demo: ['Hospital Aeronáutico'],
     basico: ['Hospital Aeronáutico', 'Sanatorio Mayo'],
-    pro: ['Hospital Aeronáutico', 'Sanatorio Mayo', 'Clínica Allende', 'Clínica Privada Córdoba'],
+    pro: [],
     bloqueado: []
   };
 
   function planSanatorios() {
     var fromProfile = USER_PROFILE && USER_PROFILE.sanatorios_permitidos;
-    if (fromProfile && fromProfile.length) return fromProfile.slice();
+    if (Array.isArray(fromProfile)) return fromProfile.slice();
     var plan = (typeof USER_PLAN !== 'undefined' && USER_PLAN) ? USER_PLAN : 'demo';
     return (DEFAULTS[plan] || DEFAULTS.demo).slice();
   }

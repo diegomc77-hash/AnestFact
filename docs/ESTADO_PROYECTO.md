@@ -2,17 +2,17 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
-- PWA `CACHE_V`: **12.41**
+- PWA `CACHE_V`: **12.42**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-28 — Lote 2 planes (SQL **016**): recorte Huerta a Aero + Mayo + Hospital Córdoba. PWA sigue **12.41** (el select lee el array de nube). Esperando Pages (`cache:'no-store'`). No guardar su plan en el panel hasta el lote 3 (014 re-une el default de 4).
-- Lote 3 planes (no empezado): validación 1 público / N lugares (Aero cuenta), `af_admin_set_sanatorios`, DEFAULTS.pro vacío.
+- 2026-08-28 — Lote 3 planes (PWA **12.42** + SQL **017**): 1 público / N lugares (Aero cuenta), `af_admin_set_sanatorios`, override auditado, DEFAULTS.pro vacío. Esperando Pages (`cache:'no-store'`).
 
 ## Qué se hizo (más reciente primero)
 
-- 2026-08-28 — SQL **016** (lote 2 planes): Huerta queda con 3 lugares (Aero, Mayo, Hospital Córdoba). Salieron Misericordia, San Roque, Clínica Allende y Clínica Privada Córdoba. Admin y Demo no se tocaron. PWA no bumpeó (12.41).
+- 2026-08-28 — SQL **017** + PWA **12.42** (lote 3 planes): validación 1 público / N no-públicos (Aero cuenta). Rechaza, no recorta. `af_admin_set_sanatorios` + override `privados_max_override` auditado. `af_assert_plan(..., p_sanatorio)`. DEFAULTS.pro vacío. Guardar plan ya no une el paquete de 4.
+- 2026-08-28 — SQL **016** (lote 2 planes): Huerta Aero + Mayo + Hospital Córdoba. **Cerrado en Pages.**
 - 2026-08-28 — SQL **015** + PWA **12.41** (lote 1 planes): Demo 1 mes y 5 fojas/semana. **Cerrado en Pages.** Contador ya no se PATCHA desde el cliente; `af_consume_foja` + tope en `af_assert_plan`. Límite real Demo no se probó (no hay login de prueba).
 - 2026-08-27 — SQL **014**: `af_admin_set_plan` une default del plan + extras que el usuario ya tenía. Guardar Pro sobre Huerta deja los 3 hospitales. Sin extras (admin/demo) el array queda igual al default. Ya no es riesgo activo.
 - 2026-08-27 — Lote 2 (PWA **12.40**). Select armado desde catálogo `desarrollado`. Admin: los 5. Huerta: Aero + Mayo + Misericordia + Córdoba + San Roque. SQL **013** solo su fila (array quedó en 7; Allende/Privada Córdoba siguen en el array, no en el select). Allende fuera.
@@ -40,8 +40,8 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - Foja-bar fija + contraste valoración (12.36): **cerrado en Pages**.
 - Ruta alternativa por DNI en GECLISA (pacientes de alta): `chrome-extension-geclisa-batch/NOTES_RUTA_HC_POR_DNI.md` — no implementada.
 - Correlativo QR entre equipos (servidor): diferido.
-- Instituciones: catálogo **010**–**016** (013 append SISalud a Huerta; **016** la recorta a Aero+Mayo+Córdoba; 014 = Guardar plan une default; 015 = Demo mes/5 fojas). Habilitar resto = `sanatorios_permitidos` + `desarrollado`, no re-sembrar.
-- Planes (confirmado 2026-08-28): Aero cuenta como lugar (no canal gratis). 1 público máx por cuenta, exclusivo. Admin ve todos sin cupo. Firma sigue atada a la cuenta, no a la foja — regla distinta al tope de lugares (antifraude de cuenta compartida). DEFAULTS.pro vacío y `af_admin_set_sanatorios` = lote 3.
+- Instituciones: catálogo **010**–**017** (016 recorte Huerta; **017** tope de lugares en servidor). Habilitar resto = `sanatorios_permitidos` + `desarrollado`, no re-sembrar.
+- Planes (confirmado 2026-08-28): Aero cuenta como lugar. 1 público máx. Admin ve todos sin cupo. Firma atada a la cuenta, no a la foja. DEFAULTS.pro vacío; lugares se cargan con `af_admin_set_sanatorios`. Pro >3 no-públicos solo con `privados_max_override`.
 - SISalud: cómo se sube la foja/PDF — **no investigar todavía**.
 - PNG oficiales de header Córdoba / San Roque: cuando existan, reemplazan compose (`oficial: false`).
 

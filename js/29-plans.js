@@ -86,18 +86,25 @@ function loadUserPlan(){
 }
 
 /** Consulta servidor (af_assert_plan). Fallback local si RPC no desplegada. */
+function afSanatorioAssertNombre(){
+  if(typeof S !== 'undefined' && S.cur && S.cur.san) return String(S.cur.san);
+  var el = document.getElementById('f-san');
+  return el && el.value ? String(el.value) : '';
+}
+
 function assertPlanServer(funcion){
   if(typeof AF_AUTH === 'undefined' || !AF_AUTH.isLoggedIn || !AF_AUTH.isLoggedIn()){
     return Promise.resolve({ ok: false, error: 'no_auth' });
   }
-  var cacheKey = funcion + ':' + (USER_PLAN || '');
+  var san = afSanatorioAssertNombre();
+  var cacheKey = funcion + ':' + (USER_PLAN || '') + ':' + san;
   if(_planAssertCache[cacheKey] && (Date.now() - _planAssertCache[cacheKey].t) < 15000){
     return Promise.resolve(_planAssertCache[cacheKey].v);
   }
   return fetch(afSupabaseUrl() + '/rest/v1/rpc/af_assert_plan', {
     method: 'POST',
     headers: afSupabaseHeaders({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify({ p_feature: funcion || '' })
+    body: JSON.stringify({ p_feature: funcion || '', p_sanatorio: san })
   }).then(function(r){
     if(!r.ok) throw new Error('rpc '+r.status);
     return r.json();
@@ -166,7 +173,7 @@ function solicitarActivacionPlan(){
   var nombre=(USER_PROFILE&&USER_PROFILE.nombre)||(localStorage.getItem('af_anest_nombre')||'');
   var wantEl=document.getElementById('plan-modal-want');
   var planPedido=(wantEl&&wantEl.value)||'consultar';
-  var planLabels={basico:'Básico (Aeronáutico + Mayo)',pro:'Pro (más sanatorios)',consultar:'No sé — que me contacten'};
+  var planLabels={basico:'Básico (hasta 2 lugares; Aero cuenta)',pro:'Pro (hasta 3 lugares; más lo carga el admin)',consultar:'No sé — que me contacten'};
   var planLabel=planLabels[planPedido]||planPedido;
   var btn=document.getElementById('plan-modal-ask');
   if(btn){ btn.disabled=true; afSetTileLabel(btn,'Enviando…'); }
@@ -243,6 +250,12 @@ function handleAssertFail(res, funcion){
   if(res.error === 'bloqueado'){ mostrarMensajeBloqueado(); return false; }
   if(res.error === 'demo_vencido'){ mostrarDemoVencido(); return false; }
   if(res.error === 'limite_semanal'){ mostrarLimiteSemanal(); return false; }
+  if(res.error === 'sanatorio_no_permitido'){
+    if(typeof showPlanModal === 'function'){
+      showPlanModal('Sanatorio no incluido', 'Tu plan no incluye "' + (res.sanatorio || '') + '". Elegí uno permitido o pedí ampliar el plan.');
+    }
+    return false;
+  }
   if(res.error === 'upgrade'){ mostrarUpgrade(funcion || res.feature); return false; }
   if(res.ok === false && !res.local){ mostrarUpgrade(funcion); return false; }
   if(res.local === true && res.ok === false){
@@ -334,8 +347,8 @@ function refreshPlanCardUi(){
   if(actual) actual.textContent = 'Plan actual: ' + plan;
   var texts = {
     demo: 'Demo: 1 mes, 5 fojas/semana, sin imprimir ni GECLISA. Pedí Básico o Pro cuando quieras.',
-    basico: 'Básico: Aeronáutico + Mayo, fojas e impresión. Podés pedir pasar a Pro cuando quieras.',
-    pro: 'Pro: más sanatorios. Si necesitás otro arreglo, pedí cambio igual.',
+    basico: 'Básico: hasta 2 lugares (Aero cuenta) y 1 hospital público. Pedí Pro si necesitás más.',
+    pro: 'Pro: hasta 3 lugares (Aero cuenta) y 1 hospital público. Más lugares los carga el admin.',
     bloqueado: 'Cuenta suspendida. Pedí reactivación acá.'
   };
   if(detail) detail.textContent = texts[plan] || ('Plan: ' + plan);

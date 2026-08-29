@@ -80,13 +80,29 @@ function renderAdminUsers(rows){
       +(u.rol === 'admin' ? ' <span class="admin-badge admin-badge-admin">admin</span>' : '')+'</td>'
       +'<td class="admin-actions">'
       +'<button type="button" class="btn btn-g admin-save" data-uid="'+adminEscape(uid)+'" style="width:auto;padding:6px 10px;font-size:11px">Guardar plan</button>'
-      +'</td></tr>';
+      +'</td></tr>'
+      +'<tr class="admin-san-row"><td colspan="6">'
+      +'<div class="admin-sub" style="margin-bottom:4px">Lugares (un nombre por línea). Tope extra &gt;3 solo si hace falta.</div>'
+      +'<textarea class="fi admin-sans" data-uid="'+adminEscape(uid)+'" rows="3" style="width:100%;font-size:12px">'
+      +adminEscape((u.sanatorios_permitidos||[]).join('\n'))+'</textarea>'
+      +'<div style="display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap">'
+      +'<label class="admin-sub" style="margin:0">Tope extra <input class="fi admin-override" data-uid="'+adminEscape(uid)+'" data-orig="'
+      +(u.privados_max_override != null ? String(u.privados_max_override) : '')
+      +'" type="number" min="4" step="1" placeholder="—" style="width:72px;font-size:12px;padding:6px" value="'
+      +(u.privados_max_override != null ? String(u.privados_max_override) : '')+'"></label>'
+      +'<button type="button" class="btn btn-s admin-save-sans" data-uid="'+adminEscape(uid)+'" style="width:auto;padding:6px 10px;font-size:11px">Guardar lugares</button>'
+      +'</div></td></tr>';
   });
   html += '</tbody></table></div>';
   box.innerHTML = html;
   box.querySelectorAll('.admin-save').forEach(function(btn){
     btn.addEventListener('click', function(){
       adminSaveUserPlan(btn.getAttribute('data-uid'));
+    });
+  });
+  box.querySelectorAll('.admin-save-sans').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      adminSaveUserLugares(btn.getAttribute('data-uid'));
     });
   });
 }
@@ -289,6 +305,39 @@ function adminSaveUserPlan(uid){
         adminSetStatus('No se pudo guardar: ' + msg, false);
       }
     });
+}
+
+function adminParseLugares(text){
+  return String(text || '').split(/\r?\n/).map(function(s){ return s.trim(); }).filter(Boolean);
+}
+
+function adminSaveUserLugares(uid){
+  if(!isAdmin()) return;
+  var ta = document.querySelector('.admin-sans[data-uid="'+uid+'"]');
+  var ovEl = document.querySelector('.admin-override[data-uid="'+uid+'"]');
+  if(!ta) return;
+  var names = adminParseLugares(ta.value);
+  var ovRaw = ovEl ? String(ovEl.value || '').trim() : '';
+  var ovOrig = ovEl ? String(ovEl.getAttribute('data-orig') || '') : '';
+  adminSetStatus('Guardando lugares…', null);
+  var chain = Promise.resolve();
+  if(ovRaw !== ovOrig){
+    var pMax = ovRaw === '' ? null : parseInt(ovRaw, 10);
+    if(ovRaw !== '' && (!isFinite(pMax) || pMax <= 3)){
+      adminSetStatus('El tope extra tiene que ser mayor a 3, o vacío.', false);
+      return;
+    }
+    chain = adminRpc('af_admin_set_privados_override', { p_user_id: uid, p_max: pMax });
+  }
+  chain.then(function(){
+    return adminRpc('af_admin_set_sanatorios', { p_user_id: uid, p_nombres: names });
+  }).then(function(){
+    toast('Lugares actualizados ✓');
+    adminSetStatus('Lugares guardados', true);
+    loadAdminPanel();
+  }).catch(function(e){
+    adminSetStatus('No se pudo guardar lugares: ' + (e.message || e), false);
+  });
 }
 
 function goAdminGuarded(){

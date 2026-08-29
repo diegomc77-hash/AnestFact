@@ -158,6 +158,7 @@ body:has(#view-nueva.active) #toast,body:has(#view-foja.active) #toast{bottom:10
 .admin-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .admin-table{width:100%;border-collapse:collapse;font-size:12px}
 .admin-table th,.admin-table td{border-bottom:1px solid var(--border);padding:8px 6px;text-align:left;vertical-align:top}
+.admin-table tr.admin-san-row td{border-bottom:1px solid var(--border);padding:4px 6px 12px}
 .admin-table th{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
 .admin-sub{font-size:10px;color:var(--text3);margin-top:2px;word-break:break-all}
 .admin-code{font-size:10px;color:var(--yellow)}
