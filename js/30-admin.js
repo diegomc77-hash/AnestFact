@@ -261,6 +261,40 @@ function loadAdminPlanRequests(){
   });
 }
 
+function loadAdminDemoAlerts(){
+  var box = document.getElementById('admin-demo-alerts');
+  if(!box) return;
+  if(!isAdmin()) return;
+  box.innerHTML = '<p class="admin-muted">Cargando…</p>';
+  fetch(afSupabaseUrl() + '/rest/v1/anesfact_plan_audit?action=eq.demo_lugar_cluster&select=created_at,user_id,detail&order=created_at.desc&limit=30', {
+    headers: afSupabaseHeaders()
+  }).then(function(r){
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function(rows){
+    rows = rows || [];
+    if(!rows.length){
+      box.innerHTML = '<p class="admin-muted">Sin alertas de cluster en este momento.</p>';
+      return;
+    }
+    var html = '<ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.45">';
+    rows.forEach(function(row){
+      var d = row.detail || {};
+      var when = row.created_at ? String(row.created_at).slice(0, 16).replace('T', ' ') : '';
+      html += '<li style="margin-bottom:6px">'
+        + adminEscape(when) + ' · '
+        + adminEscape(d.lugar || 'lugar') + ' · '
+        + adminEscape(String(d.n_demo_7d != null ? d.n_demo_7d : '?')) + ' Demo en 7 días'
+        + (d.matricula_norm ? (' · MP ' + adminEscape(String(d.matricula_norm))) : '')
+        + '</li>';
+    });
+    html += '</ul>';
+    box.innerHTML = html;
+  }).catch(function(e){
+    box.innerHTML = '<p class="admin-muted" style="color:var(--red)">No se pudieron cargar alertas: '+adminEscape(e.message||e)+'</p>';
+  });
+}
+
 function loadAdminPanel(){
   if(!isAdmin()){
     adminSetStatus('Acceso denegado', false);
@@ -269,6 +303,7 @@ function loadAdminPanel(){
   adminSetStatus('Cargando…', null);
   _adminPlanFetch = null; // forzar lista fresca al abrir panel
   loadAdminPlanRequests();
+  loadAdminDemoAlerts();
   adminRpc('af_admin_list_users')
     .then(function(users){
       users = users || [];

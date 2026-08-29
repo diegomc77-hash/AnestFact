@@ -2,16 +2,17 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
-- PWA `CACHE_V`: **12.43**
+- PWA `CACHE_V`: **12.44**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-28 — Lote 3b planes (PWA **12.43** + SQL **018**): Básico 1 lugar, **Max** 2, Pro 3. Esperando Pages (`cache:'no-store'`). Lote 3 (017/12.42) queda con esta corrección de caps.
+- 2026-08-28 — SQL **019** + PWA **12.44**: INSERT Demo no inflable + M.P. única. Esperando Pages (`cache:'no-store'`). Punto 3 (guardar/sync vs tope Demo) **no implementado** — propuesta en el chat.
 
 ## Qué se hizo (más reciente primero)
 
-- 2026-08-28 — SQL **018** + PWA **12.43**: plan **max** (2 lugares). Básico pasa a 1. Pro sigue 1 público / 3 no-públicos. Huerta no se tocó.
+- 2026-08-28 — SQL **019** + PWA **12.44**: INSERT no-admin siempre Aero + reloj Demo + sin override. M.P. (dígitos) única; cluster Demo mismo lugar en 7 días → `anesfact_plan_audit` (no bloquea).
+- 2026-08-28 — SQL **018** + PWA **12.43**: plan **max** (2 lugares). **Cerrado en Pages.**
 - 2026-08-28 — SQL **017** + PWA **12.42** (lote 3 planes): validación 1 público / N no-públicos (Aero cuenta). Rechaza, no recorta. `af_admin_set_sanatorios` + override `privados_max_override` auditado. `af_assert_plan(..., p_sanatorio)`. DEFAULTS.pro vacío. Guardar plan ya no une el paquete de 4.
 - 2026-08-28 — SQL **016** (lote 2 planes): Huerta Aero + Mayo + Hospital Córdoba. **Cerrado en Pages.**
 - 2026-08-28 — SQL **015** + PWA **12.41** (lote 1 planes): Demo 1 mes y 5 fojas/semana. **Cerrado en Pages.** Contador ya no se PATCHA desde el cliente; `af_consume_foja` + tope en `af_assert_plan`. Límite real Demo no se probó (no hay login de prueba).

@@ -133,11 +133,18 @@ var AF_AUTH = (function(){
         email: email || getUserEmail() || '',
         nombre: nombre,
         matricula: mp,
-        matricula_especial: me || '',
-        // plan/rol los fuerza el trigger servidor (demo/user) — no confiar en el cliente
-        fojas_semana: 0,
-        activo: true
+        matricula_especial: me || ''
       })
+    }).then(function(r){
+      if(r.ok || r.status === 201 || r.status === 204) return true;
+      return r.text().then(function(t){
+        var msg = t || ('HTTP ' + r.status);
+        try {
+          var j = JSON.parse(t);
+          if(j && j.message) msg = j.message;
+        } catch (e1) {}
+        throw new Error(msg);
+      });
     });
   }
 
