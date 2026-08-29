@@ -2,16 +2,18 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
-- PWA `CACHE_V`: **12.48**
+- PWA `CACHE_V`: **12.49**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-28 — PWA **12.48** + Edge `af-qr-peek`: Lote A (contador por lugar, badge real, sin nómina Mayo en públicos). Esperando Pages (`cache:'no-store'`).
+- 2026-08-29 — PWA **12.49**: Lote B Instituciones (hub + colores públicos + filtro Fojas). Esperando Pages (`cache:'no-store'`).
 
 ## Qué se hizo (más reciente primero)
 
-- 2026-08-28 — PWA **12.48**: contador QR por institución; badge paciente vía `af-qr-peek` (si falla, vacío, nunca Mayo); públicos con especialidad genérica y cirujano a mano; `cfg_id` alineado. Mayo igual. Lote B (colores/hub) y quirófanos: después.
+- 2026-08-29 — PWA **12.49**: dock/vista «Instituciones»; tarjetas Córdoba / Misericordia / San Roque; colores `--san-cordoba` `#2563eb`, `--san-misericordia` `#7c3aed`, `--san-san-roque` `#a78bfa`; `home-san` con las mismas claves. Lote A **cerrado en Pages**.
+
+- 2026-08-28 — PWA **12.48**: contador QR por institución; badge paciente vía `af-qr-peek` (si falla, vacío, nunca Mayo); públicos con especialidad genérica y cirujano a mano; `cfg_id` alineado. Mayo igual. **Cerrado en Pages.**
 
 - 2026-08-28 — PWA **12.47**: selector «Este QR es para:» en Preop (si hay >1 lugar), persistencia `af_qr_lugar_<uid>`, tarjeta/toast con el nombre real. `af-qr-submit` usa `contexto.sanatorio` del token. Mayo igual. Badge paciente queda para sub-lote.
 
@@ -63,7 +65,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - Frontend y Edge Functions se publican por separado; confirmar uno no confirma el otro.
 - Título de Home / `document.title` leen `AF_CACHE_V`. Los `version:` de export/sync, tickets y planes no.
 - Paleta: 5 familias que no se pisan. GECLISA enviado y marca comparten `#22c55e` a propósito. Preoperatorio = gris + etiqueta, no un 6º matiz. Cola `#eab308` vs advertencia `#f59e0b` (reloj vs triángulo).
-- Dock: 3 tamaños en Ajustes (chico / mediano / grande). Default mediano. Clave `localStorage.af_dock_size`. Chico 52/20/10, mediano 64/26/12, grande 76/32/14 (ítem / SVG / etiqueta). Layout fijo 2 filas: 4 (Fojas, Preop, Geclisa, evweb) + 3 (Sanatorios, Legales, Herramientas). `--dock-clear` 148 / 162 / 190.
+- Dock: 3 tamaños en Ajustes (chico / mediano / grande). Default mediano. Clave `localStorage.af_dock_size`. Chico 52/20/10, mediano 64/26/12, grande 76/32/14 (ítem / SVG / etiqueta). Layout fijo 2 filas: 4 (Fojas, Preop, Geclisa, evweb) + 3 (Instituciones, Legales, Herramientas). `--dock-clear` 148 / 162 / 190.
 - CTAs de navegación/pedido → baldosas. Pills que se quedan: login, guardar formularios, GECLISA operativo (abrir/cola/copiar), Imprimir, + Nueva compacto, Ayuda/Escanear IA (submit de flujo).
 - Tarjeta QR: lockup alrededor (no en los módulos). # = orden de generación del día en ese dispositivo (`af_qr_orden_YYYY-MM-DD_<uid>`). Día = calendario Argentina. No es el n° de turno de la clínica.
 - Print SISalud: misma `imprimir-aero.js` (no clonar). Header 3 columnas (PNG oficial o compose). Pie ADAARC en papel SISalud se omite; app no. Sala/cama texto libre solo SISalud. Select = desarrollado ∩ permitidos (no el listado de 40). Huerta: un solo público (Hospital Córdoba). Admin prueba los 3 públicos.

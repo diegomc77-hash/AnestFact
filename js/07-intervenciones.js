@@ -195,12 +195,7 @@ function filterIntervs(list){
       return false;
     }
     if(mode==='fojas'){
-      if(san){
-        var s=(x.san||'').toLowerCase();
-        if(san==='mayo'&&s.indexOf('mayo')<0)return false;
-        if(san==='aero'&&(s.indexOf('aero')<0&&s.indexOf('aeron')<0))return false;
-        if(san==='otro'&&(s.indexOf('mayo')>=0||s.indexOf('aero')>=0||s.indexOf('aeron')>=0))return false;
-      }
+      if(san && afSanFilterKey(x.san)!==san)return false;
       if(est&&x.estado!==est)return false;
       if(desde&&x.fecha&&x.fecha<desde)return false;
       if(hasta&&x.fecha&&x.fecha>hasta)return false;
@@ -210,15 +205,35 @@ function filterIntervs(list){
     return afMatchSearchQuery(blob,q);
   });
 }
+function afSanFold(san){
+  try{
+    return String(san||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  }catch(e){
+    return String(san||'').toLowerCase();
+  }
+}
+function afSanFilterKey(san){
+  var s=afSanFold(san);
+  if(s.indexOf('mayo')>=0)return 'mayo';
+  if(s.indexOf('aero')>=0||s.indexOf('aeron')>=0)return 'aero';
+  if(s.indexOf('misericordia')>=0)return 'misericordia';
+  if(s.indexOf('roque')>=0)return 'san_roque';
+  if(s.indexOf('allende')>=0)return 'otro';
+  if(s.indexOf('cordoba')>=0)return 'cordoba';
+  return 'otro';
+}
 function afSanatorioCssClass(san){
-  var s=String(san||'').toLowerCase();
+  var s=afSanFold(san);
+  if(!s.trim())return '';
   if(s.indexOf('mayo')>=0)return 'inter-san-mayo';
   if(s.indexOf('aero')>=0||s.indexOf('aeron')>=0)return 'inter-san-aero';
   if(s.indexOf('allende')>=0)return 'inter-san-allende';
   if(s.indexOf('sucre')>=0)return 'inter-san-sucre';
   if(s.indexOf('privado')>=0)return 'inter-san-privado';
-  if(s.trim())return 'inter-san-otro';
-  return '';
+  if(s.indexOf('misericordia')>=0)return 'inter-san-misericordia';
+  if(s.indexOf('roque')>=0)return 'inter-san-san-roque';
+  if(s.indexOf('cordoba')>=0)return 'inter-san-cordoba';
+  return 'inter-san-otro';
 }
 
 function afIsAeroInterv(i){
@@ -538,12 +553,6 @@ function afInterCardsHtml(filtradas){
   });
   return html;
 }
-function afSanFilterKey(san){
-  var s=String(san||'').toLowerCase();
-  if(s.indexOf('mayo')>=0)return 'mayo';
-  if(s.indexOf('aero')>=0||s.indexOf('aeron')>=0)return 'aero';
-  return 'otro';
-}
 function afGoFojasFiltrado(sanKey){
   var sel=document.getElementById('home-san');
   if(sel)sel.value=sanKey||'';
@@ -552,14 +561,18 @@ function afGoFojasFiltrado(sanKey){
 function renderSanatoriosHub(){
   var host=document.getElementById('sanatorios-hub');
   if(!host)return;
-  var counts={mayo:0,aero:0,otro:0};
+  var counts={mayo:0,aero:0,cordoba:0,misericordia:0,san_roque:0,otro:0};
   (S.intervs||[]).forEach(function(x){
     if(!x||x.estado==='preoperatorio')return;
-    counts[afSanFilterKey(x.san)]++;
+    var k=afSanFilterKey(x.san);
+    counts[k]=(counts[k]||0)+1;
   });
   var cards=[
     {k:'mayo',l:'Sanatorio Mayo',hint:'Cola GECLISA y fojas Mayo',c:'var(--san-mayo)'},
     {k:'aero',l:'Hospital Aeronáutico',hint:'Facturación evweb / ADAARC',c:'var(--san-aero)'},
+    {k:'cordoba',l:'Hospital Córdoba',hint:'Foja A4 · SISalud',c:'var(--san-cordoba)'},
+    {k:'misericordia',l:'Hospital Misericordia',hint:'Foja A4 · SISalud',c:'var(--san-misericordia)'},
+    {k:'san_roque',l:'Hospital San Roque',hint:'Foja A4 · SISalud',c:'var(--san-san-roque)'},
     {k:'otro',l:'Otros',hint:'Resto de instituciones',c:'var(--san-otro)'}
   ];
   var html='';

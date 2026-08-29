@@ -47,5 +47,5 @@ try{cirujanos=JSON.parse(localStorage.getItem('af_ciru')||'[]');}catch(e){}
 function afHomeTitle(){
   return (typeof AF_CACHE_V==='string'&&AF_CACHE_V) ? ('AnesFact v'+AF_CACHE_V) : 'AnesFact';
 }
-var TITLES={home:afHomeTitle(),preop:'Preoperatorio',sanatorios:'Sanatorios',evweb:'evweb',legales:'Legales',herramientas:'Herramientas',nueva:'Nueva intervención',facturacion:'Facturación evweb',escanear:'Escanear',config:'Configuración',foja:'Foja anestésica',nom:'Prácticas ADAARC',resumen:'Resumen evweb',geclisa:'GECLISA',ayuda:'Mesa de ayuda',admin:'Panel admin'};
+var TITLES={home:afHomeTitle(),preop:'Preoperatorio',sanatorios:'Instituciones',evweb:'evweb',legales:'Legales',herramientas:'Herramientas',nueva:'Nueva intervención',facturacion:'Facturación evweb',escanear:'Escanear',config:'Configuración',foja:'Foja anestésica',nom:'Prácticas ADAARC',resumen:'Resumen evweb',geclisa:'GECLISA',ayuda:'Mesa de ayuda',admin:'Panel admin'};
 

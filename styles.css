@@ -5,6 +5,7 @@
   --estado-borrador:#6b7280;--estado-listo:#3b82f6;--estado-cola:#eab308;--estado-geclisa:var(--green);--estado-evweb:#14b8a6;
   --blue:var(--estado-listo);
   --san-mayo:#0ea5e9;--san-aero:#8b5cf6;--san-allende:#d946ef;--san-sucre:#6366f1;--san-privado:#06b6d4;--san-otro:#38bdf8;
+  --san-cordoba:#2563eb;--san-misericordia:#7c3aed;--san-san-roque:#a78bfa;
   --os-osde:#a8735a;--os-swiss:#8a8a5c;--os-galeno:#9c9186;--os-pami:#7a8a8a;--os-particular:#6b6b6b;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -88,6 +89,9 @@ select.fi option{background:var(--bg2)}
 .inter-san-allende{border-left-color:var(--san-allende)}
 .inter-san-sucre{border-left-color:var(--san-sucre)}
 .inter-san-privado{border-left-color:var(--san-privado)}
+.inter-san-cordoba{border-left-color:var(--san-cordoba)}
+.inter-san-misericordia{border-left-color:var(--san-misericordia)}
+.inter-san-san-roque{border-left-color:var(--san-san-roque)}
 .inter-san-otro{border-left-color:var(--san-otro)}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(calc(100% + 130px));background:var(--bg2);border:1px solid var(--green);border-radius:24px;padding:10px 20px;font-size:13px;color:var(--green);transition:transform .3s,opacity .3s,visibility .3s;z-index:999;white-space:nowrap;pointer-events:none;opacity:0;visibility:hidden}
 body.has-dock{--dock-clear:162px}
