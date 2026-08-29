@@ -49,7 +49,7 @@ function adminEscape(s){
 }
 
 function adminPlanOptions(current){
-  var plans = ['demo','basico','pro','bloqueado'];
+  var plans = ['demo','basico','max','pro','bloqueado'];
   return plans.map(function(p){
     return '<option value="'+p+'"'+(p===current?' selected':'')+'>'+p+'</option>';
   }).join('');

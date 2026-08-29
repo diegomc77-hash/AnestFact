@@ -1,4 +1,4 @@
-// Planes por usuario — demo / basico / pro / bloqueado
+// Planes por usuario — demo / basico / max / pro / bloqueado
 // Fuente de verdad: anesfact_usuarios + RPC af_assert_plan (servidor).
 var USER_PLAN = 'demo';
 var USER_PROFILE = null;
@@ -173,7 +173,7 @@ function solicitarActivacionPlan(){
   var nombre=(USER_PROFILE&&USER_PROFILE.nombre)||(localStorage.getItem('af_anest_nombre')||'');
   var wantEl=document.getElementById('plan-modal-want');
   var planPedido=(wantEl&&wantEl.value)||'consultar';
-  var planLabels={basico:'Básico (hasta 2 lugares; Aero cuenta)',pro:'Pro (hasta 3 lugares; más lo carga el admin)',consultar:'No sé — que me contacten'};
+  var planLabels={basico:'Básico (1 lugar; Aero cuenta)',max:'Max (hasta 2 lugares)',pro:'Pro (hasta 3 lugares; más lo carga el admin)',consultar:'No sé — que me contacten'};
   var planLabel=planLabels[planPedido]||planPedido;
   var btn=document.getElementById('plan-modal-ask');
   if(btn){ btn.disabled=true; afSetTileLabel(btn,'Enviando…'); }
@@ -346,8 +346,9 @@ function refreshPlanCardUi(){
   var plan = USER_PLAN || 'demo';
   if(actual) actual.textContent = 'Plan actual: ' + plan;
   var texts = {
-    demo: 'Demo: 1 mes, 5 fojas/semana, sin imprimir ni GECLISA. Pedí Básico o Pro cuando quieras.',
-    basico: 'Básico: hasta 2 lugares (Aero cuenta) y 1 hospital público. Pedí Pro si necesitás más.',
+    demo: 'Demo: 1 mes, 5 fojas/semana, sin imprimir ni GECLISA. Pedí Básico, Max o Pro cuando quieras.',
+    basico: 'Básico: 1 lugar (Aero cuenta) y 1 hospital público. Pedí Max (2) o Pro (3) si necesitás más.',
+    max: 'Max: hasta 2 lugares (Aero cuenta) y 1 hospital público. Pedí Pro si necesitás un tercero.',
     pro: 'Pro: hasta 3 lugares (Aero cuenta) y 1 hospital público. Más lugares los carga el admin.',
     bloqueado: 'Cuenta suspendida. Pedí reactivación acá.'
   };
@@ -365,12 +366,14 @@ function pedirCambioPlan(){
   var titles = {
     demo: 'Activar plan',
     basico: 'Cambiar plan',
+    max: 'Cambiar plan',
     pro: 'Consultar / cambiar plan',
     bloqueado: 'Reactivar cuenta'
   };
   var msgs = {
-    demo: 'Estás en plan demo (1 mes, 5 fojas/semana). Elegí Básico o Pro y enviá el pedido. El admin lo ve en el panel; la facturación se coordina afuera.',
-    basico: 'Ya tenés Básico. Si querés Pro (más sanatorios) u otro cambio, elegí abajo y enviá el pedido.',
+    demo: 'Estás en plan demo (1 mes, 5 fojas/semana). Elegí Básico (1 lugar), Max (2) o Pro (3) y enviá el pedido. El admin lo ve en el panel; la facturación se coordina afuera.',
+    basico: 'Ya tenés Básico (1 lugar). Si querés Max (2) o Pro (3), elegí abajo y enviá el pedido.',
+    max: 'Ya tenés Max (2 lugares). Si querés Pro (3) u otro cambio, elegí abajo y enviá el pedido.',
     pro: 'Ya tenés Pro. Si necesitás otro arreglo, elegí abajo o «No sé» y enviá el pedido.',
     bloqueado: 'Tu cuenta está suspendida. Enviá el pedido para que el admin la reactive.'
   };
@@ -378,7 +381,8 @@ function pedirCambioPlan(){
   var want = document.getElementById('plan-modal-want');
   if(want){
     if(plan === 'demo') want.value = 'basico';
-    else if(plan === 'basico') want.value = 'pro';
+    else if(plan === 'basico') want.value = 'max';
+    else if(plan === 'max') want.value = 'pro';
     else want.value = 'consultar';
   }
 }

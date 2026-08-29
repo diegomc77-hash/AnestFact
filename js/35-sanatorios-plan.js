@@ -6,7 +6,8 @@
 (function (global) {
   var DEFAULTS = {
     demo: ['Hospital Aeronáutico'],
-    basico: ['Hospital Aeronáutico', 'Sanatorio Mayo'],
+    basico: ['Hospital Aeronáutico'],
+    max: [],
     pro: [],
     bloqueado: []
   };

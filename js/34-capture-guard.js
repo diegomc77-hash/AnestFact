@@ -76,7 +76,7 @@
     var plan = (typeof USER_PLAN !== 'undefined' && USER_PLAN) ? USER_PLAN : 'demo';
     if (plan === 'bloqueado') return true;
     if (plan === 'demo') return true;
-    // basico/pro: sin marca (pueden imprimir)
+    // basico/max/pro: sin marca (pueden imprimir)
     return false;
   }
 

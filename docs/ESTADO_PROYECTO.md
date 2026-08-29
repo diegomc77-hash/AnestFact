@@ -2,15 +2,16 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
-- PWA `CACHE_V`: **12.42**
+- PWA `CACHE_V`: **12.43**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-28 — Lote 3 planes (PWA **12.42** + SQL **017**): 1 público / N lugares (Aero cuenta), `af_admin_set_sanatorios`, override auditado, DEFAULTS.pro vacío. Esperando Pages (`cache:'no-store'`).
+- 2026-08-28 — Lote 3b planes (PWA **12.43** + SQL **018**): Básico 1 lugar, **Max** 2, Pro 3. Esperando Pages (`cache:'no-store'`). Lote 3 (017/12.42) queda con esta corrección de caps.
 
 ## Qué se hizo (más reciente primero)
 
+- 2026-08-28 — SQL **018** + PWA **12.43**: plan **max** (2 lugares). Básico pasa a 1. Pro sigue 1 público / 3 no-públicos. Huerta no se tocó.
 - 2026-08-28 — SQL **017** + PWA **12.42** (lote 3 planes): validación 1 público / N no-públicos (Aero cuenta). Rechaza, no recorta. `af_admin_set_sanatorios` + override `privados_max_override` auditado. `af_assert_plan(..., p_sanatorio)`. DEFAULTS.pro vacío. Guardar plan ya no une el paquete de 4.
 - 2026-08-28 — SQL **016** (lote 2 planes): Huerta Aero + Mayo + Hospital Córdoba. **Cerrado en Pages.**
 - 2026-08-28 — SQL **015** + PWA **12.41** (lote 1 planes): Demo 1 mes y 5 fojas/semana. **Cerrado en Pages.** Contador ya no se PATCHA desde el cliente; `af_consume_foja` + tope en `af_assert_plan`. Límite real Demo no se probó (no hay login de prueba).
@@ -40,8 +41,8 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - Foja-bar fija + contraste valoración (12.36): **cerrado en Pages**.
 - Ruta alternativa por DNI en GECLISA (pacientes de alta): `chrome-extension-geclisa-batch/NOTES_RUTA_HC_POR_DNI.md` — no implementada.
 - Correlativo QR entre equipos (servidor): diferido.
-- Instituciones: catálogo **010**–**017** (016 recorte Huerta; **017** tope de lugares en servidor). Habilitar resto = `sanatorios_permitidos` + `desarrollado`, no re-sembrar.
-- Planes (confirmado 2026-08-28): Aero cuenta como lugar. 1 público máx. Admin ve todos sin cupo. Firma atada a la cuenta, no a la foja. DEFAULTS.pro vacío; lugares se cargan con `af_admin_set_sanatorios`. Pro >3 no-públicos solo con `privados_max_override`.
+- Instituciones: catálogo **010**–**018** (016 recorte Huerta; **017** tope de lugares; **018** plan Max). Habilitar resto = `sanatorios_permitidos` + `desarrollado`, no re-sembrar.
+- Planes (confirmado 2026-08-28): Demo 1 lugar (Aero) + tope de fojas. **Básico 1** / **Max 2** / **Pro 3** no-públicos (Aero cuenta). 1 público máx. Admin ve todos sin cupo. Firma atada a la cuenta. DEFAULTS.pro y DEFAULTS.max vacíos; lugares con `af_admin_set_sanatorios`. Pro >3 solo con `privados_max_override`.
 - SISalud: cómo se sube la foja/PDF — **no investigar todavía**.
 - PNG oficiales de header Córdoba / San Roque: cuando existan, reemplazan compose (`oficial: false`).
 
