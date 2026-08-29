@@ -80,6 +80,7 @@ function loadUserPlan(){
     if(typeof refreshAdminUi === 'function') refreshAdminUi();
     if(typeof AfCaptureGuard !== 'undefined') AfCaptureGuard.apply();
     if(typeof AfSanatoriosPlan !== 'undefined') AfSanatoriosPlan.filterSelect();
+    if(typeof afSyncQrLugarUi === 'function') afSyncQrLugarUi();
     if(typeof refreshPlanCardUi === 'function') refreshPlanCardUi();
     return plan;
   });

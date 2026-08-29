@@ -2,14 +2,16 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
-- PWA `CACHE_V`: **12.46**
+- PWA `CACHE_V`: **12.47**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-28 — PWA **12.46**: dedup QR→foja (un vuelo + colapso). Esperando Pages (`cache:'no-store'`).
+- 2026-08-28 — PWA **12.47** + Edge `af-qr-submit`: QR por lugar (públicos). Esperando verificación en Pages (`cache:'no-store'`), sesión Huerta: QR Córdoba → foja Córdoba.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-08-28 — PWA **12.47**: selector «Este QR es para:» en Preop (si hay >1 lugar), persistencia `af_qr_lugar_<uid>`, tarjeta/toast con el nombre real. `af-qr-submit` usa `contexto.sanatorio` del token. Mayo igual. Badge paciente queda para sub-lote.
 
 - 2026-08-28 — PWA **12.46**: `afSyncValoracionesPreop` un solo fetch; dedup `valoracion_id` + `preop_+id`; sync solo desde `initApp`; colapso de clones al cargar. Sin `?t=` en la foja.
 

@@ -1,5 +1,6 @@
 /**
- * Sincroniza valoraciones QR → intervenciones locales "preoperatorio" (Etapa 1 Mayo).
+ * Sincroniza valoraciones QR → intervenciones locales "preoperatorio".
+ * `san` sale de extras.sanatorio (el token gana en af-qr-submit).
  * Un solo vuelo a la vez (initSession vs initApp no pueden importar dos veces).
  */
 var _afPreopSyncInFlight = null;

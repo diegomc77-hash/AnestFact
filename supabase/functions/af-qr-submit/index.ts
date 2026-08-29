@@ -134,7 +134,9 @@ Deno.serve(async (req) => {
 
   const extrasIn = (body.extras || {}) as Record<string, unknown>;
   const ctx = (qr.contexto || {}) as Record<string, unknown>;
-  const sanatorio = String(extrasIn.sanatorio || ctx.sanatorio || 'Sanatorio Mayo');
+  const ctxSan = String(ctx.sanatorio || '').trim();
+  const extrasSan = String(extrasIn.sanatorio || '').trim();
+  const sanatorio = ctxSan || extrasSan || 'Sanatorio Mayo';
   const dniMasked = dni.length >= 4 ? ('***' + dni.slice(-4)) : '****';
   const etiqueta = String(
     extrasIn.etiqueta_lista ||

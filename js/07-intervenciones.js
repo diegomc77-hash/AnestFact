@@ -413,6 +413,7 @@ function renderHome(){
   }
   if(typeof renderGeclisaQueuePanel==='function')renderGeclisaQueuePanel();
   if(typeof afSyncDockAlert==='function')afSyncDockAlert();
+  if(mode==='preop'&&typeof afSyncQrLugarUi==='function')afSyncQrLugarUi();
   var pool=(S.intervs||[]).filter(function(x){
     if(!x)return false;
     return mode==='preop'?(x.estado==='preoperatorio'):(x.estado!=='preoperatorio');

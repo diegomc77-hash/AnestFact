@@ -234,16 +234,102 @@ function cerrarModalQrValoracion() {
   document.body.classList.remove('af-print-qr');
 }
 
-function mostrarModalQrValoracion(data, orden) {
+function afQrLugarKey(){
+  var uid = (typeof AF_AUTH !== 'undefined' && AF_AUTH.getUserId) ? (AF_AUTH.getUserId() || '') : '';
+  return 'af_qr_lugar_' + (uid || 'anon');
+}
+
+function afQrLugaresDisponibles(){
+  if(typeof AfSanatoriosPlan !== 'undefined' && AfSanatoriosPlan.selectNames){
+    return AfSanatoriosPlan.selectNames() || [];
+  }
+  return [];
+}
+
+/** Token gana sobre extras del cliente (misma regla que af-qr-submit). */
+function afQrSanatorioDesdeToken(ctx, extras){
+  var c = ctx && ctx.sanatorio ? String(ctx.sanatorio).trim() : '';
+  if(c) return c;
+  var e = extras && extras.sanatorio ? String(extras.sanatorio).trim() : '';
+  if(e) return e;
+  return 'Sanatorio Mayo';
+}
+
+function afQrLugarLeido(){
+  try { return (localStorage.getItem(afQrLugarKey()) || '').trim(); } catch (e) { return ''; }
+}
+
+function afQrLugarGuardar(nombre){
+  try { localStorage.setItem(afQrLugarKey(), String(nombre || '')); } catch (e) {}
+}
+
+function afQrLugarActual(){
+  var names = afQrLugaresDisponibles();
+  if(!names.length) return '';
+  if(names.length === 1) return names[0];
+  var saved = afQrLugarLeido();
+  if(saved && names.indexOf(saved) >= 0) return saved;
+  return names[0];
+}
+
+function afQrLugarOnChange(){
+  var sel = _qr$('qr-lugar-sel');
+  if(!sel || !sel.value) return;
+  afQrLugarGuardar(sel.value);
+  afSyncQrLugarUi();
+}
+
+function afSyncQrLugarUi(){
+  var row = _qr$('qr-lugar-row');
+  var sel = _qr$('qr-lugar-sel');
+  var nom = _qr$('qr-lugar-nombre');
+  if(!row || !sel || !nom) return;
+  var names = afQrLugaresDisponibles();
+  var cur = afQrLugarActual();
+  if(!names.length){
+    row.style.display = 'none';
+    return;
+  }
+  row.style.display = '';
+  if(names.length === 1){
+    sel.style.display = 'none';
+    nom.style.display = 'block';
+    nom.textContent = names[0];
+    return;
+  }
+  nom.style.display = 'none';
+  sel.style.display = 'block';
+  while(sel.options.length) sel.remove(0);
+  names.forEach(function(n){
+    var o = document.createElement('option');
+    o.value = n;
+    o.textContent = n;
+    sel.appendChild(o);
+  });
+  sel.value = cur;
+}
+
+function afQrPieTarjeta(lugar, data){
+  var exp = data && data.expires_at ? new Date(data.expires_at).toLocaleString('es-AR') : '';
+  var single = !!(data && (data.single_use || data.max_uses === 1));
+  var mayo = lugar === 'Sanatorio Mayo';
+  if(mayo){
+    return single
+      ? (exp ? 'Mayo · un uso · vence ' + exp : 'Sanatorio Mayo · un uso · 48 h')
+      : (exp ? 'Vence el ' + exp : 'Sanatorio Mayo');
+  }
+  var name = lugar || 'AnesFact';
+  return single
+    ? (exp ? name + ' · un uso · vence ' + exp : name + ' · un uso · 48 h')
+    : (exp ? name + ' · vence ' + exp : name);
+}
+
+function mostrarModalQrValoracion(data, orden, lugar){
   var url = afPublicBaseUrl() + 'valoracion.html?t=' + encodeURIComponent(data.token);
   var n = orden || 1;
   var fecha = afQrFechaCorta();
   var nombre = afQrMedicoNombre();
-  var exp = data.expires_at ? new Date(data.expires_at).toLocaleString('es-AR') : '';
-  var single = data.single_use || data.max_uses === 1;
-  var pie = single
-    ? (exp ? 'Mayo · un uso · vence ' + exp : 'Sanatorio Mayo · un uso · 48 h')
-    : (exp ? 'Vence el ' + exp : 'Sanatorio Mayo');
+  var pie = afQrPieTarjeta(lugar || 'Sanatorio Mayo', data);
   _qrCardMeta = { n: n, fecha: fecha, nombre: nombre, pie: pie };
   _qrModalEl().style.display = 'block';
   _qr$('qr-val-url').value = url;
@@ -291,6 +377,12 @@ function crearQrValoracion() {
     if (typeof go === 'function') go('config');
     return;
   }
+  var lugar = afQrLugarActual();
+  if (!lugar) {
+    toast('No hay un lugar habilitado para este QR');
+    return;
+  }
+  afQrLugarGuardar(lugar);
   toast('Generando QR…');
   fetch(afSupabaseUrl() + '/functions/v1/af-qr-create', {
     method: 'POST',
@@ -298,7 +390,7 @@ function crearQrValoracion() {
     body: JSON.stringify({
       contexto: {
         origen: 'home',
-        sanatorio: 'Sanatorio Mayo',
+        sanatorio: lugar,
         modo: 'preoperatorio',
         max_uses: 1,
       },
@@ -310,8 +402,8 @@ function crearQrValoracion() {
         throw new Error((res.j && res.j.error) || 'No se pudo crear el QR');
       }
       var orden = afNextQrOrdenDia();
-      mostrarModalQrValoracion(res.j, orden);
-      toast('QR Mayo listo (un uso)');
+      mostrarModalQrValoracion(res.j, orden, lugar);
+      toast(lugar === 'Sanatorio Mayo' ? 'QR Mayo listo (un uso)' : ('QR listo · ' + lugar + ' (un uso)'));
     })
     .catch(function (err) {
       toast(err.message || 'Error al crear QR');
