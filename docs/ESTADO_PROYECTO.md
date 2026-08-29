@@ -2,14 +2,16 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
-- PWA `CACHE_V`: **12.49**
+- PWA `CACHE_V`: **12.50**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-29 — PWA **12.49**: Lote B Instituciones (hub + colores públicos + filtro Fojas). Esperando Pages (`cache:'no-store'`).
+- 2026-08-29 — PWA **12.50**: catálogo cirujanos + quirófanos Hospital Córdoba. Esperando Pages (`cache:'no-store'`).
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-08-29 — PWA **12.50**: `CIRUJANOS_POR_LUGAR['Hospital Córdoba']` (sin Jefe; Clara Huerta queda). 9 quirófanos en `AF_FOJA_INST` → select `#f-sala-inst`. Misericordia/San Roque sin catálogo. Mayo/Aero intactos.
 
 - 2026-08-29 — PWA **12.49**: dock/vista «Instituciones»; tarjetas Córdoba / Misericordia / San Roque; colores `--san-cordoba` `#2563eb`, `--san-misericordia` `#7c3aed`, `--san-san-roque` `#a78bfa`; `home-san` con las mismas claves. Lote A **cerrado en Pages**.
 

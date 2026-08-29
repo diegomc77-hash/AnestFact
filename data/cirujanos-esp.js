@@ -94,6 +94,111 @@ var CIRUJANOS_POR_LUGAR = {
       'Luna Campos Sandra',
       'Moreno María José'
     ]
+  },
+  'Hospital Córdoba': {
+    'Cirugía General': [
+      'Prof. Dr. José A. Cooke',
+      'Prof. Dr. Germán Llancaman',
+      'Dr. Máximo Sánchez Mocchi',
+      'Dr. Aberastain Oro',
+      'Dr. Leandro Correa',
+      'Dr. Maximiliano Sosa Gallardo',
+      'Dr. Nicolás Sosa Gallardo (Bariátrica)',
+      'Dra. Mariana Oliva (Bariátrica)',
+      'Dra. Mercedes Burgos (Unidad Bariátrica)',
+      'Dr. Ignacio José Becchetti (Digestivo Superior / Hernias)',
+      'Prof. Dr. Ángel Lo Celso',
+      'Dr. Guillermo Sosa (Cuidados Críticos)'
+    ],
+    'Urología': [
+      'Dr. Alberto Marcelo Bertrán',
+      'Dr. Gustavo Héctor Bechis',
+      'Dr. Héctor Marcelo Páez',
+      'Dr. Félix Francisco Terroba',
+      'Dr. Luis Abreu',
+      'Dr. Raúl Roldán',
+      'Dr. Marcelo De La Colina (Oncólogo)'
+    ],
+    'Neurocirugía': [
+      'Dr. Matías S. Berra',
+      'Dr. Javier A. Sánchez',
+      'Dr. Santiago Passero Gavier',
+      'Dra. Paula Estario'
+    ],
+    'Cirugía Vascular': [
+      'Dr. Pablo Monayar',
+      'Dr. Daniel Kuznietz',
+      'Dr. Ariel Vicens',
+      'Dr. Juan Navarro',
+      'Dr. José D\'Angelo'
+    ],
+    'Cirugía de Tórax y Cardiovascular': [
+      'Dr. Néstor Medeot',
+      'Prof. Dr. Adolfo Uribe (Trasplante intratorácico)',
+      'Dr. Néstor Bustamante',
+      'Dr. Sergio Rottino',
+      'Dr. Matías Bochinfuso',
+      'Dr. Daniel Maldonado',
+      'Dr. Jorge Guevara',
+      'Dr. Ricardo Luengo',
+      'Dra. Clara Huerta (Trasplante Cardíaco)'
+    ],
+    'Cirugía Torácica': [
+      'Dr. Néstor Medeot',
+      'Prof. Dr. Adolfo Uribe (Trasplante intratorácico)',
+      'Dr. Néstor Bustamante',
+      'Dr. Sergio Rottino',
+      'Dr. Matías Bochinfuso',
+      'Dr. Daniel Maldonado',
+      'Dr. Jorge Guevara',
+      'Dr. Ricardo Luengo',
+      'Dra. Clara Huerta (Trasplante Cardíaco)'
+    ],
+    'Cirugía Cardiovascular': [
+      'Dr. Néstor Medeot',
+      'Prof. Dr. Adolfo Uribe (Trasplante intratorácico)',
+      'Dr. Néstor Bustamante',
+      'Dr. Sergio Rottino',
+      'Dr. Matías Bochinfuso',
+      'Dr. Daniel Maldonado',
+      'Dr. Jorge Guevara',
+      'Dr. Ricardo Luengo',
+      'Dra. Clara Huerta (Trasplante Cardíaco)'
+    ],
+    'Cardiocirugía': [
+      'Dr. Néstor Medeot',
+      'Prof. Dr. Adolfo Uribe (Trasplante intratorácico)',
+      'Dr. Néstor Bustamante',
+      'Dr. Sergio Rottino',
+      'Dr. Matías Bochinfuso',
+      'Dr. Daniel Maldonado',
+      'Dr. Jorge Guevara',
+      'Dr. Ricardo Luengo',
+      'Dra. Clara Huerta (Trasplante Cardíaco)'
+    ],
+    'Instituto del Quemado': [
+      'Dr. Damián Andrade',
+      'Dr. Walter Contreras',
+      'Dr. Guillermo Pedraza',
+      'Dr. José Almada',
+      'Dra. Analía Riutort',
+      'Dra. Romina Setti',
+      'Dr. Sergio Ledesma',
+      'Dr. Martín Rapetti',
+      'Dr. Carlos Manukian',
+      'Dr. Diego Oviedo',
+      'Dr. Mariano Fagandini',
+      'Dra. Wilda Olmos',
+      'Dra. Paula Shiraishi'
+    ],
+    'Oftalmología': [
+      'Dr. Marcos Iribarren',
+      'Dr. Osvaldo Cuello',
+      'Dr. Federico Pegoraro',
+      'Dr. Pablo Fornero',
+      'Dra. Ximena Castelao Lima',
+      'Dra. Paula Romero'
+    ]
   }
 };
 

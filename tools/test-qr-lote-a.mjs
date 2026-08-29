@@ -91,16 +91,22 @@ if (cba.id !== 'h_cordoba' || cba.label !== 'Hospital Córdoba' || cba.cirujanos
 if (cba.id === 'mayo') fail('cfg_id Córdoba no puede ser mayo');
 
 const specCba = context.afValoracionEspecialidadesParaLugar('Hospital Córdoba');
-if (specCba.indexOf('Cirugía General') < 0) fail('especialidad genérica ausente');
+if (specCba.indexOf('Cirugía General') < 0) fail('especialidad Córdoba ausente');
 const ciruCba = context.getCirujanosMapForLugar('Hospital Córdoba');
-if (Object.keys(ciruCba || {}).length) fail('públicos no deben tener catálogo de cirujanos');
+if ((ciruCba['Cirugía General'] || []).indexOf('Prof. Dr. José A. Cooke') < 0) {
+  fail('Córdoba debe autocompletar su nómina');
+}
 
 const specMayo = context.afValoracionEspecialidadesParaLugar('Sanatorio Mayo');
 if (specMayo.indexOf('Cirugía General') < 0) fail('Mayo debe seguir con especialidades del catálogo');
 const ciruMayo = context.getCirujanosMapForLugar('Sanatorio Mayo');
 const mayoNames = (ciruMayo['Cirugía General'] || []).join(' ');
 if (mayoNames.indexOf('COOKE') < 0) fail('Mayo debe conservar su nómina');
-if (specCba.indexOf('Proctología') < 0) fail('lista genérica debe incluir Proctología');
+const specMis = context.afValoracionEspecialidadesParaLugar('Hospital Misericordia');
+if (specMis.indexOf('Proctología') < 0) fail('Misericordia sigue lista genérica');
+if (Object.keys(context.getCirujanosMapForLugar('Hospital Misericordia') || {}).length) {
+  fail('Misericordia no debe tener catálogo');
+}
 if (specMayo.indexOf('Proctología') >= 0) fail('Mayo no debe listar especialidades sin nómina');
 
 const kMayo = context.afQrOrdenKey('Sanatorio Mayo');

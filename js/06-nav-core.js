@@ -357,12 +357,38 @@ function onSanChange(){
   if(aw)aw.style.display=s==='Hospital Aeronáutico'?'block':'none';
   var sw=document.getElementById('f-sisalud-ubic-wrap');
   if(sw)sw.style.display=(typeof afFojaEsSisalud==='function'&&afFojaEsSisalud(s))?'block':'none';
+  if(typeof afSyncSalaInstUi==='function')afSyncSalaInstUi();
   var mw=document.getElementById('f-mayo-wrap');if(mw)mw.style.display=s==='Sanatorio Mayo'?'block':'none';
   var mb=document.getElementById('btn-mayo-wrap');if(mb)mb.style.display=s==='Sanatorio Mayo'?'block':'none';
   if(s==='Sanatorio Mayo')updateMayoCamas();
-  // Recargar sugerencias de cirujano según el lugar
   if(typeof actualizarHintCirujano==='function')actualizarHintCirujano();
   if(typeof acCirujano==='function')acCirujano();
+}
+function afSyncSalaInstUi(){
+  var sanEl=document.getElementById('f-san');
+  var inp=document.getElementById('f-sala-sisalud');
+  var sel=document.getElementById('f-sala-inst');
+  if(!inp||!sel)return;
+  var san=sanEl?sanEl.value:'';
+  var list=(typeof afFojaQuirofanos==='function')?afFojaQuirofanos(san):[];
+  var prev=sel.value||inp.value||'';
+  if(list.length){
+    sel.innerHTML='<option value="">—</option>';
+    list.forEach(function(n){
+      var o=document.createElement('option');
+      o.value=n;
+      o.textContent=n;
+      sel.appendChild(o);
+    });
+    if(prev)sel.value=prev;
+    sel.style.display='';
+    inp.style.display='none';
+  }else{
+    if(sel.value&&!inp.value)inp.value=sel.value;
+    sel.style.display='none';
+    while(sel.options.length)sel.remove(0);
+    inp.style.display='';
+  }
 }
 function updateMayoCamas(){
   var sec=document.getElementById('f-mayo-sector');var cam=document.getElementById('f-mayo-cama');

@@ -24,7 +24,18 @@ var AF_FOJA_INST = {
       mode: 'compose',
       oficial: false,
       lineas: ['HOSPITAL', 'CÓRDOBA']
-    }
+    },
+    quirofanos: [
+      'Quirófano 1',
+      'Quirófano 2',
+      'Quirófano 3',
+      'Quirófano 4',
+      'Quirófano 5',
+      'Quirófano 6',
+      'Quirófano Quemados 1',
+      'Quirófano Quemados 2',
+      'Quirófano Oftalmología'
+    ]
   },
   'Hospital Misericordia': {
     id: 'h_misericordia',
@@ -57,6 +68,12 @@ function afFojaInst(san) {
 function afFojaEsSisalud(san) {
   var inst = afFojaInst(san);
   return !!(inst && inst.destino_final === 'sisalud');
+}
+
+function afFojaQuirofanos(san) {
+  var inst = afFojaInst(san);
+  if (!inst || !inst.quirofanos || !inst.quirofanos.length) return [];
+  return inst.quirofanos.slice();
 }
 
 function afFojaNombresDesarrollados() {

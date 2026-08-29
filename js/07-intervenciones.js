@@ -698,7 +698,7 @@ function cargarForm(i){
   sv('f-edad',i.edad);sv('f-sexo',i.sexo||'');sv('f-dni',i.dni);
   sv('f-peso',i.peso||'');sv('f-ciru',i.ciru);sv('f-serv',i.serv||'');sv('f-diag',i.diag||'');
   if(typeof AfSanatoriosPlan!=='undefined')AfSanatoriosPlan.filterSelect();
-  sv('f-san',i.san);onSanChange();sv('f-mayo-sector',i.mayo_sector||'');sv('f-mayo-quir',i.mayo_quir||'');sv('f-mayo-tipociru',i.mayo_tipociru||'');sv('f-mayo-posicion',i.mayo_posicion||'');if(i.mayo_sector)setTimeout(function(){updateMayoCamas();sv('f-mayo-cama',i.mayo_cama||'');},50);sv('f-sala',i.sala||'');sv('f-cama',i.cama||'');sv('f-sala-sisalud',i.sala||'');sv('f-cama-sisalud',i.cama||'');
+  sv('f-san',i.san);onSanChange();sv('f-mayo-sector',i.mayo_sector||'');sv('f-mayo-quir',i.mayo_quir||'');sv('f-mayo-tipociru',i.mayo_tipociru||'');sv('f-mayo-posicion',i.mayo_posicion||'');if(i.mayo_sector)setTimeout(function(){updateMayoCamas();sv('f-mayo-cama',i.mayo_cama||'');},50);sv('f-sala',i.sala||'');sv('f-cama',i.cama||'');sv('f-sala-sisalud',i.sala||'');sv('f-sala-inst',i.sala||'');sv('f-cama-sisalud',i.cama||'');
   sv('f-obra',i.obra);sv('f-afil',sanitizeAfil(i.afil));
   var ob=document.getElementById('f-ob');if(ob)ob.checked=!!i.ob;
   var en=document.getElementById('f-env');if(en)en.checked=i.env!==false;
@@ -723,7 +723,12 @@ function flushFormIntoCur(extra){
     S.cur.peso=gv('f-peso');S.cur.ciru=gv('f-ciru');S.cur.serv=gv('f-serv');S.cur.diag=gv('f-diag');
     S.cur.san=gv('f-san');S.cur.mayo_sector=gv('f-mayo-sector')||'';S.cur.mayo_cama=gv('f-mayo-cama')||'';S.cur.mayo_quir=gv('f-mayo-quir')||'';S.cur.mayo_tipociru=gv('f-mayo-tipociru')||'';S.cur.mayo_posicion=gv('f-mayo-posicion')||'';
     if(typeof afFojaEsSisalud==='function'&&afFojaEsSisalud(S.cur.san)){
-      S.cur.sala=gv('f-sala-sisalud');S.cur.cama=gv('f-cama-sisalud');
+      if(typeof afFojaQuirofanos==='function'&&afFojaQuirofanos(S.cur.san).length){
+        S.cur.sala=gv('f-sala-inst');
+      }else{
+        S.cur.sala=gv('f-sala-sisalud');
+      }
+      S.cur.cama=gv('f-cama-sisalud');
     }else{
       S.cur.sala=gv('f-sala');S.cur.cama=gv('f-cama');
     }

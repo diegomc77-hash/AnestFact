@@ -21,10 +21,11 @@ var AF_VALORACION_ESPECIALIDADES = [
   'Cirugía General', 'Cirugía Laparoscópica',
   'Cirugía Hepática', 'Obesología / Bariátrica',
   'Cirugía de Cabeza y Cuello', 'Cirugía Torácica',
+  'Cirugía de Tórax y Cardiovascular',
   'Cirugía Vascular', 'Cirugía Plástica y Reparadora',
   'Ginecología y Obstetricia', 'Traumatología y Ortopedia',
   'Neurocirugía', 'Urología', 'ORL (Otorrinolaringología)',
-  'Oftalmología', 'Proctología', 'Mastología',
+  'Oftalmología', 'Instituto del Quemado', 'Proctología', 'Mastología',
   'Cirugía Pediátrica', 'Cardiocirugía', 'Cirugía Cardiovascular',
   'Endoscopía Digestiva', 'Gastroenterología', 'Hemodinamia',
   'Radiología Intervencionista', 'Odontología'
