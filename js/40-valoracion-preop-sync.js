@@ -1,32 +1,120 @@
 /**
  * Sincroniza valoraciones QR → intervenciones locales "preoperatorio" (Etapa 1 Mayo).
+ * Un solo vuelo a la vez (initSession vs initApp no pueden importar dos veces).
  */
-function afSyncValoracionesPreop() {
-  if (typeof AF_AUTH === 'undefined' || !AF_AUTH.isLoggedIn || !AF_AUTH.isLoggedIn()) {
+var _afPreopSyncInFlight = null;
+
+function afValoracionDedupeKey(i){
+  if(!i) return '';
+  if(i.valoracion_id) return String(i.valoracion_id);
+  var id = String(i.id || '');
+  if(id.indexOf('preop_') === 0 && id.length > 6) return id.slice(6);
+  return '';
+}
+
+function afPickValoracionKeep(a, b){
+  var aOut = !!(a && a.estado && a.estado !== 'preoperatorio');
+  var bOut = !!(b && b.estado && b.estado !== 'preoperatorio');
+  if(aOut && !bOut) return a;
+  if(bOut && !aOut) return b;
+  var ta = (a && a._ts) ? Number(a._ts) : 0;
+  var tb = (b && b._ts) ? Number(b._ts) : 0;
+  if(tb > ta) return b;
+  return a;
+}
+
+/** Colapsa clones del mismo submit QR. No fusiona campos clínicos. */
+function afCollapseValoracionDupes(){
+  var list = S.intervs || [];
+  var best = {};
+  var order = [];
+  var dropped = 0;
+  list.forEach(function(i){
+    var k = afValoracionDedupeKey(i);
+    if(!k){
+      order.push({ kind: 'plain', item: i });
+      return;
+    }
+    if(!best[k]){
+      best[k] = i;
+      order.push({ kind: 'key', key: k });
+    } else {
+      dropped++;
+      best[k] = afPickValoracionKeep(best[k], i);
+    }
+  });
+  if(!dropped) return { collapsed: 0 };
+  var out = [];
+  order.forEach(function(slot){
+    if(slot.kind === 'plain') out.push(slot.item);
+    else out.push(best[slot.key]);
+  });
+  S.intervs = out;
+  try { saveIntervsToStorage(); } catch (e) {}
+  if(typeof syncAutoPushDebounced === 'function') syncAutoPushDebounced();
+  if(typeof renderHome === 'function') renderHome();
+  try { console.info('[AF] colapso valoraciones: ' + dropped + ' duplicado(s)'); } catch (e2) {}
+  return { collapsed: dropped };
+}
+
+function afFojaYaTieneValoracion(vId){
+  var id = String(vId || '');
+  if(!id) return false;
+  var preopId = 'preop_' + id;
+  var list = S.intervs || [];
+  for(var n = 0; n < list.length; n++){
+    var it = list[n];
+    if(!it) continue;
+    if(String(it.valoracion_id || '') === id) return true;
+    if(String(it.id || '') === preopId) return true;
+  }
+  return false;
+}
+
+function afSyncValoracionesPreop(){
+  if(typeof AF_AUTH === 'undefined' || !AF_AUTH.isLoggedIn || !AF_AUTH.isLoggedIn()){
     return Promise.resolve({ ok: false, reason: 'auth' });
   }
+  if(_afPreopSyncInFlight) return _afPreopSyncInFlight;
+  _afPreopSyncInFlight = afSyncValoracionesPreopRun().then(function(r){
+    _afPreopSyncInFlight = null;
+    return r;
+  }, function(err){
+    _afPreopSyncInFlight = null;
+    return { ok: false, error: err && err.message };
+  });
+  return _afPreopSyncInFlight;
+}
+
+function afSyncValoracionesPreopRun(){
+  var collapsed = afCollapseValoracionDupes();
   var url = afSupabaseUrl() +
     '/rest/v1/anesfact_valoraciones?select=id,paciente_id,diagnostico_cirugia,datos_basicos,antecedentes,medicacion,antec_anestesicos,extras,submitted_at,estado,resultado_episodio&order=submitted_at.desc&limit=40';
   return fetch(url, { headers: afSupabaseHeaders() })
-    .then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     })
-    .then(function (rows) {
-      if (!Array.isArray(rows)) return { ok: true, added: 0 };
+    .then(function(rows){
+      if(!Array.isArray(rows)) return { ok: true, added: 0, collapsed: collapsed.collapsed };
       var added = 0;
       var existing = {};
-      (S.intervs || []).forEach(function (i) {
-        if (i && i.valoracion_id) existing[String(i.valoracion_id)] = true;
+      (S.intervs || []).forEach(function(i){
+        var k = afValoracionDedupeKey(i);
+        if(k) existing[k] = true;
       });
-      rows.forEach(function (v) {
-        if (!v || !v.id || existing[String(v.id)]) return;
-        if (v.resultado_episodio && v.resultado_episodio !== 'pendiente') return;
+      rows.forEach(function(v){
+        if(!v || !v.id) return;
+        var vid = String(v.id);
+        if(existing[vid] || afFojaYaTieneValoracion(vid)){
+          existing[vid] = true;
+          return;
+        }
+        if(v.resultado_episodio && v.resultado_episodio !== 'pendiente') return;
         var db = v.datos_basicos || {};
         var ex = v.extras || {};
         var ant = v.antecedentes || {};
         var pac = ex.etiqueta_nombre || (ex.etiqueta_lista ? String(ex.etiqueta_lista).split(' · ')[0] : '') || 'Paciente (QR)';
-        // Profesional autenticado: DNI completo (datos_basicos). Máscara solo fallback legado.
         var dniFull = String(db.dni || '').replace(/\D/g, '');
         var dniShow = dniFull || String(ex.dni_enmascarado || '');
         var diagPrincipal = v.diagnostico_cirugia || '';
@@ -38,9 +126,9 @@ function afSyncValoracionesPreop() {
               extras: ex
             })
           : { alerta: !!ex.alerta_seguridad, motivos: ex.alerta_motivos || [] };
-        if (ex.alerta_seguridad) {
+        if(ex.alerta_seguridad){
           alerta.alerta = true;
-          if (!alerta.motivos || !alerta.motivos.length) alerta.motivos = ex.alerta_motivos || [];
+          if(!alerta.motivos || !alerta.motivos.length) alerta.motivos = ex.alerta_motivos || [];
         }
         var interv = {
           id: 'preop_' + v.id,
@@ -85,18 +173,19 @@ function afSyncValoracionesPreop() {
           }
         };
         S.intervs.push(interv);
+        existing[vid] = true;
         added++;
       });
-      if (added) {
+      if(added){
         try { saveIntervsToStorage(); } catch (e) {}
-        if (typeof syncAutoPushDebounced === 'function') syncAutoPushDebounced();
-        if (typeof renderHome === 'function') renderHome();
+        if(typeof syncAutoPushDebounced === 'function') syncAutoPushDebounced();
+        if(typeof renderHome === 'function') renderHome();
       }
-      return { ok: true, added: added };
+      return { ok: true, added: added, collapsed: collapsed.collapsed };
     })
-    .catch(function (err) {
+    .catch(function(err){
       try { console.warn('[AFG] sync valoraciones preop', err); } catch (e2) {}
-      return { ok: false, error: err && err.message };
+      return { ok: false, error: err && err.message, collapsed: collapsed.collapsed };
     });
 }
 

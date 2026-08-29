@@ -2,14 +2,16 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
-- PWA `CACHE_V`: **12.45**
+- PWA `CACHE_V`: **12.46**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- Nada de planes pendiente. Punto 3 **cerrado en Pages.**
+- 2026-08-28 — PWA **12.46**: dedup QR→foja (un vuelo + colapso). Esperando Pages (`cache:'no-store'`).
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-08-28 — PWA **12.46**: `afSyncValoracionesPreop` un solo fetch; dedup `valoracion_id` + `preop_+id`; sync solo desde `initApp`; colapso de clones al cargar. Sin `?t=` en la foja.
 
 - 2026-08-28 — SQL **020** + PWA **12.45**: Punto 3 A+B. **Cerrado en Pages.** Guardar Pro igual que siempre; `AF_TEST_RPC_FAIL` → toast fail-closed y no persiste; al bajar el flag vuelve «Guardado ✓». Trigger sync Demo vencida / `fojas_semana >= 5`. `nuevaInter()` no consume.
 - 2026-08-28 — SQL **019** + PWA **12.44**: INSERT Demo no inflable + M.P. única. **Cerrado en Pages.**
