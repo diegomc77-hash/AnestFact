@@ -5,6 +5,7 @@ var USER_PROFILE = null;
 var USER_IS_ADMIN = false;
 var fojasEstaSemana = 0;
 var _planAssertCache = {};
+var AF_DEMO_FOJAS_SEMANA = 5;
 
 function startOfWeek(d){
   var x = new Date(d);
@@ -138,8 +139,20 @@ function mostrarUpgrade(funcion){
   var labels = { imprimir: 'imprimir fojas', geclisa: 'usar GECLISA / fill.js', foja: 'crear más fojas', sanatorio: 'usar ese sanatorio' };
   showPlanModal('Plan demo', 'La función "' + (labels[funcion]||funcion) + '" requiere un plan activo (básico o pro). Tocá «Solicitar activación» para avisar al administrador.');
 }
+function afDemoVencido(){
+  if(USER_IS_ADMIN) return false;
+  if((USER_PLAN || '') !== 'demo') return false;
+  var exp = USER_PROFILE && USER_PROFILE.plan_expires_at;
+  if(!exp) return false;
+  var t = Date.parse(exp);
+  return !isNaN(t) && Date.now() >= t;
+}
+
+function mostrarDemoVencido(){
+  showPlanModal('Demo vencida', 'El mes de prueba terminó. Pedí Básico o Pro para seguir creando fojas. El admin lo ve en el panel.');
+}
 function mostrarLimiteSemanal(){
-  showPlanModal('Límite semanal', 'El plan demo permite 1 foja por semana (ya la usaste o está contada). Tocá «Solicitar activación» para pedir un plan completo; el admin lo ve en el panel.');
+  showPlanModal('Límite semanal', 'El plan demo permite 5 fojas por semana (ya las usaste o están contadas). Tocá «Solicitar activación» para pedir un plan completo; el admin lo ve en el panel.');
 }
 
 /** Pedido de activación → ticket en nube (admin lo ve). No depende de mailto. */
@@ -199,11 +212,15 @@ function solicitarActivacionPlan(){
 function checkPlanLocal(funcion){
   if(USER_IS_ADMIN) return true;
   if(USER_PLAN === 'bloqueado'){ return false; }
+  if(afDemoVencido()) return false;
   if(funcion === 'imprimir' && USER_PLAN === 'demo'){ return false; }
   if(funcion === 'geclisa' && USER_PLAN === 'demo'){ return false; }
   if(funcion === 'foja' && USER_PLAN === 'demo'){
+    if(typeof USER_PROFILE !== 'undefined' && USER_PROFILE && USER_PROFILE.fojas_semana != null){
+      return USER_PROFILE.fojas_semana < AF_DEMO_FOJAS_SEMANA;
+    }
     countFojasEstaSemana();
-    if(fojasEstaSemana >= 1) return false;
+    if(fojasEstaSemana >= AF_DEMO_FOJAS_SEMANA) return false;
   }
   return true;
 }
@@ -211,11 +228,12 @@ function checkPlanLocal(funcion){
 function checkPlan(funcion){
   if(USER_IS_ADMIN) return true;
   if(USER_PLAN === 'bloqueado'){ mostrarMensajeBloqueado(); return false; }
+  if(afDemoVencido()){ mostrarDemoVencido(); return false; }
   if(funcion === 'imprimir' && USER_PLAN === 'demo'){ mostrarUpgrade('imprimir'); return false; }
   if(funcion === 'geclisa' && USER_PLAN === 'demo'){ mostrarUpgrade('geclisa'); return false; }
   if(funcion === 'foja' && USER_PLAN === 'demo'){
-    countFojasEstaSemana();
-    if(fojasEstaSemana >= 1){ mostrarLimiteSemanal(); return false; }
+    var n = (USER_PROFILE && USER_PROFILE.fojas_semana != null) ? USER_PROFILE.fojas_semana : fojasEstaSemana;
+    if(n >= AF_DEMO_FOJAS_SEMANA){ mostrarLimiteSemanal(); return false; }
   }
   return true;
 }
@@ -223,12 +241,14 @@ function checkPlan(funcion){
 function handleAssertFail(res, funcion){
   if(!res || res.ok) return true;
   if(res.error === 'bloqueado'){ mostrarMensajeBloqueado(); return false; }
+  if(res.error === 'demo_vencido'){ mostrarDemoVencido(); return false; }
   if(res.error === 'limite_semanal'){ mostrarLimiteSemanal(); return false; }
   if(res.error === 'upgrade'){ mostrarUpgrade(funcion || res.feature); return false; }
   if(res.ok === false && !res.local){ mostrarUpgrade(funcion); return false; }
   if(res.local === true && res.ok === false){
     if(funcion === 'foja') mostrarLimiteSemanal();
     else if(USER_PLAN === 'bloqueado') mostrarMensajeBloqueado();
+    else if(afDemoVencido()) mostrarDemoVencido();
     else mostrarUpgrade(funcion);
     return false;
   }
@@ -253,16 +273,27 @@ function nuevaInterGuarded(){
 }
 
 function bumpFojaSemana(){
-  if(USER_PLAN !== 'demo') return;
-  fojasEstaSemana++;
-  var uid = AF_AUTH && AF_AUTH.getUserId ? AF_AUTH.getUserId() : '';
-  if(!uid) return;
-  // Solo contador — plan/rol no se pueden cambiar por PATCH (trigger servidor)
-  fetch(afSupabaseUrl() + '/rest/v1/anesfact_usuarios?id=eq.' + encodeURIComponent(uid), {
-    method: 'PATCH',
-    headers: afSupabaseHeaders({ 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }),
-    body: JSON.stringify({ fojas_semana: fojasEstaSemana, semana_reset: new Date().toISOString().slice(0,10) })
-  }).catch(function(){});
+  if(USER_PLAN !== 'demo' || USER_IS_ADMIN) return;
+  if(typeof AF_AUTH === 'undefined' || !AF_AUTH.getUserId || !AF_AUTH.getUserId()) return;
+  fetch(afSupabaseUrl() + '/rest/v1/rpc/af_consume_foja', {
+    method: 'POST',
+    headers: afSupabaseHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({})
+  }).then(function(r){
+    if(!r.ok) throw new Error('rpc '+r.status);
+    return r.json();
+  }).then(function(j){
+    if(j && j.fojas_semana != null){
+      fojasEstaSemana = j.fojas_semana;
+      if(USER_PROFILE) USER_PROFILE.fojas_semana = j.fojas_semana;
+    }
+    if(j && j.ok === false){
+      S.cur && (S.cur._demoCounted = false);
+      if(typeof handleAssertFail === 'function') handleAssertFail(j, 'foja');
+    }
+  }).catch(function(){
+    if(S.cur) S.cur._demoCounted = false;
+  });
 }
 
 /** Cuenta la foja demo solo al guardar con datos mínimos (nombre o DNI). */
@@ -302,7 +333,7 @@ function refreshPlanCardUi(){
   var plan = USER_PLAN || 'demo';
   if(actual) actual.textContent = 'Plan actual: ' + plan;
   var texts = {
-    demo: 'Demo: 1 foja/semana, sin imprimir ni GECLISA. Podés pedir Básico o Pro cuando quieras.',
+    demo: 'Demo: 1 mes, 5 fojas/semana, sin imprimir ni GECLISA. Pedí Básico o Pro cuando quieras.',
     basico: 'Básico: Aeronáutico + Mayo, fojas e impresión. Podés pedir pasar a Pro cuando quieras.',
     pro: 'Pro: más sanatorios. Si necesitás otro arreglo, pedí cambio igual.',
     bloqueado: 'Cuenta suspendida. Pedí reactivación acá.'
@@ -325,7 +356,7 @@ function pedirCambioPlan(){
     bloqueado: 'Reactivar cuenta'
   };
   var msgs = {
-    demo: 'Estás en plan demo. Elegí Básico o Pro y enviá el pedido. El admin lo ve en el panel; la facturación se coordina afuera.',
+    demo: 'Estás en plan demo (1 mes, 5 fojas/semana). Elegí Básico o Pro y enviá el pedido. El admin lo ve en el panel; la facturación se coordina afuera.',
     basico: 'Ya tenés Básico. Si querés Pro (más sanatorios) u otro cambio, elegí abajo y enviá el pedido.',
     pro: 'Ya tenés Pro. Si necesitás otro arreglo, elegí abajo o «No sé» y enviá el pedido.',
     bloqueado: 'Tu cuenta está suspendida. Enviá el pedido para que el admin la reactive.'

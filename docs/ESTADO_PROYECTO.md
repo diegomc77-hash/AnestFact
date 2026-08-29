@@ -1,16 +1,19 @@
 # Estado del proyecto AnesFact
 
-Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-27:
+Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
-- PWA `CACHE_V`: **12.40**
+- PWA `CACHE_V`: **12.41**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-27 — Lote 2 SISalud select (PWA **12.40**): `#f-san` = desarrollado ∩ permitidos; 3 hospitales append **solo** a Huerta. Esperando Pages (flujo real). Admin ve los 5 desarrollado.
+- 2026-08-28 — Lote 1 planes Demo (PWA **12.41** + SQL **015**): 1 mes + 5 fojas/semana en servidor (`demo_started_at`, `plan_expires_at`, `af_consume_foja`). Esperando Pages (`cache:'no-store'`). SQL 015 ya está en el proyecto linked.
+- Lotes 2–3 planes (no empezados): recorte Huerta (solo Hospital Córdoba de públicos) + validación 1 público / N lugares (Aero cuenta).
+- 2026-08-27 — Lote 2 SISalud select (PWA **12.40**): `#f-san` = desarrollado ∩ permitidos. Esperando Pages (flujo real). Admin ve los 5 desarrollado.
 
 ## Qué se hizo (más reciente primero)
 
+- 2026-08-28 — SQL **015** + PWA **12.41** (lote 1 planes): Demo 1 mes y 5 fojas/semana. Contador ya no se PATCHA desde el cliente; `af_consume_foja` + tope en `af_assert_plan`. Huerta y tope de lugares no se tocaron.
 - 2026-08-27 — SQL **014**: `af_admin_set_plan` une default del plan + extras que el usuario ya tenía. Guardar Pro sobre Huerta deja los 3 hospitales. Sin extras (admin/demo) el array queda igual al default. Ya no es riesgo activo.
 - 2026-08-27 — Lote 2 (PWA **12.40**). Select armado desde catálogo `desarrollado`. Admin: los 5. Huerta: Aero + Mayo + Misericordia + Córdoba + San Roque. SQL **013** solo su fila (array quedó en 7; Allende/Privada Córdoba siguen en el array, no en el select). Allende fuera.
 - 2026-08-27 — Sub-lote 1 SISalud (PWA **12.39**). SQL **012** + header A4 + pie ADAARC condicional + sala/cama texto SISalud. No se pudo verificar en Pages sin el select (guardar() revertía `S.cur.san`). Se verifica junto con 12.40.
@@ -37,7 +40,8 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - Foja-bar fija + contraste valoración (12.36): **cerrado en Pages**.
 - Ruta alternativa por DNI en GECLISA (pacientes de alta): `chrome-extension-geclisa-batch/NOTES_RUTA_HC_POR_DNI.md` — no implementada.
 - Correlativo QR entre equipos (servidor): diferido.
-- Instituciones: catálogo **010** + **011** + **012** + **013** + **014** (013 = extras Huerta; 014 = Guardar plan no los pisa). Habilitar resto = `sanatorios_permitidos` + `desarrollado`, no re-sembrar. String legado `Clínica Allende` sigue en el array de Huerta; no sale en el select.
+- Instituciones: catálogo **010**–**015** (013 = extras Huerta; 014 = Guardar plan no los pisa; 015 = Demo mes/5 fojas). Habilitar resto = `sanatorios_permitidos` + `desarrollado`, no re-sembrar. String legado `Clínica Allende` sigue en el array de Huerta; no sale en el select.
+- Planes (confirmado 2026-08-28): Aero cuenta como lugar (no canal gratis). 1 público máx por cuenta, exclusivo. Admin ve todos sin cupo. Firma sigue atada a la cuenta, no a la foja — regla distinta al tope de lugares (antifraude de cuenta compartida). DEFAULTS.pro vacío y `af_admin_set_sanatorios` = lote 3.
 - SISalud: cómo se sube la foja/PDF — **no investigar todavía**.
 - PNG oficiales de header Córdoba / San Roque: cuando existan, reemplazan compose (`oficial: false`).
 
