@@ -1,6 +1,6 @@
 (function () {
   var TOKEN = '';
-  var SANATORIO = 'Sanatorio Mayo'; // Etapa 1
+  var SANATORIO = '';
   var organState = {};
   var estudiosExtraidos = {};
   var estudiosAdjuntos = {};
@@ -616,7 +616,7 @@
     if ($('v-intub') && $('v-intub').value === 'si' && org.chips.indexOf('Vía difícil') < 0) org.chips.push('Vía difícil');
     var adjuntos = collectEstudioAdjuntos();
     var provEl = $('v-prov-obra');
-    var cfg = afValoracionCfg(SANATORIO);
+    var cfg = typeof afValoracionCfg === 'function' ? afValoracionCfg(SANATORIO) : { id: '', label: SANATORIO };
     var nombre = $('v-nombre').value.trim();
     var dniRaw = $('v-dni').value.trim();
     var dniCanon = digitsDni(dniRaw);
@@ -690,7 +690,7 @@
         fiebre_infeccion: $('v-fiebre').value.trim() || null,
         tvp_viaje: $('v-tvp').value.trim() || null,
         sanatorio: SANATORIO,
-        cfg_id: cfg.id,
+        cfg_id: (cfg && cfg.id) || '',
         diagnostico_paciente: dxPaciente,
         diagnostico_medico_sugerido: mapped || null,
         diagnostico_sugerido: !!mapped,
@@ -727,7 +727,7 @@
     return String(d == null ? '' : d).replace(/\D/g, '').replace(/^0+/, '') || '';
   }
 
-  /** Validación fuerte de campos críticos (Mayo). HC opcional. */
+  /** Validación fuerte de campos críticos. HC opcional. */
   function validateCriticos() {
     var errs = [];
     var nombre = $('v-nombre').value.trim();
@@ -864,17 +864,45 @@
       });
   }
 
-  function applyMayoCfg() {
-    var cfg = typeof afValoracionCfg === 'function' ? afValoracionCfg(SANATORIO) : null;
+  function peekLugar() {
+    var url = (typeof afSupabaseUrl === 'function' ? afSupabaseUrl() : '') + '/functions/v1/af-qr-peek';
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: AF_SUPABASE_KEY },
+      body: JSON.stringify({ token: TOKEN }),
+    })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok || !res.j || !res.j.ok) return '';
+        return String(res.j.sanatorio || '').trim();
+      })
+      .catch(function () { return ''; });
+  }
+
+  function applyValoracionCfg() {
     var badge = $('val-inst-badge');
-    if (badge) badge.textContent = 'Institución: ' + (cfg ? cfg.label : SANATORIO);
-    var map = typeof getCirujanosMapForLugar === 'function' ? getCirujanosMapForLugar(SANATORIO) : {};
+    var texto = typeof afValoracionBadgeTexto === 'function' ? afValoracionBadgeTexto(SANATORIO) : '';
+    if (badge) {
+      badge.textContent = texto;
+      badge.style.display = texto ? '' : 'none';
+    }
     var sel = $('v-serv');
     if (sel) {
-      var keys = Object.keys(map).filter(function (k) { return (map[k] || []).length > 0; }).sort();
-      sel.innerHTML = '<option value="">Seleccionar…</option>' + keys.map(function (k) {
-        return '<option value="' + k.replace(/"/g, '&quot;') + '">' + k + '</option>';
+      var prev = sel.value;
+      var opts = typeof afValoracionEspecialidadesParaLugar === 'function'
+        ? afValoracionEspecialidadesParaLugar(SANATORIO)
+        : [];
+      sel.innerHTML = '<option value="">Seleccionar…</option>' + opts.map(function (k) {
+        return '<option value="' + String(k).replace(/"/g, '&quot;') + '">' + k + '</option>';
       }).join('');
+      if (prev) {
+        for (var i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === prev) {
+            sel.value = prev;
+            break;
+          }
+        }
+      }
     }
   }
 
@@ -1182,7 +1210,11 @@
     TOKEN = parseToken();
     if (!TOKEN) return;
     showPrivacyThenForm();
-    applyMayoCfg();
+    applyValoracionCfg();
+    peekLugar().then(function (san) {
+      SANATORIO = san || '';
+      applyValoracionCfg();
+    });
     initProvincias();
     renderOrganos();
     wireObraAc();

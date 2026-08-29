@@ -29,13 +29,27 @@ function afQrFechaCorta() {
   return (p[2] || '') + '/' + (p[1] || '');
 }
 
-function afQrOrdenKey() {
-  var suf = (typeof afUserSuffix === 'function' ? afUserSuffix() : '') || '_anon';
-  return 'af_qr_orden_' + afQrFechaAR() + suf;
+function afQrLugarId(lugar) {
+  var n = String(lugar || '').trim();
+  if (typeof afFojaInst === 'function') {
+    var inst = afFojaInst(n);
+    if (inst && inst.id) return String(inst.id);
+  }
+  if (!n) return 'x';
+  try {
+    return n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || 'x';
+  } catch (e) {
+    return 'x';
+  }
 }
 
-function afNextQrOrdenDia() {
-  var k = afQrOrdenKey();
+function afQrOrdenKey(lugar) {
+  var suf = (typeof afUserSuffix === 'function' ? afUserSuffix() : '') || '_anon';
+  return 'af_qr_orden_' + afQrFechaAR() + suf + '_' + afQrLugarId(lugar);
+}
+
+function afNextQrOrdenDia(lugar) {
+  var k = afQrOrdenKey(lugar);
   var n = 0;
   try { n = parseInt(localStorage.getItem(k) || '0', 10) || 0; } catch (e) {}
   n += 1;
@@ -401,7 +415,7 @@ function crearQrValoracion() {
       if (!res.ok || !res.j.ok || !res.j.token) {
         throw new Error((res.j && res.j.error) || 'No se pudo crear el QR');
       }
-      var orden = afNextQrOrdenDia();
+      var orden = afNextQrOrdenDia(lugar);
       mostrarModalQrValoracion(res.j, orden, lugar);
       toast(lugar === 'Sanatorio Mayo' ? 'QR Mayo listo (un uso)' : ('QR listo · ' + lugar + ' (un uso)'));
     })

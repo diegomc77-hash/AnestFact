@@ -2,14 +2,16 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
-- PWA `CACHE_V`: **12.47**
+- PWA `CACHE_V`: **12.48**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-28 — PWA **12.47** + Edge `af-qr-submit`: QR por lugar (públicos). Esperando verificación en Pages (`cache:'no-store'`), sesión Huerta: QR Córdoba → foja Córdoba.
+- 2026-08-28 — PWA **12.48** + Edge `af-qr-peek`: Lote A (contador por lugar, badge real, sin nómina Mayo en públicos). Esperando Pages (`cache:'no-store'`).
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-08-28 — PWA **12.48**: contador QR por institución; badge paciente vía `af-qr-peek` (si falla, vacío, nunca Mayo); públicos con especialidad genérica y cirujano a mano; `cfg_id` alineado. Mayo igual. Lote B (colores/hub) y quirófanos: después.
 
 - 2026-08-28 — PWA **12.47**: selector «Este QR es para:» en Preop (si hay >1 lugar), persistencia `af_qr_lugar_<uid>`, tarjeta/toast con el nombre real. `af-qr-submit` usa `contexto.sanatorio` del token. Mayo igual. Badge paciente queda para sub-lote.
 
