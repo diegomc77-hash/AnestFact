@@ -143,8 +143,10 @@ function cargarFojaUI(){
     if(typeof initBalanceFluidosUI==='function')initBalanceFluidosUI();
   },200);
 }
-function guardarFoja(){guardarFojaVG();
+function flushFojaDomIntoCur(){
+  if(typeof guardarFojaVG==='function')guardarFojaVG();
   if(!S.cur)return;
+  if(!S.cur.foja)S.cur.foja={drogas:[],vitals:[]};
   if(typeof syncFojaHoras==='function')syncFojaHoras();
   if(typeof syncTivaFromUI==='function')syncTivaFromUI();
   if(typeof syncGasesFromUI==='function')syncGasesFromUI();
@@ -216,6 +218,14 @@ function guardarFoja(){guardarFojaVG();
     S.cur.foja.mon_pani=_monChk('mon-pani');S.cur.foja.mon_decub=_monChk('mon-decub');
     S.cur.foja.mon_emerg=_monChk('mon-emerg');
   }
-  guardar();toast('Foja guardada ✓');
+}
+
+function guardarFoja(){
+  flushFojaDomIntoCur();
+  if(!S.cur) return Promise.resolve(false);
+  return guardar().then(function(ok){
+    if(ok) toast('Foja guardada ✓');
+    return ok;
+  });
 }
 

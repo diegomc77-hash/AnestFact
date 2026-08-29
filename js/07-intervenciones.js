@@ -700,9 +700,9 @@ function refreshFacturacionHeader(){
   if(S.cur.san) t+=' · '+S.cur.san;
   el.textContent=t;
 }
-function guardar(extra){
-  if(!S.cur)return;
-  if(document.getElementById('f-san')&&typeof AfSanatoriosPlan!=='undefined'&&!AfSanatoriosPlan.assertCurrent())return;
+/** Copia el formulario a S.cur en memoria. No toca localStorage ni sync. */
+function flushFormIntoCur(extra){
+  if(!S.cur)return false;
   if(document.getElementById('f-fecha')){
     S.cur.fecha=gv('f-fecha');S.cur.pac=gv('f-pac');
     S.cur.edad=gv('f-edad');S.cur.sexo=gv('f-sexo');S.cur.dni=gv('f-dni');
@@ -722,12 +722,14 @@ function guardar(extra){
   }
   if(extra)Object.assign(S.cur,extra);
   if(typeof AF_AUTH!=='undefined'&&AF_AUTH.getUserId)S.cur.owner_id=AF_AUTH.getUserId();
+  return true;
+}
+
+function afCommitGuardarLocal(){
   var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});
   if(idx>=0)S.intervs[idx]=S.cur;else S.intervs.push(S.cur);
   S.cur._ts=Date.now();
   saveIntervsToStorage();
-  if(typeof maybeBumpDemoFojaOnSave==='function')maybeBumpDemoFojaOnSave();
-  // Learn cirujano (ignorar placeholders de prueba)
   if(S.cur.ciru&&S.cur.ciru.trim()){
     var c=S.cur.ciru.trim();
     if(!(typeof afIsCirujanoBasura==='function'&&afIsCirujanoBasura(c))){
@@ -735,10 +737,45 @@ function guardar(extra){
     }
   }
   if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
-  toast('Guardado ✓');
+}
+
+function guardar(extra){
+  if(!S.cur)return Promise.resolve(false);
+  if(document.getElementById('f-san')&&typeof AfSanatoriosPlan!=='undefined'&&!AfSanatoriosPlan.assertCurrent()){
+    return Promise.resolve(false);
+  }
+  flushFormIntoCur(extra);
+
+  function finishOk(){
+    afCommitGuardarLocal();
+    toast('Guardado ✓');
+    return true;
+  }
+
+  var logged=typeof AF_AUTH!=='undefined'&&AF_AUTH.isLoggedIn&&AF_AUTH.isLoggedIn();
+  if(!logged){
+    return Promise.resolve(finishOk());
+  }
+
+  return assertPlanServer('foja').then(function(res){
+    if(typeof handleAssertFail==='function'&&!handleAssertFail(res,'foja')) return false;
+    if(typeof afGuardarMayPersist==='function'&&!afGuardarMayPersist(res,null)) return false;
+    var bump=typeof maybeBumpDemoFojaOnSave==='function'
+      ? maybeBumpDemoFojaOnSave()
+      : Promise.resolve({ok:true,consumed:false});
+    return bump.then(function(cres){
+      if(typeof afGuardarMayPersist==='function'&&!afGuardarMayPersist(res,cres)){
+        if(typeof handleAssertFail==='function') handleAssertFail(cres,'foja');
+        return false;
+      }
+      return finishOk();
+    });
+  }).catch(function(){
+    if(typeof toast==='function') toast('No se pudo verificar el plan. Reintentá.');
+    return false;
+  });
 }
 function marcarListo(){
-  guardar({estado:'listo'});
   if(S.cur&&document.getElementById('fj-tec')){
     if(!S.cur.foja)S.cur.foja={drogas:[],vitals:[]};
     var f2=S.cur.foja;
@@ -746,12 +783,12 @@ function marcarListo(){
     ['tec','asa','via','ind','hint','hext','fin','premed','metodos','recup','obs','suero','sangre','plasma','outro'].forEach(function(k){
       var id='fj-'+(k==='outro'?'otro':k);if(!f2[k]&&gfv2(id))f2[k]=gfv2(id);
     });
-    guardarFojaVG();
-    var idx2=S.intervs.findIndex(function(i){return i.id===S.cur.id;});
-    if(idx2>=0)S.intervs[idx2]=S.cur;
-    saveIntervsToStorage();
+    if(typeof guardarFojaVG==='function')guardarFojaVG();
   }
-  go('resumen');
+  return guardar({estado:'listo'}).then(function(ok){
+    if(ok) go('resumen');
+    return ok;
+  });
 }
 function renderPracs(){
   var c=document.getElementById('pracs-list');if(!c||!S.cur)return;

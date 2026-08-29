@@ -2,16 +2,17 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
-- PWA `CACHE_V`: **12.44**
+- PWA `CACHE_V`: **12.45**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-28 — SQL **019** + PWA **12.44**: INSERT Demo no inflable + M.P. única. Esperando Pages (`cache:'no-store'`). Punto 3 (guardar/sync vs tope Demo) **no implementado** — propuesta en el chat.
+- 2026-08-28 — SQL **020** + PWA **12.45**: Punto 3 A+B (guardar fail-closed + trigger sync Demo). Esperando Pages (`cache:'no-store'`).
 
 ## Qué se hizo (más reciente primero)
 
-- 2026-08-28 — SQL **019** + PWA **12.44**: INSERT no-admin siempre Aero + reloj Demo + sin override. M.P. (dígitos) única; cluster Demo mismo lugar en 7 días → `anesfact_plan_audit` (no bloquea).
+- 2026-08-28 — SQL **020** + PWA **12.45**: `guardar()` espera assert + consume Demo antes de localStorage/sync. RPC caída → toast «No se pudo verificar el plan. Reintentá.» (no deja pasar). Trigger en `anesfact_datos` rechaza INSERT/UPDATE `anesfact_sync_*` de Demo vencida o `fojas_semana >= 5`. SELECT/pull intacto. `nuevaInter()` no consume.
+- 2026-08-28 — SQL **019** + PWA **12.44**: INSERT Demo no inflable + M.P. única. **Cerrado en Pages.**
 - 2026-08-28 — SQL **018** + PWA **12.43**: plan **max** (2 lugares). **Cerrado en Pages.**
 - 2026-08-28 — SQL **017** + PWA **12.42** (lote 3 planes): validación 1 público / N no-públicos (Aero cuenta). Rechaza, no recorta. `af_admin_set_sanatorios` + override `privados_max_override` auditado. `af_assert_plan(..., p_sanatorio)`. DEFAULTS.pro vacío. Guardar plan ya no une el paquete de 4.
 - 2026-08-28 — SQL **016** (lote 2 planes): Huerta Aero + Mayo + Hospital Córdoba. **Cerrado en Pages.**

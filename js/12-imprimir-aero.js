@@ -317,8 +317,9 @@ function _buildObsAdicionalSheet(i,obsText,signImg,pageNum){
 function imprimirFoja(){
   // Defensa en profundidad: no confiar solo en el botón guarded
   if(typeof checkPlan==='function' && !checkPlan('imprimir')) return;
-  if(document.getElementById('f-pac'))guardar();
-  if(document.getElementById('fj-tec'))guardarFoja();
+  if(typeof flushFormIntoCur==='function'&&document.getElementById('f-pac'))flushFormIntoCur();
+  if(typeof flushFojaDomIntoCur==='function'&&document.getElementById('fj-tec'))flushFojaDomIntoCur();
+  if(typeof guardar==='function'&&document.getElementById('f-pac'))guardar();
   var i=S.cur;if(!i){toast('Complet\u00e1 los datos primero');return;}
   var f=i.foja||{};
   _afPrintFirmaOpts={colegio:!(typeof afFojaEsSisalud==='function'&&afFojaEsSisalud(i.san))};

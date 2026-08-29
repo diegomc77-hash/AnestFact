@@ -85,16 +85,30 @@ function loadUserPlan(){
   });
 }
 
-/** Consulta servidor (af_assert_plan). Fallback local si RPC no desplegada. */
+/** Consulta servidor (af_assert_plan). Fail-closed si la RPC no responde. */
 function afSanatorioAssertNombre(){
   if(typeof S !== 'undefined' && S.cur && S.cur.san) return String(S.cur.san);
   var el = document.getElementById('f-san');
   return el && el.value ? String(el.value) : '';
 }
 
+function afRpcForceFail(){
+  return typeof window !== 'undefined' && !!window.AF_TEST_RPC_FAIL;
+}
+
+/** Persistí solo si assert (y consume, si vino) dieron ok. */
+function afGuardarMayPersist(assertRes, consumeRes){
+  if(!assertRes || assertRes.ok !== true) return false;
+  if(consumeRes && consumeRes.ok === false) return false;
+  return true;
+}
+
 function assertPlanServer(funcion){
   if(typeof AF_AUTH === 'undefined' || !AF_AUTH.isLoggedIn || !AF_AUTH.isLoggedIn()){
     return Promise.resolve({ ok: false, error: 'no_auth' });
+  }
+  if(afRpcForceFail()){
+    return Promise.resolve({ ok: false, error: 'rpc_fail' });
   }
   var san = afSanatorioAssertNombre();
   var cacheKey = funcion + ':' + (USER_PLAN || '') + ':' + san;
@@ -114,8 +128,7 @@ function assertPlanServer(funcion){
     if(j && j.sanatorios && USER_PROFILE) USER_PROFILE.sanatorios_permitidos = j.sanatorios;
     return j;
   }).catch(function(){
-    // RPC aún no migrada: usar chequeo local
-    return { ok: checkPlanLocal(funcion), local: true };
+    return { ok: false, error: 'rpc_fail' };
   });
 }
 
@@ -247,6 +260,10 @@ function checkPlan(funcion){
 
 function handleAssertFail(res, funcion){
   if(!res || res.ok) return true;
+  if(res.error === 'rpc_fail'){
+    if(typeof toast === 'function') toast('No se pudo verificar el plan. Reintentá.');
+    return false;
+  }
   if(res.error === 'bloqueado'){ mostrarMensajeBloqueado(); return false; }
   if(res.error === 'demo_vencido'){ mostrarDemoVencido(); return false; }
   if(res.error === 'limite_semanal'){ mostrarLimiteSemanal(); return false; }
@@ -286,9 +303,16 @@ function nuevaInterGuarded(){
 }
 
 function bumpFojaSemana(){
-  if(USER_PLAN !== 'demo' || USER_IS_ADMIN) return;
-  if(typeof AF_AUTH === 'undefined' || !AF_AUTH.getUserId || !AF_AUTH.getUserId()) return;
-  fetch(afSupabaseUrl() + '/rest/v1/rpc/af_consume_foja', {
+  if(USER_PLAN !== 'demo' || USER_IS_ADMIN){
+    return Promise.resolve({ ok: true, consumed: false });
+  }
+  if(typeof AF_AUTH === 'undefined' || !AF_AUTH.getUserId || !AF_AUTH.getUserId()){
+    return Promise.resolve({ ok: false, error: 'rpc_fail' });
+  }
+  if(afRpcForceFail()){
+    return Promise.resolve({ ok: false, error: 'rpc_fail' });
+  }
+  return fetch(afSupabaseUrl() + '/rest/v1/rpc/af_consume_foja', {
     method: 'POST',
     headers: afSupabaseHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify({})
@@ -301,23 +325,35 @@ function bumpFojaSemana(){
       if(USER_PROFILE) USER_PROFILE.fojas_semana = j.fojas_semana;
     }
     if(j && j.ok === false){
-      S.cur && (S.cur._demoCounted = false);
-      if(typeof handleAssertFail === 'function') handleAssertFail(j, 'foja');
+      if(S.cur) S.cur._demoCounted = false;
     }
+    return j || { ok: false, error: 'rpc_fail' };
   }).catch(function(){
     if(S.cur) S.cur._demoCounted = false;
+    return { ok: false, error: 'rpc_fail' };
   });
 }
 
 /** Cuenta la foja demo solo al guardar con datos mínimos (nombre o DNI). */
 function maybeBumpDemoFojaOnSave(){
-  if(USER_PLAN !== 'demo' || !S.cur) return;
-  if(S.cur._demoCounted) return;
+  if(USER_PLAN !== 'demo' || !S.cur){
+    return Promise.resolve({ ok: true, consumed: false });
+  }
+  if(S.cur._demoCounted){
+    return Promise.resolve({ ok: true, consumed: false });
+  }
   var pac = String(S.cur.pac || '').trim();
   var dni = String(S.cur.dni || '').trim().replace(/^0+/, '');
-  if(pac.length < 2 && !/^\d{7,9}$/.test(dni)) return;
+  if(pac.length < 2 && !/^\d{7,9}$/.test(dni)){
+    return Promise.resolve({ ok: true, consumed: false });
+  }
   S.cur._demoCounted = true;
-  bumpFojaSemana();
+  return bumpFojaSemana().then(function(j){
+    if(!j || j.ok === false){
+      if(S.cur) S.cur._demoCounted = false;
+    }
+    return j || { ok: false, error: 'rpc_fail' };
+  });
 }
 
 function planBadgeText(){
