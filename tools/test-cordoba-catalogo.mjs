@@ -40,9 +40,6 @@ const mayo = context.getCirujanosMapForLugar('Sanatorio Mayo');
 if ((mayo['Cirugía General'] || []).indexOf('COOKE JOSE ALBERTO') < 0) fail('Mayo Cooke intacto');
 if (mayo['Instituto del Quemado']) fail('Mayo no debe tener Instituto del Quemado');
 
-if (Object.keys(context.getCirujanosMapForLugar('Hospital Misericordia') || {}).length) {
-  fail('Misericordia debe seguir sin catálogo');
-}
 if (Object.keys(context.getCirujanosMapForLugar('Hospital San Roque') || {}).length) {
   fail('San Roque debe seguir sin catálogo');
 }
@@ -52,11 +49,19 @@ if (specCba.indexOf('Cirugía General') < 0) fail('QR Córdoba debe listar Cirug
 if (specCba.indexOf('Instituto del Quemado') < 0) fail('QR Córdoba debe listar Instituto del Quemado');
 if (specCba.indexOf('Proctología') >= 0) fail('QR Córdoba no debe usar lista genérica (Proctología)');
 
+const mis = context.getCirujanosMapForLugar('Hospital Misericordia');
+if ((mis['Cirugía General'] || []).indexOf('Dr. Fernando Craievich') < 0) fail('Misericordia General');
+if ((mis['Cirugía Plástica y Reparadora'] || []).indexOf('Dr. Patat Roman') < 0) fail('Plástica → Plástica y Reparadora');
+if ((mis['Cirugía Torácica'] || []).indexOf('Dr. Matías Losano Brotons') < 0) fail('Tórax → Cirugía Torácica');
+if ((mis['Cirugía Vascular'] || []).indexOf('Dr. Sergio Javier Vacca') < 0) fail('Vascular Misericordia');
+if ((mis['Cirugía Pediátrica'] || []).length) fail('Pediátrica Misericordia debe quedar vacía');
 const specMis = context.afValoracionEspecialidadesParaLugar('Hospital Misericordia');
-if (specMis.indexOf('Proctología') < 0) fail('Misericordia QR sigue genérica');
-if ((context.getCirujanosMapForLugar('Hospital Misericordia')['Cirugía General'] || []).length) {
-  fail('Misericordia no debe autocompletar cirujanos');
-}
+if (specMis.indexOf('Cirugía General') < 0) fail('QR Misericordia debe usar catálogo');
+if (specMis.indexOf('Proctología') >= 0) fail('QR Misericordia no debe ser lista genérica');
+if (specMis.indexOf('Cirugía Pediátrica') >= 0) fail('QR no lista Pediátrica vacía');
+
+const specRoque = context.afValoracionEspecialidadesParaLugar('Hospital San Roque');
+if (specRoque.indexOf('Proctología') < 0) fail('San Roque QR sigue genérica');
 
 const q = context.afFojaQuirofanos('Hospital Córdoba');
 if (q.length !== 9) fail('Córdoba debe tener 9 quirófanos, tiene ' + q.length);
@@ -74,4 +79,4 @@ if (nueva.indexOf('Instituto del Quemado') < 0) fail('#f-serv sin Instituto del 
 if (nueva.indexOf('Cirugía de Tórax y Cardiovascular') < 0) fail('#f-serv sin Tórax y Cardiovascular');
 if (nueva.indexOf('id="f-sala-inst"') < 0) fail('falta select f-sala-inst');
 
-process.stdout.write('OK    Córdoba 9 + Misericordia 4 quirófanos; Roque/Mayo/Aero sin este select; sin nómina Misericordia\n');
+process.stdout.write('OK    Córdoba 9 + Misericordia nómina + 4 quirófanos; Roque genérico; Mayo/Aero intactos\n');

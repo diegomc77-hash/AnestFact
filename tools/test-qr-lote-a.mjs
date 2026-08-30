@@ -103,9 +103,14 @@ const ciruMayo = context.getCirujanosMapForLugar('Sanatorio Mayo');
 const mayoNames = (ciruMayo['Cirugía General'] || []).join(' ');
 if (mayoNames.indexOf('COOKE') < 0) fail('Mayo debe conservar su nómina');
 const specMis = context.afValoracionEspecialidadesParaLugar('Hospital Misericordia');
-if (specMis.indexOf('Proctología') < 0) fail('Misericordia sigue lista genérica');
-if (Object.keys(context.getCirujanosMapForLugar('Hospital Misericordia') || {}).length) {
-  fail('Misericordia no debe tener catálogo');
+if (specMis.indexOf('Cirugía General') < 0) fail('Misericordia QR usa catálogo');
+if ((context.getCirujanosMapForLugar('Hospital Misericordia')['Cirugía General'] || []).indexOf('Dr. Fernando Craievich') < 0) {
+  fail('Misericordia debe autocompletar');
+}
+const specRoque = context.afValoracionEspecialidadesParaLugar('Hospital San Roque');
+if (specRoque.indexOf('Proctología') < 0) fail('San Roque sigue lista genérica');
+if (Object.keys(context.getCirujanosMapForLugar('Hospital San Roque') || {}).length) {
+  fail('San Roque no debe tener catálogo');
 }
 if (specMayo.indexOf('Proctología') >= 0) fail('Mayo no debe listar especialidades sin nómina');
 

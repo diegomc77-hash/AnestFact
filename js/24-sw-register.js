@@ -10,7 +10,7 @@
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
-      navigator.serviceWorker.register('./sw.js?v=12.51').then(function (reg) {
+      navigator.serviceWorker.register('./sw.js?v=12.52').then(function (reg) {
         if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
         navigator.serviceWorker.addEventListener('message', function (ev) {
           if (ev.data && ev.data.type === 'anesfact-offline') setOffline(true);

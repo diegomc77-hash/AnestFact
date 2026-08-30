@@ -199,6 +199,67 @@ var CIRUJANOS_POR_LUGAR = {
       'Dra. Ximena Castelao Lima',
       'Dra. Paula Romero'
     ]
+  },
+  'Hospital Misericordia': {
+    'Cirugía Plástica y Reparadora': [
+      'Dr. Patat Roman',
+      'Dr. Ochoa Jorge'
+    ],
+    'Cirugía Vascular': [
+      'Dr. Sergio Javier Vacca'
+    ],
+    'Cirugía Torácica': [
+      'Dr. Matías Losano Brotons',
+      'Dr. Sarquis Jose Luis',
+      'Dr. Torres Rafael'
+    ],
+    'Urología': [
+      'Rolando Santos',
+      'Manuel Alejandro Lupiañez'
+    ],
+    'Cirugía de Cabeza y Cuello': [
+      'Dr. Clavero Diego Martin'
+    ],
+    'Neurocirugía': [
+      'Dr. Germán Olmedo',
+      'Dr. Vicente Enrique Oddo',
+      'Dr. Francisco Javier Celis'
+    ],
+    'Cirugía General': [
+      'Dr. Fernando Craievich',
+      'Dr. Alejandro Mariano Bulacio Sánchez',
+      'Dr. Pablo Esteban Petrone',
+      'Brian Coppari',
+      'Cecilia Rodriguez Oses',
+      'Dr. Lucas Cottonaro',
+      'Dr. Juan Pablo Villalba Santana',
+      'Ricardo Perez',
+      'Nicolas Gonzalo',
+      'Maximiliano Titarelli',
+      'Ricardo Marti',
+      'Gallo Aguilar',
+      'Dr. Ariel Esteban Álvarez',
+      'Sebastian Romero'
+    ],
+    'Gastroenterología': [
+      'Maretich Cecilia',
+      'Romina Castaño'
+    ],
+    'Traumatología y Ortopedia': [
+      'Gaston Echenique',
+      'Mariano Curti',
+      'Nicolas Ortiz',
+      'Dr. Diego Bernardini',
+      'Dr. Gustavo Adolfo Morelli',
+      'Dr. Marcos Daniel Bustos',
+      'Dr. Mario Rostagno'
+    ],
+    'Oftalmología': [
+      'Luciana Gorostiaga',
+      'Roque Broin',
+      'Dra. Yanina Karin Proietti'
+    ],
+    'Cirugía Pediátrica': []
   }
 };
 

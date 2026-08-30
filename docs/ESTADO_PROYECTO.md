@@ -2,14 +2,18 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
-- PWA `CACHE_V`: **12.51**
+- PWA `CACHE_V`: **12.52**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-29 — PWA **12.51**: 4 quirófanos Hospital Misericordia. Esperando Pages (`cache:'no-store'`).
+- 2026-08-30 — PWA **12.52**: nómina cirujanos Hospital Misericordia. Esperando Pages (`cache:'no-store'`).
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-08-30 — PWA **12.52**: `CIRUJANOS_POR_LUGAR['Hospital Misericordia']`. Plástica → Plástica y Reparadora; Tórax → Cirugía Torácica; Pediátrica vacía. San Roque / Córdoba / Mayo / Aero intactos.
+
+- 2026-08-30 — Regla: navegación nueva solo por `go(vista)` (`.cursor/rules/00-anesfact-general.mdc`).
 
 - 2026-08-29 — PWA **12.51**: Misericordia `Quirófano 1–4` (select). San Roque sigue texto. Sin nómina de cirujanos. Córdoba 9 / Mayo / Aero intactos.
 
