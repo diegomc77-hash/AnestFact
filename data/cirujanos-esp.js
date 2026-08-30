@@ -214,8 +214,8 @@ var CIRUJANOS_POR_LUGAR = {
       'Dr. Torres Rafael'
     ],
     'Urología': [
-      'Rolando Santos',
-      'Manuel Alejandro Lupiañez'
+      'Dr. Rolando Santos',
+      'Dr. Manuel Alejandro Lupiañez'
     ],
     'Cirugía de Cabeza y Cuello': [
       'Dr. Clavero Diego Martin'
@@ -229,34 +229,34 @@ var CIRUJANOS_POR_LUGAR = {
       'Dr. Fernando Craievich',
       'Dr. Alejandro Mariano Bulacio Sánchez',
       'Dr. Pablo Esteban Petrone',
-      'Brian Coppari',
-      'Cecilia Rodriguez Oses',
+      'Dr. Brian Coppari',
+      'Dra. Cecilia Rodriguez Oses',
       'Dr. Lucas Cottonaro',
       'Dr. Juan Pablo Villalba Santana',
-      'Ricardo Perez',
-      'Nicolas Gonzalo',
-      'Maximiliano Titarelli',
-      'Ricardo Marti',
-      'Gallo Aguilar',
+      'Dr. Ricardo Perez',
+      'Dr. Nicolas Gonzalo',
+      'Dr. Maximiliano Titarelli',
+      'Dr. Ricardo Marti',
+      'Dr. Gallo Aguilar',
       'Dr. Ariel Esteban Álvarez',
-      'Sebastian Romero'
+      'Dr. Sebastian Romero'
     ],
     'Gastroenterología': [
-      'Maretich Cecilia',
-      'Romina Castaño'
+      'Dra. Maretich Cecilia',
+      'Dra. Romina Castaño'
     ],
     'Traumatología y Ortopedia': [
-      'Gaston Echenique',
-      'Mariano Curti',
-      'Nicolas Ortiz',
+      'Dr. Gaston Echenique',
+      'Dr. Mariano Curti',
+      'Dr. Nicolas Ortiz',
       'Dr. Diego Bernardini',
       'Dr. Gustavo Adolfo Morelli',
       'Dr. Marcos Daniel Bustos',
       'Dr. Mario Rostagno'
     ],
     'Oftalmología': [
-      'Luciana Gorostiaga',
-      'Roque Broin',
+      'Dra. Luciana Gorostiaga',
+      'Dr. Roque Broin',
       'Dra. Yanina Karin Proietti'
     ],
     'Cirugía Pediátrica': []

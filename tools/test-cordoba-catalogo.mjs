@@ -55,6 +55,11 @@ if ((mis['Cirugía Plástica y Reparadora'] || []).indexOf('Dr. Patat Roman') < 
 if ((mis['Cirugía Torácica'] || []).indexOf('Dr. Matías Losano Brotons') < 0) fail('Tórax → Cirugía Torácica');
 if ((mis['Cirugía Vascular'] || []).indexOf('Dr. Sergio Javier Vacca') < 0) fail('Vascular Misericordia');
 if ((mis['Cirugía Pediátrica'] || []).length) fail('Pediátrica Misericordia debe quedar vacía');
+Object.keys(mis).forEach(function (k) {
+  (mis[k] || []).forEach(function (n) {
+    if (!/^Dr[a]?\. /.test(n)) fail('Misericordia sin Dr/Dra: ' + n);
+  });
+});
 const specMis = context.afValoracionEspecialidadesParaLugar('Hospital Misericordia');
 if (specMis.indexOf('Cirugía General') < 0) fail('QR Misericordia debe usar catálogo');
 if (specMis.indexOf('Proctología') >= 0) fail('QR Misericordia no debe ser lista genérica');
