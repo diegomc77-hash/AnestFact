@@ -43,6 +43,26 @@ if (cssSrc.indexOf('--san-misericordia:') < 0) fail('falta --san-misericordia');
 if (cssSrc.indexOf('--san-san-roque:') < 0) fail('falta --san-san-roque');
 if (cssSrc.indexOf('.inter-san-cordoba') < 0) fail('falta clase inter-san-cordoba');
 
+const PALETTE = {
+  '--san-san-roque': '#0d9488',
+  '--san-mayo': '#0ea5e9',
+  '--san-cordoba': '#2563eb',
+  '--san-aero': '#8b5cf6',
+  '--san-misericordia': '#c026d3',
+  '--san-allende': '#db2777',
+  '--san-otro': '#64748b'
+};
+Object.keys(PALETTE).forEach(function (name) {
+  var re = new RegExp(name.replace(/-/g, '\\-') + ':\\s*(' + PALETTE[name] + ')\\b', 'i');
+  if (!re.test(cssSrc)) fail('paleta ' + name + ' debe ser ' + PALETTE[name]);
+});
+if (hubSrc.indexOf("c:'var(--san-mayo)'") < 0) fail('hub Mayo no usa var(--san-mayo)');
+if (hubSrc.indexOf("c:'var(--san-aero)'") < 0) fail('hub Aero no usa var(--san-aero)');
+if (hubSrc.indexOf("c:'var(--san-cordoba)'") < 0) fail('hub Córdoba no usa var(--san-cordoba)');
+if (hubSrc.indexOf("c:'var(--san-misericordia)'") < 0) fail('hub Misericordia no usa var(--san-misericordia)');
+if (hubSrc.indexOf("c:'var(--san-san-roque)'") < 0) fail('hub San Roque no usa var(--san-san-roque)');
+if (hubSrc.indexOf("c:'var(--san-otro)'") < 0) fail('hub Otros no usa var(--san-otro)');
+
 const context = {
   console,
   String,

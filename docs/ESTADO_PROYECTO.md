@@ -2,14 +2,16 @@
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
-- PWA `CACHE_V`: **12.53**
+- PWA `CACHE_V`: **12.54**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-30 — PWA **12.53**: títulos Dr/Dra unificados en nómina Misericordia. Esperando Pages (`cache:'no-store'`).
+- 2026-08-30 — PWA **12.54**: paleta instituciones (San Roque teal, Misericordia magenta, Allende rosa, Otros slate). Mayo/Aero/Córdoba anclas. Esperando Pages (`cache:'no-store'`).
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-08-30 — PWA **12.54**: hex de `--san-*` en `styles.css` (rueda ~30°). Sin cambio de lógica.
 
 - 2026-08-30 — PWA **12.53**: Misericordia, todos los cirujanos con Dr./Dra. (grilla pareja).
 - 2026-08-30 — PWA **12.52**: `CIRUJANOS_POR_LUGAR['Hospital Misericordia']`. Plástica → Plástica y Reparadora; Tórax → Cirugía Torácica; Pediátrica vacía. San Roque / Córdoba / Mayo / Aero intactos.

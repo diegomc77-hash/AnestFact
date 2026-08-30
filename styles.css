@@ -4,8 +4,8 @@
   --red:#ef4444;--warn:#f59e0b;--yellow:var(--warn);
   --estado-borrador:#6b7280;--estado-listo:#3b82f6;--estado-cola:#eab308;--estado-geclisa:var(--green);--estado-evweb:#14b8a6;
   --blue:var(--estado-listo);
-  --san-mayo:#0ea5e9;--san-aero:#8b5cf6;--san-allende:#d946ef;--san-sucre:#6366f1;--san-privado:#06b6d4;--san-otro:#38bdf8;
-  --san-cordoba:#2563eb;--san-misericordia:#7c3aed;--san-san-roque:#a78bfa;
+  --san-mayo:#0ea5e9;--san-aero:#8b5cf6;--san-allende:#db2777;--san-sucre:#6366f1;--san-privado:#06b6d4;--san-otro:#64748b;
+  --san-cordoba:#2563eb;--san-misericordia:#c026d3;--san-san-roque:#0d9488;
   --os-osde:#a8735a;--os-swiss:#8a8a5c;--os-galeno:#9c9186;--os-pami:#7a8a8a;--os-particular:#6b6b6b;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
