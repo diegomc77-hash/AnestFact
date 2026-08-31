@@ -4,6 +4,8 @@ Las reglas por glob se activan al tocar archivos. Si el chat es temático y no h
 
 **Versiones:** no las copies de memoria. Corré `node tools/check-version-sync.mjs`.
 
+**Memoria:** el índice de todos los `docs/` vive arriba de `docs/ESTADO_PROYECTO.md`. Un doc nuevo se anota ahí en el mismo paso. Este mapa es dueños de código, no el inventario de decisiones.
+
 ## Contrato compartido — parar y avisar antes de tocar
 
 Ninguna sección es dueña de estos archivos. Un cambio acá puede romper QR, foja, GECLISA y caché a la vez.

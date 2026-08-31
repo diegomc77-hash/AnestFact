@@ -5,8 +5,10 @@ alwaysApply: true
 
 # AnesFact — siempre
 
-Antes de responder: leé `docs/ESTADO_PROYECTO.md` y `docs/MAPA_SECCIONES.md`.
+Antes de responder: leé `docs/ESTADO_PROYECTO.md` (empezá por el **índice de docs** de arriba) y `docs/MAPA_SECCIONES.md`.
+Si el tema del usuario pega con un archivo de esa lista (Home / PC / institución, facturación / evweb / mutual, QR, instituciones), leé **ese archivo entero** en el mismo turno — ESTADO es el índice, no el resumen de la decisión.
 Al terminar una sesión con cambios reales: actualizá el estado (qué se hizo, pendiente, **En curso**).
+Si **creás o renombrás** un `.md` en `docs/`: en el **mismo paso** (mismo diff), agregá o ajustá su fila en el índice de `ESTADO_PROYECTO.md`. No lo dejes para un pedido aparte.
 Las versiones las imprime `node tools/check-version-sync.mjs` — no las inventes.
 
 ## No negociable
@@ -17,3 +19,4 @@ Las versiones las imprime `node tools/check-version-sync.mjs` — no las invente
 - Partes chicas, resultado intermedio. No "todo junto".
 - Archivos del **contrato compartido** (mapa): antes de tocarlos, listá qué otras secciones se ven y esperá OK.
 - Antes de decir "listo" o de bumpear caché: `node tools/check-version-sync.mjs` tiene que salir `OK`.
+- Toda navegación nueva dentro de AnesFact debe pasar por la función `go(vista)` existente — nunca crear links directos hardcodeados ni rutas nuevas fuera de ese patrón. Esto mantiene barato cualquier cambio futuro de navegación (por ejemplo, si se reorganiza Home por institución).

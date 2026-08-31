@@ -1,0 +1,14 @@
+---
+description: Índice de docs en ESTADO — al crear o tocar docs/*.md
+globs: docs/**
+alwaysApply: false
+---
+
+# Docs y memoria
+
+`docs/ESTADO_PROYECTO.md` (índice de arriba) es el punto de entrada. Este glob se activa al trabajar en `docs/`.
+
+- **Archivo nuevo o rename:** en el mismo cambio, una fila en el índice de ESTADO (una frase). Sin eso el doc no existe para el próximo chat.
+- **Decisión de producto:** además, una línea en «Decisiones tomadas» de ESTADO, con el path del doc. No sustituyas el doc por un resumen en el diario.
+- Home / institución / layout PC o móvil → leer entero `docs/DISENO_PC_HOME.md` (primera línea en negrita).
+- Preop → evweb × mutual → leer entero `docs/CIERRE_ARQUITECTURA_FACTURACION.md`.

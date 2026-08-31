@@ -1,3 +1,5 @@
+**Este documento es la fuente completa de la decisión de rediseñar Home por institución (no por foja). Antes de tocar este tema, leer todo el archivo — no asumir nada de memoria, ni el usuario ni el asistente.**
+
 # Diseño Home — AnesFact (Opción A)
 
 **Estado: diseño, no implementado.** Guía de intención para cuando se

@@ -1,5 +1,49 @@
 # Estado del proyecto AnesFact
 
+**Punto de entrada único.** Este archivo no sustituye los docs de decisión: los **señala**. Un chat nuevo que solo lea el diario de versiones no va a enterarse de Home-por-institución ni de evweb×mutual. Si el tema toca un ítem de la lista, leé **ese archivo entero** (no de memoria).
+
+## Índice de docs (`docs/`) — actualizar en el mismo paso al crear uno nuevo
+
+### Decisiones vivas (leer enteras si el tema pega)
+
+| Archivo | Qué trata (una frase) |
+|---|---|
+| `docs/DISENO_PC_HOME.md` | **Home por institución, no por foja** (PC primero, misma lógica en móvil; PC hoy = columna 520px). Leer el archivo completo antes de tocar Home/dock/layout. |
+| `docs/CIERRE_ARQUITECTURA_FACTURACION.md` | Flujo Preop → foja → GECLISA/Traditum/evweb/SISalud × mutual. Diseño; no codear Traditum/foja qx desde ahí. |
+| `docs/ARQUITECTURA_INSTITUCIONES.md` | Tres patrones de HC (GECLISA / sistema propio / sin sistema) y `tipo_sistema` vs `destino_final`. No mezclar con el cierre de facturación. |
+| `docs/VALORACION_QR.md` | Contrato QR → prefoja → foja (importar solo vacíos; no `resetFojaUIDom`). |
+| `docs/MAPA_SECCIONES.md` | Quién es dueño de qué archivos; contrato compartido; secciones futuras. |
+
+### Legal (borrador; abogado)
+
+| Archivo | Qué trata |
+|---|---|
+| `docs/AnesFact_Terminos_y_Condiciones.md` | Términos + deslinde médico. Pendiente de abogado. |
+| `docs/AnesFact_Aviso_Privacidad_Paciente_QR.md` | Aviso corto en `valoracion.html` (paciente). |
+
+### Cómo hacer (operación, no producto nuevo)
+
+| Archivo | Qué trata |
+|---|---|
+| `docs/DEPLOY_V8.md` | Publicar PWA (Pages) + orden de migraciones v8. |
+| `docs/DESPLEGAR_QR.md` | Deploy Edge Functions de valoración QR. |
+| `docs/EJECUTAR_VALORACION_QR.md` | Paso a paso de la migración QR en Supabase. |
+| `docs/SUPABASE_ADMIN.md` | Panel admin / planes sin pisar fojas de Huerta. |
+| `docs/RECUPERAR_CUENTA.md` | Auth bloqueada / rate limit de email. |
+| `docs/FIX_ADMIN_PLAN.md` | Por qué el plan Pro volvía a Demo (UPSERT vs RLS). |
+
+### Históricos (revisión SQL 007/008; no reabrir sin motivo)
+
+| Archivo | Qué trata |
+|---|---|
+| `docs/SEGURIDAD_007.md` | Modelo de seguridad paso 007. |
+| `docs/APP_008_REVIEW.md` | Revisión app antes de SQL 008. |
+| `docs/REVISION_007b_008.md` | Orden de ejecución 007b + 008. |
+
+Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendiente. No listar acá una decisión **en lugar** de un doc: listar el doc en el índice y una línea en «Decisiones tomadas».
+
+---
+
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
 
 - PWA `CACHE_V`: **12.54**
@@ -7,9 +51,11 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- 2026-08-31 — Docs de diseño (facturación + Home PC). Sin código.
+- 2026-08-31 — Índice de docs en `ESTADO_PROYECTO.md` + regla: un doc nuevo se anota en esa lista en el mismo paso. Sin código de Home.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-08-31 — Memoria: índice de `docs/` arriba de ESTADO; regla always-on obliga a actualizarlo al crear un `.md`. Fallo anterior: leer ESTADO sin el índice no alcanzaba para ver Home-por-institución.
 
 - 2026-08-31 — `docs/DISENO_PC_HOME.md`: visión aspiracional (especialidades, institución primero PC+móvil por etapas) + matriz Mayo/Aero/públicos. No contradice cupo de lugares ni bandejas. Sin implementar.
 
@@ -86,3 +132,4 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - Tarjeta QR: lockup alrededor (no en los módulos). # = orden de generación del día en ese dispositivo (`af_qr_orden_YYYY-MM-DD_<uid>`). Día = calendario Argentina. No es el n° de turno de la clínica.
 - Print SISalud: misma `imprimir-aero.js` (no clonar). Header 3 columnas (PNG oficial o compose). Pie ADAARC en papel SISalud se omite; app no. Sala/cama texto libre solo SISalud. Select = desarrollado ∩ permitidos (no el listado de 40). Huerta: un solo público (Hospital Córdoba). Admin prueba los 3 públicos.
 - Facturación ADAARC (evweb) es de **privadas en general**, no de una institución. Lo que cambia es la HC: Mayo = GECLISA siempre (después, camino a evweb según mutual); Aero = foja nativa. Públicos = SISalud, no evweb. Firma digital de consentimiento: no hasta abogado.
+- **Home se rediseña por institución, no por foja.** Fuente completa: `docs/DISENO_PC_HOME.md` (leer entero; no de memoria). PC hoy = misma columna 520px del celular, centrada. No implementado.
