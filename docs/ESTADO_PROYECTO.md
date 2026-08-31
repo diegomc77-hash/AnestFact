@@ -7,9 +7,11 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- 2026-08-31 — Doc `docs/CIERRE_ARQUITECTURA_FACTURACION.md` (diseño Preop → evweb × mutual). Sin código.
+- 2026-08-31 — Docs de diseño (facturación + Home PC). Sin código.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-08-31 — `docs/DISENO_PC_HOME.md`: visión aspiracional (especialidades, institución primero PC+móvil por etapas) + matriz Mayo/Aero/públicos. No contradice cupo de lugares ni bandejas. Sin implementar.
 
 - 2026-08-31 — Cierre de arquitectura de facturación sacado de Downloads + charla 24-ago; referencia en `MAPA_SECCIONES.md` como sección futura. Sin implementar Traditum / foja qx / QR cirujano / consentimiento.
 
