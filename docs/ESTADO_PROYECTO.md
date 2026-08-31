@@ -9,7 +9,7 @@
 | Archivo | Qué trata (una frase) |
 |---|---|
 | `docs/DISENO_PC_HOME.md` | **Home por institución, no por foja** (PC primero, misma lógica en móvil; PC hoy = columna 520px). Leer el archivo completo antes de tocar Home/dock/layout. |
-| `docs/ROADMAP_ESCALAMIENTO.md` | Auditoría código vs diseño + fases P (tuberías) y U (Home/PC), tamaños, sin implementar. |
+| `docs/ROADMAP_ESCALAMIENTO.md` | Auditoría código vs diseño + fases P/U + empaquetado de adjuntos por institución (Mayo = 1 PDF combinado). |
 | `docs/CIERRE_ARQUITECTURA_FACTURACION.md` | Flujo Preop → foja → GECLISA/Traditum/evweb/SISalud × mutual. Diseño; no codear Traditum/foja qx desde ahí. |
 | `docs/ARQUITECTURA_INSTITUCIONES.md` | Tres patrones de HC (GECLISA / sistema propio / sin sistema) y `tipo_sistema` vs `destino_final`. No mezclar con el cierre de facturación. |
 | `docs/VALORACION_QR.md` | Contrato QR → prefoja → foja (importar solo vacíos; no `resetFojaUIDom`). |
@@ -52,9 +52,11 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- 2026-08-31 — P1 **12.55** en `main`. Probar en foja «prueba» (PDF chico + foto pesada). Pages ≠ este chat: confirmar cuando lo veas.
+- 2026-08-31 — Docs: empaquetado de adjuntos por institución en el roadmap (§ 1c). Sin código.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-08-31 — `docs/ROADMAP_ESCALAMIENTO.md` § 1c: Mayo = GECLISA un PDF (qx+anest) + auth aparte; Aero = fojas desde AnesFact + foto auth (2 fotos si aún no hay qx nativa); otras = relevar. P1 no cambia (ranuras opcionales).
 
 - 2026-08-31 — PWA **12.55** P1: 3 ranuras en Facturación (anest / qx / auth). Imagen o PDF ≤500 KB tal cual; más pesado → JPEG ~450 KB (PDF vía pdf.js lazy en `vendor/pdfjs/`, no precache). Si falla, se guarda el original.
 
@@ -139,3 +141,4 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - Print SISalud: misma `imprimir-aero.js` (no clonar). Header 3 columnas (PNG oficial o compose). Pie ADAARC en papel SISalud se omite; app no. Sala/cama texto libre solo SISalud. Select = desarrollado ∩ permitidos (no el listado de 40). Huerta: un solo público (Hospital Córdoba). Admin prueba los 3 públicos.
 - Facturación ADAARC (evweb) es de **privadas en general**, no de una institución. Lo que cambia es la HC: Mayo = GECLISA siempre (después, camino a evweb según mutual); Aero = foja nativa. Públicos = SISalud, no evweb. Firma digital de consentimiento: no hasta abogado.
 - **Home se rediseña por institución, no por foja.** Fuente completa: `docs/DISENO_PC_HOME.md` (leer entero; no de memoria). PC hoy = misma columna 520px del celular, centrada. No implementado.
+- Empaquetado de adjuntos **por institución** (no forzar 3 archivos): Mayo GECLISA = 1 PDF qx+anest + auth aparte; Aero = fojas AnesFact + foto auth (2 fotos si no hay qx nativa). Detalle: `docs/ROADMAP_ESCALAMIENTO.md` § 1c. P1 no lo implementa.

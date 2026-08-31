@@ -28,7 +28,7 @@ flujo cerrado · **no** = 0 código o solo diseño.
 | QR preop | **sí** | `af-qr-create` / `submit` / `peek`; selector de lugar; prefoja; catálogo Mayo |
 | Foja anestésica | **sí** | Foja + UI Mayo (sector/cama/quirófano GECLISA) |
 | Inyección GECLISA | **sí** | Cola `js/39-geclisa-queue.js` + extensión **0.5.10**; fill; **nunca** click en Guardar |
-| Camino a evweb «directo» | **parcial / no automatizado** | No hay fill ni API a `adaarc.evweb.com.ar`. Falta **recolectar en GECLISA** foja qx + foja anestésica + autorización (salvo PAMI) y dejarlas listas para subir a evweb. Hoy: copiar/marcar a mano + bajar docs en el navegador. Ver tuberías Mayo más abajo y fase **P1b** |
+| Camino a evweb «directo» | **parcial / no automatizado** | No hay fill ni API a `adaarc.evweb.com.ar`. Falta recolectar en GECLISA el **PDF combinado** (qx+anest en un `Reporte.pdf`) + auth si aplica (PAMI: solo el combinado). Ver § 1c y **P1b**. Hoy: copiar/marcar a mano + bajar docs en el navegador |
 | Traditum (APROSS) | **no** | 0 matches en `js/` / `views/`. Diseño en el cierre. Flujo operativo: GECLISA (auth) → Traditum (buscar esa auth) → 3 estados. Fase **P4** |
 | QR recepción PDFs (secretaria) | **no** | Distinto del Escanear IA (Gemini) |
 | Foja qx nativa / QR cirujano | **no (a propósito)** | En Mayo la qx vive en GECLISA |
@@ -40,7 +40,7 @@ flujo cerrado · **no** = 0 código o solo diseño.
 | Foja anestésica nativa | **sí** | Misma foja + `imprimirFoja()`; `destino_final: evweb` |
 | Foja quirúrgica (editor / QR) | **no** | No hay vista ni modelo de foja qx. `S.cur.docs.qx` es un **adjunto** en JS (`adjuntarDoc`), no un formulario |
 | QR al cirujano | **no** | Solo existe QR de valoración paciente |
-| Escaneo de autorizaciones | **parcial** | (1) Herramientas → Escanear: Gemini extrae campos y manda a Facturación; **no** es el QR de recepción ni parseo Traditum. (2) `adjuntarDoc(..., 'auth')` existe en JS, pero `views/facturacion.html` `#docs-card-body` **nunca se rellena** con `<input type=file>`: no hay botones de adjuntar en la UI |
+| Escaneo de autorizaciones | **parcial** | (1) Herramientas → Escanear: Gemini extrae campos y manda a Facturación; **no** es el QR de recepción ni parseo Traditum. (2) P1 **12.55**: 3 ranuras en Facturación; no exige las tres llenas |
 | evweb | **parcial** | Dock evweb = lista Aero pendiente de **marca local**. Toggle «Enviar a ADAARC/evweb», copiar campos, abrir evweb a mano. No hay automatización |
 
 ### Públicos (Córdoba / Misericordia / San Roque)
@@ -78,7 +78,8 @@ pide. Eso no es P2 (P2 es foja qx **nativa Aero**, sin GECLISA).
 
 - **Qué va a evweb:** foja de cirugía + foja de anestesia. **Sin**
   autorización aparte.
-- **Dónde viven:** ambas en GECLISA (Mayo).
+- **Dónde viven:** ambas en GECLISA (Mayo). **Cómo se bajan:** un solo
+  archivo (`Reporte.pdf`) con las dos juntas — ver § 1c.
 - **Hoy:** la doctora las busca y baja a mano, sube a evweb a mano.
 - **Fases:** recolección = **P1b**. P1 (adjuntos AnesFact) no sustituye
   esto. P4 Traditum **no aplica**.
@@ -87,12 +88,13 @@ pide. Eso no es P2 (P2 es foja qx **nativa Aero**, sin GECLISA).
 
 - **Qué va a evweb:** foja anestesia + foja cirugía + autorización de
   mutual.
-- **Dónde:** fojas en GECLISA; auth en GECLISA (documentos) y/o llega
-  por WhatsApp (QR recepción / adjunto P1).
-- **Falta automatizar:** buscar en GECLISA las **dos fojas + la auth** y
-  dejar el paquete listo **antes** de subir a evweb.
-- **Fases:** P1 = colgar auth en AnesFact si no está en GECLISA; **P1b**
-  = búsqueda/recolección en GECLISA; P4 no aplica.
+- **Dónde:** fojas en GECLISA (**un PDF combinado**, no dos archivos);
+  auth en GECLISA (documentos) y/o llega por WhatsApp (QR recepción /
+  adjunto P1) — **archivo aparte**.
+- **Falta automatizar:** buscar en GECLISA el **reporte combinado + la
+  auth** y dejar el paquete listo **antes** de subir a evweb.
+- **Fases:** P1 = colgar auth (o el combinado) en AnesFact si no está
+  en GECLISA; **P1b** = búsqueda/recolección en GECLISA; P4 no aplica.
 
 ### APROSS (Traditum, no «3 papeles a evweb» primero)
 
@@ -121,12 +123,42 @@ Flujo cerrado en `CIERRE_ARQUITECTURA_FACTURACION.md`:
 
 ---
 
+## 1c. Empaquetado de adjuntos por institución (configurar después)
+
+Hallazgo de la prueba P1 en vivo (2026-08-31): **GECLISA no entrega
+dos archivos**. Baja **un solo PDF** (`Reporte.pdf`) con foja de
+cirugía + foja anestésica juntas. En Facturación eso se cuelga en
+**una** ranura (ej. Foja Anestésica) y la otra queda vacía — es el
+uso correcto hoy, no un error del usuario.
+
+P1 **sigue igual**: 3 ranuras genéricas; cada una acepta cualquier
+archivo; **no** se exige que estén las tres completas. No codear
+configuración por institución todavía. Cuando se diseñe, el patrón
+es el de cirujanos / quirófanos (`CIRUJANOS_POR_LUGAR` /
+`AF_FOJA_INST`): una tabla por lugar, no ifs sueltos en la UI.
+
+El cierre (`CIERRE_ARQUITECTURA_FACTURACION.md`) sigue hablando de
+«2 fojas» como **qué pide evweb**. Eso no cambia. Cambia **cómo
+llegan** esos papeles a AnesFact.
+
+| Institución | Cómo llegan las fojas | Autorización | Notas |
+|---|---|---|---|
+| **Sanatorio Mayo** | GECLISA: **un archivo** = qx + anestésica juntas | **Archivo aparte** (GECLISA y/o WhatsApp / P1) | P1b no debe asumir 2 descargas de protocolo. PAMI = ese PDF combinado, sin auth. ART/obras = combinado + auth |
+| **Hospital Aeronáutico** | Fojas **desde AnesFact** (no hay GECLISA) | Foto sacada en AnesFact | Mientras no exista foja qx nativa (P2): la parte del cirujano llega como **foto aparte** → 2 fotos (auth + qx papel) más la foja anestésica que ya imprime la app |
+| **Otras** (públicos, Allende, etc.) | **Pendiente** de relevar impresión / autorización de cada sistema | Idem | Caso por caso al sumar el lugar. No inventar el paquete |
+
+No mezclar con P1 (ranuras genéricas). Alimenta P1b (Mayo), P2 (Aero
+qx) y una config futura tipo catálogo, no un rediseño de Facturación
+ahora.
+
+---
+
 ## 2. Fases — riel P (tuberías)
 
 Orden: más valor por caso real de Huerta, menos riesgo de romper GECLISA/foja.
 **No** meter fases U aquí.
 
-### P1 — Adjuntos en Facturación · **hecho en 12.55** (local; sin Pages)
+### P1 — Adjuntos en Facturación · **hecho en 12.55**
 
 **Cierre:** `docs/CIERRE_ARQUITECTURA_FACTURACION.md` — matriz Mayo ×
 mutual (PAMI sin auth; ART/obras = fojas + autorización; APROSS no usa
@@ -137,26 +169,32 @@ UI en `#docs-card-body` (3 ranuras + badges). Pipeline: ≤500 KB tal
 cual; imagen/PDF pesado → JPEG ~450 KB (`js/41-adjuntos-compress.js`).
 PDF via pdf.js lazy `vendor/pdfjs/` (no `STATIC_CORE`). Fallo → original.
 
+Las 3 ranuras son **genéricas y opcionales**: cualquier archivo en
+cualquiera; no se fuerza completar las tres. En Mayo el PDF combinado
+de GECLISA va en **una** ranura (§ 1c). No rediseñar slots por
+institución en este lote.
+
 **Valor:** Aero (foto auth / qx papel); Mayo ART/obras si la auth llegó
 por mail/WhatsApp y **no** se va a buscar en GECLISA todavía.
 
 **No es:** recolección en GECLISA (eso es **P1b**), Traditum (**P4**),
-editor de foja qx (**P2**).
+editor de foja qx (**P2**), config por institución (§ 1c).
 
 **Riesgo:** `S.cur.docs` sigue data-URL. No tocar `fill.js`.
 
 ### P1b — Recolección Mayo en GECLISA → paquete evweb · **grande**
 
 **Cierre:** misma matriz. Este es el hueco del «directo a evweb»:
-**buscar** en GECLISA foja quirúrgica + foja anestésica + autorización
-de mutual (PAMI: solo las dos fojas) y dejarlas listas **antes** de
-subir a ADAARC/evweb.
+**buscar** en GECLISA el paquete y dejarlo listo **antes** de subir a
+ADAARC/evweb. Confirmado en prueba P1 (§ 1c): las dos fojas salen en
+**un** `Reporte.pdf`; la auth (si aplica) es **otro** archivo. PAMI =
+solo el combinado. ART/obras = combinado + auth.
 
 Hoy la extensión **inyecta** foja anestésica; no **descarga** protocolos
 ni documentos. Ruta HC por DNI (`NOTES_RUTA_HC_POR_DNI.md`) es otro
 hueco (pacientes de alta) y no es este lote salvo que se decida.
 
-**PAMI:** 2 fojas, sin auth — el camino más corto de P1b.
+**PAMI:** el PDF combinado, sin auth — el camino más corto de P1b.
 
 **No es P2:** P2 es foja qx **nativa** para Aero (sin GECLISA). Mayo no
 edita qx en AnesFact.
