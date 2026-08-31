@@ -34,8 +34,25 @@
     </div>
   </div>
   <div class="card" id="docs-card">
-    <div class="ct">&#128206; Documentaci&oacute;n para evweb</div>
-    <div id="docs-card-body"><p style="font-size:12px;color:var(--text3)">Guardá primero los datos</p></div>
+    <div class="ct">Documentaci&oacute;n (PDF o foto)</div>
+    <div id="docs-card-body">
+      <p style="font-size:12px;color:var(--text3);margin:0 0 10px">No se sube solo a evweb ni a GECLISA. Queda en esta foja.</p>
+      <div style="margin-bottom:10px">
+        <input type="file" id="doc-anest-file" accept="image/*,application/pdf" style="display:none" onchange="adjuntarDoc(this,'anest')">
+        <label id="doc-anest-label" for="doc-anest-file" class="upload" style="display:block;padding:12px 14px;margin:0;font-size:14px">Foja Anest&eacute;sica <span id="doc-anest-badge" class="badge bg" style="display:none;margin-left:6px">&#10003;</span></label>
+        <div id="doc-anest-prev"></div>
+      </div>
+      <div style="margin-bottom:10px">
+        <input type="file" id="doc-qx-file" accept="image/*,application/pdf" style="display:none" onchange="adjuntarDoc(this,'qx')">
+        <label id="doc-qx-label" for="doc-qx-file" class="upload" style="display:block;padding:12px 14px;margin:0;font-size:14px">Foja Quir&uacute;rgica <span id="doc-qx-badge" class="badge bg" style="display:none;margin-left:6px">&#10003;</span></label>
+        <div id="doc-qx-prev"></div>
+      </div>
+      <div>
+        <input type="file" id="doc-auth-file" accept="image/*,application/pdf" style="display:none" onchange="adjuntarDoc(this,'auth')">
+        <label id="doc-auth-label" for="doc-auth-file" class="upload" style="display:block;padding:12px 14px;margin:0;font-size:14px">Autorizaci&oacute;n <span id="doc-auth-badge" class="badge bg" style="display:none;margin-left:6px">&#10003;</span></label>
+        <div id="doc-auth-prev"></div>
+      </div>
+    </div>
   </div>
   <div class="brow" style="margin-bottom:8px">
     <button class="btn btn-s" onclick="guardar()">&#128190; Guardar</button>

@@ -9,6 +9,7 @@
 | Archivo | Qué trata (una frase) |
 |---|---|
 | `docs/DISENO_PC_HOME.md` | **Home por institución, no por foja** (PC primero, misma lógica en móvil; PC hoy = columna 520px). Leer el archivo completo antes de tocar Home/dock/layout. |
+| `docs/ROADMAP_ESCALAMIENTO.md` | Auditoría código vs diseño + fases P (tuberías) y U (Home/PC), tamaños, sin implementar. |
 | `docs/CIERRE_ARQUITECTURA_FACTURACION.md` | Flujo Preop → foja → GECLISA/Traditum/evweb/SISalud × mutual. Diseño; no codear Traditum/foja qx desde ahí. |
 | `docs/ARQUITECTURA_INSTITUCIONES.md` | Tres patrones de HC (GECLISA / sistema propio / sin sistema) y `tipo_sistema` vs `destino_final`. No mezclar con el cierre de facturación. |
 | `docs/VALORACION_QR.md` | Contrato QR → prefoja → foja (importar solo vacíos; no `resetFojaUIDom`). |
@@ -44,16 +45,20 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 ---
 
-Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-28:
+Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-31:
 
-- PWA `CACHE_V`: **12.54**
+- PWA `CACHE_V`: **12.55**
 - Extensión GECLISA: **0.5.10**
 
 ## En curso
 
-- 2026-08-31 — Índice de docs en `ESTADO_PROYECTO.md` + regla: un doc nuevo se anota en esa lista en el mismo paso. Sin código de Home.
+- 2026-08-31 — P1 **12.55** en `main`. Probar en foja «prueba» (PDF chico + foto pesada). Pages ≠ este chat: confirmar cuando lo veas.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-08-31 — PWA **12.55** P1: 3 ranuras en Facturación (anest / qx / auth). Imagen o PDF ≤500 KB tal cual; más pesado → JPEG ~450 KB (PDF vía pdf.js lazy en `vendor/pdfjs/`, no precache). Si falla, se guarda el original.
+
+- 2026-08-31 — `docs/ROADMAP_ESCALAMIENTO.md`: auditoría Mayo/Aero/públicos (código vs diseño) + rieles P/U. evweb no está automatizado; Traditum 0 líneas; adjuntos JS sin UI.
 
 - 2026-08-31 — Memoria: índice de `docs/` arriba de ESTADO; regla always-on obliga a actualizarlo al crear un `.md`. Fallo anterior: leer ESTADO sin el índice no alcanzaba para ver Home-por-institución.
 
@@ -116,6 +121,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - Planes (confirmado 2026-08-28): Demo 1 lugar (Aero) + tope de fojas. **Básico 1** / **Max 2** / **Pro 3** no-públicos (Aero cuenta). 1 público máx. Admin ve todos sin cupo. Firma atada a la cuenta. DEFAULTS.pro y DEFAULTS.max vacíos; lugares con `af_admin_set_sanatorios`. Pro >3 solo con `privados_max_override`.
 - SISalud: cómo se sube la foja/PDF — **no investigar todavía**.
 - PNG oficiales de header Córdoba / San Roque: cuando existan, reemplazan compose (`oficial: false`).
+- P1 adjuntos **12.55**: probar en foja «prueba» — PDF chico tal cual, foto ~2 MB → JPEG, ver/borrar, sobrevivir a Guardar.
 - Facturación (diseño, no código): Traditum APROSS; foja qx nativa + QR cirujano (Aero/públicos); consentimiento informado (bloqueado legal — papel + foto). Doc `docs/CIERRE_ARQUITECTURA_FACTURACION.md`.
 
 ## Decisiones tomadas (no repreguntar)

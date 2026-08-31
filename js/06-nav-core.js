@@ -166,6 +166,7 @@ function go(id,addH){
     if(typeof refreshFacturacionHeader==='function')refreshFacturacionHeader();
     if(typeof renderPracs==='function')renderPracs();
     onSanChange();
+    if(typeof cargarDocBadges==='function')cargarDocBadges();
   }
   if(id==='ayuda'&&typeof renderAyuda==='function')renderAyuda();
   return true;

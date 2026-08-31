@@ -614,11 +614,39 @@ function initAutoSync(){
   syncAutoStatusUpdate();
 }
 // === DOCUMENTOS ===
-function adjuntarDoc(input,tipo){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){var data=e.target.result;if(!S.cur)return;if(!S.cur.docs)S.cur.docs={};S.cur.docs[tipo]={nombre:file.name,tipo:file.type,data:data,fecha:new Date().toISOString()};var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});if(idx>=0)S.intervs[idx]=S.cur;saveIntervsToStorage();renderDocBadges();toast(getNombreDoc(tipo)+' guardada \u2713');};reader.readAsDataURL(file);}
+function afCommitAdjunto(tipo,doc){
+  if(!S.cur||!doc)return;
+  if(!S.cur.docs)S.cur.docs={};
+  S.cur.docs[tipo]=doc;
+  var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});
+  if(idx>=0)S.intervs[idx]=S.cur;
+  saveIntervsToStorage();
+  if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+  renderDocBadges();
+  toast(getNombreDoc(tipo)+' guardada \u2713');
+}
+function adjuntarDoc(input,tipo){
+  var file=input&&input.files&&input.files[0];
+  if(input)input.value='';
+  if(!file)return;
+  if(!S.cur){toast('Abrí una intervención primero');return;}
+  if(file.size>500*1024)toast('Ajustando\u2026');
+  var finish=function(doc){afCommitAdjunto(tipo,doc);};
+  var fallback=function(){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      finish({nombre:file.name,tipo:file.type,data:e.target.result,fecha:new Date().toISOString()});
+    };
+    reader.onerror=function(){toast('No se pudo leer el archivo');};
+    reader.readAsDataURL(file);
+  };
+  if(typeof afPrepareAdjunto!=='function'){fallback();return;}
+  afPrepareAdjunto(file).then(finish).catch(fallback);
+}
 function getNombreDoc(tipo){return tipo==='anest'?'Foja Anest\u00e9sica':tipo==='qx'?'Foja Quir\u00fargica':'Autorizaci\u00f3n';}
 function renderDocBadges(){var docs=(S.cur&&S.cur.docs)||{};['anest','qx','auth'].forEach(function(tipo){var badge=document.getElementById('doc-'+tipo+'-badge');var prev=document.getElementById('doc-'+tipo+'-prev');var label=document.getElementById('doc-'+tipo+'-label');if(!badge)return;if(docs[tipo]){badge.style.display='inline-block';var d=docs[tipo];var isImg=d.tipo&&d.tipo.startsWith('image/');if(prev)prev.innerHTML='<div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--green);border-radius:8px;padding:8px 10px;margin-top:4px">'+(isImg?'<img src="'+d.data+'" style="height:44px;border-radius:4px;object-fit:cover">':'<span style="font-size:24px">doc</span>')+'<div style="flex:1;overflow:hidden"><div style="font-size:12px;font-weight:500">'+d.nombre+'</div><div style="font-size:11px;color:var(--text3)">'+new Date(d.fecha).toLocaleString()+'</div></div><button onclick="verDoc(\''+tipo+'\')" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:13px">ver</button><button onclick="borrarDoc(\''+tipo+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px">\u00d7</button></div>';if(label)label.style.borderColor='var(--green)';}else{badge.style.display='none';if(prev)prev.innerHTML='';if(label)label.style.borderColor='var(--border)';}});}
 function verDoc(tipo){var docs=(S.cur&&S.cur.docs)||{};var d=docs[tipo];if(!d)return;var w=window.open('','_blank');if(d.tipo&&d.tipo.startsWith('image/')){w.document.write('<img src="'+d.data+'" style="max-width:100%">');}else{w.document.write('<embed src="'+d.data+'" width="100%" height="100%" type="application/pdf">');}w.document.close();}
-function borrarDoc(tipo){if(!S.cur||!S.cur.docs)return;delete S.cur.docs[tipo];var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});if(idx>=0)S.intervs[idx]=S.cur;saveIntervsToStorage();renderDocBadges();toast(getNombreDoc(tipo)+' eliminada');}
+function borrarDoc(tipo){if(!S.cur||!S.cur.docs)return;delete S.cur.docs[tipo];var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});if(idx>=0)S.intervs[idx]=S.cur;saveIntervsToStorage();if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();renderDocBadges();toast(getNombreDoc(tipo)+' eliminada');}
 function cargarDocBadges(){setTimeout(renderDocBadges,100);}
 function verDocRes(tipo){verDoc(tipo);}
 function descargarDoc(tipo){var docs=(S.cur&&S.cur.docs)||{};var d=docs[tipo];if(!d)return;var a=document.createElement('a');a.href=d.data;a.download=d.nombre;document.body.appendChild(a);a.click();document.body.removeChild(a);toast('Descargando '+d.nombre);}

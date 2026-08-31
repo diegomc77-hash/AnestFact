@@ -44,6 +44,7 @@ No son dueñas de archivos de producción. No tocan `fill.js`, IDs GECLISA, `S.c
 |---|---|---|
 | Facturación / destinos | `docs/CIERRE_ARQUITECTURA_FACTURACION.md` | Preop → foja → GECLISA (Mayo) / nativo (Aero) → Traditum (solo APROSS) → evweb ADAARC. Públicos → SISalud. Traditum, QR cirujano, foja qx nativa y consentimiento: pendientes. HC de fondo vs facturación: ver el doc; no mezclar con `docs/ARQUITECTURA_INSTITUCIONES.md`. |
 | Home institución primero | `docs/DISENO_PC_HOME.md` | Shell PC (etapa 1) y misma lógica en móvil (etapa 2). Baldosas por lugar + bandejas. Visión de especialidades sin SKU Cirugía hoy. No codear todavía. |
+| Roadmap escalamiento | `docs/ROADMAP_ESCALAMIENTO.md` | Fases P (tuberías) vs U (UI). No mezclar en el mismo lote. |
 
 ## Semáforo
 
