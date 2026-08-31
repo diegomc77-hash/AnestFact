@@ -7,9 +7,11 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- 2026-08-30 — PWA **12.54**: paleta instituciones (San Roque teal, Misericordia magenta, Allende rosa, Otros slate). Mayo/Aero/Córdoba anclas. Esperando Pages (`cache:'no-store'`).
+- 2026-08-31 — Doc `docs/CIERRE_ARQUITECTURA_FACTURACION.md` (diseño Preop → evweb × mutual). Sin código.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-08-31 — Cierre de arquitectura de facturación sacado de Downloads + charla 24-ago; referencia en `MAPA_SECCIONES.md` como sección futura. Sin implementar Traditum / foja qx / QR cirujano / consentimiento.
 
 - 2026-08-30 — PWA **12.54**: hex de `--san-*` en `styles.css` (rueda ~30°). Sin cambio de lógica.
 
@@ -66,6 +68,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - Planes (confirmado 2026-08-28): Demo 1 lugar (Aero) + tope de fojas. **Básico 1** / **Max 2** / **Pro 3** no-públicos (Aero cuenta). 1 público máx. Admin ve todos sin cupo. Firma atada a la cuenta. DEFAULTS.pro y DEFAULTS.max vacíos; lugares con `af_admin_set_sanatorios`. Pro >3 solo con `privados_max_override`.
 - SISalud: cómo se sube la foja/PDF — **no investigar todavía**.
 - PNG oficiales de header Córdoba / San Roque: cuando existan, reemplazan compose (`oficial: false`).
+- Facturación (diseño, no código): Traditum APROSS; foja qx nativa + QR cirujano (Aero/públicos); consentimiento informado (bloqueado legal — papel + foto). Doc `docs/CIERRE_ARQUITECTURA_FACTURACION.md`.
 
 ## Decisiones tomadas (no repreguntar)
 
@@ -80,3 +83,4 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - CTAs de navegación/pedido → baldosas. Pills que se quedan: login, guardar formularios, GECLISA operativo (abrir/cola/copiar), Imprimir, + Nueva compacto, Ayuda/Escanear IA (submit de flujo).
 - Tarjeta QR: lockup alrededor (no en los módulos). # = orden de generación del día en ese dispositivo (`af_qr_orden_YYYY-MM-DD_<uid>`). Día = calendario Argentina. No es el n° de turno de la clínica.
 - Print SISalud: misma `imprimir-aero.js` (no clonar). Header 3 columnas (PNG oficial o compose). Pie ADAARC en papel SISalud se omite; app no. Sala/cama texto libre solo SISalud. Select = desarrollado ∩ permitidos (no el listado de 40). Huerta: un solo público (Hospital Córdoba). Admin prueba los 3 públicos.
+- Facturación ADAARC (evweb) es de **privadas en general**, no de una institución. Lo que cambia es la HC: Mayo = GECLISA siempre (después, camino a evweb según mutual); Aero = foja nativa. Públicos = SISalud, no evweb. Firma digital de consentimiento: no hasta abogado.

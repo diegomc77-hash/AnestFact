@@ -34,6 +34,14 @@ Tres detectores de alertas distintos — no fusionarlos sin listar impacto:
 | Deploy / versionado | bump de `CACHE_V` y listas SW. Checker obligatorio. Home lee `AF_CACHE_V`. | `version:` de export/sync, tickets y planes no son `CACHE_V`. |
 | Foja / PWA core | `js/08-foja.js`, `js/07-intervenciones.js`, `views/foja/**`, drogas/vitals/nomenclador/técnica | `S.cur` vive en `js/01-state.js` (contrato). |
 
+## Secciones futuras (diseño, no código)
+
+No son dueñas de archivos de producción. No tocan `fill.js`, IDs GECLISA, `S.cur`, `abrirInter` / `cargarFojaUI`.
+
+| Sección | Doc | Qué es / qué no |
+|---|---|---|
+| Facturación / destinos | `docs/CIERRE_ARQUITECTURA_FACTURACION.md` | Preop → foja → GECLISA (Mayo) / nativo (Aero) → Traditum (solo APROSS) → evweb ADAARC. Públicos → SISalud. Traditum, QR cirujano, foja qx nativa y consentimiento: pendientes. HC de fondo vs facturación: ver el doc; no mezclar con `docs/ARQUITECTURA_INSTITUCIONES.md`. |
+
 ## Semáforo
 
 Antes de laburar: casillero **En curso** en `docs/ESTADO_PROYECTO.md`. Si otra sección está locked, no toques sus archivos ni el contrato.
