@@ -288,7 +288,10 @@
     await AFG.humanDelay();
 
     log('Paso 11: buscando #btnSeleccionarPopup…');
-    notifyNavProgress('step11_wait_btn', { plantilla: plantilla });
+    notifyNavProgress('step11_wait_btn', {
+      plantilla: plantilla,
+      nroAtencion: headerInfo.nroAtencion || null
+    });
     var selTpl = await AFG.waitFor(function () {
       var b = document.getElementById('btnSeleccionarPopup');
       if (!b) return null;
@@ -316,7 +319,10 @@
       await AFG.clickElAsync(selTpl);
     }
     log('Paso 11: click disparado — espero foja #8054 (máx 12s) o fin de CS por navegación');
-    notifyNavProgress('step11_after_click', { plantilla: plantilla });
+    notifyNavProgress('step11_after_click', {
+      plantilla: plantilla,
+      nroAtencion: headerInfo.nroAtencion || null
+    });
 
     var fojaEl = null;
     try {

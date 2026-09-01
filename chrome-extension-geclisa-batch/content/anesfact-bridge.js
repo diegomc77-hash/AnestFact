@@ -11,7 +11,7 @@
   var lastOkSig = '';
   var lastQueueSig = '';
   var pendingMints = {};
-  var BRIDGE_VERSION = '0.5.10';
+  var BRIDGE_VERSION = '0.5.11';
 
   function normalize(detail) {
     if (!detail || !detail.token) return null;
@@ -379,6 +379,33 @@
         setTimeout(check, 80);
       };
       setTimeout(check, 60);
+      return true;
+    }
+
+    if (msg.type === 'AFG_SET_MAYO_NRO_ATENCION') {
+      try {
+        window.postMessage({
+          source: 'AFG_EXT',
+          type: 'SET_MAYO_NRO_ATENCION',
+          intervId: String(msg.intervId || msg.id || ''),
+          nroAtencion: String(msg.nroAtencion || msg.mayo_nro_atencion || ''),
+          via: msg.via || 'extension'
+        }, '*');
+      } catch (eNro) {}
+      var startedNro = Date.now();
+      var checkNro = function () {
+        var rN = window.__AFG_LAST_MAYO_NRO;
+        if (rN && String(rN.intervId) === String(msg.intervId || msg.id || '') && (Date.now() - (rN.atMs || 0) < 5000)) {
+          sendResponse(rN);
+          return;
+        }
+        if (Date.now() - startedNro > 2500) {
+          sendResponse({ ok: false, error: 'mayo_nro_timeout', intervId: msg.intervId });
+          return;
+        }
+        setTimeout(checkNro, 80);
+      };
+      setTimeout(checkNro, 60);
       return true;
     }
   });

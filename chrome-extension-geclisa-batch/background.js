@@ -73,6 +73,13 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         return setRunnerState(st);
       }
     }).catch(function () {});
+    var nroProg = msg.extra && (msg.extra.nroAtencion || msg.extra.mayo_nro_atencion);
+    if (nroProg && String(msg.step || '').indexOf('step11') === 0) {
+      getRunnerState().then(function (stN) {
+        if (!(stN && stN.currentIntervId)) return;
+        return notifyAnesFactMayoNroAtencion(stN.currentIntervId, nroProg, 'step11');
+      }).catch(function () {});
+    }
     sendResponse({ ok: true });
     return false;
   }
@@ -1246,6 +1253,19 @@ async function run111(paciente) {
       paciente: paciente
     }, 180000);
 
+    var nroCap = pickNroAtencionFromIframe(iframeRes) ||
+      pickNroAtencionFromIframe({ lastProgress: lastIframeNavProgress });
+    var intervCap = String((paciente && (paciente.intervId || paciente.id)) || '').trim();
+    if (iframeRes && iframeRes.reason === 'evolucion_nombre_mismatch') {
+      try { console.warn('[AFG] no persisto nro: mismatch 8b'); } catch (eMm) {}
+    } else if (nroCap && intervCap && iframeNameMatchedForNro(iframeRes)) {
+      try {
+        await notifyAnesFactMayoNroAtencion(intervCap, nroCap, 'run111_iframe');
+      } catch (eNro) {
+        try { console.warn('[AFG] persist nro after iframe', eNro); } catch (eN2) {}
+      }
+    }
+
     if (!(iframeRes && iframeRes.ok)) {
       try { console.warn('[AFG bg] iframe 3–11 no OK', iframeRes); } catch (e1) {}
       return {
@@ -1298,6 +1318,15 @@ async function run111(paciente) {
         await notifyAnesFactEnviadoGeclisa(markId, { via: 'run111_fillOk' });
       } catch (eMark) {
         try { console.warn('[AFG] notify enviado after fill', eMark); } catch (eM) {}
+      }
+      var nroFill = pickNroAtencionFromIframe(iframeRes) ||
+        pickNroAtencionFromIframe({ lastProgress: lastIframeNavProgress });
+      if (nroFill && markId) {
+        try {
+          await notifyAnesFactMayoNroAtencion(markId, nroFill, 'run111_fillOk');
+        } catch (eNroF) {
+          try { console.warn('[AFG] persist nro after fill', eNroF); } catch (eN3) {}
+        }
       }
     }
     return {
@@ -1551,6 +1580,59 @@ async function notifyAnesFactEnviadoGeclisa(intervId, extra) {
     }
   }
   try { console.warn('[AFG] mark enviado_geclisa falló', id, lastErr); } catch (eW) {}
+  return lastErr || { ok: false, error: 'no_anesfact_tab' };
+}
+
+function pickNroAtencionFromIframe(iframeRes) {
+  if (!iframeRes) return '';
+  var extra = iframeRes.lastProgress && iframeRes.lastProgress.extra;
+  var raw = iframeRes.nroAtencion
+    || (iframeRes.steps711 && iframeRes.steps711.nroAtencion)
+    || (iframeRes.evolucionHeader && iframeRes.evolucionHeader.nroAtencion)
+    || (extra && extra.nroAtencion)
+    || '';
+  var s = String(raw || '').replace(/\D/g, '');
+  return s.length >= 4 ? s : '';
+}
+
+/** 8b coincidió (o se infirió paso 11, que solo corre tras match). No persistir en mismatch. */
+function iframeNameMatchedForNro(iframeRes) {
+  if (!iframeRes) return false;
+  if (iframeRes.reason === 'evolucion_nombre_mismatch') return false;
+  if (iframeRes.ok) return true;
+  if (iframeRes.reason === 'template_ambiguous_or_empty') return true;
+  var step = iframeRes.lastProgress && iframeRes.lastProgress.step;
+  if (step && String(step).indexOf('step11') === 0) return true;
+  if (iframeRes.inferred) return true;
+  return false;
+}
+
+async function notifyAnesFactMayoNroAtencion(intervId, nro, via) {
+  var id = String(intervId || '').trim();
+  var num = String(nro || '').replace(/\D/g, '');
+  if (!id || num.length < 4) {
+    return { ok: false, ignored: true, reason: 'missing_id_or_nro' };
+  }
+  var tabs = await findAnesFactTabs();
+  var lastErr = null;
+  for (var i = 0; i < (tabs || []).length; i++) {
+    try {
+      var res = await chrome.tabs.sendMessage(tabs[i].id, {
+        type: 'AFG_SET_MAYO_NRO_ATENCION',
+        intervId: id,
+        nroAtencion: num,
+        via: via || 'extension'
+      });
+      if (res && res.ok) {
+        try { console.log('[AFG] mayo_nro_atencion OK', id, num, via); } catch (eL) {}
+        return res;
+      }
+      lastErr = res || { ok: false, error: 'no_response' };
+    } catch (eTab) {
+      lastErr = { ok: false, error: String(eTab && eTab.message || eTab) };
+    }
+  }
+  try { console.warn('[AFG] mayo_nro_atencion falló', id, lastErr); } catch (eW) {}
   return lastErr || { ok: false, error: 'no_anesfact_tab' };
 }
 

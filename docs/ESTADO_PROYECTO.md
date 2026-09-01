@@ -9,7 +9,7 @@
 | Archivo | Qué trata (una frase) |
 |---|---|
 | `docs/DISENO_PC_HOME.md` | **Home por institución, no por foja** (PC primero, misma lógica en móvil; PC hoy = columna 520px). Leer el archivo completo antes de tocar Home/dock/layout. |
-| `docs/ROADMAP_ESCALAMIENTO.md` | Fases P/U + empaquetado por institución + P1b = modal imprimir internado GECLISA (IDs). |
+| `docs/ROADMAP_ESCALAMIENTO.md` | Fases P/U + empaquetado + P1b = GET PDF GECLISA (nroAtencion), no modal. |
 | `docs/CIERRE_ARQUITECTURA_FACTURACION.md` | Flujo Preop → foja → GECLISA/Traditum/evweb/SISalud × mutual. Diseño; no codear Traditum/foja qx desde ahí. |
 | `docs/ARQUITECTURA_INSTITUCIONES.md` | Tres patrones de HC (GECLISA / sistema propio / sin sistema) y `tipo_sistema` vs `destino_final`. No mezclar con el cierre de facturación. |
 | `docs/VALORACION_QR.md` | Contrato QR → prefoja → foja (importar solo vacíos; no `resetFojaUIDom`). |
@@ -47,14 +47,22 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-31:
 
-- PWA `CACHE_V`: **12.55**
-- Extensión GECLISA: **0.5.10**
+- PWA `CACHE_V`: **12.56**
+- Extensión GECLISA: **0.5.11**
 
 ## En curso
 
-- 2026-08-31 — Docs: P1b regla genérica (destildar todo, tildar 2 protocolos). Sin código.
+- 2026-09-01 — P1b Lote A **hecho** (PWA 12.56 + ext 0.5.11): persistir `mayo_nro_atencion` del 8b. Parado antes de Lote B (GET PDF) y C (reintento qx).
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-09-01 — PWA **12.56** + extensión **0.5.11** P1b Lote A: el N° de Atención del 8b (solo si el nombre coincidió) queda en `mayo_nro_atencion` (intervención + cola). Refresh no lo borra. Vacío no pisa. Sin GET todavía.
+
+- 2026-09-01 — P1b recortado en `docs/ROADMAP_ESCALAMIENTO.md`: `pMeId` único por internación (4 internaciones → 4 N°). Ventana = fecha+hora de esta foja, no «ahora». Sin botón «Bajar fojas». GET en la tab GECLISA del 1–12. Qx ausente = reintento silencioso. Sin código.
+
+- 2026-09-01 — `docs/ROADMAP_ESCALAMIENTO.md` P1b: URL real (`pMeId`, `pEventos` con pipe, `pConFirma=true`, fechas `dd/MM/yyyy`). Guardar N° Atención del 8b. Fetch en tab GECLISA → ranura anestésica.
+
+- 2026-08-31 — `docs/ROADMAP_ESCALAMIENTO.md` P1b: `#btnImprimirReportesPopup`; modal sin nombre/DNI; verificar fila (criterio 8b) antes; tildar Incluir firma + 2 protocolos, destildar el resto. Inyección a P1 bloqueada hasta ver cómo sale el PDF.
 
 - 2026-08-31 — `docs/ROADMAP_ESCALAMIENTO.md` P1b: no destildar una lista fija. Recorrer todos los tildados (Eventos + Adjuntos variables) y destildar; tildar solo `ProtocoloQuirurgico` + `ProtocoloAnestesico`. Auth no sale del modal. Sin código.
 
@@ -146,4 +154,4 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - Facturación ADAARC (evweb) es de **privadas en general**, no de una institución. Lo que cambia es la HC: Mayo = GECLISA siempre (después, camino a evweb según mutual); Aero = foja nativa. Públicos = SISalud, no evweb. Firma digital de consentimiento: no hasta abogado.
 - **Home se rediseña por institución, no por foja.** Fuente completa: `docs/DISENO_PC_HOME.md` (leer entero; no de memoria). PC hoy = misma columna 520px del celular, centrada. No implementado.
 - Empaquetado de adjuntos **por institución** (no forzar 3 archivos): Mayo GECLISA = 1 PDF qx+anest + auth aparte; Aero = fojas AnesFact + foto auth (2 fotos si no hay qx nativa). Detalle: `docs/ROADMAP_ESCALAMIENTO.md` § 1c. P1 no lo implementa.
-- P1b (Mayo, fojas): Panel Internados → `#btnImprimirPanelInternado` → destildar **todos** los checkboxes del modal (Eventos + Adjuntos; la lista default y los `jqg_gridAdjuntos_*` cambian) → tildar solo `jqg_gridEventos_ProtocoloQuirurgico` + `ProtocoloAnestesico` → Imprimir. Auth **no** está en ese modal. Detalle: `docs/ROADMAP_ESCALAMIENTO.md` P1b. Sin código.
+- P1b (Mayo, fojas): GET `/Reporte/ReporteListadoInternado`. `pMeId` = N° por internación (confirmado en vivo). Ventana = fecha+hora de **esta** foja ± 8 h, no «ahora» ni ingreso/egreso. Persistido en 8b si el nombre coincidió. Fetch en la tab GECLISA del 1–12; sin botón extra; reintento si falta qx. Combinado → `docs.anest`. No es upload a evweb. `docs/ROADMAP_ESCALAMIENTO.md` P1b.

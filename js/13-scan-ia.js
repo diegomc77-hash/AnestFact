@@ -16,7 +16,7 @@ function extraer(){
   .catch(function(e){document.getElementById('err-msg').textContent=e.message;document.getElementById('err-panel').classList.add('on');setSpin(false);document.getElementById('btn-extraer').style.display='block';});
 }
 function aplicarIA(j){
-  var base={id:Date.now()+'',estado:'borrador',fecha:new Date().toISOString().slice(0,10),hora:'',pac:'',edad:'',sexo:'',dni:'',peso:'',ciru:'',serv:'',diag:'',san:'Hospital Aeronáutico',sala:'',cama:'',mayo_sector:'',mayo_cama:'',obra:'',afil:'',docs:{},ob:false,env:true,pracs:[],foja:{drogas:[],vitals:[]}};
+  var base={id:Date.now()+'',estado:'borrador',fecha:new Date().toISOString().slice(0,10),hora:'',pac:'',edad:'',sexo:'',dni:'',peso:'',ciru:'',serv:'',diag:'',san:'Hospital Aeronáutico',sala:'',cama:'',mayo_sector:'',mayo_cama:'',mayo_nro_atencion:'',obra:'',afil:'',docs:{},ob:false,env:true,pracs:[],foja:{drogas:[],vitals:[]}};
   if(!S.cur)S.cur=base;
   var m={paciente:'pac',hora_inicio:'hora',obra_social:'obra',afiliado:'afil',cirujano:'ciru',sanatorio:'san',dni:'dni',diagnostico:'diag',sexo:'sexo'};
   Object.keys(m).forEach(function(k){if(j[k])S.cur[m[k]]=j[k];});

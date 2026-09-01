@@ -421,6 +421,22 @@ window.addEventListener('message', function(ev){
     try{window.__AFG_LAST_MARK_ENVIADO=markRes;}catch(eW){}
     try{console.log('[AFG] MARK_ENVIADO_GECLISA',markRes);}catch(eL){}
   }
+  if(d.type==='SET_MAYO_NRO_ATENCION'){
+    var nroRes={ok:false,error:'persist_fn_missing',intervId:d.intervId||'',atMs:Date.now()};
+    try{
+      if(typeof afPersistMayoNroAtencion==='function'){
+        nroRes=afPersistMayoNroAtencion(d.intervId||d.id,d.nroAtencion||d.mayo_nro_atencion,{
+          via:d.via||'extension'
+        })||nroRes;
+      }
+    }catch(eNro){
+      nroRes={ok:false,error:String(eNro&&eNro.message||eNro),intervId:d.intervId||'',atMs:Date.now()};
+    }
+    nroRes.atMs=Date.now();
+    nroRes.intervId=String(d.intervId||d.id||nroRes.intervId||'');
+    try{window.__AFG_LAST_MAYO_NRO=nroRes;}catch(eW2){}
+    try{console.log('[AFG] SET_MAYO_NRO_ATENCION',nroRes);}catch(eL2){}
+  }
 });
 
 /**

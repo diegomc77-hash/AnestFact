@@ -135,6 +135,12 @@ function afGeclisaQueueValidate(i) {
   return { ok: true };
 }
 
+/** N° Atención GECLISA (pMeId). Solo dígitos; vacío si no hay ≥4. */
+function afNormMayoNroAtencion(v) {
+  var s = String(v == null ? '' : v).replace(/\D/g, '');
+  return s.length >= 4 ? s : '';
+}
+
 function afGeclisaQueueSnapshotFromInterv(i) {
   return {
     id: String(i.id),
@@ -144,6 +150,7 @@ function afGeclisaQueueSnapshotFromInterv(i) {
     hora: (i.hora || '').trim(),
     sector: (i.mayo_sector || '').trim(),
     mayo_cama: (i.mayo_cama || '').trim(),
+    mayo_nro_atencion: afNormMayoNroAtencion(i && i.mayo_nro_atencion),
     san: (i.san || '').trim(),
     status: 'queued',
     message: '',
@@ -160,7 +167,7 @@ function afGeclisaQueueRefreshFromIntervs(envelope) {
   envelope.items = (envelope.items || []).map(function (it) {
     var live = byId[String(it.id)];
     if (!live) return it;
-    return {
+    return Object.assign({}, it, {
       id: it.id,
       pac: (live.pac || it.pac || '').trim(),
       dni: (live.dni || it.dni || '').trim(),
@@ -168,12 +175,14 @@ function afGeclisaQueueRefreshFromIntervs(envelope) {
       hora: (live.hora || it.hora || '').trim(),
       sector: (live.mayo_sector || it.sector || '').trim(),
       mayo_cama: (live.mayo_cama || it.mayo_cama || '').trim(),
+      mayo_nro_atencion: afNormMayoNroAtencion(live.mayo_nro_atencion) ||
+        afNormMayoNroAtencion(it.mayo_nro_atencion),
       san: (live.san || it.san || '').trim(),
       status: it.status || 'queued',
       message: it.message || '',
       addedAt: it.addedAt || Date.now(),
       updatedAt: Date.now()
-    };
+    });
   });
   return envelope;
 }
@@ -228,6 +237,7 @@ function afGeclisaQueueAdd(interv) {
     existing.hora = snap.hora;
     existing.sector = snap.sector;
     existing.mayo_cama = snap.mayo_cama;
+    if (snap.mayo_nro_atencion) existing.mayo_nro_atencion = snap.mayo_nro_atencion;
     existing.san = snap.san;
     existing.updatedAt = Date.now();
     if (existing.status === 'paused_error' || existing.status === 'done') {
@@ -310,6 +320,7 @@ function afGeclisaQueueDebug() {
       fecha: S.cur.fecha,
       hora: S.cur.hora,
       sector: S.cur.mayo_sector,
+      mayo_nro_atencion: S.cur.mayo_nro_atencion || '',
       san: S.cur.san
     } : null,
     validateCur: (typeof S !== 'undefined' && S.cur) ? afGeclisaQueueValidate(afGeclisaQueueHydrateCurFromDom(S.cur)) : null
@@ -383,6 +394,60 @@ function afGeclisaQueueSetStatus(intervId, status, message) {
     if (typeof renderGeclisaQueuePanel === 'function') renderGeclisaQueuePanel();
   } catch (e) {}
   return { ok: true, item: hit };
+}
+
+/**
+ * Guarda N° Atención GECLISA en la intervención + ítem de cola.
+ * Nunca persiste vacío. No toca el campo si `nro` no es usable.
+ * Solo llamar tras 8b con match de nombre (la extensión no manda mismatch).
+ */
+function afPersistMayoNroAtencion(intervId, nro, opts) {
+  opts = opts || {};
+  var id = String(intervId || '').trim();
+  var num = afNormMayoNroAtencion(nro);
+  if (!id) return { ok: false, error: 'missing_intervId' };
+  if (!num) return { ok: false, error: 'empty_nro', intervId: id };
+
+  var intervHit = false;
+  if (typeof S !== 'undefined' && Array.isArray(S.intervs)) {
+    for (var i = 0; i < S.intervs.length; i++) {
+      if (String(S.intervs[i].id) === id) {
+        S.intervs[i].mayo_nro_atencion = num;
+        intervHit = true;
+        break;
+      }
+    }
+    if (S.cur && String(S.cur.id) === id) {
+      S.cur.mayo_nro_atencion = num;
+      intervHit = true;
+    }
+    if (intervHit) {
+      if (typeof saveIntervsToStorage === 'function') saveIntervsToStorage();
+      if (typeof syncAutoPushDebounced === 'function') syncAutoPushDebounced();
+    }
+  }
+
+  var queueHit = false;
+  var env = afGeclisaQueueLoad();
+  for (var q = 0; q < (env.items || []).length; q++) {
+    if (String(env.items[q].id) === id) {
+      env.items[q].mayo_nro_atencion = num;
+      env.items[q].updatedAt = Date.now();
+      queueHit = true;
+      break;
+    }
+  }
+  if (queueHit) afGeclisaQueueSave(env);
+
+  try {
+    console.log('[AFG] mayo_nro_atencion', num, 'interv=', id, 'via=', opts.via || '',
+      'intervHit=', intervHit, 'queueHit=', queueHit);
+  } catch (eL) {}
+
+  if (!intervHit && !queueHit) {
+    return { ok: false, error: 'not_found', intervId: id, nro: num };
+  }
+  return { ok: true, intervId: id, nro: num, intervHit: intervHit, queueHit: queueHit };
 }
 
 window.addEventListener('message', function (ev) {
