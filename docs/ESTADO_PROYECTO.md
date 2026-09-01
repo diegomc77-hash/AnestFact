@@ -52,9 +52,11 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- 2026-09-01 — P1b Lote A **hecho** (PWA 12.56 + ext 0.5.11): persistir `mayo_nro_atencion` del 8b. Parado antes de Lote B (GET PDF) y C (reintento qx).
+- 2026-09-01 — SQL **021** aplicado en vivo: queda solo `af_assert_plan(text, text)` (oid 39319). Probar mint GECLISA (Ávila franco). P1b Lote A hecho; B/C pendientes.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-09-01 — SQL **021** en producción: `DROP FUNCTION public.af_assert_plan(text)` (oid 26261, wrapper). Queda **39319** `af_assert_plan(text, text)` de 017. El mint GECLISA llamaba 1 arg y Postgres no distinguía.
 
 - 2026-09-01 — PWA **12.56** + extensión **0.5.11** P1b Lote A: el N° de Atención del 8b (solo si el nombre coincidió) queda en `mayo_nro_atencion` (intervención + cola). Refresh no lo borra. Vacío no pisa. Sin GET todavía.
 
