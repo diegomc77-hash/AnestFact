@@ -28,7 +28,7 @@ flujo cerrado · **no** = 0 código o solo diseño.
 | QR preop | **sí** | `af-qr-create` / `submit` / `peek`; selector de lugar; prefoja; catálogo Mayo |
 | Foja anestésica | **sí** | Foja + UI Mayo (sector/cama/quirófano GECLISA) |
 | Inyección GECLISA | **sí** | Cola `js/39-geclisa-queue.js` + extensión **0.5.10**; fill; **nunca** click en Guardar |
-| Camino a evweb «directo» | **parcial / no automatizado** | No hay fill ni API a `adaarc.evweb.com.ar`. Falta recolectar en GECLISA el **PDF combinado** (qx+anest en un `Reporte.pdf`) + auth si aplica (PAMI: solo el combinado). Ver § 1c y **P1b**. Hoy: copiar/marcar a mano + bajar docs en el navegador |
+| Camino a evweb «directo» | **parcial / no automatizado** | No hay fill ni API a `adaarc.evweb.com.ar`. Fojas: modal **Imprimir HC de internación** (IDs en **P1b**; 2026-08-31). Auth: **no** está en esa lista — archivo aparte (P1 / WhatsApp / otro). PAMI = solo el PDF combinado |
 | Traditum (APROSS) | **no** | 0 matches en `js/` / `views/`. Diseño en el cierre. Flujo operativo: GECLISA (auth) → Traditum (buscar esa auth) → 3 estados. Fase **P4** |
 | QR recepción PDFs (secretaria) | **no** | Distinto del Escanear IA (Gemini) |
 | Foja qx nativa / QR cirujano | **no (a propósito)** | En Mayo la qx vive en GECLISA |
@@ -70,9 +70,11 @@ Fuente de la matriz: `docs/CIERRE_ARQUITECTURA_FACTURACION.md` (secciones
 cómo se arma cada paquete**, para no reconstruirlo de memoria. El cierre
 sigue siendo la norma si hay conflicto.
 
-Inyección AnesFact → GECLISA (foja anestésica) **ya está**. Lo que falta
-es el sentido **inverso**: buscar en GECLISA y **juntar** lo que evweb
-pide. Eso no es P2 (P2 es foja qx **nativa Aero**, sin GECLISA).
+Inyección AnesFact → GECLISA (foja anestésica) **ya está**. El sentido
+**inverso** de las fojas ya no es «buscar a ciegas»: es el modal de
+impresión del Panel de Internados (**P1b**, IDs verificados). La auth
+no sale de ahí. Eso no es P2 (P2 es foja qx **nativa Aero**, sin
+GECLISA).
 
 ### PAMI (el más simple)
 
@@ -91,8 +93,9 @@ pide. Eso no es P2 (P2 es foja qx **nativa Aero**, sin GECLISA).
 - **Dónde:** fojas en GECLISA (**un PDF combinado**, no dos archivos);
   auth en GECLISA (documentos) y/o llega por WhatsApp (QR recepción /
   adjunto P1) — **archivo aparte**.
-- **Falta automatizar:** buscar en GECLISA el **reporte combinado + la
-  auth** y dejar el paquete listo **antes** de subir a evweb.
+- **Falta automatizar:** P1b = PDF combinado por el modal de impresión
+  (abajo). La auth **casi nunca** está en ese modal (APROSS/ART);
+  sigue siendo archivo aparte (P1 / WhatsApp / otro lado de GECLISA).
 - **Fases:** P1 = colgar auth (o el combinado) en AnesFact si no está
   en GECLISA; **P1b** = búsqueda/recolección en GECLISA; P4 no aplica.
 
@@ -182,26 +185,63 @@ editor de foja qx (**P2**), config por institución (§ 1c).
 
 **Riesgo:** `S.cur.docs` sigue data-URL. No tocar `fill.js`.
 
-### P1b — Recolección Mayo en GECLISA → paquete evweb · **grande**
+### P1b — Recolección Mayo en GECLISA → PDF combinado · **grande**
 
-**Cierre:** misma matriz. Este es el hueco del «directo a evweb»:
-**buscar** en GECLISA el paquete y dejarlo listo **antes** de subir a
-ADAARC/evweb. Confirmado en prueba P1 (§ 1c): las dos fojas salen en
-**un** `Reporte.pdf`; la auth (si aplica) es **otro** archivo. PAMI =
-solo el combinado. ART/obras = combinado + auth.
+**Cierre:** misma matriz + § 1c. Hueco del «directo a evweb»: bajar las
+fojas **antes** de subir a ADAARC. **No** automatizar desde este
+archivo. Chat dueño GECLISA. **Nunca** click en Guardar.
 
-Hoy la extensión **inyecta** foja anestésica; no **descarga** protocolos
-ni documentos. Ruta HC por DNI (`NOTES_RUTA_HC_POR_DNI.md`) es otro
-hueco (pacientes de alta) y no es este lote salvo que se decida.
+Hoy la extensión **inyecta** foja anestésica; no **descarga**. Ruta HC
+por DNI (`NOTES_RUTA_HC_POR_DNI.md`) es otro hueco (pacientes de alta)
+y no es este lote salvo que se decida.
 
-**PAMI:** el PDF combinado, sin auth — el camino más corto de P1b.
+**PAMI:** solo el PDF combinado (sin auth) — el camino más corto.
+**ART/obras:** combinado + auth **aparte**. **APROSS:** P1b no sustituye
+Traditum (**P4**); las fojas de este modal no van a Traditum.
 
 **No es P2:** P2 es foja qx **nativa** para Aero (sin GECLISA). Mayo no
 edita qx en AnesFact.
 
-**Riesgo:** alto (GECLISA, posible roce con `fill.js` / extensión). Chat
-dueño GECLISA. Nunca click en Guardar. Confirmar alcance (qué pantallas
-de GECLISA tienen las 2 fojas y la auth) **antes** de codear.
+#### Mecanismo verificado (2026-08-31, IDs reales, GECLISA 4.1)
+
+Reemplaza la idea vaga de «buscar en GECLISA». Confirmado en vivo.
+
+1. **Panel de Internados.** Al lado de **Opciones** (☰,
+   `btnGrillaInternadoMore`) hay un botón de impresora:
+   `button#btnImprimirPanelInternado.btn.btn-default`
+   (clase `btnImprimirPanelInternado`).
+2. Abre el modal **«Imprimir Historia Clínica de Internación»**:
+   rango de fechas + checkboxes.
+3. El modal tiene **más de una lista**. En una prueba en vivo
+   (2026-08-31): **13 de 24** tildados por defecto. Incluye Eventos
+   (Anamnesis, Evolución, Protocolo Quirúrgico, Protocolo Anestésico,
+   Pedidos de Estudios, Indicaciones Médicas, Epicrisis, «Archivos1»,
+   …) y una segunda sección **Archivos Adjuntos** cuyos IDs son por
+   documento (`jqg_gridAdjuntos_51888` y similares) y **cambian por
+   paciente**. El botón Imprimir es nuevo de GECLISA 4.1: la lista
+   default puede crecer otra vez. **No** hardcodear «destildar estos
+   N».
+4. **Regla genérica (la que hay que automatizar):** al abrir el
+   modal, recorrer **todos** los checkboxes tildados (Eventos +
+   Adjuntos) y destildarlos; después tildar **únicamente**
+   `jqg_gridEventos_ProtocoloQuirurgico` y
+   `jqg_gridEventos_ProtocoloAnestesico`. Así no importa cuántos
+   vengan marcados ni qué adjuntos tenga el paciente.
+5. Click **Imprimir** → PDF combinado (qx + anestésica en un archivo,
+   el `Reporte.pdf` de § 1c). Id del botón Imprimir del modal: **no
+   relevado todavía**.
+
+**La autorización no sale de este modal.** Confirmado por la usuaria:
+en APROSS y ART casi nunca figura en esa lista; a veces no está en
+ningún lado de GECLISA. P1b automatiza **solo fojas**. Auth = P1 /
+WhatsApp / otro camino (P4 busca auth en GECLISA para Traditum, no
+este modal).
+
+Pendiente antes de codear: id del Imprimir del modal; qué hace el
+rango de fechas (¿dejar default?). No inventar IDs. No mezclar con
+`fill.js` de inyección.
+
+**Riesgo:** alto (GECLISA / extensión). Un lote, chat dueño GECLISA.
 
 ### P2 — Foja quirúrgica nativa + QR cirujano · **Aero primero** · **grande**
 

@@ -9,7 +9,7 @@
 | Archivo | Qué trata (una frase) |
 |---|---|
 | `docs/DISENO_PC_HOME.md` | **Home por institución, no por foja** (PC primero, misma lógica en móvil; PC hoy = columna 520px). Leer el archivo completo antes de tocar Home/dock/layout. |
-| `docs/ROADMAP_ESCALAMIENTO.md` | Auditoría código vs diseño + fases P/U + empaquetado de adjuntos por institución (Mayo = 1 PDF combinado). |
+| `docs/ROADMAP_ESCALAMIENTO.md` | Fases P/U + empaquetado por institución + P1b = modal imprimir internado GECLISA (IDs). |
 | `docs/CIERRE_ARQUITECTURA_FACTURACION.md` | Flujo Preop → foja → GECLISA/Traditum/evweb/SISalud × mutual. Diseño; no codear Traditum/foja qx desde ahí. |
 | `docs/ARQUITECTURA_INSTITUCIONES.md` | Tres patrones de HC (GECLISA / sistema propio / sin sistema) y `tipo_sistema` vs `destino_final`. No mezclar con el cierre de facturación. |
 | `docs/VALORACION_QR.md` | Contrato QR → prefoja → foja (importar solo vacíos; no `resetFojaUIDom`). |
@@ -52,9 +52,13 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- 2026-08-31 — Docs: empaquetado de adjuntos por institución en el roadmap (§ 1c). Sin código.
+- 2026-08-31 — Docs: P1b regla genérica (destildar todo, tildar 2 protocolos). Sin código.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-08-31 — `docs/ROADMAP_ESCALAMIENTO.md` P1b: no destildar una lista fija. Recorrer todos los tildados (Eventos + Adjuntos variables) y destildar; tildar solo `ProtocoloQuirurgico` + `ProtocoloAnestesico`. Auth no sale del modal. Sin código.
+
+- 2026-08-31 — `docs/ROADMAP_ESCALAMIENTO.md` P1b: Panel Internados → `#btnImprimirPanelInternado` → modal HC internación → Imprimir. Auth no está en esa lista. Sin código.
 
 - 2026-08-31 — `docs/ROADMAP_ESCALAMIENTO.md` § 1c: Mayo = GECLISA un PDF (qx+anest) + auth aparte; Aero = fojas desde AnesFact + foto auth (2 fotos si aún no hay qx nativa); otras = relevar. P1 no cambia (ranuras opcionales).
 
@@ -142,3 +146,4 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - Facturación ADAARC (evweb) es de **privadas en general**, no de una institución. Lo que cambia es la HC: Mayo = GECLISA siempre (después, camino a evweb según mutual); Aero = foja nativa. Públicos = SISalud, no evweb. Firma digital de consentimiento: no hasta abogado.
 - **Home se rediseña por institución, no por foja.** Fuente completa: `docs/DISENO_PC_HOME.md` (leer entero; no de memoria). PC hoy = misma columna 520px del celular, centrada. No implementado.
 - Empaquetado de adjuntos **por institución** (no forzar 3 archivos): Mayo GECLISA = 1 PDF qx+anest + auth aparte; Aero = fojas AnesFact + foto auth (2 fotos si no hay qx nativa). Detalle: `docs/ROADMAP_ESCALAMIENTO.md` § 1c. P1 no lo implementa.
+- P1b (Mayo, fojas): Panel Internados → `#btnImprimirPanelInternado` → destildar **todos** los checkboxes del modal (Eventos + Adjuntos; la lista default y los `jqg_gridAdjuntos_*` cambian) → tildar solo `jqg_gridEventos_ProtocoloQuirurgico` + `ProtocoloAnestesico` → Imprimir. Auth **no** está en ese modal. Detalle: `docs/ROADMAP_ESCALAMIENTO.md` P1b. Sin código.
