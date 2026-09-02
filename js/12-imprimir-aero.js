@@ -117,8 +117,8 @@ function _buildObsSignRow(obsText, obsFs, signImg, boxStyle, obsLabel){
   return '<div style="display:flex;gap:8px;align-items:flex-end">'+obsSection+_buildSignBlock(signImg)+'</div>';
 }
 
-/** Tope de columnas VG por hoja A4 (paso 5 min → 37 = 3 h 00 min extremos inclusive). */
-var AF_PRINT_VG_COLS_PER_PAGE=37;
+/** Tope VG por hoja: 49 cols = 4 h 00 min a 5 min (extremos inclusive). Etiqueta de hora cada 15 min. */
+var AF_PRINT_VG_COLS_PER_PAGE=49;
 var AF_PRINT_VG_YCOL='54px';
 
 function _chartColsPerPage(n){
@@ -139,6 +139,46 @@ function _chartTableStart(n, lockCols){
   for(var ci=0;ci<n;ci++)html+='<col>';
   html+='</colgroup>';
   return html;
+}
+
+function _vgMinOf(t){
+  var p=String(t||'').split(':');
+  return parseInt(p[1],10);
+}
+
+function _vgTickInfo(t){
+  var m=_vgMinOf(t);
+  var h=String(t||'').split(':')[0]||'';
+  if(isNaN(m))return {label:'',kind:''};
+  if(m===0)return {label:h,kind:'h'};
+  if(m===15||m===30||m===45)return {label:String(m),kind:'q'};
+  if(Math.abs(m-15)<=2)return {label:'15',kind:'q'};
+  if(Math.abs(m-30)<=2)return {label:'30',kind:'q'};
+  if(Math.abs(m-45)<=2)return {label:'45',kind:'q'};
+  if(m>=58){
+    var nh=(parseInt(h,10)+1)%24;
+    return {label:(nh<10?'0':'')+nh,kind:'h'};
+  }
+  if(m<=2)return {label:h,kind:'h'};
+  return {label:'',kind:''};
+}
+
+function _vgTickCellStyle(kind){
+  if(kind==='h')return 'font-size:8px;font-weight:bold;color:#000;line-height:1.05';
+  if(kind==='q')return 'font-size:5.5px;font-weight:normal;color:#555;line-height:1.05';
+  return 'font-size:6px;color:#000;line-height:1.05';
+}
+
+/** Un solo color/grosor para toda la grilla. El borde vertical no puede
+ *  depender de la fila Y: con border-collapse eso corta las verticales
+ *  en franjas (p. ej. 175–150 lavadas vs 150–125 nítidas). */
+function _vgGridBorder(){
+  return '1px solid #ccc';
+}
+
+function _vgMarkLeft(i, n, lockCols){
+  var denom=(lockCols&&n<lockCols)?lockCols:n;
+  return 'calc('+AF_PRINT_VG_YCOL+' + '+(i+0.5)+' * ((100% - '+AF_PRINT_VG_YCOL+') / '+denom+'))';
 }
 
 function _buildPrintStyles(){
@@ -178,31 +218,33 @@ function _buildChartLegend(){
 function _buildChartHtml(vgCols, vgCells, vgObs, vgFluidos, start, end, useEmptyGrid, lockCols){
   if(useEmptyGrid||!vgCols.length){
     var COLS=24;
-    var rDefs=[];for(var r=0;r<16;r++){var yv=200-r*12.5;rDefs.push({lb:(yv===200||yv===150||yv===100||yv===50)?String(yv):'',th:(yv%50===0)});}
+    var rDefs=[];for(var r=0;r<16;r++){var yv=200-r*12.5;rDefs.push({lb:(yv===200||yv===150||yv===100||yv===50)?String(yv):''});}
     var html=_chartTableStart(COLS,0);
     rDefs.forEach(function(rd){
-      html+='<tr><td style="border:1px solid #999;font-size:6.5px;padding:0 2px;background:#f5f5f5;text-align:right;font-weight:'+(rd.lb?'bold':'normal')+'">'+rd.lb+'</td>';
-      for(var c=0;c<COLS;c++)html+='<td style="border:1px solid '+(rd.th?'#aaa':'#ddd')+';height:13px"></td>';
+      html+='<tr><td style="border:'+_vgGridBorder()+';font-size:6.5px;padding:0 2px;background:#f5f5f5;text-align:right;font-weight:'+(rd.lb?'bold':'normal')+'">'+rd.lb+'</td>';
+      for(var c=0;c<COLS;c++)html+='<td style="border:'+_vgGridBorder()+';height:13px"></td>';
       html+='</tr>';
     });
     html+='<tr><td style="font-size:6px;text-align:right;padding:0 2px;background:#f5f5f5;line-height:1.1">Hora<br>obs.</td>';
-    for(var c2=0;c2<COLS;c2++)html+='<td style="border:1px solid #ddd;height:13px"></td>';
+    for(var c2=0;c2<COLS;c2++)html+='<td style="border:'+_vgGridBorder()+';height:13px"></td>';
     html+='</tr><tr><td style="font-size:6.5px;font-weight:bold;text-align:right;padding:0 2px;background:#f5f5f5">FLUIDOS</td>';
-    for(var c3=0;c3<COLS;c3++)html+='<td style="border:1px solid #ddd;height:13px"></td>';
+    for(var c3=0;c3<COLS;c3++)html+='<td style="border:'+_vgGridBorder()+';height:13px"></td>';
     html+='</tr></table>';
     return html;
   }
   var slice=vgCols.slice(start,end);
   var n=slice.length;
+  var seriesN=vgCols.length;
   var YVALS=[];for(var yv=200;yv>=50;yv-=5)YVALS.push(yv);
   var chartHtml=_chartTableStart(n,lockCols)+'<tbody>';
   chartHtml+='<tr><td></td>';
   slice.forEach(function(col){
-    chartHtml+='<td style="font-size:5px;text-align:center;border:1px solid #ccc;white-space:nowrap;overflow:hidden;line-height:1.1">'+_printEsc(col.t)+'</td>';
+    var info=_vgTickInfo(col.t);
+    chartHtml+='<td style="text-align:center;border:'+_vgGridBorder()+';white-space:nowrap;overflow:hidden;'+_vgTickCellStyle(info.kind)+'">'+_printEsc(info.label)+'</td>';
   });
   chartHtml+='</tr>';
   YVALS.forEach(function(yval){
-    var sl=(yval%25===0), th=(yval%25===0);
+    var sl=(yval%25===0);
     chartHtml+='<tr><td style="font-size:6.5px;text-align:right;padding-right:3px;font-weight:'+(sl?'bold':'normal')+'">'+(sl?yval:'')+'</td>';
     slice.forEach(function(col,si){
       var ci2=start+si;
@@ -221,23 +263,30 @@ function _buildChartHtml(vgCols, vgCells, vgObs, vgFluidos, start, end, useEmpty
       var cell=mappedKey?vgCells[mappedKey]:null;
       var valReal=cell&&cell.val?cell.val:null;
       var fuera=valReal&&(valReal<50||valReal>200);
-      var sym=cell?('<b style="font-size:8px">'+cell.sym+(fuera?'<sup style="font-size:5px">'+valReal+'</sup>':'')+'</b>'):'';
-      chartHtml+='<td style="height:10px;border:1px solid '+(th?'#aaa':'#e0e0e0')+';text-align:center;vertical-align:middle">'+sym+'</td>';
+      var sym=cell?('<b style="font-size:7px;line-height:1">'+cell.sym+(fuera?'<sup style="font-size:5px">'+valReal+'</sup>':'')+'</b>'):'';
+      chartHtml+='<td style="height:10px;max-height:10px;overflow:hidden;border:'+_vgGridBorder()+';text-align:center;vertical-align:middle;line-height:1"><div style="height:10px;overflow:hidden;line-height:10px">'+sym+'</div></td>';
     });
     chartHtml+='</tr>';
   });
   chartHtml+='<tr><td style="font-size:6px;text-align:right;padding-right:3px;line-height:1.1">Hora<br>obs.</td>';
   slice.forEach(function(col,si){
     var ci3=start+si;
-    chartHtml+='<td style="height:10px;border:1px solid #ddd;font-size:6px;text-align:center">'+_printEsc(vgObs[ci3]||'')+'</td>';
+    chartHtml+='<td style="height:10px;overflow:hidden;border:'+_vgGridBorder()+';font-size:6px;text-align:center">'+_printEsc(vgObs[ci3]||'')+'</td>';
   });
   chartHtml+='</tr><tr><td style="font-size:6px;font-weight:bold;text-align:right;padding-right:3px">FLUIDOS</td>';
   slice.forEach(function(col,si){
     var ci4=start+si;
-    chartHtml+='<td style="height:10px;border:1px solid #ddd;font-size:6px;text-align:center">'+_printEsc(vgFluidos[ci4]||'')+'</td>';
+    chartHtml+='<td style="height:10px;overflow:hidden;border:'+_vgGridBorder()+';font-size:6px;text-align:center">'+_printEsc(vgFluidos[ci4]||'')+'</td>';
   });
   chartHtml+='</tr></tbody></table>';
-  return chartHtml;
+  var marks='';
+  if(n&&start===0){
+    marks+='<div style="position:absolute;top:0;left:'+_vgMarkLeft(0,n,lockCols)+';transform:translateX(-50%);font-size:7px;font-weight:bold;white-space:nowrap;line-height:1.05;text-align:center">'+_printEsc(slice[0].t)+'<div style="font-size:9px;line-height:1">&#8595;</div></div>';
+  }
+  if(n&&end===seriesN&&!(start===0&&n===1)){
+    marks+='<div style="position:absolute;top:0;left:'+_vgMarkLeft(n-1,n,lockCols)+';transform:translateX(-100%);font-size:7px;font-weight:bold;white-space:nowrap;line-height:1.05;text-align:right;padding-right:2px">'+_printEsc(slice[n-1].t)+'<div style="font-size:9px;line-height:1">&#8595;</div></div>';
+  }
+  return '<div style="position:relative;padding-top:16px">'+marks+chartHtml+'</div>';
 }
 
 function _buildChartBlock(chartInner, minHeight){
@@ -246,8 +295,15 @@ function _buildChartBlock(chartInner, minHeight){
     +'<div style="flex:1;min-width:0">'+chartInner+'</div></div>';
 }
 
-function _buildFojaSheet(i,f,drogaLines,signImg,obsMain,obsFs,chartInner){
-  return _printPgOpen(i)+'<h1>FOJA DE ANESTESIA</h1><div class="pg-fill">'
+function _printFolio(pageNum, totalPages){
+  if(!(totalPages>1))return '';
+  return 'Página '+pageNum+' de '+totalPages;
+}
+
+function _buildFojaSheet(i,f,drogaLines,signImg,obsMain,obsFs,chartInner,pageLabel){
+  return _printPgOpen(i)+'<h1>FOJA DE ANESTESIA</h1>'
+    +(pageLabel?'<div class="hoja-n">'+_printEsc(pageLabel)+'</div>':'')
+    +'<div class="pg-fill">'
     +'<div class="r"><div style="flex:3"><span class="l">Apellido y nombres</span><div class="f">'+_printEsc(i.pac)+'</div></div>'
     +'<div style="flex:0 0 118px"><span class="l">D.N.I. N&#176;</span><div class="f">'+_printEsc(i.dni)+'</div></div></div>'
     +'<div class="r"><div style="flex:2"><span class="l">Servicio</span><div class="f">'+_printEsc(i.serv)+'</div></div>'
@@ -284,34 +340,10 @@ function _buildFojaSheet(i,f,drogaLines,signImg,obsMain,obsFs,chartInner){
     +'</div></div></div>';
 }
 
-/** Continuación: paciente + gráfico + obs sobrantes + firma (todo en flujo normal, sin pie oculto). */
-function _buildChartContinuationSheet(i,f,chartInner,pageNum,obsOverflow,signImg){
-  var obsHtml='';
-  if(obsOverflow){
-    obsHtml='<div class="s" style="margin-top:8px">Observaciones (continuaci&#243;n):</div>'
-      +'<div style="border:1px solid #ccc;padding:4px 6px;font-size:8.5px;line-height:1.45;word-wrap:break-word;margin-bottom:6px">'
-      +_printEsc(obsOverflow)+'</div>';
-  }
-  var signHtml='<div style="display:flex;gap:8px;margin-top:6px;justify-content:flex-end;align-items:flex-end">'
-    +'<div style="flex:1;text-align:right;font-size:7.5px;font-weight:bold;padding-bottom:4px">FIRMA Y SELLO DEL ANESTESISTA</div>'
-    +_buildSignBlock(signImg)+'</div>';
+function _buildObsAdicionalSheet(i,obsText,signImg,pageNum,totalPages){
+  var folio=_printFolio(pageNum,totalPages);
   return _printPgOpen(i)+'<h1>FOJA DE ANESTESIA</h1>'
-    +'<div class="hoja-n">Hoja '+pageNum+' — Signos vitales (continuaci&#243;n)</div>'
-    +'<div class="r"><div style="flex:3"><span class="l">Apellido y nombres</span><div class="f">'+_printEsc(i.pac)+'</div></div>'
-    +'<div style="flex:0 0 118px"><span class="l">D.N.I. N&#176;</span><div class="f">'+_printEsc(i.dni)+'</div></div></div>'
-    +'<div class="r"><div style="flex:2"><span class="l">Servicio</span><div class="f">'+_printEsc(i.serv)+'</div></div>'
-    +'<div style="flex:3"><span class="l">Procedimiento</span><div class="f">'+_printEsc(i.diag)+'</div></div>'
-    +'<div style="flex:0 0 64px"><span class="l">Fecha</span><div class="f">'+fmt(i.fecha)+'</div></div>'
-    +'<div style="flex:0 0 72px"><span class="l">Sala</span><div class="f">'+_printEsc(i.sala)+'</div></div></div>'
-    +_buildChartBlock(chartInner,_printChartH(i,120))
-    +obsHtml
-    +signHtml
-    +'</div>';
-}
-
-function _buildObsAdicionalSheet(i,obsText,signImg,pageNum){
-  return _printPgOpen(i)+'<h1>FOJA DE ANESTESIA</h1>'
-    +'<div class="hoja-n">Observaciones — Hoja '+pageNum+'</div>'
+    +(folio?'<div class="hoja-n">'+_printEsc(folio)+'</div>':'')
     +'<div class="r"><div style="flex:3"><span class="l">Apellido y nombres</span><div class="f">'+_printEsc(i.pac)+'</div></div>'
     +'<div style="flex:0 0 118px"><span class="l">D.N.I. N&#176;</span><div class="f">'+_printEsc(i.dni)+'</div></div></div>'
     +'<div class="r"><div style="flex:2"><span class="l">Servicio</span><div class="f">'+_printEsc(i.serv)+'</div></div>'
@@ -359,21 +391,17 @@ function imprimirFoja(){
   var hasChartCont=chartChunks.length>1;
   var lockCols=hasChartCont?perPage:0;
   var obsOverflow=obsFit.overflow||'';
-  var lastChartIdx=chartChunks.length-1;
+  var extraObs=!!obsOverflow;
+  var totalPages=chartChunks.length+(extraObs?1:0);
 
   var pagesHtml='';
   chartChunks.forEach(function(chunk,idx){
     var chartInner=_buildChartHtml(vgCols,vgCells,vgObs,vgFluidos,chunk.start,chunk.end,chunk.empty,lockCols);
-    if(idx===0){
-      pagesHtml+=_buildFojaSheet(i,f,drogaLines,signImg,obsFit.main,obsFit.fs,chartInner);
-    } else {
-      var isLast=idx===lastChartIdx;
-      pagesHtml+=_buildChartContinuationSheet(i,f,chartInner,idx+1,isLast?obsOverflow:'',signImg);
-    }
+    pagesHtml+=_buildFojaSheet(i,f,drogaLines,signImg,obsFit.main,obsFit.fs,chartInner,_printFolio(idx+1,totalPages));
   });
 
-  if(!hasChartCont&&obsOverflow){
-    pagesHtml+=_buildObsAdicionalSheet(i,obsOverflow,signImg,2);
+  if(extraObs){
+    pagesHtml+=_buildObsAdicionalSheet(i,obsOverflow,signImg,chartChunks.length+1,totalPages);
   }
 
   var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Foja de Anestesia</title><style>'

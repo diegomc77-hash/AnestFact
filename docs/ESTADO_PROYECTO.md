@@ -47,18 +47,20 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-02:
 
-- PWA `CACHE_V`: **12.58**
-- Extensión GECLISA: **0.5.12**
+- PWA `CACHE_V`: **12.59** (este commit, local; 12.58 en Pages hasta el push)
+- Extensión GECLISA: **0.5.12** (P1b, sin commit)
 
 ## En curso
 
-- 2026-09-02 — Impresión Aeronáutico **12.58**: tope **37 cols / 3 h** en hoja 1; hoja 2 sin estirar. PDF «prueba» 3 h confirmado (1 hoja, horas legibles). **Commit local** — falta push/Pages. P1b sigue en pausa.
+- 2026-09-01 — **P1b (Lote B, GET PDF GECLISA) en pausa**. Impresión Aeronáutico 12.59 lista (commit local; sin push). Retomar P1b exactamente ahí: probar Lote B con foja «prueba» / paciente real cuando haya uno disponible. GET en vivo ya confirmado (200 + PDF ~445 KB). Pendiente: filtro fecha evento vs carga.
 
 - 2026-09-01 — **P1b (Lote B, GET PDF GECLISA) en pausa** hasta cerrar el bug de impresión Aeronáutico. Retomar exactamente ahí: probar Lote B con foja «prueba» / paciente real cuando haya uno disponible. GET en vivo ya confirmado (200 + PDF ~445 KB). Pendiente: filtro fecha evento vs carga.
 
 ## Qué se hizo (más reciente primero)
 
-- 2026-09-02 — PWA **12.58** impresión VG: `_chartColsPerPage` = **37** (3 h a 5 min). Continuación usa el mismo ancho de columna (`lockCols`); no estira. Prueba «prueba»: 2 h → 1 hoja; 3 h → 1 hoja (horas legibles); 5 h → 2 hojas, hoja 2 sin estirar. Confirmado en PDF A4.
+- 2026-09-02 — PWA **12.59**: tope **49 cols / 4 h** en una hoja; etiquetas tipo reloj; flechas de inicio/fin `HH:mm`; grilla de borde uniforme; cada hoja de continuación es foja completa + folio `Página X de N` (omitido si N=1). Sin push. P1b no entra en este commit.
+
+- 2026-09-02 — PWA **12.58** en **origin/main** (`1e58e08`): 37 cols / 3 h en una hoja; Hoja 2 sin estirar. PDF prueba 3 h OK. Pendiente: Pages (el push ya salió).
 
 - 2026-09-02 — Diagnóstico (sin código) Hoja 2 Aeronáutico: se disparaba a **más de 28 columnas**. ~3 h → 37 cols. El lote SISalud 12.39 no cambió ese umbral (v8.4). P1b pausado.
 
@@ -139,7 +141,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## Pendiente / conocido
 
-- Impresión Aeronáutico Hoja 2: arreglo **12.58** commiteado (37 cols). Falta push/Pages. P1b Lote B sigue en pausa.
+- Impresión Aeronáutico: **12.58** en origin (3 h / 37 cols). **12.59** local (4 h / 49 cols, etiquetas 15 min) — esperar OK. P1b Lote B sigue en pausa.
 - Lote 2 SISalud select + print (12.40): esperando Pages. Probar como Huerta y/o admin: las 3 opciones nuevas, header/pie, sala texto, `getBoundingClientRect` del A4.
 - Dock 2 filas + tamaños (12.38): **cerrado en Pages**.
 - Wizard valoración 6 pasos (12.37): esperando e2e de Diego en Pages (viaja en el SW). Token de prueba propio.
