@@ -47,18 +47,17 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-02:
 
-- PWA `CACHE_V`: **12.59** (este commit, local; 12.58 en Pages hasta el push)
+- PWA `CACHE_V`: **12.59** (`8d6ca37` en origin; Pages #195 build OK, **deploy en cola** — reintento)
 - Extensión GECLISA: **0.5.12** (P1b, sin commit)
 
 ## En curso
 
-- 2026-09-01 — **P1b (Lote B, GET PDF GECLISA) en pausa**. Impresión Aeronáutico 12.59 lista (commit local; sin push). Retomar P1b exactamente ahí: probar Lote B con foja «prueba» / paciente real cuando haya uno disponible. GET en vivo ya confirmado (200 + PDF ~445 KB). Pendiente: filtro fecha evento vs carga.
-
-- 2026-09-01 — **P1b (Lote B, GET PDF GECLISA) en pausa** hasta cerrar el bug de impresión Aeronáutico. Retomar exactamente ahí: probar Lote B con foja «prueba» / paciente real cuando haya uno disponible. GET en vivo ya confirmado (200 + PDF ~445 KB). Pendiente: filtro fecha evento vs carga.
+- 2026-09-01 — **P1b (Lote B, GET PDF GECLISA) en pausa**. Impresión Aeronáutico **12.59** en origin (`8d6ca37`). Retomar P1b exactamente ahí: probar Lote B con foja «prueba» / paciente real cuando haya uno disponible. GET en vivo ya confirmado (200 + PDF ~445 KB). Pendiente: filtro fecha evento vs carga.
 
 ## Qué se hizo (más reciente primero)
 
-- 2026-09-02 — PWA **12.59**: tope **49 cols / 4 h** en una hoja; etiquetas tipo reloj; flechas de inicio/fin `HH:mm`; grilla de borde uniforme; cada hoja de continuación es foja completa + folio `Página X de N` (omitido si N=1). Sin push. P1b no entra en este commit.
+- 2026-09-02 — Reintento Pages de **12.59**: #195 (`8d6ca37`) armó el build (30 s) y el artefacto; el job **deploy** quedó en cola (mismo patrón que #192). Sitio vivo sigue en 12.58.
+- 2026-09-02 — PWA **12.59** en **origin/main** (`8d6ca37`): tope **49 cols / 4 h** en una hoja; etiquetas tipo reloj; flechas de inicio/fin `HH:mm`; grilla de borde uniforme; cada hoja de continuación es foja completa + folio `Página X de N` (omitido si N=1). 7 símbolos VG confirmados. P1b no entra en este commit.
 
 - 2026-09-02 — PWA **12.58** en **origin/main** (`1e58e08`): 37 cols / 3 h en una hoja; Hoja 2 sin estirar. PDF prueba 3 h OK. Pendiente: Pages (el push ya salió).
 
