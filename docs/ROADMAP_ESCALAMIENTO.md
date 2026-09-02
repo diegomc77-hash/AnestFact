@@ -95,7 +95,8 @@ GECLISA).
   adjunto P1) — **archivo aparte**.
 - **Falta automatizar:** P1b = PDF combinado por GET (abajo). La auth
   **no** sale de ese GET (APROSS/ART); sigue archivo aparte (P1 /
-  WhatsApp / otro lado de GECLISA).
+  WhatsApp / otro lado de GECLISA). Idea aparte: buzón AnesFact
+  (**P6**, no es P1b).
 - **Fases:** P1 = colgar auth (o el combinado) en AnesFact si no está
   en GECLISA; **P1b** = búsqueda/recolección en GECLISA; P4 no aplica.
 
@@ -180,8 +181,9 @@ institución en este lote.
 **Valor:** Aero (foto auth / qx papel); Mayo ART/obras si la auth llegó
 por mail/WhatsApp y **no** se va a buscar en GECLISA todavía.
 
-**No es:** recolección en GECLISA (eso es **P1b**), Traditum (**P4**),
-editor de foja qx (**P2**), config por institución (§ 1c).
+**No es:** recolección en GECLISA (eso es **P1b**), buzón de mail para
+auth (**P6**), Traditum (**P4**), editor de foja qx (**P2**), config por
+institución (§ 1c).
 
 **Riesgo:** `S.cur.docs` sigue data-URL. No tocar `fill.js`.
 
@@ -209,6 +211,9 @@ AnesFact.
 - El riesgo que queda: **dos cirugías en la misma internación** (mismo
   `pMeId`). Se acota con fecha+hora de **esta** foja, no con «ahora»
   ni con toda la internación.
+- Internación con **ambos** protocolos ya cargados (2026-09-01): mismo
+  GET → 200, `application/pdf`, **~445 KB** (bajo el tope 1.5 MB). El
+  endpoint no es solo el caso de prueba chico. Sin nombres ni N° acá.
 
 ```
 http://sanatoriomayo.myvnc.com:84/Reporte/ReporteListadoInternado
@@ -275,14 +280,76 @@ match de nombre: `mayo_nro_atencion` en la intervención (familia
 lo borra. No persistir si el nombre no coincidió. Nunca overwrite con
 vacío. Invisible, 0 clics.
 
-**Lote B — GET + adjunto.** Tras GRABAR (`AFG_USER_SAVED_FOJA`,
-`confirmed`, no `saveFailed`): content script hace el GET con el N°
-ya guardado + ventana de la foja → bridge → `afPrepareAdjunto` →
-`docs.anest`. Bump extensión. Bump `CACHE_V` si la PWA recibe el blob.
+**Lote B+C — GET + adjunto + reintento qx** · plan concreto 2026-09-01
+(código cuando Diego OK). C va pegado a B: el reintento es el mismo
+GET.
 
-**Lote C — reintento qx.** Misma URL, tab GECLISA abierta, tope y
-flag de arriba. Puede ir pegado a B si B queda chico; si no, B
-entrega anest-only y C completa.
+**Cómo se dispara (sin botón):**
+
+1. Humana toca GRABAR. `grabar-watch.js` ya manda `AFG_USER_SAVED_FOJA`.
+2. `handleUserSavedFoja` en `background.js`: si `saveFailed` → no GET.
+   Si `confirmed` (o timeout_assume_ok) → **no bloquea** el auto-next.
+   A los ~5 s dispara el GET en paralelo (la cola puede ir al siguiente:
+   el fetch usa cookies + `pMeId`, no el DOM de esa foja).
+3. Datos: `currentIntervId` del runner + ítem de cola (`mayo_nro_atencion`,
+   `fecha`, `hora`). Sin N° o sin hora → skip, log, no GET.
+4. URL: ventana `fecha+hora − 15 min` … `+ AFG_PDF_VENTANA_HORAS` (8).
+   Misma URL en cada reintento. Nunca «ahora».
+5. `geclisa.js` (tab GECLISA): `fetch(url, { credentials: 'include' })`
+   → blob. El SW no hace este fetch.
+6. Bridge `AFG_COMMIT_GECLISA_PDF` → PWA. `intervId` en el mensaje
+   (S.cur puede ser otra foja).
+
+**PWA:**
+
+- `afCommitGeclisaPdf(intervId, file, { toast })` en `js/17-sync-export.js`.
+  Busca la intervención **por id**, no exige que esté abierta.
+- Si `docs.anest` existe y `fuente !== 'geclisa_p1b'` → no pisar.
+- **No** pasar este PDF por `afPrepareAdjunto` / `afRasterizePdfPage1`
+  (eso convierte página 1 a JPEG y rompe el combinado para evweb).
+  Guardar `application/pdf` tal cual. Tope **1.5 MB** crudo (~2 MB
+  data-URL): si pasa, no se guarda (el medido era 347 KB).
+- `fuente: 'geclisa_p1b'`. Ranura `docs.anest`. Ranura qx vacía OK.
+- Completo: pdf.js (ya en PWA) extrae texto → hay quirúrgico **y**
+  anestésico. Títulos: confirmar en foja **prueba**. Si no se parsea,
+  no se declara completo.
+- Incompleto: se guarda igual + `mayo_pdf_qx_pendiente` (interv + cola).
+  Un toast solo cuando pasa a completo. Reintentos sin toast.
+
+**Reintento (ex-Lote C):** `chrome.alarms` cada ~10 min, tope 6, solo
+si hay tab GECLISA. Misma URL. Reemplaza el adjunto si ahora está
+completo. Al tope: queda lo que haya. Permiso `alarms` en el manifest.
+
+**Prueba de filtro de fechas (viva, foja prueba — no bloquea el código
+del GET, sí decide si el reintento sirve al día siguiente):**
+
+1. GET ~5 s post-GRABAR → debe traer protocolo anestésico.
+2. Cirujano carga qx **más tarde** (horas; idealmente al día siguiente
+   si se puede). Reintento **misma URL**.
+3. Si el qx entra: GECLISA filtra por **fecha del evento** (o el
+   grabado cae dentro de las 8 h) → el reintento sirve.
+4. Si no entra hasta ensanchar `hasta` a «ahora»: filtra por **fecha
+   de carga**. No ensanchamos. Queda como límite conocido: qx cargado
+   fuera de la ventana no entra.
+
+**Archivos (este lote):**
+
+| Archivo | Función |
+|---|---|
+| `background.js` | trigger post-GRABAR; armar URL; alarmas |
+| `content/geclisa.js` | `AFG_FETCH_INTERNADO_PDF` → fetch blob |
+| `content/anesfact-bridge.js` | `AFG_COMMIT_GECLISA_PDF` |
+| `manifest.json` | `alarms`; bump 0.5.12 |
+| `js/20-geclisa-send.js` | recibe blob + intervId |
+| `js/17-sync-export.js` | commit silencioso por id; no pisa manual |
+| `js/41-adjuntos-compress.js` | reusar pdf.js para **texto**, no raster |
+| `js/39-geclisa-queue.js` | `mayo_pdf_qx_pendiente` no se wipea |
+| `CACHE_V` → 12.57 | PWA recibe el blob |
+
+No: `fill.js`, Guardar auto, modal, `js/01-state.js`, script nuevo.
+
+**Lote A** sigue hecho. Este lote no es upload a evweb.
+
 
 #### Archivos que se tocan (OK explícito antes de codear)
 
@@ -353,6 +420,32 @@ adjunta; P1b junta fojas para evweb **sin** Traditum.
   el cierre lo deja para «después de diagramar evweb/Traditum».
 - Allende.
 
+### P6 — Buzón de mail AnesFact para autorizaciones · **idea 2026-09-01** · **no diseñar / no codear**
+
+**Separado de P1b / Lote B.** P1b baja el PDF combinado de fojas desde
+GECLISA. Esto es la **autorización de mutual** que hoy llega por
+WhatsApp o mail personal de secretarias/auditores, sin orden, y alguien
+la cuelga a mano en la ranura auth (P1). No es GET GECLISA, no es
+Traditum (**P4**), no es el QR de recepción de PDFs de la auditoría
+Mayo.
+
+**Idea (una frase):** un mail propio de AnesFact; el sistema lee ese
+buzón, identifica de qué paciente/foja es cada autorización, y la
+adjunta sola a la ranura correspondiente.
+
+**Preguntas abiertas** (cuando se retome; no responder acá):
+
+1. ¿Cómo identificar a qué paciente/foja corresponde cada mail
+   (asunto, contenido del PDF adjunto, remitente)?
+2. ¿Hace falta un servicio de correo con API (lectura automática) o
+   alcanza un mail normal?
+3. ¿Volumen aproximado de autorizaciones por día, para dimensionar
+   prioridad?
+
+Ranura destino = auth (`docs.auth` / § 1c), no pisar el combinado
+GECLISA en `docs.anest`. Sin lote de código, sin proveedor, sin
+prioridad en el orden de § 4.
+
 ---
 
 ## 3. Fases — riel U (interfaz), aparte
@@ -388,10 +481,11 @@ docs ya escrito, y U1 no edita esos archivos.
 ## 4. Orden sugerido (revisar juntos)
 
 ```
-ahora     P1b Lote A hecho — B GET y C reintento qx pendientes de OK
+ahora     P1b B+C codeado 12.57 / 0.5.12 — probar GET; pendiente filtro fechas
    │
    ├─ riel P:  P1 adjuntos (hecho 12.55) → P1b A persistir N° → B GET → C reintento qx
    │            → P2 Aero qx+QR (grande) → P3 públicos (mediano) → P4 Traditum (grande)
+   │            P6 buzón auth = idea anotada; no entra en este orden
    │
    └─ riel U:  U1 PC shell (mediano) ──después──► U2 bandejas ──► U3 móvil
 ```

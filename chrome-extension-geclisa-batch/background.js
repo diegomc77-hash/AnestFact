@@ -202,6 +202,7 @@ async function handleUserSavedFoja(msg) {
     return { ok: false, ignored: true, reason: 'save_failed' };
   }
   var state = await getRunnerState();
+  var savedIntervId = String(state.currentIntervId || '').trim();
   if (state.status !== 'awaiting_save') {
     return { ok: false, ignored: true, reason: 'not_awaiting_save', status: state.status };
   }
@@ -232,6 +233,10 @@ async function handleUserSavedFoja(msg) {
       autoNextInFlight = false;
     });
   }, delayMs);
+
+  if (msg && msg.confirmed && savedIntervId) {
+    scheduleMayoPdfFetch(savedIntervId, AFG_PDF_FIRST_DELAY_MS);
+  }
 
   return { ok: true, scheduled: true, delayMs: delayMs, confirmed: !!(msg && msg.confirmed) };
 }
@@ -1635,6 +1640,276 @@ async function notifyAnesFactMayoNroAtencion(intervId, nro, via) {
   try { console.warn('[AFG] mayo_nro_atencion falló', id, lastErr); } catch (eW) {}
   return lastErr || { ok: false, error: 'no_anesfact_tab' };
 }
+
+var AFG_PDF_VENTANA_HORAS = 8;
+var AFG_PDF_SLACK_MIN = 15;
+var AFG_PDF_MAX_BYTES = 1572864;
+var AFG_PDF_RETRY_MIN = 10;
+var AFG_PDF_RETRY_MAX = 6;
+var AFG_PDF_FIRST_DELAY_MS = 5000;
+var AFG_PDF_ALARM = 'afg-mayo-pdf-retry';
+
+function afgPdfPad2(n) {
+  return (n < 10 ? '0' : '') + n;
+}
+
+function afgPdfParseFojaDt(fecha, hora) {
+  var f = String(fecha || '').trim();
+  var h = String(hora || '').trim();
+  var y = 0, mo = 0, d = 0;
+  var iso = f.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  var dmy = f.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
+  if (iso) {
+    y = Number(iso[1]); mo = Number(iso[2]); d = Number(iso[3]);
+  } else if (dmy) {
+    d = Number(dmy[1]); mo = Number(dmy[2]); y = Number(dmy[3]);
+    if (y < 100) y += 2000;
+  } else {
+    return null;
+  }
+  var hm = h.match(/^(\d{1,2}):(\d{2})/);
+  if (!hm) return null;
+  var dt = new Date(y, mo - 1, d, Number(hm[1]), Number(hm[2]), 0, 0);
+  if (isNaN(dt.getTime())) return null;
+  return dt;
+}
+
+function afgPdfFmtDate(dt) {
+  return afgPdfPad2(dt.getDate()) + '/' + afgPdfPad2(dt.getMonth() + 1) + '/' + dt.getFullYear();
+}
+
+function afgPdfFmtTime(dt) {
+  return afgPdfPad2(dt.getHours()) + ':' + afgPdfPad2(dt.getMinutes());
+}
+
+function buildReporteInternadoUrl(origin, nro, desde, hasta) {
+  var base = String(origin || 'http://sanatoriomayo.myvnc.com:84').replace(/\/$/, '');
+  return base + '/Reporte/ReporteListadoInternado'
+    + '?pMeId=' + encodeURIComponent(nro)
+    + '&pEventos=ProtocoloQuirurgico|ProtocoloAnestesico|'
+    + '&pConFirma=true'
+    + '&pFechaDesde=' + afgPdfFmtDate(desde)
+    + '&pHoraDesde=' + afgPdfFmtTime(desde)
+    + '&pFechaHasta=' + afgPdfFmtDate(hasta)
+    + '&pHoraHasta=' + afgPdfFmtTime(hasta)
+    + '&pAsIds=';
+}
+
+async function loadMayoPdfJobs() {
+  try {
+    var st = await chrome.storage.local.get(['afg_mayo_pdf_jobs']);
+    return (st && st.afg_mayo_pdf_jobs && typeof st.afg_mayo_pdf_jobs === 'object')
+      ? st.afg_mayo_pdf_jobs : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+async function saveMayoPdfJobs(jobs) {
+  try { await chrome.storage.local.set({ afg_mayo_pdf_jobs: jobs || {} }); } catch (e) {}
+}
+
+async function upsertMayoPdfJob(intervId, patch) {
+  var jobs = await loadMayoPdfJobs();
+  var cur = jobs[intervId] || {};
+  var next = Object.assign({}, cur, patch || {}, { intervId: intervId, updatedAt: Date.now() });
+  jobs[intervId] = next;
+  await saveMayoPdfJobs(jobs);
+  return next;
+}
+
+async function deleteMayoPdfJob(intervId) {
+  var jobs = await loadMayoPdfJobs();
+  delete jobs[intervId];
+  await saveMayoPdfJobs(jobs);
+  var left = Object.keys(jobs).some(function (k) {
+    return jobs[k] && jobs[k].pendingQx && (jobs[k].tries || 0) < AFG_PDF_RETRY_MAX;
+  });
+  if (!left) {
+    try { await chrome.alarms.clear(AFG_PDF_ALARM); } catch (e) {}
+  }
+}
+
+async function ensureMayoPdfAlarm() {
+  try {
+    var al = await chrome.alarms.get(AFG_PDF_ALARM);
+    if (!al) {
+      await chrome.alarms.create(AFG_PDF_ALARM, { periodInMinutes: AFG_PDF_RETRY_MIN });
+    }
+  } catch (e) {}
+}
+
+async function askAnesFactPdfMeta(intervId) {
+  var tabs = await findAnesFactTabs();
+  for (var i = 0; i < (tabs || []).length; i++) {
+    try {
+      var res = await chrome.tabs.sendMessage(tabs[i].id, {
+        type: 'AFG_GET_MAYO_PDF_META',
+        intervId: String(intervId)
+      });
+      if (res && res.ok) return res;
+    } catch (e) {}
+  }
+  return null;
+}
+
+async function resolveMayoPdfMeta(intervId) {
+  var id = String(intervId || '').trim();
+  var jobs = await loadMayoPdfJobs();
+  var job = jobs[id];
+  var meta = await askAnesFactPdfMeta(id);
+  var q = await pullQueueFromAnesFactTabs();
+  var item = null;
+  if (q && q.ok && q.queue && Array.isArray(q.queue.items)) {
+    for (var i = 0; i < q.queue.items.length; i++) {
+      if (String(q.queue.items[i].id) === id) { item = q.queue.items[i]; break; }
+    }
+  }
+  var nro = String((meta && meta.nroAtencion) || (job && job.nro) || (item && item.mayo_nro_atencion) || '').replace(/\D/g, '');
+  var fecha = String((meta && meta.fecha) || (job && job.fecha) || (item && item.fecha) || '').trim();
+  var hora = String((meta && meta.hora) || (job && job.hora) || (item && item.hora) || '').trim();
+  return { nro: nro, fecha: fecha, hora: hora, intervId: id };
+}
+
+async function findGeclisaTabOrNull() {
+  try {
+    var tabs = await chrome.tabs.query({ url: 'http://sanatoriomayo.myvnc.com:84/*' });
+    if (!tabs || !tabs.length) return null;
+    var active = tabs.find(function (t) { return t.active; });
+    return active || tabs[0];
+  } catch (e) {
+    return null;
+  }
+}
+
+function scheduleMayoPdfFetch(intervId, delayMs) {
+  var id = String(intervId || '').trim();
+  if (!id) return;
+  setTimeout(function () {
+    fetchMayoPdfForInterv(id).catch(function (e) {
+      try { console.warn('[AFG pdf] fetch fail', id, e); } catch (e2) {}
+    });
+  }, delayMs || AFG_PDF_FIRST_DELAY_MS);
+}
+
+async function fetchMayoPdfForInterv(intervId) {
+  var id = String(intervId || '').trim();
+  if (!id) return { ok: false, error: 'no_id' };
+  var meta = await resolveMayoPdfMeta(id);
+  if (!meta.nro || meta.nro.length < 4) {
+    try { console.warn('[AFG pdf] sin nroAtencion, skip', id); } catch (e0) {}
+    return { ok: false, error: 'no_nro' };
+  }
+  if (!meta.fecha || !meta.hora) {
+    try { console.warn('[AFG pdf] sin fecha/hora, skip', id); } catch (e1) {}
+    return { ok: false, error: 'no_fecha_hora' };
+  }
+  var start = afgPdfParseFojaDt(meta.fecha, meta.hora);
+  if (!start) return { ok: false, error: 'bad_fecha_hora' };
+  var desde = new Date(start.getTime() - AFG_PDF_SLACK_MIN * 60000);
+  var hasta = new Date(start.getTime() + AFG_PDF_VENTANA_HORAS * 3600000);
+  var gTab = await findGeclisaTabOrNull();
+  if (!gTab || !gTab.id) {
+    await upsertMayoPdfJob(id, {
+      nro: meta.nro, fecha: meta.fecha, hora: meta.hora, pendingQx: true
+    });
+    await ensureMayoPdfAlarm();
+    try { console.warn('[AFG pdf] sin tab GECLISA, reintento luego', id); } catch (e2) {}
+    return { ok: false, error: 'no_geclisa_tab' };
+  }
+  var origin = 'http://sanatoriomayo.myvnc.com:84';
+  try { origin = new URL(gTab.url).origin; } catch (eO) {}
+  var url = buildReporteInternadoUrl(origin, meta.nro, desde, hasta);
+  var jobs = await loadMayoPdfJobs();
+  var prevTries = (jobs[id] && jobs[id].tries) || 0;
+  if (prevTries >= AFG_PDF_RETRY_MAX) {
+    try { console.warn('[AFG pdf] tope reintentos', id, prevTries); } catch (eT) {}
+    return { ok: false, error: 'max_tries' };
+  }
+  await upsertMayoPdfJob(id, {
+    nro: meta.nro, fecha: meta.fecha, hora: meta.hora, url: url, tries: prevTries + 1, pendingQx: true
+  });
+
+  var fetched = null;
+  try {
+    var frameId = await findFrameId(gTab.id, 'top');
+    fetched = await chrome.tabs.sendMessage(gTab.id, {
+      type: 'AFG_FETCH_INTERNADO_PDF',
+      url: url,
+      maxBytes: AFG_PDF_MAX_BYTES
+    }, { frameId: frameId });
+  } catch (eF) {
+    try { console.warn('[AFG pdf] sendMessage fetch', eF); } catch (eF2) {}
+    await ensureMayoPdfAlarm();
+    return { ok: false, error: String(eF && eF.message || eF) };
+  }
+  if (!(fetched && fetched.ok && fetched.base64)) {
+    var why = (fetched && fetched.error) || 'fetch_failed';
+    try { console.warn('[AFG pdf] GET no ok', id, why, fetched && fetched.size); } catch (eW) {}
+    if (why === 'too_large') {
+      await deleteMayoPdfJob(id);
+    } else {
+      await ensureMayoPdfAlarm();
+    }
+    return { ok: false, error: why, fetch: fetched };
+  }
+
+  var commit = null;
+  var tabs = await findAnesFactTabs();
+  for (var t = 0; t < (tabs || []).length; t++) {
+    try {
+      commit = await chrome.tabs.sendMessage(tabs[t].id, {
+        type: 'AFG_COMMIT_GECLISA_PDF',
+        intervId: id,
+        base64: fetched.base64,
+        mime: fetched.mime || 'application/pdf',
+        size: fetched.size || 0,
+        nombre: 'Reporte.pdf',
+        toast: true
+      });
+      if (commit && (commit.ok || commit.skipped)) break;
+    } catch (eC) {}
+  }
+  if (commit && commit.skipped === 'manual') {
+    await deleteMayoPdfJob(id);
+    return commit;
+  }
+  if (commit && commit.ok && commit.complete) {
+    await deleteMayoPdfJob(id);
+    return commit;
+  }
+  if (commit && commit.ok) {
+    await upsertMayoPdfJob(id, { pendingQx: true, nro: meta.nro, fecha: meta.fecha, hora: meta.hora, url: url });
+    await ensureMayoPdfAlarm();
+    return commit;
+  }
+  await ensureMayoPdfAlarm();
+  return commit || { ok: false, error: 'commit_failed' };
+}
+
+async function runPendingMayoPdfRetries() {
+  var jobs = await loadMayoPdfJobs();
+  var ids = Object.keys(jobs || {});
+  var gTab = await findGeclisaTabOrNull();
+  if (!gTab) return;
+  for (var i = 0; i < ids.length; i++) {
+    var job = jobs[ids[i]];
+    if (!job || !job.pendingQx) continue;
+    if ((job.tries || 0) >= AFG_PDF_RETRY_MAX) continue;
+    try {
+      await fetchMayoPdfForInterv(ids[i]);
+    } catch (e) {
+      try { console.warn('[AFG pdf] retry', ids[i], e); } catch (e2) {}
+    }
+  }
+}
+
+try {
+  chrome.alarms.onAlarm.addListener(function (alarm) {
+    if (!alarm || alarm.name !== AFG_PDF_ALARM) return;
+    runPendingMayoPdfRetries().catch(function () {});
+  });
+} catch (eAl) {}
 
 function firstPendingQueueItem(queue, preferId) {
   var items = (queue && queue.items) || [];

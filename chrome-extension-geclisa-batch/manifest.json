@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "AnesFact GECLISA Batch (pasos 1–12)",
-  "version": "0.5.11",
+  "version": "0.5.12",
   "description": "GECLISA Mayo: Iniciar cola desde AnesFact o popup; tras GRABAR avanza sola.",
-  "permissions": ["storage", "tabs", "scripting", "debugger", "clipboardRead"],
+  "permissions": ["storage", "tabs", "scripting", "debugger", "clipboardRead", "alarms"],
   "host_permissions": [
     "http://sanatoriomayo.myvnc.com:84/*",
     "http://localhost/*",

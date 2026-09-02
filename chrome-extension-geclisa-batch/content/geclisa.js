@@ -82,7 +82,63 @@
       });
       return true;
     }
+
+    if (msg.type === 'AFG_FETCH_INTERNADO_PDF') {
+      if (!IS_TOP) return false;
+      fetchInternadoPdf(msg.url, msg.maxBytes).then(function (r) {
+        sendResponse(r);
+      }).catch(function (e) {
+        sendResponse({ ok: false, error: String(e && e.message || e) });
+      });
+      return true;
+    }
   });
+
+  var AFG_PDF_MAX_BYTES = 1572864; /* 1.5 MiB: tope, no comprimir */
+
+  function blobToBase64(blob) {
+    return new Promise(function (resolve, reject) {
+      var r = new FileReader();
+      r.onload = function () {
+        var s = String(r.result || '');
+        var i = s.indexOf(',');
+        resolve(i >= 0 ? s.slice(i + 1) : s);
+      };
+      r.onerror = function () { reject(r.error || new Error('read')); };
+      r.readAsDataURL(blob);
+    });
+  }
+
+  function fetchInternadoPdf(url, maxBytes) {
+    var cap = Number(maxBytes) > 0 ? Number(maxBytes) : AFG_PDF_MAX_BYTES;
+    if (!url) return Promise.resolve({ ok: false, error: 'no_url' });
+    log('GET reporte', String(url).slice(0, 180));
+    return fetch(url, { credentials: 'include' }).then(function (res) {
+      var ct = String(res.headers.get('content-type') || '').toLowerCase();
+      if (!res.ok) {
+        return { ok: false, error: 'http_' + res.status, contentType: ct };
+      }
+      if (ct && ct.indexOf('pdf') < 0 && ct.indexOf('octet-stream') < 0) {
+        return { ok: false, error: 'not_pdf', contentType: ct };
+      }
+      return res.blob().then(function (blob) {
+        var size = blob && blob.size ? blob.size : 0;
+        if (size > cap) {
+          log('PDF demasiado grande', size, 'cap', cap);
+          return { ok: false, error: 'too_large', size: size, maxBytes: cap };
+        }
+        if (!size) return { ok: false, error: 'empty_blob' };
+        return blobToBase64(blob).then(function (b64) {
+          return {
+            ok: true,
+            mime: blob.type || 'application/pdf',
+            size: size,
+            base64: b64
+          };
+        });
+      });
+    });
+  }
 
   async function locateStep2() {
     log('Locate paso 2: Historias clínicas internados');

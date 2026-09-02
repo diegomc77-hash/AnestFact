@@ -11,7 +11,7 @@
   var lastOkSig = '';
   var lastQueueSig = '';
   var pendingMints = {};
-  var BRIDGE_VERSION = '0.5.11';
+  var BRIDGE_VERSION = '0.5.12';
 
   function normalize(detail) {
     if (!detail || !detail.token) return null;
@@ -406,6 +406,62 @@
         setTimeout(checkNro, 80);
       };
       setTimeout(checkNro, 60);
+      return true;
+    }
+
+    if (msg.type === 'AFG_GET_MAYO_PDF_META') {
+      try {
+        window.postMessage({
+          source: 'AFG_EXT',
+          type: 'GET_MAYO_PDF_META',
+          intervId: String(msg.intervId || msg.id || '')
+        }, '*');
+      } catch (eM) {}
+      var startedMeta = Date.now();
+      var checkMeta = function () {
+        var rM = window.__AFG_LAST_PDF_META;
+        if (rM && String(rM.intervId) === String(msg.intervId || msg.id || '') && (Date.now() - (rM.atMs || 0) < 5000)) {
+          sendResponse(rM);
+          return;
+        }
+        if (Date.now() - startedMeta > 2500) {
+          sendResponse({ ok: false, error: 'pdf_meta_timeout', intervId: msg.intervId });
+          return;
+        }
+        setTimeout(checkMeta, 80);
+      };
+      setTimeout(checkMeta, 60);
+      return true;
+    }
+
+    if (msg.type === 'AFG_COMMIT_GECLISA_PDF') {
+      try {
+        window.__AFG_LAST_GECLISA_PDF = null;
+        window.postMessage({
+          source: 'AFG_EXT',
+          type: 'COMMIT_GECLISA_PDF',
+          intervId: String(msg.intervId || msg.id || ''),
+          base64: msg.base64 || '',
+          mime: msg.mime || 'application/pdf',
+          size: msg.size || 0,
+          nombre: msg.nombre || 'Reporte.pdf',
+          toast: msg.toast !== false
+        }, '*');
+      } catch (ePdf) {}
+      var startedPdf = Date.now();
+      var checkPdf = function () {
+        var rP = window.__AFG_LAST_GECLISA_PDF;
+        if (rP && String(rP.intervId) === String(msg.intervId || msg.id || '') && (Date.now() - (rP.atMs || 0) < 20000)) {
+          sendResponse(rP);
+          return;
+        }
+        if (Date.now() - startedPdf > 18000) {
+          sendResponse({ ok: false, error: 'pdf_commit_timeout', intervId: msg.intervId });
+          return;
+        }
+        setTimeout(checkPdf, 120);
+      };
+      setTimeout(checkPdf, 80);
       return true;
     }
   });

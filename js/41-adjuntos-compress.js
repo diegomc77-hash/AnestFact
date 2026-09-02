@@ -173,6 +173,46 @@ function afRasterizePdfPage1(file) {
   });
 }
 
+function afPdfExtractTextFromDataUrl(dataUrl) {
+  return afEnsurePdfJs().then(function (lib) {
+    var blob = afDataUrlToBlob(dataUrl);
+    return afFileToArrayBuffer(blob).then(function (buf) {
+      return lib.getDocument({ data: new Uint8Array(buf) }).promise;
+    });
+  }).then(function (pdf) {
+    var n = pdf.numPages || 0;
+    var acc = Promise.resolve('');
+    var i;
+    for (i = 1; i <= n; i++) {
+      acc = (function (pageNo, seq) {
+        return seq.then(function (text) {
+          return pdf.getPage(pageNo).then(function (page) {
+            return page.getTextContent().then(function (tc) {
+              var bits = (tc.items || []).map(function (it) { return it.str || ''; }).join(' ');
+              return text + ' ' + bits;
+            });
+          });
+        });
+      })(i, acc);
+    }
+    return acc;
+  });
+}
+
+/** Completo = texto con protocolo qx y anestésico. Parse fail → no declarar completo. */
+function afPdfLooksComplete(dataUrl) {
+  if (!dataUrl) return Promise.resolve({ parseOk: false, complete: false });
+  return afPdfExtractTextFromDataUrl(dataUrl).then(function (raw) {
+    var t = String(raw || '').toLowerCase();
+    t = t.replace(/\s+/g, ' ');
+    var qx = /protocolo\s*quir[uú]rgico/.test(t) || /protocoloquirurgico/.test(t);
+    var an = /protocolo\s*anest/.test(t);
+    return { parseOk: true, hasQx: qx, hasAnest: an, complete: !!(qx && an) };
+  }).catch(function () {
+    return { parseOk: false, complete: false, hasQx: false, hasAnest: false };
+  });
+}
+
 function afAdjuntoFromFile(file) {
   return afFileToDataURL(file).then(function (data) {
     return {

@@ -625,6 +625,103 @@ function afCommitAdjunto(tipo,doc){
   renderDocBadges();
   toast(getNombreDoc(tipo)+' guardada \u2713');
 }
+
+var AF_GECLISA_PDF_MAX = 1572864; /* 1.5 MiB crudo; data-URL ~2 MB. No comprimir. */
+
+function afFindIntervById(id){
+  id=String(id||'');
+  if(!id||typeof S==='undefined')return null;
+  if(S.cur&&String(S.cur.id)===id)return S.cur;
+  var list=S.intervs||[];
+  for(var i=0;i<list.length;i++){
+    if(String(list[i].id)===id)return list[i];
+  }
+  return null;
+}
+
+function afMayoPdfMeta(intervId){
+  var it=afFindIntervById(intervId);
+  if(!it)return{ok:false,error:'interv_not_found',intervId:String(intervId||'')};
+  return{
+    ok:true,
+    intervId:String(it.id),
+    nroAtencion:(typeof afNormMayoNroAtencion==='function'?afNormMayoNroAtencion(it.mayo_nro_atencion):String(it.mayo_nro_atencion||'').replace(/\D/g,'')),
+    fecha:(it.fecha||'').trim(),
+    hora:(it.hora||'').trim(),
+    pendingQx:!!it.mayo_pdf_qx_pendiente
+  };
+}
+
+/**
+ * PDF combinado GECLISA → docs.anest. No rasteriza. No pisa adjunto manual.
+ * Toast solo si el combinado está completo.
+ */
+function afCommitGeclisaPdf(intervId,payload,opts){
+  opts=opts||{};
+  var id=String(intervId||'').trim();
+  var it=afFindIntervById(id);
+  if(!it)return Promise.resolve({ok:false,error:'interv_not_found',intervId:id});
+  var existing=it.docs&&it.docs.anest;
+  if(existing&&existing.fuente&&existing.fuente!=='geclisa_p1b'){
+    try{console.log('[AFG] PDF GECLISA no pisa adjunto manual',id);}catch(e0){}
+    return Promise.resolve({ok:false,skipped:'manual',intervId:id});
+  }
+  var size=Number(payload&&payload.size)||0;
+  if(size>AF_GECLISA_PDF_MAX){
+    return Promise.resolve({ok:false,error:'too_large',size:size,maxBytes:AF_GECLISA_PDF_MAX,intervId:id});
+  }
+  var data=payload&&payload.dataUrl;
+  if(!data&&payload&&payload.base64){
+    data='data:application/pdf;base64,'+payload.base64;
+  }
+  if(!data)return Promise.resolve({ok:false,error:'no_data',intervId:id});
+
+  var doc={
+    nombre:payload.nombre||'Reporte.pdf',
+    tipo:payload.mime||'application/pdf',
+    data:data,
+    fecha:new Date().toISOString(),
+    fuente:'geclisa_p1b',
+    size:size
+  };
+
+  function inspect(look){
+    look=look||{parseOk:false,complete:false};
+    var complete=!!look.complete;
+    if(!it.docs)it.docs={};
+    it.docs.anest=doc;
+    it.mayo_pdf_qx_pendiente=!complete;
+    it._ts=Date.now();
+    var idx=S.intervs.findIndex(function(x){return String(x.id)===id;});
+    if(idx>=0)S.intervs[idx]=it;
+    if(S.cur&&String(S.cur.id)===id)S.cur=it;
+    saveIntervsToStorage();
+    if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+    if(typeof afGeclisaQueueSetPdfPending==='function')afGeclisaQueueSetPdfPending(id,!complete);
+    if(S.cur&&String(S.cur.id)===id&&typeof renderDocBadges==='function')renderDocBadges();
+    if(complete&&opts.toast!==false&&typeof toast==='function'){
+      toast('Foja GECLISA (qx + anestesia) guardada \u2713');
+    }
+    try{
+      console.log('[AFG] PDF GECLISA commit',id,'complete=',complete,'parseOk=',!!look.parseOk,'size=',size);
+    }catch(eL){}
+    return{
+      ok:true,
+      intervId:id,
+      complete:complete,
+      pendingQx:!complete,
+      parseOk:!!look.parseOk,
+      hasQx:!!look.hasQx,
+      hasAnest:!!look.hasAnest,
+      size:size
+    };
+  }
+
+  if(typeof afPdfLooksComplete!=='function'){
+    return Promise.resolve(inspect({parseOk:false,complete:false}));
+  }
+  return afPdfLooksComplete(data).then(inspect);
+}
 function adjuntarDoc(input,tipo){
   var file=input&&input.files&&input.files[0];
   if(input)input.value='';

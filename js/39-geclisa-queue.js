@@ -177,6 +177,9 @@ function afGeclisaQueueRefreshFromIntervs(envelope) {
       mayo_cama: (live.mayo_cama || it.mayo_cama || '').trim(),
       mayo_nro_atencion: afNormMayoNroAtencion(live.mayo_nro_atencion) ||
         afNormMayoNroAtencion(it.mayo_nro_atencion),
+      mayo_pdf_qx_pendiente: live.mayo_pdf_qx_pendiente != null
+        ? !!live.mayo_pdf_qx_pendiente
+        : !!it.mayo_pdf_qx_pendiente,
       san: (live.san || it.san || '').trim(),
       status: it.status || 'queued',
       message: it.message || '',
@@ -448,6 +451,23 @@ function afPersistMayoNroAtencion(intervId, nro, opts) {
     return { ok: false, error: 'not_found', intervId: id, nro: num };
   }
   return { ok: true, intervId: id, nro: num, intervHit: intervHit, queueHit: queueHit };
+}
+
+function afGeclisaQueueSetPdfPending(intervId, pending) {
+  var id = String(intervId || '').trim();
+  if (!id) return { ok: false };
+  var env = afGeclisaQueueLoad();
+  var hit = false;
+  for (var i = 0; i < (env.items || []).length; i++) {
+    if (String(env.items[i].id) === id) {
+      env.items[i].mayo_pdf_qx_pendiente = !!pending;
+      env.items[i].updatedAt = Date.now();
+      hit = true;
+      break;
+    }
+  }
+  if (hit) afGeclisaQueueSave(env);
+  return { ok: hit };
 }
 
 window.addEventListener('message', function (ev) {

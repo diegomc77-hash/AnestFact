@@ -437,6 +437,44 @@ window.addEventListener('message', function(ev){
     try{window.__AFG_LAST_MAYO_NRO=nroRes;}catch(eW2){}
     try{console.log('[AFG] SET_MAYO_NRO_ATENCION',nroRes);}catch(eL2){}
   }
+  if(d.type==='GET_MAYO_PDF_META'){
+    var meta={ok:false,error:'meta_fn_missing',intervId:d.intervId||'',atMs:Date.now()};
+    try{
+      if(typeof afMayoPdfMeta==='function') meta=afMayoPdfMeta(d.intervId||d.id)||meta;
+    }catch(eMeta){
+      meta={ok:false,error:String(eMeta&&eMeta.message||eMeta),intervId:d.intervId||'',atMs:Date.now()};
+    }
+    meta.atMs=Date.now();
+    meta.intervId=String(d.intervId||d.id||meta.intervId||'');
+    try{window.__AFG_LAST_PDF_META=meta;}catch(eW3){}
+  }
+  if(d.type==='COMMIT_GECLISA_PDF'){
+    var pdfRes={ok:false,error:'commit_fn_missing',intervId:d.intervId||'',atMs:Date.now()};
+    var finishPdf=function(r){
+      r=r||pdfRes;
+      r.atMs=Date.now();
+      r.intervId=String(d.intervId||d.id||r.intervId||'');
+      try{window.__AFG_LAST_GECLISA_PDF=r;}catch(eW4){}
+      try{console.log('[AFG] COMMIT_GECLISA_PDF',r);}catch(eL3){}
+    };
+    try{
+      if(typeof afCommitGeclisaPdf==='function'){
+        Promise.resolve(afCommitGeclisaPdf(d.intervId||d.id,{
+          base64:d.base64,
+          dataUrl:d.dataUrl,
+          mime:d.mime,
+          size:d.size,
+          nombre:d.nombre
+        },{toast:d.toast!==false})).then(finishPdf).catch(function(eC){
+          finishPdf({ok:false,error:String(eC&&eC.message||eC),intervId:d.intervId||''});
+        });
+      }else{
+        finishPdf(pdfRes);
+      }
+    }catch(ePdf){
+      finishPdf({ok:false,error:String(ePdf&&ePdf.message||ePdf),intervId:d.intervId||''});
+    }
+  }
 });
 
 /**
