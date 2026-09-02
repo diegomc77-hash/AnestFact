@@ -9,7 +9,7 @@
 | Archivo | Qué trata (una frase) |
 |---|---|
 | `docs/DISENO_PC_HOME.md` | **Home por institución, no por foja** (PC primero, misma lógica en móvil; PC hoy = columna 520px). Leer el archivo completo antes de tocar Home/dock/layout. |
-| `docs/ROADMAP_ESCALAMIENTO.md` | Fases P/U + empaquetado + P1b = GET PDF GECLISA (nroAtencion), no modal. |
+| `docs/ROADMAP_ESCALAMIENTO.md` | Fases P/U + empaquetado + P1b GET GECLISA + **P6 buzón auth** (idea, sin diseño). |
 | `docs/CIERRE_ARQUITECTURA_FACTURACION.md` | Flujo Preop → foja → GECLISA/Traditum/evweb/SISalud × mutual. Diseño; no codear Traditum/foja qx desde ahí. |
 | `docs/ARQUITECTURA_INSTITUCIONES.md` | Tres patrones de HC (GECLISA / sistema propio / sin sistema) y `tipo_sistema` vs `destino_final`. No mezclar con el cierre de facturación. |
 | `docs/VALORACION_QR.md` | Contrato QR → prefoja → foja (importar solo vacíos; no `resetFojaUIDom`). |
@@ -45,16 +45,28 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 ---
 
-Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-08-31:
+Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-02:
 
-- PWA `CACHE_V`: **12.56**
-- Extensión GECLISA: **0.5.11**
+- PWA `CACHE_V`: **12.58**
+- Extensión GECLISA: **0.5.12**
 
 ## En curso
 
-- 2026-09-01 — SQL **021** aplicado en vivo: queda solo `af_assert_plan(text, text)` (oid 39319). Probar mint GECLISA (Ávila franco). P1b Lote A hecho; B/C pendientes.
+- 2026-09-02 — Impresión Aeronáutico **12.58**: tope **37 cols / 3 h** en hoja 1; hoja 2 sin estirar. PDF «prueba» 3 h confirmado (1 hoja, horas legibles). **Commit local** — falta push/Pages. P1b sigue en pausa.
+
+- 2026-09-01 — **P1b (Lote B, GET PDF GECLISA) en pausa** hasta cerrar el bug de impresión Aeronáutico. Retomar exactamente ahí: probar Lote B con foja «prueba» / paciente real cuando haya uno disponible. GET en vivo ya confirmado (200 + PDF ~445 KB). Pendiente: filtro fecha evento vs carga.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-09-02 — PWA **12.58** impresión VG: `_chartColsPerPage` = **37** (3 h a 5 min). Continuación usa el mismo ancho de columna (`lockCols`); no estira. Prueba «prueba»: 2 h → 1 hoja; 3 h → 1 hoja (horas legibles); 5 h → 2 hojas, hoja 2 sin estirar. Confirmado en PDF A4.
+
+- 2026-09-02 — Diagnóstico (sin código) Hoja 2 Aeronáutico: se disparaba a **más de 28 columnas**. ~3 h → 37 cols. El lote SISalud 12.39 no cambió ese umbral (v8.4). P1b pausado.
+
+- 2026-09-01 — Roadmap **P6**: buzón de mail AnesFact para autorizaciones (idea). No es P1b. Preguntas abiertas en `docs/ROADMAP_ESCALAMIENTO.md`. Sin diseño ni código.
+
+- 2026-09-01 — P1b GET en vivo, internación con ambos protocolos: 200, PDF ~445 KB (tope 1.5 MB OK). Sin nombres ni N° en este diario.
+
+- 2026-09-01 — PWA **12.57** + extensión **0.5.12** P1b B+C: GET `ReporteListadoInternado` ~5 s tras GRABAR; PDF a `docs.anest` sin rasterizar; tope **1.5 MB** (no guardar si pasa); reintento silencioso si falta qx. Sin commit/push aún.
 
 - 2026-09-01 — SQL **021** en producción: `DROP FUNCTION public.af_assert_plan(text)` (oid 26261, wrapper). Queda **39319** `af_assert_plan(text, text)` de 017. El mint GECLISA llamaba 1 arg y Postgres no distinguía.
 
@@ -127,6 +139,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## Pendiente / conocido
 
+- Impresión Aeronáutico Hoja 2: arreglo **12.58** commiteado (37 cols). Falta push/Pages. P1b Lote B sigue en pausa.
 - Lote 2 SISalud select + print (12.40): esperando Pages. Probar como Huerta y/o admin: las 3 opciones nuevas, header/pie, sala texto, `getBoundingClientRect` del A4.
 - Dock 2 filas + tamaños (12.38): **cerrado en Pages**.
 - Wizard valoración 6 pasos (12.37): esperando e2e de Diego en Pages (viaja en el SW). Token de prueba propio.
@@ -157,3 +170,4 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - **Home se rediseña por institución, no por foja.** Fuente completa: `docs/DISENO_PC_HOME.md` (leer entero; no de memoria). PC hoy = misma columna 520px del celular, centrada. No implementado.
 - Empaquetado de adjuntos **por institución** (no forzar 3 archivos): Mayo GECLISA = 1 PDF qx+anest + auth aparte; Aero = fojas AnesFact + foto auth (2 fotos si no hay qx nativa). Detalle: `docs/ROADMAP_ESCALAMIENTO.md` § 1c. P1 no lo implementa.
 - P1b (Mayo, fojas): GET `/Reporte/ReporteListadoInternado`. `pMeId` = N° por internación (confirmado en vivo). Ventana = fecha+hora de **esta** foja ± 8 h, no «ahora» ni ingreso/egreso. Persistido en 8b si el nombre coincidió. Fetch en la tab GECLISA del 1–12; sin botón extra; reintento si falta qx. Combinado → `docs.anest`. No es upload a evweb. `docs/ROADMAP_ESCALAMIENTO.md` P1b.
+- P6 buzón de mail AnesFact para **autorizaciones** (mutual): idea 2026-09-01, sin diseñar. No es P1b. Detalle y preguntas abiertas: `docs/ROADMAP_ESCALAMIENTO.md` P6.

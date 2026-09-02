@@ -117,11 +117,28 @@ function _buildObsSignRow(obsText, obsFs, signImg, boxStyle, obsLabel){
   return '<div style="display:flex;gap:8px;align-items:flex-end">'+obsSection+_buildSignBlock(signImg)+'</div>';
 }
 
+/** Tope de columnas VG por hoja A4 (paso 5 min → 37 = 3 h 00 min extremos inclusive). */
+var AF_PRINT_VG_COLS_PER_PAGE=37;
+var AF_PRINT_VG_YCOL='54px';
+
 function _chartColsPerPage(n){
   if(n<=0)return 24;
-  var minCw=6,maxCw=14,chartW=170;
-  if(Math.floor(chartW/n)>=minCw)return n;
-  return Math.max(1,Math.floor(chartW/minCw));
+  if(n<=AF_PRINT_VG_COLS_PER_PAGE)return n;
+  return AF_PRINT_VG_COLS_PER_PAGE;
+}
+
+function _chartTableStart(n, lockCols){
+  var y=AF_PRINT_VG_YCOL;
+  var style='border-collapse:collapse;table-layout:fixed;';
+  if(lockCols&&n<lockCols){
+    style+='width:calc('+y+' + '+n+' * ((100% - '+y+') / '+lockCols+'));';
+  }else{
+    style+='width:100%;';
+  }
+  var html='<table style="'+style+'"><colgroup><col style="width:'+y+'">';
+  for(var ci=0;ci<n;ci++)html+='<col>';
+  html+='</colgroup>';
+  return html;
 }
 
 function _buildPrintStyles(){
@@ -158,13 +175,11 @@ function _buildChartLegend(){
     +'<div style="margin-top:3px;font-size:6.5px;font-weight:bold">FLUIDOS</div></div>';
 }
 
-function _buildChartHtml(vgCols, vgCells, vgObs, vgFluidos, start, end, useEmptyGrid){
+function _buildChartHtml(vgCols, vgCells, vgObs, vgFluidos, start, end, useEmptyGrid, lockCols){
   if(useEmptyGrid||!vgCols.length){
     var COLS=24;
     var rDefs=[];for(var r=0;r<16;r++){var yv=200-r*12.5;rDefs.push({lb:(yv===200||yv===150||yv===100||yv===50)?String(yv):'',th:(yv%50===0)});}
-    var html='<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup><col style="width:54px">';
-    for(var c0=0;c0<COLS;c0++)html+='<col>';
-    html+='</colgroup>';
+    var html=_chartTableStart(COLS,0);
     rDefs.forEach(function(rd){
       html+='<tr><td style="border:1px solid #999;font-size:6.5px;padding:0 2px;background:#f5f5f5;text-align:right;font-weight:'+(rd.lb?'bold':'normal')+'">'+rd.lb+'</td>';
       for(var c=0;c<COLS;c++)html+='<td style="border:1px solid '+(rd.th?'#aaa':'#ddd')+';height:13px"></td>';
@@ -180,12 +195,10 @@ function _buildChartHtml(vgCols, vgCells, vgObs, vgFluidos, start, end, useEmpty
   var slice=vgCols.slice(start,end);
   var n=slice.length;
   var YVALS=[];for(var yv=200;yv>=50;yv-=5)YVALS.push(yv);
-  var chartHtml='<table style="border-collapse:collapse;width:100%;table-layout:fixed"><colgroup><col style="width:54px">';
-  for(var ci=0;ci<n;ci++)chartHtml+='<col>';
-  chartHtml+='</colgroup><tbody>';
+  var chartHtml=_chartTableStart(n,lockCols)+'<tbody>';
   chartHtml+='<tr><td></td>';
   slice.forEach(function(col){
-    chartHtml+='<td style="font-size:5px;text-align:center;border:1px solid #ccc">'+_printEsc(col.t)+'</td>';
+    chartHtml+='<td style="font-size:5px;text-align:center;border:1px solid #ccc;white-space:nowrap;overflow:hidden;line-height:1.1">'+_printEsc(col.t)+'</td>';
   });
   chartHtml+='</tr>';
   YVALS.forEach(function(yval){
@@ -344,12 +357,13 @@ function imprimirFoja(){
 
   var obsFit=_obsFitInBox(f.obs||'');
   var hasChartCont=chartChunks.length>1;
+  var lockCols=hasChartCont?perPage:0;
   var obsOverflow=obsFit.overflow||'';
   var lastChartIdx=chartChunks.length-1;
 
   var pagesHtml='';
   chartChunks.forEach(function(chunk,idx){
-    var chartInner=_buildChartHtml(vgCols,vgCells,vgObs,vgFluidos,chunk.start,chunk.end,chunk.empty);
+    var chartInner=_buildChartHtml(vgCols,vgCells,vgObs,vgFluidos,chunk.start,chunk.end,chunk.empty,lockCols);
     if(idx===0){
       pagesHtml+=_buildFojaSheet(i,f,drogaLines,signImg,obsFit.main,obsFit.fs,chartInner);
     } else {
