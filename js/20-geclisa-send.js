@@ -465,7 +465,12 @@ window.addEventListener('message', function(ev){
           mime:d.mime,
           size:d.size,
           nombre:d.nombre
-        },{toast:d.toast!==false})).then(finishPdf).catch(function(eC){
+        },{
+          toast:d.toast!==false,
+          wide:!!d.wide,
+          dryRun:!!d.dryRun,
+          ciru:d.ciru
+        })).then(finishPdf).catch(function(eC){
           finishPdf({ok:false,error:String(eC&&eC.message||eC),intervId:d.intervId||''});
         });
       }else{

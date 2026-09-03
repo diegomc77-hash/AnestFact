@@ -6,7 +6,7 @@ Sin Guardar. **Sin modal** `#btnBuscarPaciente`.
 
 1. `#ddlUbicacion` = `2` (Sanatorio Mayo)
 2. `#ddlSector` = sector AnesFact (texto exacto, ej. `UTI`, `PRE-QUIRÚRGICO`)
-3. Fecha = `fechaCirugia`, Hora = `horaInicio`
+3. Fecha = `fechaCirugia` en `#txtFechaConsulta` (datepicker: `setDate` o flechas de mes + día; no solo tipeo). Hora = `horaInicio`
 4. Click **Consultar** (no Buscar Paciente)
 5. Ubicar fila por apellido/nombre en el grid (capa 1)
 6. Reintentos: hora −1 h → otros sectores

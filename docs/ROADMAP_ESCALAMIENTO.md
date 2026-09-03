@@ -245,7 +245,11 @@ para el GET. No se pide ingreso/egreso. Fojas que nunca pasaron por
   `AFG_PDF_VENTANA_HORAS`; se afina con una prueba, no a ojo en
   producción).
 - La cola Mayo ya exige hora para encolar. Si faltara, no hay GET.
-- Reintentos usan **la misma URL**. No ensanchar a «ahora».
+- Reintentos: tries 1–3 misma ventana de 8 h. Try 4 = **+36 h**. Tries
+  5–6 = **+7 días**. `desde` no se mueve. Nunca `hasta = ahora`.
+  Ventana ancha: candado cirujano (`cirujanos:` fuzzy) primero; fecha
+  = la pegada a `hora inicio de cirugia` (= `i.fecha`). Si no verifica,
+  no pisa el PDF de 8 h.
 
 **Qx todavía no cargado:** el GET inmediato post-GRABAR suele traer
 solo anestesia. Primera pasada ~5 s después de GRABAR confirmado (no
@@ -293,8 +297,8 @@ GET.
    el fetch usa cookies + `pMeId`, no el DOM de esa foja).
 3. Datos: `currentIntervId` del runner + ítem de cola (`mayo_nro_atencion`,
    `fecha`, `hora`). Sin N° o sin hora → skip, log, no GET.
-4. URL: ventana `fecha+hora − 15 min` … `+ AFG_PDF_VENTANA_HORAS` (8).
-   Misma URL en cada reintento. Nunca «ahora».
+4. URL: `desde` = `fecha+hora − 15 min`. `hasta` = +8 h (tries 1–3),
+   +36 h (try 4), +7 d (tries 5–6). Nunca «ahora».
 5. `geclisa.js` (tab GECLISA): `fetch(url, { credentials: 'include' })`
    → blob. El SW no hace este fetch.
 6. Bridge `AFG_COMMIT_GECLISA_PDF` → PWA. `intervId` en el mensaje
@@ -317,8 +321,9 @@ GET.
   Un toast solo cuando pasa a completo. Reintentos sin toast.
 
 **Reintento (ex-Lote C):** `chrome.alarms` cada ~10 min, tope 6, solo
-si hay tab GECLISA. Misma URL. Reemplaza el adjunto si ahora está
-completo. Al tope: queda lo que haya. Permiso `alarms` en el manifest.
+si hay tab GECLISA. Escalera 8 h → 36 h → 7 d. En ventana ancha no
+se pisa si falla cirujano/fecha. Al tope: queda lo que haya. Permiso
+`alarms` en el manifest.
 
 **Prueba de filtro de fechas (viva, foja prueba — no bloquea el código
 del GET, sí decide si el reintento sirve al día siguiente):**

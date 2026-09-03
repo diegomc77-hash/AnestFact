@@ -828,6 +828,9 @@
       log('__AFG_debugPanelMatch', d.expectAp, d.expectNm1, d);
       return d;
     };
+    window.__AFG_debugSetFecha = function (f) {
+      return setPanelFechaYHora(f || '', null);
+    };
   } catch (eDbg) {}
 
   function findConsultarButton() {
@@ -867,17 +870,238 @@
     await waitGridStable(12000);
   }
 
+  function findPanelFechaInput() {
+    return document.getElementById('txtFechaConsulta')
+      || document.getElementById('txtFecha')
+      || document.querySelector('input[name="txtFechaConsulta"], input[id*="FechaConsulta" i]')
+      || AFG.findInputNearLabel(document, 'Fecha')
+      || document.querySelector('input[id*="Fecha" i], input[name*="Fecha" i], input[id*="fecha"], input[name*="fecha"]');
+  }
+
+  function parseFechaParts(fechaDDMMYYYY) {
+    var s = AFG.formatFechaGeclisa(fechaDDMMYYYY);
+    var m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (!m) return null;
+    return { d: parseInt(m[1], 10), m: parseInt(m[2], 10), y: parseInt(m[3], 10), formatted: s };
+  }
+
+  function fechaDomEquals(a, b) {
+    var fa = AFG.formatFechaGeclisa(a);
+    var fb = AFG.formatFechaGeclisa(b);
+    return !!(fa && fb && fa === fb);
+  }
+
+  function findVisibleFechaCalendar() {
+    var cands = [
+      document.getElementById('ui-datepicker-div'),
+      document.querySelector('.datepicker.datepicker-dropdown'),
+      document.querySelector('.ajax__calendar'),
+      document.querySelector('div.datepicker-days'),
+      document.querySelector('[class*="datepicker-popup"], [class*="calendar-popup"]')
+    ];
+    for (var i = 0; i < cands.length; i++) {
+      var el = cands[i];
+      if (!el) continue;
+      var st = window.getComputedStyle(el);
+      if (st.display === 'none' || st.visibility === 'hidden') continue;
+      if (el.offsetWidth < 8 || el.offsetHeight < 8) continue;
+      return el;
+    }
+    return null;
+  }
+
+  function findFechaCalendarTrigger(inp) {
+    if (!inp) return null;
+    var wrap = inp.parentElement;
+    if (!wrap) return null;
+    return wrap.querySelector(
+      'img.ui-datepicker-trigger, button.ui-datepicker-trigger, .ui-datepicker-trigger, img[id*="Fecha"], button[id*="Fecha"], [class*="calendar" i], [class*="datepicker" i]:not(input)'
+    );
+  }
+
+  function tryJquerySetDate(inp, parts) {
+    var jq = window.jQuery || window.$;
+    if (!jq || !jq.fn || typeof jq.fn.datepicker !== 'function') return false;
+    try {
+      var $el = jq(inp);
+      var inst = null;
+      try { inst = $el.data('datepicker'); } catch (e0) {}
+      var isPicker = !!(inst || /hasDatepicker/i.test(inp.className || ''));
+      if (!isPicker) return false;
+      var dt = new Date(parts.y, parts.m - 1, parts.d);
+      $el.datepicker('setDate', dt);
+      try { $el.datepicker('update', dt); } catch (e1) {}
+      return fechaDomEquals(inp.value, parts.formatted);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function parseCalMonthYearTitle(txt) {
+    var s = AFG.norm(txt).toLowerCase();
+    var yMatch = s.match(/(20\d{2}|19\d{2})/);
+    if (!yMatch) return null;
+    var names = [
+      ['septiembre', 9], ['september', 9], ['diciembre', 12], ['december', 12],
+      ['noviembre', 11], ['november', 11], ['febrero', 2], ['february', 2],
+      ['octubre', 10], ['october', 10], ['agosto', 8], ['august', 8],
+      ['enero', 1], ['january', 1], ['marzo', 3], ['march', 3],
+      ['abril', 4], ['april', 4], ['junio', 6], ['june', 6],
+      ['julio', 7], ['july', 7], ['mayo', 5],
+      ['sept', 9], ['sep', 9], ['dic', 12], ['dec', 12],
+      ['nov', 11], ['feb', 2], ['oct', 10], ['ago', 8], ['aug', 8],
+      ['ene', 1], ['jan', 1], ['mar', 3], ['abr', 4], ['apr', 4],
+      ['jun', 6], ['jul', 7], ['may', 5]
+    ];
+    for (var i = 0; i < names.length; i++) {
+      if (s.indexOf(names[i][0]) >= 0) {
+        return { y: parseInt(yMatch[1], 10), m: names[i][1] };
+      }
+    }
+    var num = s.match(/(\d{1,2})\s*[\/\-]\s*(20\d{2}|19\d{2})/);
+    if (num) return { y: parseInt(num[2], 10), m: parseInt(num[1], 10) };
+    return null;
+  }
+
+  function readCalYearMonth(root) {
+    var monthSel = root.querySelector('select.ui-datepicker-month');
+    var yearSel = root.querySelector('select.ui-datepicker-year');
+    if (monthSel && yearSel) {
+      var mv = parseInt(monthSel.value, 10);
+      var yv = parseInt(yearSel.value, 10);
+      if (!isNaN(mv) && !isNaN(yv)) {
+        var first = monthSel.options && monthSel.options[0]
+          ? parseInt(monthSel.options[0].value, 10)
+          : 0;
+        var month = (first === 0) ? mv + 1 : mv;
+        return { y: yv, m: month };
+      }
+    }
+    var title = root.querySelector('.ui-datepicker-title, .datepicker-switch, .ajax__calendar_title');
+    var txt = title
+      ? (title.innerText || title.textContent || '')
+      : (root.innerText || '').slice(0, 80);
+    return parseCalMonthYearTitle(txt);
+  }
+
+  async function navigateCalToMonth(root, y, m) {
+    var monthSel = root.querySelector('select.ui-datepicker-month');
+    var yearSel = root.querySelector('select.ui-datepicker-year');
+    if (monthSel && yearSel) {
+      var first = monthSel.options && monthSel.options[0]
+        ? parseInt(monthSel.options[0].value, 10)
+        : 0;
+      var monthVal = (first === 0) ? String(m - 1) : String(m);
+      AFG.setSelectByValueOrText(yearSel, String(y));
+      AFG.setSelectByValueOrText(monthSel, monthVal);
+      await AFG.sleep(160);
+      var afterSel = readCalYearMonth(root);
+      if (afterSel && afterSel.y === y && afterSel.m === m) return true;
+    }
+    var guard = 0;
+    while (guard++ < 36) {
+      var cur = readCalYearMonth(root);
+      if (!cur) return false;
+      var diff = (y * 12 + m) - (cur.y * 12 + cur.m);
+      if (diff === 0) return true;
+      var btn = diff < 0
+        ? root.querySelector('.ui-datepicker-prev, .ajax__calendar_prev, th.prev, .prev, a[title*="prev" i], a[title*="anterior" i]')
+        : root.querySelector('.ui-datepicker-next, .ajax__calendar_next, th.next, .next, a[title*="next" i], a[title*="siguiente" i]');
+      if (!btn || /ui-state-disabled|disabled/.test(btn.className || '')) return false;
+      await AFG.clickElAsync(btn);
+      await AFG.sleep(180);
+    }
+    return false;
+  }
+
+  function findCalDayEl(root, y, m, d) {
+    var tds = root.querySelectorAll('td[data-handler="selectDay"]');
+    for (var i = 0; i < tds.length; i++) {
+      var td = tds[i];
+      if (/ui-datepicker-other-month/.test(td.className || '')) continue;
+      var dm = parseInt(td.getAttribute('data-month'), 10);
+      var dy = parseInt(td.getAttribute('data-year'), 10);
+      if (!isNaN(dm) && !isNaN(dy) && (dm !== (m - 1) || dy !== y)) continue;
+      var a = td.querySelector('a');
+      if (a && parseInt(AFG.norm(a.textContent || ''), 10) === d) return a;
+    }
+    var links = root.querySelectorAll(
+      'td:not(.old):not(.new):not(.ui-datepicker-other-month) a, td.day:not(.old):not(.new), .ajax__calendar_day'
+    );
+    for (var j = 0; j < links.length; j++) {
+      var el = links[j];
+      if (/other|old|new|disabled|ui-datepicker-other-month/.test(el.className || '')) continue;
+      if (parseInt(AFG.norm(el.textContent || ''), 10) === d) return el;
+    }
+    return null;
+  }
+
+  async function openFechaCalendar(inp) {
+    var already = findVisibleFechaCalendar();
+    if (already) return already;
+    var trigger = findFechaCalendarTrigger(inp) || inp;
+    await AFG.clickElAsync(trigger);
+    await AFG.sleep(200);
+    try {
+      return await AFG.waitFor(function () {
+        return findVisibleFechaCalendar();
+      }, { label: 'calendario Fecha panel', timeout: 2500, interval: 80 });
+    } catch (e) {
+      return findVisibleFechaCalendar();
+    }
+  }
+
+  /**
+   * El panel usa un datepicker (no un textbox suelto). Tipear DD/MM/AAAA
+   * deja el mes interno en "hoy" y Consultar busca el mes equivocado.
+   * Orden: API jQuery setDate → abrir calendario, flechas de mes, click día → tipeo.
+   */
+  async function setPanelFechaConsulta(inp, fechaDDMMYYYY) {
+    var parts = parseFechaParts(fechaDDMMYYYY);
+    var before = AFG.norm(inp.value || '');
+    if (!parts) {
+      await AFG.typeIntoInputAsync(inp, fechaDDMMYYYY);
+      commitPanelFilterInput(inp);
+      log('Fecha panel DOM (sin parse):', before, '->', inp.value);
+      return;
+    }
+
+    if (tryJquerySetDate(inp, parts)) {
+      commitPanelFilterInput(inp);
+      log('Fecha panel DOM (jquery_setDate):', before, '->', inp.value);
+      return;
+    }
+
+    var cal = await openFechaCalendar(inp);
+    if (cal) {
+      var navOk = await navigateCalToMonth(cal, parts.y, parts.m);
+      if (navOk) {
+        var dayEl = findCalDayEl(cal, parts.y, parts.m, parts.d);
+        if (dayEl) {
+          await AFG.clickElAsync(dayEl);
+          await AFG.sleep(180);
+          if (fechaDomEquals(inp.value, parts.formatted)) {
+            commitPanelFilterInput(inp);
+            log('Fecha panel DOM (calendar_nav):', before, '->', inp.value);
+            return;
+          }
+        }
+      }
+      log('Fecha panel calendario no confirmó día', parts.formatted, 'value=', inp.value);
+    }
+
+    await AFG.typeIntoInputAsync(inp, parts.formatted);
+    commitPanelFilterInput(inp);
+    log('Fecha panel DOM (type_fallback):', before, '->', inp.value);
+  }
+
   /** Setea Fecha/Hora del panel. */
   async function setPanelFechaYHora(fechaDDMMYYYY, horaHHMM) {
     if (fechaDDMMYYYY) {
       var inpFecha = await AFG.waitFor(function () {
-        return AFG.findInputNearLabel(document, 'Fecha')
-          || document.querySelector('input[id*="Fecha" i], input[name*="Fecha" i], input[id*="fecha"], input[name*="fecha"]');
+        return findPanelFechaInput();
       }, { label: 'input Fecha panel', timeout: 15000 });
-      var beforeF = AFG.norm(inpFecha.value || '');
-      await AFG.typeIntoInputAsync(inpFecha, fechaDDMMYYYY);
-      commitPanelFilterInput(inpFecha);
-      log('Fecha panel DOM:', beforeF, '->', inpFecha.value);
+      await setPanelFechaConsulta(inpFecha, fechaDDMMYYYY);
     }
 
     if (horaHHMM) {

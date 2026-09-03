@@ -11,7 +11,7 @@
   var lastOkSig = '';
   var lastQueueSig = '';
   var pendingMints = {};
-  var BRIDGE_VERSION = '0.5.12';
+  var BRIDGE_VERSION = '0.5.14';
 
   function normalize(detail) {
     if (!detail || !detail.token) return null;
@@ -445,7 +445,10 @@
           mime: msg.mime || 'application/pdf',
           size: msg.size || 0,
           nombre: msg.nombre || 'Reporte.pdf',
-          toast: msg.toast !== false
+          toast: msg.toast !== false,
+          wide: !!msg.wide,
+          dryRun: !!msg.dryRun,
+          ciru: msg.ciru || ''
         }, '*');
       } catch (ePdf) {}
       var startedPdf = Date.now();

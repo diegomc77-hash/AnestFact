@@ -47,14 +47,18 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-02:
 
-- PWA `CACHE_V`: **12.60** (P1b B+C; 12.59 = solo impresión)
-- Extensión GECLISA: **0.5.12**
+- PWA `CACHE_V`: **12.61** (reintento P1b: escalera 8h/36h/7d + candados)
+- Extensión GECLISA: **0.5.14**
 
 ## En curso
 
-- 2026-09-02 — **P1b Lote B en vivo** (Mayo, GRABAR real). Código = el de 2026-09-01; la foja A4 de hoy no lo tocó. Pendiente de la prueba: filtro fecha evento vs carga.
+- 2026-09-02 — P1b reintento qx en **origin/main** (12.61 / 0.5.14). Pendiente: recargar PWA + extensión y Pages.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-09-02 — PWA **12.61** + ext **0.5.14**: si el qx no entra en 8 h, el GET se ensancha a 36 h y luego 7 d. En ancha: apellido en `cirujanos:` gana; fecha = la de `hora inicio de cirugia`. No pisa el adjunto si no verifica. Sin nombres ni N° en este diario.
+
+- 2026-09-02 — Extensión **0.5.13**: Consultar del panel deja de tipearle la fecha al datepicker. Usa `datepicker('setDate')` o abre el calendario, cambia de mes con las flechas y toca el día. Sin nombres ni N° en este diario.
 
 - 2026-09-02 — PWA **12.60** + extensión **0.5.12**: GET `ReporteListadoInternado` ~5 s tras GRABAR; PDF a `docs.anest` (tope 1.5 MB, sin rasterizar); reintento si falta qx. Roadmap P1b + nota P6. Sin nombres ni N° en este diario.
 - 2026-09-02 — PWA **12.59** en **origin/main** (`8d6ca37`): tope **49 cols / 4 h** en una hoja; etiquetas tipo reloj; flechas de inicio/fin `HH:mm`; grilla de borde uniforme; cada hoja de continuación es foja completa + folio `Página X de N` (omitido si N=1). 7 símbolos VG confirmados. P1b no entra en este commit.

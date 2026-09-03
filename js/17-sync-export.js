@@ -648,6 +648,7 @@ function afMayoPdfMeta(intervId){
     nroAtencion:(typeof afNormMayoNroAtencion==='function'?afNormMayoNroAtencion(it.mayo_nro_atencion):String(it.mayo_nro_atencion||'').replace(/\D/g,'')),
     fecha:(it.fecha||'').trim(),
     hora:(it.hora||'').trim(),
+    ciru:(it.ciru||'').trim(),
     pendingQx:!!it.mayo_pdf_qx_pendiente
   };
 }
@@ -713,14 +714,59 @@ function afCommitGeclisaPdf(intervId,payload,opts){
       parseOk:!!look.parseOk,
       hasQx:!!look.hasQx,
       hasAnest:!!look.hasAnest,
+      verify:look.verify||null,
+      wide:!!opts.wide,
       size:size
     };
   }
 
+  var meta={
+    wide:!!opts.wide,
+    ciru:(opts.ciru!=null?opts.ciru:(it.ciru||'')),
+    fecha:it.fecha||'',
+    hora:it.hora||''
+  };
+  var dry=!!opts.dryRun||(typeof window!=='undefined'&&!!window.AF_PDF_VERIFY_DRY);
+
   if(typeof afPdfLooksComplete!=='function'){
+    if(dry) return Promise.resolve({ok:true,dryRun:true,intervId:id,complete:false,parseOk:false,wide:meta.wide});
     return Promise.resolve(inspect({parseOk:false,complete:false}));
   }
-  return afPdfLooksComplete(data).then(inspect);
+  return afPdfLooksComplete(data, meta).then(function(look){
+    if(dry){
+      try{console.log('[AFG] PDF GECLISA dry-run',id,'wide=',meta.wide,'complete=',!!(look&&look.complete),'verify=',look&&look.verify);}catch(eD){}
+      return{
+        ok:true,
+        dryRun:true,
+        intervId:id,
+        complete:!!(look&&look.complete),
+        pendingQx:!(look&&look.complete),
+        parseOk:!!(look&&look.parseOk),
+        hasQx:!!(look&&look.hasQx),
+        hasAnest:!!(look&&look.hasAnest),
+        verify:look&&look.verify||null,
+        wide:meta.wide,
+        size:size
+      };
+    }
+    if(meta.wide && !(look && look.complete)){
+      try{console.log('[AFG] PDF GECLISA wide no verifica, no pisa',id,look&&look.verify);}catch(eV){}
+      return{
+        ok:false,
+        skipped:'verify',
+        intervId:id,
+        complete:false,
+        pendingQx:true,
+        parseOk:!!(look&&look.parseOk),
+        hasQx:!!(look&&look.hasQx),
+        hasAnest:!!(look&&look.hasAnest),
+        verify:look&&look.verify||null,
+        wide:true,
+        size:size
+      };
+    }
+    return inspect(look);
+  });
 }
 function adjuntarDoc(input,tipo){
   var file=input&&input.files&&input.files[0];

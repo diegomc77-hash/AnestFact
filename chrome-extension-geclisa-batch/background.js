@@ -1642,6 +1642,9 @@ async function notifyAnesFactMayoNroAtencion(intervId, nro, via) {
 }
 
 var AFG_PDF_VENTANA_HORAS = 8;
+var AFG_PDF_VENTANA_WIDE_H = 36;
+var AFG_PDF_VENTANA_WEEK_H = 168;
+var AFG_PDF_WIDE_DRY_RUN = false;
 var AFG_PDF_SLACK_MIN = 15;
 var AFG_PDF_MAX_BYTES = 1572864;
 var AFG_PDF_RETRY_MIN = 10;
@@ -1680,6 +1683,14 @@ function afgPdfFmtDate(dt) {
 
 function afgPdfFmtTime(dt) {
   return afgPdfPad2(dt.getHours()) + ':' + afgPdfPad2(dt.getMinutes());
+}
+
+/** try 1–3: 8h; 4: 36h; 5–6: 7d. */
+function afgPdfVentanaHorasForTry(tryNo) {
+  var n = Number(tryNo) || 0;
+  if (n >= 5) return AFG_PDF_VENTANA_WEEK_H;
+  if (n >= 4) return AFG_PDF_VENTANA_WIDE_H;
+  return AFG_PDF_VENTANA_HORAS;
 }
 
 function buildReporteInternadoUrl(origin, nro, desde, hasta) {
@@ -1768,7 +1779,8 @@ async function resolveMayoPdfMeta(intervId) {
   var nro = String((meta && meta.nroAtencion) || (job && job.nro) || (item && item.mayo_nro_atencion) || '').replace(/\D/g, '');
   var fecha = String((meta && meta.fecha) || (job && job.fecha) || (item && item.fecha) || '').trim();
   var hora = String((meta && meta.hora) || (job && job.hora) || (item && item.hora) || '').trim();
-  return { nro: nro, fecha: fecha, hora: hora, intervId: id };
+  var ciru = String((meta && meta.ciru) || (job && job.ciru) || (item && item.ciru) || '').trim();
+  return { nro: nro, fecha: fecha, hora: hora, ciru: ciru, intervId: id };
 }
 
 async function findGeclisaTabOrNull() {
@@ -1806,12 +1818,16 @@ async function fetchMayoPdfForInterv(intervId) {
   }
   var start = afgPdfParseFojaDt(meta.fecha, meta.hora);
   if (!start) return { ok: false, error: 'bad_fecha_hora' };
+  var jobsPre = await loadMayoPdfJobs();
+  var nextTry = ((jobsPre[id] && jobsPre[id].tries) || 0) + 1;
+  var ventanaH = afgPdfVentanaHorasForTry(nextTry);
+  var wide = ventanaH > AFG_PDF_VENTANA_HORAS;
   var desde = new Date(start.getTime() - AFG_PDF_SLACK_MIN * 60000);
-  var hasta = new Date(start.getTime() + AFG_PDF_VENTANA_HORAS * 3600000);
+  var hasta = new Date(start.getTime() + ventanaH * 3600000);
   var gTab = await findGeclisaTabOrNull();
   if (!gTab || !gTab.id) {
     await upsertMayoPdfJob(id, {
-      nro: meta.nro, fecha: meta.fecha, hora: meta.hora, pendingQx: true
+      nro: meta.nro, fecha: meta.fecha, hora: meta.hora, ciru: meta.ciru, pendingQx: true
     });
     await ensureMayoPdfAlarm();
     try { console.warn('[AFG pdf] sin tab GECLISA, reintento luego', id); } catch (e2) {}
@@ -1820,14 +1836,13 @@ async function fetchMayoPdfForInterv(intervId) {
   var origin = 'http://sanatoriomayo.myvnc.com:84';
   try { origin = new URL(gTab.url).origin; } catch (eO) {}
   var url = buildReporteInternadoUrl(origin, meta.nro, desde, hasta);
-  var jobs = await loadMayoPdfJobs();
-  var prevTries = (jobs[id] && jobs[id].tries) || 0;
-  if (prevTries >= AFG_PDF_RETRY_MAX) {
-    try { console.warn('[AFG pdf] tope reintentos', id, prevTries); } catch (eT) {}
+  if (nextTry > AFG_PDF_RETRY_MAX) {
+    try { console.warn('[AFG pdf] tope reintentos', id, nextTry - 1); } catch (eT) {}
     return { ok: false, error: 'max_tries' };
   }
+  try { console.log('[AFG pdf] GET', id, 'try', nextTry, 'ventanaH', ventanaH, 'wide', wide); } catch (eLog) {}
   await upsertMayoPdfJob(id, {
-    nro: meta.nro, fecha: meta.fecha, hora: meta.hora, url: url, tries: prevTries + 1, pendingQx: true
+    nro: meta.nro, fecha: meta.fecha, hora: meta.hora, ciru: meta.ciru, url: url, tries: nextTry, pendingQx: true, wide: wide
   });
 
   var fetched = null;
@@ -1865,10 +1880,17 @@ async function fetchMayoPdfForInterv(intervId) {
         mime: fetched.mime || 'application/pdf',
         size: fetched.size || 0,
         nombre: 'Reporte.pdf',
-        toast: true
+        toast: !(wide && AFG_PDF_WIDE_DRY_RUN),
+        wide: wide,
+        dryRun: !!(wide && AFG_PDF_WIDE_DRY_RUN),
+        ciru: meta.ciru || ''
       });
       if (commit && (commit.ok || commit.skipped)) break;
     } catch (eC) {}
+  }
+  if (commit && commit.dryRun) {
+    await ensureMayoPdfAlarm();
+    return commit;
   }
   if (commit && commit.skipped === 'manual') {
     await deleteMayoPdfJob(id);
@@ -1879,7 +1901,7 @@ async function fetchMayoPdfForInterv(intervId) {
     return commit;
   }
   if (commit && commit.ok) {
-    await upsertMayoPdfJob(id, { pendingQx: true, nro: meta.nro, fecha: meta.fecha, hora: meta.hora, url: url });
+    await upsertMayoPdfJob(id, { pendingQx: true, nro: meta.nro, fecha: meta.fecha, hora: meta.hora, ciru: meta.ciru, url: url });
     await ensureMayoPdfAlarm();
     return commit;
   }

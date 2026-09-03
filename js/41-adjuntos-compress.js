@@ -199,15 +199,123 @@ function afPdfExtractTextFromDataUrl(dataUrl) {
   });
 }
 
-/** Completo = texto con protocolo qx y anestésico. Parse fail → no declarar completo. */
-function afPdfLooksComplete(dataUrl) {
+function afPdfFold(s) {
+  return String(s || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
+function afPdfFormatFecha(fecha) {
+  var s = String(fecha || '').trim();
+  var iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return iso[3] + '/' + iso[2] + '/' + iso[1];
+  var dmy = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+  if (!dmy) return '';
+  var dd = dmy[1].length === 1 ? '0' + dmy[1] : dmy[1];
+  var mm = dmy[2].length === 1 ? '0' + dmy[2] : dmy[2];
+  var y = dmy[3];
+  if (y.length === 2) y = '20' + y;
+  return dd + '/' + mm + '/' + y;
+}
+
+/** Primer apellido usable (≥4 letras), sin dr/dra. */
+function afPdfCirujanoToken(name) {
+  var s = afPdfFold(name).replace(/[^a-z0-9\s]/g, ' ');
+  s = s.replace(/\b(dr|dra|prof|doctor|doctora)\b/g, ' ');
+  var parts = s.replace(/\s+/g, ' ').trim().split(' ');
+  var i;
+  for (i = 0; i < parts.length; i++) {
+    if (parts[i].length >= 4) return parts[i];
+  }
+  return '';
+}
+
+function afPdfParseGeclisaLabels(raw) {
+  var t = afPdfFold(raw).replace(/\s+/g, ' ');
+  var next = '(?=\\s+(?:cirujanos\\s*:|diagnostico\\s*\\d*\\s*:|fecha\\s+admision|hora\\s+inicio|hora\\s+fin|n[°ºo.]?\\s*atenc|protocolo\\s*(?:quir|anest)|posicion\\s*:|$))';
+  var cirujanos = [];
+  var reC = new RegExp('cirujanos\\s*:\\s*(.+?)' + next, 'g');
+  var m;
+  while ((m = reC.exec(t))) cirujanos.push(String(m[1] || '').trim());
+  var fechasQx = [];
+  var reF = /(\d{1,2}\/\d{1,2}\/\d{4})\s+hora\s+inicio\s+de\s+cirugia/g;
+  while ((m = reF.exec(t))) {
+    var f = afPdfFormatFecha(m[1]);
+    if (f) fechasQx.push(f);
+  }
+  return {
+    text: t,
+    cirujanos: cirujanos,
+    fechasQx: fechasQx,
+    hasHoraInicio: /hora\s+inicio\s+de\s+cirugia\s*:/.test(t),
+    hasQx: /protocolo\s*quir[uú]rgico/.test(t) || /protocoloquirurgico/.test(t),
+    hasAnest: /protocolo\s*anest/.test(t)
+  };
+}
+
+/**
+ * Ventana ancha: cirujano fuzzy gana; fecha = la pegada a hora inicio de cirugia.
+ * meta: { ciru, fecha }
+ */
+function afPdfVerifyGeclisaMatch(rawOrLabels, meta) {
+  meta = meta || {};
+  var labels = (rawOrLabels && rawOrLabels.cirujanos)
+    ? rawOrLabels
+    : afPdfParseGeclisaLabels(rawOrLabels);
+  var token = afPdfCirujanoToken(meta.ciru);
+  var fojaFecha = afPdfFormatFecha(meta.fecha);
+  var surgeonMatch = false;
+  var i;
+  if (token) {
+    var re = new RegExp('\\b' + token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b');
+    for (i = 0; i < labels.cirujanos.length; i++) {
+      if (re.test(afPdfFold(labels.cirujanos[i]))) {
+        surgeonMatch = true;
+        break;
+      }
+    }
+  }
+  var dateMatch = false;
+  for (i = 0; i < labels.fechasQx.length; i++) {
+    if (labels.fechasQx[i] === fojaFecha) {
+      dateMatch = true;
+      break;
+    }
+  }
+  var surgeonRequired = !!token;
+  var accept = surgeonRequired ? surgeonMatch : dateMatch;
+  return {
+    accept: !!accept,
+    surgeonRequired: surgeonRequired,
+    surgeonMatch: surgeonMatch,
+    dateMatch: dateMatch,
+    cirujanoToken: token || '',
+    fojaFecha: fojaFecha,
+    cirujanos: labels.cirujanos,
+    fechasQx: labels.fechasQx,
+    hasHoraInicio: !!labels.hasHoraInicio
+  };
+}
+
+/** Completo = títulos qx+anest. Si meta.wide, también candados (cirujano > fecha). */
+function afPdfLooksComplete(dataUrl, meta) {
+  meta = meta || {};
   if (!dataUrl) return Promise.resolve({ parseOk: false, complete: false });
   return afPdfExtractTextFromDataUrl(dataUrl).then(function (raw) {
-    var t = String(raw || '').toLowerCase();
-    t = t.replace(/\s+/g, ' ');
-    var qx = /protocolo\s*quir[uú]rgico/.test(t) || /protocoloquirurgico/.test(t);
-    var an = /protocolo\s*anest/.test(t);
-    return { parseOk: true, hasQx: qx, hasAnest: an, complete: !!(qx && an) };
+    var labels = afPdfParseGeclisaLabels(raw);
+    var look = {
+      parseOk: true,
+      hasQx: labels.hasQx,
+      hasAnest: labels.hasAnest,
+      complete: !!(labels.hasQx && labels.hasAnest)
+    };
+    if (meta.wide) {
+      var v = afPdfVerifyGeclisaMatch(labels, meta);
+      look.verify = v;
+      look.complete = !!(look.complete && v.accept);
+    }
+    return look;
   }).catch(function () {
     return { parseOk: false, complete: false, hasQx: false, hasAnest: false };
   });
