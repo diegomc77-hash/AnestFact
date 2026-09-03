@@ -1,0 +1,13 @@
+{
+  "name": "AnesFact PWA",
+  "terminals": [
+    {
+      "name": "web",
+      "command": "python3 -m http.server 3000 --bind 0.0.0.0",
+      "description": "Static dev server for the AnesFact PWA on http://localhost:3000. The app loads its views/modules via fetch(), so a local HTTP server is required (opening files with file:// does not work)."
+    }
+  ],
+  "ports": [
+    { "name": "web", "port": 3000 }
+  ]
+}
