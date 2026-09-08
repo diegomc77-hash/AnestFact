@@ -628,6 +628,52 @@ function afCommitAdjunto(tipo,doc){
 
 var AF_GECLISA_PDF_MAX = 1572864; /* 1.5 MiB crudo; data-URL ~2 MB. No comprimir. */
 
+function afDocIsP1bAlias(d){
+  return !!(d && d.aliasOf && d.fuente==='geclisa_p1b' && !d.data);
+}
+
+/** PDF combinado: qx es un puntero a anest, sin duplicar el blob. */
+function afResolveDoc(docs, tipo){
+  var d=docs&&docs[tipo];
+  if(!d)return null;
+  if(!d.aliasOf)return d;
+  var src=docs[d.aliasOf];
+  if(!src||!src.data)return d;
+  return{
+    nombre:src.nombre,
+    tipo:src.tipo,
+    data:src.data,
+    fecha:src.fecha,
+    fuente:d.fuente||src.fuente,
+    size:src.size,
+    aliasOf:d.aliasOf
+  };
+}
+
+/**
+ * Si el parseo dice qx+anest, marcar docs.qx como alias (sin data).
+ * No pisa un qx colgado a mano. Si el combinado aún no está completo, saca el alias.
+ */
+function afSyncGeclisaQxAlias(it, complete, opts){
+  opts=opts||{};
+  if(!it)return false;
+  if(!it.docs)it.docs={};
+  var qx=it.docs.qx;
+  if(complete && it.docs.anest && it.docs.anest.fuente==='geclisa_p1b'){
+    if(qx && qx.data && !qx.aliasOf)return false;
+    if(opts.fromCommit)it.mayo_pdf_qx_alias_off=false;
+    if(it.mayo_pdf_qx_alias_off && !opts.fromCommit)return false;
+    if(afDocIsP1bAlias(qx))return false;
+    it.docs.qx={ aliasOf:'anest', fuente:'geclisa_p1b' };
+    return true;
+  }
+  if(afDocIsP1bAlias(qx)){
+    delete it.docs.qx;
+    return true;
+  }
+  return false;
+}
+
 function afFindIntervById(id){
   id=String(id||'');
   if(!id||typeof S==='undefined')return null;
@@ -692,6 +738,7 @@ function afCommitGeclisaPdf(intervId,payload,opts){
     if(!it.docs)it.docs={};
     it.docs.anest=doc;
     it.mayo_pdf_qx_pendiente=!complete;
+    afSyncGeclisaQxAlias(it, complete, {fromCommit:true});
     it._ts=Date.now();
     var idx=S.intervs.findIndex(function(x){return String(x.id)===id;});
     if(idx>=0)S.intervs[idx]=it;
@@ -787,10 +834,85 @@ function adjuntarDoc(input,tipo){
   afPrepareAdjunto(file).then(finish).catch(fallback);
 }
 function getNombreDoc(tipo){return tipo==='anest'?'Foja Anest\u00e9sica':tipo==='qx'?'Foja Quir\u00fargica':'Autorizaci\u00f3n';}
-function renderDocBadges(){var docs=(S.cur&&S.cur.docs)||{};['anest','qx','auth'].forEach(function(tipo){var badge=document.getElementById('doc-'+tipo+'-badge');var prev=document.getElementById('doc-'+tipo+'-prev');var label=document.getElementById('doc-'+tipo+'-label');if(!badge)return;if(docs[tipo]){badge.style.display='inline-block';var d=docs[tipo];var isImg=d.tipo&&d.tipo.startsWith('image/');if(prev)prev.innerHTML='<div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--green);border-radius:8px;padding:8px 10px;margin-top:4px">'+(isImg?'<img src="'+d.data+'" style="height:44px;border-radius:4px;object-fit:cover">':'<span style="font-size:24px">doc</span>')+'<div style="flex:1;overflow:hidden"><div style="font-size:12px;font-weight:500">'+d.nombre+'</div><div style="font-size:11px;color:var(--text3)">'+new Date(d.fecha).toLocaleString()+'</div></div><button onclick="verDoc(\''+tipo+'\')" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:13px">ver</button><button onclick="borrarDoc(\''+tipo+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px">\u00d7</button></div>';if(label)label.style.borderColor='var(--green)';}else{badge.style.display='none';if(prev)prev.innerHTML='';if(label)label.style.borderColor='var(--border)';}});}
-function verDoc(tipo){var docs=(S.cur&&S.cur.docs)||{};var d=docs[tipo];if(!d)return;var w=window.open('','_blank');if(d.tipo&&d.tipo.startsWith('image/')){w.document.write('<img src="'+d.data+'" style="max-width:100%">');}else{w.document.write('<embed src="'+d.data+'" width="100%" height="100%" type="application/pdf">');}w.document.close();}
-function borrarDoc(tipo){if(!S.cur||!S.cur.docs)return;delete S.cur.docs[tipo];var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});if(idx>=0)S.intervs[idx]=S.cur;saveIntervsToStorage();if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();renderDocBadges();toast(getNombreDoc(tipo)+' eliminada');}
+function renderDocBadges(){
+  if(S.cur&&S.cur.docs&&S.cur.docs.anest&&S.cur.docs.anest.fuente==='geclisa_p1b'&&!S.cur.mayo_pdf_qx_pendiente){
+    if(afSyncGeclisaQxAlias(S.cur,true)){
+      var idxBf=S.intervs.findIndex(function(i){return i.id===S.cur.id;});
+      if(idxBf>=0)S.intervs[idxBf]=S.cur;
+      saveIntervsToStorage();
+      if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+    }
+  }
+  var docs=(S.cur&&S.cur.docs)||{};
+  ['anest','qx','auth'].forEach(function(tipo){
+    var badge=document.getElementById('doc-'+tipo+'-badge');
+    var prev=document.getElementById('doc-'+tipo+'-prev');
+    var label=document.getElementById('doc-'+tipo+'-label');
+    if(!badge)return;
+    var raw=docs[tipo];
+    var d=afResolveDoc(docs,tipo);
+    if(raw&&d&&d.data){
+      badge.style.display='inline-block';
+      var isImg=d.tipo&&d.tipo.startsWith('image/');
+      var sub=d.aliasOf
+        ? 'mismo archivo (qx + anest)'
+        : (d.fecha?new Date(d.fecha).toLocaleString():'');
+      if(prev){
+        prev.innerHTML='<div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--green);border-radius:8px;padding:8px 10px;margin-top:4px">'
+          +(isImg?'<img src="'+d.data+'" style="height:44px;border-radius:4px;object-fit:cover">':'<span style="font-size:24px">doc</span>')
+          +'<div style="flex:1;overflow:hidden"><div style="font-size:12px;font-weight:500">'+(d.nombre||getNombreDoc(tipo))+'</div>'
+          +'<div style="font-size:11px;color:var(--text3)">'+sub+'</div></div>'
+          +'<button onclick="verDoc(\''+tipo+'\')" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:13px">ver</button>'
+          +'<button onclick="borrarDoc(\''+tipo+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px">\u00d7</button></div>';
+      }
+      if(label)label.style.borderColor='var(--green)';
+    }else{
+      badge.style.display='none';
+      if(prev)prev.innerHTML='';
+      if(label)label.style.borderColor='var(--border)';
+    }
+  });
+}
+function verDoc(tipo){
+  var docs=(S.cur&&S.cur.docs)||{};
+  var d=afResolveDoc(docs,tipo);
+  if(!d||!d.data)return;
+  var w=window.open('','_blank');
+  if(d.tipo&&d.tipo.startsWith('image/')){
+    w.document.write('<img src="'+d.data+'" style="max-width:100%">');
+  }else{
+    w.document.write('<embed src="'+d.data+'" width="100%" height="100%" type="application/pdf">');
+  }
+  w.document.close();
+}
+function borrarDoc(tipo){
+  if(!S.cur||!S.cur.docs)return;
+  if(tipo==='qx'&&afDocIsP1bAlias(S.cur.docs.qx)){
+    S.cur.mayo_pdf_qx_alias_off=true;
+  }
+  if(tipo==='anest'&&afDocIsP1bAlias(S.cur.docs.qx)&&S.cur.docs.qx.aliasOf==='anest'){
+    delete S.cur.docs.qx;
+  }
+  delete S.cur.docs[tipo];
+  var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});
+  if(idx>=0)S.intervs[idx]=S.cur;
+  saveIntervsToStorage();
+  if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+  renderDocBadges();
+  toast(getNombreDoc(tipo)+' eliminada');
+}
 function cargarDocBadges(){setTimeout(renderDocBadges,100);}
 function verDocRes(tipo){verDoc(tipo);}
-function descargarDoc(tipo){var docs=(S.cur&&S.cur.docs)||{};var d=docs[tipo];if(!d)return;var a=document.createElement('a');a.href=d.data;a.download=d.nombre;document.body.appendChild(a);a.click();document.body.removeChild(a);toast('Descargando '+d.nombre);}
+function descargarDoc(tipo){
+  var docs=(S.cur&&S.cur.docs)||{};
+  var d=afResolveDoc(docs,tipo);
+  if(!d||!d.data)return;
+  var a=document.createElement('a');
+  a.href=d.data;
+  a.download=d.nombre||('doc-'+tipo);
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  toast('Descargando '+d.nombre);
+}
 

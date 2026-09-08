@@ -131,9 +131,11 @@ Flujo cerrado en `CIERRE_ARQUITECTURA_FACTURACION.md`:
 
 Hallazgo de la prueba P1 en vivo (2026-08-31): **GECLISA no entrega
 dos archivos**. Baja **un solo PDF** (`Reporte.pdf`) con foja de
-cirugía + foja anestésica juntas. En Facturación eso se cuelga en
-**una** ranura (ej. Foja Anestésica) y la otra queda vacía — es el
-uso correcto hoy, no un error del usuario.
+cirugía + foja anestésica juntas. El blob vive en `docs.anest`. Si
+pdf.js ve los dos protocolos, Facturación marca **también** Foja
+Quirúrgica con un alias (`docs.qx.aliasOf = 'anest'`), sin duplicar
+el archivo. Ranura qx vacía = combinado todavía incompleto, o qx
+colgada a mano.
 
 P1 **sigue igual**: 3 ranuras genéricas; cada una acepta cualquier
 archivo; **no** se exige que estén las tres completas. No codear
@@ -175,8 +177,8 @@ PDF via pdf.js lazy `vendor/pdfjs/` (no `STATIC_CORE`). Fallo → original.
 
 Las 3 ranuras son **genéricas y opcionales**: cualquier archivo en
 cualquiera; no se fuerza completar las tres. En Mayo el PDF combinado
-de GECLISA va en **una** ranura (§ 1c). No rediseñar slots por
-institución en este lote.
+de GECLISA va en `docs.anest`; si está completo, qx muestra el mismo
+archivo vía alias (§ 1c). No rediseñar slots por institución.
 
 **Valor:** Aero (foto auth / qx papel); Mayo ART/obras si la auth llegó
 por mail/WhatsApp y **no** se va a buscar en GECLISA todavía.
@@ -267,9 +269,9 @@ tiene que aparecer protocolo quirúrgico **y** anestésico. Títulos
 exactos: confirmarlos en un PDF de foja **prueba**, no de paciente
 real. Si no se puede parsear, no se declara completo.
 
-Ranura: el combinado va a `docs.anest` (§ 1c). Ranura qx vacía es
-correcto. Marca `fuente: 'geclisa_p1b'`. Si ella ya colgó un archivo
-a mano en esa ranura, **no** pisar.
+Ranura: el combinado va a `docs.anest` (`fuente: 'geclisa_p1b'`). Si
+está completo, `docs.qx` es alias al mismo PDF (sin data). Si ella ya
+colgó un qx a mano, **no** pisar. Incompleto → qx sin alias.
 
 Auth **no** sale de este GET.
 
@@ -313,7 +315,8 @@ GET.
   (eso convierte página 1 a JPEG y rompe el combinado para evweb).
   Guardar `application/pdf` tal cual. Tope **1.5 MB** crudo (~2 MB
   data-URL): si pasa, no se guarda (el medido era 347 KB).
-- `fuente: 'geclisa_p1b'`. Ranura `docs.anest`. Ranura qx vacía OK.
+- `fuente: 'geclisa_p1b'`. Ranura `docs.anest`. Completo → alias en
+  `docs.qx` (mismo archivo). Manual en qx no se pisa.
 - Completo: pdf.js (ya en PWA) extrae texto → hay quirúrgico **y**
   anestésico. Títulos: confirmar en foja **prueba**. Si no se parsea,
   no se declara completo.

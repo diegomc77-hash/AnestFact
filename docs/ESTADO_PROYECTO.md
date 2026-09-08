@@ -45,16 +45,21 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 ---
 
-Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-02:
+Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-08:
 
-- PWA `CACHE_V`: **12.61** (reintento P1b: escalera 8h/36h/7d + candados)
-- Extensión GECLISA: **0.5.14**
+- PWA `CACHE_V`: **12.62** (nivel regional cola + alias PDF combinado)
+- Extensión GECLISA: **0.5.15** (lote aparte, sin commit; se sigue probando en vivo)
 
 ## En curso
 
-- 2026-09-02 — P1b reintento qx en **origin/main** (12.61 / 0.5.14). Pendiente: recargar PWA + extensión y Pages.
+- 2026-09-08 — PWA **12.62** a origin/main. Pendiente: recargar PWA en Pages y verificar nivel regional en cola + tilde qx del combinado. Ext **0.5.15** sigue en prueba, sin commit.
+- 2026-09-07 — Ext **0.5.15**: 8b = bolsa de tokens del nombre; Siguiente/Reanudar saltan `paused_error`. Sin commit.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-09-08 — PWA **12.62**: cola GECLISA arma `nivelRegional` desde `tec_espacio` / bloqueo+lateral (no exige foja abierta). PDF P1b completo: tilde qx = alias al mismo `docs.anest`, sin duplicar. Sin nombres ni N° en este diario.
+
+- 2026-09-07 — Ext **0.5.15**: 8b compara bolsa de tokens del nombre completo (no raya apellido/nombre). Iniciar/Reanudar y Siguiente saltan `paused_error` (queda en pausa; Reintentar sigue siendo este). Sin nombres ni N° en este diario. Sin commit/push aún.
 
 - 2026-09-02 — PWA **12.61** + ext **0.5.14**: si el qx no entra en 8 h, el GET se ensancha a 36 h y luego 7 d. En ancha: apellido en `cirujanos:` gana; fecha = la de `hora inicio de cirugia`. No pisa el adjunto si no verifica. Sin nombres ni N° en este diario.
 

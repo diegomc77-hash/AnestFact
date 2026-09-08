@@ -118,6 +118,24 @@ function afIsCurrentInterv(i){
   return !!(typeof S!=='undefined'&&S.cur&&i&&String(S.cur.id)===String(i.id));
 }
 
+/**
+ * Texto para GECLISA #8072. Fuente: Técnica (espacio / bloqueo), no un input aparte.
+ * Funciona con la foja abierta o solo con i.foja (cola).
+ */
+function afNivelRegionalFromFoja(i, tipoTec){
+  tipoTec=tipoTec||afFojaField(i,'tecTipo','fj-tec-tipo','')||afFojaField(i,'tec_tipo','fj-tec-tipo','');
+  if(tipoTec==='neuroaxial'){
+    var esp=afFojaField(i,'tec_espacio','fj-tec-espacio','');
+    return esp?('Espacio '+esp):'';
+  }
+  if(tipoTec==='bloqueo'){
+    var tecVal=afFojaField(i,'tec','fj-tec','')||afFojaField(i,'tec_bloqueo','fj-tec-bloqueo','');
+    var lat=afFojaField(i,'tec_lateral','fj-tec-lateral','');
+    return tecVal?(tecVal+(lat?' - '+lat:'')):'';
+  }
+  return '';
+}
+
 /** DOM solo si la foja está abierta; si no, i.foja. */
 function afFojaField(i, fojaKey, domId, fallback){
   var f=(i&&i.foja)||{};
@@ -187,17 +205,8 @@ function afBuildGeclisaClinicalPayload(i){
   });
 
   var _tipoTec=afFojaField(i,'tecTipo','fj-tec-tipo','')||afFojaField(i,'tec_tipo','fj-tec-tipo','');
-  var _nivelRegional=f.nivel_regional||'';
-  if(!_nivelRegional&&afIsCurrentInterv(i)){
-    if(_tipoTec==='neuroaxial'){
-      var _esp=document.getElementById('fj-tec-espacio')?document.getElementById('fj-tec-espacio').value:'';
-      if(_esp)_nivelRegional='Espacio '+_esp;
-    } else if(_tipoTec==='bloqueo'){
-      var _lat=document.getElementById('fj-tec-lateral')?document.getElementById('fj-tec-lateral').value:'';
-      var _tecVal=document.getElementById('fj-tec')?document.getElementById('fj-tec').value:'';
-      if(_tecVal)_nivelRegional=_tecVal+(_lat?' - '+_lat:'');
-    }
-  }
+  var _nivelRegional=(f.nivel_regional||'').trim();
+  if(!_nivelRegional)_nivelRegional=afNivelRegionalFromFoja(i,_tipoTec);
 
   var _mon=afIsCurrentInterv(i)
     ? getMayoMonitoreoFlags(i)
