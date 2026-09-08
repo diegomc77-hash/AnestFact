@@ -2,6 +2,59 @@
 
 **Punto de entrada único.** Este archivo no sustituye los docs de decisión: los **señala**. Un chat nuevo que solo lea el diario de versiones no va a enterarse de Home-por-institución ni de evweb×mutual. Si el tema toca un ítem de la lista, leé **ese archivo entero** (no de memoria).
 
+---
+
+## Retomar — 2026-09-08 (corte hasta el viernes)
+
+Próxima prueba en vivo: **viernes 11 sep 2026** (no hay pacientes reales hasta entonces). Un chat nuevo arranca **acá**, no reconstruyas el hilo.
+
+Versiones: `node tools/check-version-sync.mjs`. Snapshot:
+
+| Qué | Versión | Dónde está |
+|---|---|---|
+| PWA | **12.62** | **origin/main** `25b8408` (Pages). Título de Home = `AnesFact v12.62`. |
+| Extensión GECLISA | **0.5.15** | **origin/main** `5c874f8` (backup). Chrome **no** la baja de Pages: recargar carpeta local. |
+
+### Extensión 0.5.15 — ¿hace falta Pages antes del viernes?
+
+**No.** Chrome carga `chrome-extension-geclisa-batch/` sin empaquetar. Recargar en `chrome://extensions` en esta PC. GitHub es backup (ya en `5c874f8`); Pages no sirve la extensión.
+
+No mezclar: confirmar PWA ≠ confirmar extensión.
+
+### Hecho 2026-09-08
+
+**Publicado (PWA 12.62, `25b8408`):**
+
+1. **Nivel de bloqueo regional (GECLISA ID 8072).** No se tocó `fill.js`. El payload (`js/20-geclisa-send.js`) deriva `nivelRegional` desde Técnica guardada (`tec_espacio` / `tec`+`tec_lateral`) aunque la foja **no** esté abierta. Antes solo leía el DOM si `S.cur` era esa foja → la cola desde Home mandaba vacío.
+2. **Alias visual del PDF combinado.** GET P1b sigue guardando **un** blob en `docs.anest`. Si pdf.js ve protocolo quirúrgico **y** anestésico, `docs.qx` = `{ aliasOf: 'anest' }` (sin duplicar). Facturación tilda las dos ranuras. Qx colgada a mano no se pisa. Incompleto → solo anestésica. Roadmap § 1c actualizado.
+
+**En origin/main, backup (ext 0.5.15, `5c874f8` — no es Pages):**
+
+3. **Paso 8b — bolsa de tokens del nombre.** Match de encabezado Evolución vs `pac` (o apellido+nombre): todos los tokens esperados tienen que estar en el encabezado (sin acentos, sin orden, sin prefijos tipo `dan`→`daniele`). Capa 1 del grid no cambió. Cubre apellido compuesto (`pac` sin coma vs GECLISA `APELLIDO COMPUESTO, NOMBRE`). Sin nombres ni N° en este diario.
+4. **Cola atascada en `paused_error`.** Iniciar/Reanudar solo toman `queued`. **Siguiente** en pausa: botón habilitado, **no** marca `done`, deja `paused_error`, arranca el siguiente `queued`. **Reintentar** sigue siendo **este**. PWA «Iniciar cola» = START (con el skip alcanza).
+
+No se tocó: `fill.js`, IDs GECLISA, `S.cur` de foja clínica. `docs.qx` alias es puntero, no segundo PDF.
+
+### Pendiente de probar en vivo — viernes
+
+PWA (tras recargar Pages, título **v12.62**):
+
+- [ ] Cola con foja de anestesia **regional**, **sin abrirla** → campo 8072 (nivel regional) completo en GECLISA.
+- [ ] Documentación de una foja con combinado **completo** → Foja Anestésica **y** Foja Quirúrgica tildadas, mismo PDF (leyenda tipo «mismo archivo (qx + anest)»). **Ver** abre el mismo archivo.
+
+Extensión (tras recargar **0.5.15** en `chrome://extensions`; no hace falta Pages):
+
+- [ ] Nombre: apellido compuesto (o reintentar un `evolucion_nombre_mismatch` por raya apellido/nombre).
+- [ ] **Siguiente paciente** con una foja en pausa: la deja en `paused_error` y sigue con la próxima `queued`. Reanudar/Iniciar no vuelven a esa pausa. Reintentar sí.
+
+Prueba con nombre **prueba** y DNI ficticio cuando se pueda; en Mayo real, no copiar nombres ni N° a este diario.
+
+### Archivos del lote 0.5.15 (`5c874f8`)
+
+`chrome-extension-geclisa-batch/`: `content/geclisa.js`, `background.js`, `popup.js`, `popup.html`, `manifest.json`, `content/anesfact-bridge.js`, `SELECTORS_PASOS_1_11.md`. No incluir `foja-prueba-*.pdf`.
+
+---
+
 ## Índice de docs (`docs/`) — actualizar en el mismo paso al crear uno nuevo
 
 ### Decisiones vivas (leer enteras si el tema pega)
@@ -48,18 +101,21 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-08:
 
 - PWA `CACHE_V`: **12.62** (nivel regional cola + alias PDF combinado)
-- Extensión GECLISA: **0.5.15** (lote aparte, sin commit; se sigue probando en vivo)
+- Extensión GECLISA: **0.5.15** (origin/main `5c874f8`; recargar local el viernes)
 
 ## En curso
 
-- 2026-09-08 — PWA **12.62** a origin/main. Pendiente: recargar PWA en Pages y verificar nivel regional en cola + tilde qx del combinado. Ext **0.5.15** sigue en prueba, sin commit.
-- 2026-09-07 — Ext **0.5.15**: 8b = bolsa de tokens del nombre; Siguiente/Reanudar saltan `paused_error`. Sin commit.
+- **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo).
+- PWA **12.62** en origin/main (`25b8408`). Pendiente recargar Pages + checklist del viernes.
+- Ext **0.5.15** en origin/main (`5c874f8`) como backup. El viernes: recargar local en `chrome://extensions`.
 
 ## Qué se hizo (más reciente primero)
 
+- 2026-09-08 — Ext **0.5.15** en origin/main (`5c874f8`): 8b bolsa de tokens; Siguiente/Reanudar saltan `paused_error`. Backup; Chrome recarga carpeta local. Sin nombres ni N° en este diario.
+
 - 2026-09-08 — PWA **12.62**: cola GECLISA arma `nivelRegional` desde `tec_espacio` / bloqueo+lateral (no exige foja abierta). PDF P1b completo: tilde qx = alias al mismo `docs.anest`, sin duplicar. Sin nombres ni N° en este diario.
 
-- 2026-09-07 — Ext **0.5.15**: 8b compara bolsa de tokens del nombre completo (no raya apellido/nombre). Iniciar/Reanudar y Siguiente saltan `paused_error` (queda en pausa; Reintentar sigue siendo este). Sin nombres ni N° en este diario. Sin commit/push aún.
+- 2026-09-07 — Ext **0.5.15** (mismo lote, publicado 2026-09-08 `5c874f8`): 8b bolsa de tokens; cola salta `paused_error`.
 
 - 2026-09-02 — PWA **12.61** + ext **0.5.14**: si el qx no entra en 8 h, el GET se ensancha a 36 h y luego 7 d. En ancha: apellido en `cirujanos:` gana; fecha = la de `hora inicio de cirugia`. No pisa el adjunto si no verifica. Sin nombres ni N° en este diario.
 
