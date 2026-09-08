@@ -126,7 +126,7 @@ function setBanners(state) {
 function setButtons(state, busy) {
   var st = (state && state.status) || 'idle';
   document.getElementById('btn-start').disabled = !!busy || st === 'running' || st === 'awaiting_save';
-  document.getElementById('btn-next').disabled = !!busy || st !== 'awaiting_save';
+  document.getElementById('btn-next').disabled = !!busy || !(st === 'awaiting_save' || st === 'paused_error');
   document.getElementById('btn-retry').disabled = !!busy || !(st === 'paused_error' || st === 'awaiting_save');
   document.getElementById('btn-abort').disabled = !!busy || st === 'idle' || st === 'done_all';
   document.getElementById('btn-start').textContent =
@@ -179,7 +179,12 @@ document.getElementById('btn-start').addEventListener('click', function () {
   runAction('AFG_QUEUE_START');
 });
 document.getElementById('btn-next').addEventListener('click', function () {
-  if (!confirm('¿Ya guardaste en GECLISA?\n\nSe marcará esta foja como lista y arrancará la siguiente (reload a home).')) return;
+  var st = (lastState && lastState.status) || '';
+  if (st === 'paused_error') {
+    if (!confirm('Esta foja queda en pausa (no se marca lista).\n\nSe arranca el siguiente pendiente de la cola.')) return;
+  } else if (!confirm('¿Ya guardaste en GECLISA?\n\nSe marcará esta foja como lista y arrancará la siguiente (reload a home).')) {
+    return;
+  }
   runAction('AFG_QUEUE_NEXT');
 });
 document.getElementById('btn-retry').addEventListener('click', function () {

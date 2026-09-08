@@ -11,7 +11,7 @@
   var lastOkSig = '';
   var lastQueueSig = '';
   var pendingMints = {};
-  var BRIDGE_VERSION = '0.5.14';
+  var BRIDGE_VERSION = '0.5.15';
 
   function normalize(detail) {
     if (!detail || !detail.token) return null;

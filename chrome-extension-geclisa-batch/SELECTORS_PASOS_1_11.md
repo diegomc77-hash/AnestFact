@@ -11,7 +11,7 @@ Sin Guardar. **Sin modal** `#btnBuscarPaciente`.
 5. Ubicar fila por apellido/nombre en el grid (capa 1)
 6. Reintentos: hora −1 h → otros sectores
 7. Opciones → **Evoluciones** → leer encabezado `APELLIDO, NOMBRE - N° Atención: …`
-   - Apellido exacto; nombre **tolerante** (esperado prefijo por tokens del real, p.ej. `DANIEL` ⊆ `DANIEL ALFREDO`)
+   - Bolsa de tokens del nombre completo (AnesFact `pac` o apellido+nombre vs encabezado). Todo token esperado tiene que estar; orden irrelevante. No prefijos (`dan` ↛ `daniele`).
    - Si no coincide → **PAUSA** (no toca Nuevo)
    - Si coincide → capturar `nroAtencion` del encabezado y seguir
 8. Nuevo → plantilla → fill.js

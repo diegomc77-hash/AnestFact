@@ -1933,8 +1933,11 @@ try {
   });
 } catch (eAl) {}
 
-function firstPendingQueueItem(queue, preferId) {
+function firstPendingQueueItem(queue, preferId, opts) {
   var items = (queue && queue.items) || [];
+  opts = opts || {};
+  var skipPaused = !!opts.skipPaused;
+  var skipIds = opts.skipIds || {};
   if (preferId) {
     for (var i = 0; i < items.length; i++) {
       if (String(items[i].id) === String(preferId) && items[i].status !== 'done') return items[i];
@@ -1943,6 +1946,11 @@ function firstPendingQueueItem(queue, preferId) {
   for (var j = 0; j < items.length; j++) {
     var st = items[j].status || 'queued';
     if (st === 'done') continue;
+    if (skipIds[String(items[j].id)]) continue;
+    if (skipPaused) {
+      if (st === 'queued') return items[j];
+      continue;
+    }
     if (st === 'running' || st === 'awaiting_save' || st === 'queued' || st === 'paused_error') {
       return items[j];
     }
@@ -1998,7 +2006,22 @@ async function runQueueAction(action) {
   var state = stateGate;
 
   if (action === 'next') {
-    if (state.status !== 'awaiting_save' || !state.currentIntervId) {
+    if (state.status === 'awaiting_save' && state.currentIntervId) {
+      await patchQueueItemStatus(state.currentIntervId, 'done', '');
+      state.processedIds = (state.processedIds || []).concat([String(state.currentIntervId)]);
+      state.currentIntervId = null;
+      state.currentPac = '';
+      state.status = 'idle';
+      state.message = 'Buscando siguiente…';
+      await setRunnerState(state);
+    } else if (state.status === 'paused_error' && state.currentIntervId) {
+      state.processedIds = (state.processedIds || []).concat([String(state.currentIntervId)]);
+      state.currentIntervId = null;
+      state.currentPac = '';
+      state.status = 'idle';
+      state.message = 'Salteado (en pausa) — siguiente…';
+      await setRunnerState(state);
+    } else {
       return {
         ok: false,
         error: 'not_awaiting_save',
@@ -2006,13 +2029,6 @@ async function runQueueAction(action) {
         state: state
       };
     }
-    await patchQueueItemStatus(state.currentIntervId, 'done', '');
-    state.processedIds = (state.processedIds || []).concat([String(state.currentIntervId)]);
-    state.currentIntervId = null;
-    state.currentPac = '';
-    state.status = 'idle';
-    state.message = 'Buscando siguiente…';
-    await setRunnerState(state);
   }
 
   if (action === 'retry') {
@@ -2037,32 +2053,30 @@ async function runQueueAction(action) {
   }
 
   var preferId = action === 'retry' ? state.currentIntervId : null;
-  // Tras next, no preferir el done
+  // Tras next, no preferir el done / el paused que acabamos de saltar
   if (action === 'start' || action === 'next') preferId = null;
 
-  var item = firstPendingQueueItem(queue, preferId);
-  // Excluir ya procesados en esta sesión si status quedó raro
-  if (item && action === 'next') {
-    var skip = {};
-    (state.processedIds || []).forEach(function (id) { skip[String(id)] = true; });
-    if (skip[String(item.id)]) {
-      var items = queue.items;
-      item = null;
-      for (var k = 0; k < items.length; k++) {
-        if (items[k].status === 'done') continue;
-        if (skip[String(items[k].id)]) continue;
-        item = items[k];
-        break;
-      }
-    }
+  var skipIds = {};
+  if (action === 'start' || action === 'next') {
+    (state.processedIds || []).forEach(function (id) { skipIds[String(id)] = true; });
   }
+  var item = firstPendingQueueItem(queue, preferId, {
+    skipPaused: action === 'start' || action === 'next',
+    skipIds: skipIds
+  });
 
   if (!item) {
+    var pausedLeft = 0;
+    ((queue && queue.items) || []).forEach(function (it) {
+      if ((it.status || '') === 'paused_error') pausedLeft += 1;
+    });
     state = await setRunnerState(Object.assign(state, {
       status: 'done_all',
       currentIntervId: null,
       currentPac: '',
-      message: 'Cola completa — no quedan pendientes'
+      message: pausedLeft
+        ? ('No quedan queued. Hay ' + pausedLeft + ' en pausa (Reintentar o sacalos de la cola).')
+        : 'Cola completa — no quedan pendientes'
     }));
     return { ok: true, doneAll: true, state: state };
   }
