@@ -62,7 +62,7 @@ Prueba con nombre **prueba** y DNI ficticio cuando se pueda; en Mayo real, no co
 | Archivo | Qué trata (una frase) |
 |---|---|
 | `docs/DISENO_PC_HOME.md` | **Home por institución, no por foja** (PC primero, misma lógica en móvil; PC hoy = columna 520px). Leer el archivo completo antes de tocar Home/dock/layout. |
-| `docs/ROADMAP_ESCALAMIENTO.md` | Fases P/U + empaquetado + P1b GET GECLISA + **P6 buzón auth** (idea, sin diseño). |
+| `docs/ROADMAP_ESCALAMIENTO.md` | Fases P/U + empaquetado + P1b GET GECLISA + **P4 Traditum** (reconocimiento 2026-09-10, sin código) + **P6 buzón auth** (idea). |
 | `docs/CIERRE_ARQUITECTURA_FACTURACION.md` | Flujo Preop → foja → GECLISA/Traditum/evweb/SISalud × mutual. Diseño; no codear Traditum/foja qx desde ahí. |
 | `docs/ARQUITECTURA_INSTITUCIONES.md` | Tres patrones de HC (GECLISA / sistema propio / sin sistema) y `tipo_sistema` vs `destino_final`. No mezclar con el cierre de facturación. |
 | `docs/VALORACION_QR.md` | Contrato QR → prefoja → foja (importar solo vacíos; no `resetFojaUIDom`). |
@@ -105,11 +105,13 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- **Lotes 1+2 foja:** antecedentes + protecciones en PWA **12.64** (este commit, local). Impresiones de prueba OK (nombre **prueba**, Aero + Córdoba). **Sin push/Pages.** Origin/main sigue en **12.62** hasta publicar.
-- **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo). Origin/main sigue en **12.62** hasta publicar este lote.
+- **P4 Traditum:** reconocimiento de Nueva Solicitud anotado en `docs/ROADMAP_ESCALAMIENTO.md`. **Sin código.** Pendiente con Huerta: qué hacer al consultar Sujeta a Auditoría / Rechazada.
+- **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo 12.62 / 0.5.15). PWA **12.64** ya en origin (`7b3cc99`); recargar Pages aparte.
 - Ext **0.5.15** en origin/main (`5c874f8`) como backup. El viernes: recargar local en `chrome://extensions`.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-09-10 — Roadmap **P4**: mapa Nueva Solicitud Traditum (IDs ASP.NET, fuentes afiliado/diagnóstico/práctica `1601`+comp, cross-origin `aprossgestores`). Solo doc; 0 automatización. Sin nombres de pacientes ni credenciales.
 
 - 2026-09-10 — Impresiones de prueba (local): foja **prueba** Aero y Hospital Córdoba, VG 4 h / 49 cols, 12 chips + decúbito y ocular. 1 hoja cada una. PDFs no van a git. Sin nombres reales ni N° en este diario.
 

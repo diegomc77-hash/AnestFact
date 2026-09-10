@@ -29,7 +29,7 @@ flujo cerrado · **no** = 0 código o solo diseño.
 | Foja anestésica | **sí** | Foja + UI Mayo (sector/cama/quirófano GECLISA) |
 | Inyección GECLISA | **sí** | Cola `js/39-geclisa-queue.js` + extensión **0.5.10**; fill; **nunca** click en Guardar |
 | Camino a evweb «directo» | **parcial / no automatizado** | Fojas: GET PDF en GECLISA (`fetch` + cookies; **P1b** recortado 2026-09-01). Auth: archivo aparte. PAMI = solo el combinado. Sin botón extra; no es upload a evweb |
-| Traditum (APROSS) | **no** | 0 matches en `js/` / `views/`. Diseño en el cierre. Flujo operativo: GECLISA (auth) → Traditum (buscar esa auth) → 3 estados. Fase **P4** |
+| Traditum (APROSS) | **no** | 0 matches en `js/` / `views/`. Diseño en el cierre. Reconocimiento de pantalla **2026-09-10** en **P4** (IDs Nueva Solicitud; sin código) |
 | QR recepción PDFs (secretaria) | **no** | Distinto del Escanear IA (Gemini) |
 | Foja qx nativa / QR cirujano | **no (a propósito)** | En Mayo la qx vive en GECLISA |
 
@@ -402,23 +402,76 @@ con OK explícito.
 **Cierre:** públicos → SISalud, no evweb. Misma pieza que P2, destino
 print A4 (upload SISalud vetado).
 
-### P4 — Traditum APROSS · **grande**
+### P4 — Traditum APROSS · **grande** · reconocimiento 2026-09-10 (sin código)
 
 **Cierre:** `docs/CIERRE_ARQUITECTURA_FACTURACION.md` § APROSS / Traditum
-+ sub-estados `auth_status`. Flujo a implementar (no está en código):
++ sub-estados `auth_status`. Flujo a implementar (sigue **0 líneas**
+en `js/` / `views/` / extensión):
 
 1. Buscar la autorización en **GECLISA**.
 2. Entrar a **Traditum** (login de la doctora, nunca secretaria).
-3. Buscar **esa** autorización en Traditum.
+3. Buscar **esa** autorización en Traditum **o** cargar **Nueva
+   Solicitud** (mapa abajo).
 4. Registrar uno de los **3 resultados**: `validado` |
-   `sujeto_a_auditoria` | `rechazado` (confirmado: son esos, no otro
-   trío).
+   `sujeto_a_auditoria` | `rechazado` (en la UI: Validada / Sujeta a
+   Auditoría / Rechazada). No hay otro trío.
 5. `validado` → listo_evweb; auditoría → espera; rechazo → alerta y
    reintento. `cirugia_autorizada` vs `cirugia_clinica` sin conciliar.
-   Parser = fila de prestaciones del PDF.
+   Parser = fila de prestaciones del PDF (cuando exista).
 
 **Por qué no antes:** APROSS-only. PAMI y ART no pasan por acá. P1 solo
 adjunta; P1b junta fojas para evweb **sin** Traditum.
+
+Lo que sigue es **reconocimiento en vivo** (Gestor de Ambulatorio,
+cuenta personal de la Dra. Huerta). No se tocaron credenciales. No
+automatizar desde este archivo.
+
+#### Dominios (cross-origin real)
+
+| Pieza | Dónde |
+|---|---|
+| Login / menú | `menu.traditum.com` |
+| Gestión | `aprossgestores.traditum.com` — `Forms/FrmGestionAmbulatorios.aspx` |
+
+El DOM de gestión **no** se lee desde el menú con JS de página. Una
+extensión futura necesita un content script que matchee
+`aprossgestores.traditum.com` (no el de login).
+
+#### Gestor Ambulatorio — dos usos
+
+1. **Nueva Solicitud** — formulario mapeado abajo.
+2. **Consultar** solicitudes ya cargadas, filtro Estado: Validada /
+   Sujeta a Auditoría / Rechazada.
+
+**Pendiente (no bloquea el mapa):** confirmar con Huerta el
+procedimiento concreto al consultar — qué se hace si sale Sujeta a
+Auditoría o Rechazada (reintentar, corregir, escalar). El cierre ya
+dice: auditoría = espera pasiva; rechazo = alerta + ella decide baja
+de complejidad y reintenta.
+
+#### Nueva Solicitud — campos (confirmado Huerta)
+
+Prestador **Efector** y **Prescriptor**: ambos fijos = Huerta,
+matrícula **32393**. El prescriptor **no** es el cirujano.
+
+| Campo | ID (`input`) | Origen del dato |
+|---|---|---|
+| Prestador Efector | fijo (UI) | Huerta, MP 32393 |
+| Prestador Prescriptor | fijo (UI) | Huerta (no el cirujano) |
+| Nro. Credencial (afiliado) | `bodyContent_PID_txtNroIDAfiliado` | N° afiliado **APROSS**. Tres fuentes, cruzables: (1) foto de la autorización que da la secretaria; (2) QR de valoración preanestésica si el paciente lo cargó; (3) foja GECLISA |
+| Cod. Diagnóstico | `bodyContent_DG1_txtNroDDDiagnostico` | Código APROSS de la autorización (ej. `K80`). **Solo la foto**; no está en otro lado de AnesFact |
+| Fecha Prescripción | `bodyContent_AUT_dtFechaPrescripcion` | Fecha de la autorización — de la foto |
+| Fecha Realización | `bodyContent_PRE_dtFechaPrestacion` | Debe **coincidir** con Fecha Prescripción |
+| Cód. Práctica | `bodyContent_PRE_txtCodigoPrestacion` | `1601` + complejidad, **sin separadores** (comp. 5 → `160105`). Complejidad ya está en AnesFact: vista evweb / **Prácticas ADAARC** (`go('nom')`, `data/nomenclador.js`: cada ítem trae `cod` + `comp` 1–5) |
+| Cantidad Solicitada | visible en el form (ID a anotar si se automatiza) | Normalmente `1` |
+| Observaciones | `bodyContent_NTE_txtObservacion01` | Texto libre: qué cirugía hizo el cirujano |
+| Enviar | `bodyContent_btnAceptar` | Envía la solicitud |
+
+#### No es
+
+- No es `fill.js` ni IDs GECLISA.
+- No es evweb ADAARC (eso viene **después** de `validado`).
+- No hay parser de foto ni content script todavía.
 
 ### P5 — Bloqueados / no ahora
 
