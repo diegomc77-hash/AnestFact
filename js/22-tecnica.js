@@ -91,6 +91,7 @@ function actualizarMetodos(soloMateriales){
       ta.value=texto;
     }
   }
+  if(typeof afApplyProtBlock==='function')afApplyProtBlock();
   var mat=document.getElementById('fj-materiales');
   if(!mat)return;
   var tipoTec=document.getElementById('fj-tec-tipo')?document.getElementById('fj-tec-tipo').value:'';
@@ -138,6 +139,13 @@ function actualizarMetodos(soloMateriales){
 var _aldrete='',_destino='',_destinoExtra='',_arm='',_inotrop='';
 var _bromage='',_ramsay='';
 var _antecedentes=[];
+var AF_ANTEC_NEGADOS='Sin antecedentes patológicos referidos';
+var AF_PROT_OPEN='\u00ABAF-PROT\u00BB';
+var AF_PROT_CLOSE='\u00AB/AF-PROT\u00BB';
+var AF_PROT_DECUB='Protección de decúbito: puntos de apoyo almohadillados.';
+var AF_PROT_OCULAR='Protección ocular: ungüento oftálmico y cierre palpebral.';
+var _protOcular=null;
+var _protDecubSyncing=false;
 var _viaEgreso='',_spo2='',_neuro='',_hemo='',_anal='',_ahem='';
 
 var BROMAGE_LABELS={
@@ -218,18 +226,75 @@ function actualizarRecup(){
   var recup=document.getElementById('fj-recup');
   if(recup)recup.value=partes.join('. ')+(partes.length?'.':'');
 }
-function toggleAntec(btn,val){
-  var idx=_antecedentes.indexOf(val);
-  if(idx>=0){_antecedentes.splice(idx,1);btn.style.background='var(--bg3)';btn.style.borderColor='var(--border)';btn.style.color='var(--text)';}
-  else{_antecedentes.push(val);btn.style.background='rgba(34,197,94,.15)';btn.style.borderColor='var(--green)';btn.style.color='var(--green)';}
+function afAntecChipVal(btn,val){
+  if(val)return val;
+  if(!btn)return '';
+  return (btn.getAttribute('data-antec')||btn.textContent||'').trim();
+}
+function afAntecedentesClinicos(arr){
+  arr=arr||_antecedentes||[];
+  return arr.filter(function(a){return a&&a!==AF_ANTEC_NEGADOS;});
+}
+function afAntecEsNegados(arr){
+  arr=arr||_antecedentes||[];
+  return arr.indexOf(AF_ANTEC_NEGADOS)>=0;
+}
+/** Texto único app + A4. Vacío ≠ «se preguntó y no hay». */
+function afTextoAntecedentesFoja(f){
+  f=f||{};
+  var arr=Array.isArray(f.antecedentes)?f.antecedentes:[];
+  var clin=arr.filter(function(a){return a&&a!==AF_ANTEC_NEGADOS;});
+  var otros=String(f.antec_otros||'').trim();
+  var neg=!!f.antec_negados||arr.indexOf(AF_ANTEC_NEGADOS)>=0;
+  if(neg&&!clin.length&&!otros)return 'Antecedentes: Sin antecedentes patológicos referidos.';
+  if(!clin.length&&!otros)return 'Antecedentes: (no consignados)';
+  var parts=[];
+  if(clin.length)parts.push(clin.join(', '));
+  if(otros)parts.push('Otros: '+otros);
+  return 'Antecedentes: '+parts.join('. ')+(parts.length?'.':'');
+}
+function afPaintAntecChips(){
   document.querySelectorAll('#antec-chips button,#antec-chips-tec button').forEach(function(b){
-    if(b.textContent===val||b.getAttribute('data-antec')===val){
-      var on=_antecedentes.indexOf(val)>=0;
-      b.style.background=on?'rgba(34,197,94,.15)':'var(--bg3)';
-      b.style.borderColor=on?'var(--green)':'var(--border)';
-      b.style.color=on?'var(--green)':'var(--text)';
-    }
+    var v=afAntecChipVal(b,'');
+    var on=_antecedentes.indexOf(v)>=0;
+    b.style.background=on?'rgba(34,197,94,.15)':'var(--bg3)';
+    b.style.borderColor=on?'var(--green)':'var(--border)';
+    b.style.color=on?'var(--green)':'var(--text)';
   });
+}
+function afObsGeclisaExtra(){
+  var ta=document.getElementById('fj-obs-geclisa');
+  if(!ta)return '';
+  return String(ta.value||'').replace(/^Antecedentes:[^.]*\.\s*/,'').trim();
+}
+function onAntecOtrosInput(){
+  var ta=document.getElementById('fj-antec-otros');
+  var typed=ta&&String(ta.value||'').trim();
+  if(!typed&&!afObsGeclisaExtra())return;
+  if(!afAntecEsNegados())return;
+  _antecedentes=afAntecedentesClinicos();
+  afPaintAntecChips();
+  syncObsGeclisaAntecedentes();
+  if(typeof renderAlertasClinicas==='function')renderAlertasClinicas();
+}
+function toggleAntec(btn,val){
+  val=afAntecChipVal(btn,val);
+  if(!val)return;
+  var idx=_antecedentes.indexOf(val);
+  var turningOn=idx<0;
+  if(turningOn){
+    if(val===AF_ANTEC_NEGADOS){
+      _antecedentes=[AF_ANTEC_NEGADOS];
+      var otros=document.getElementById('fj-antec-otros');
+      if(otros)otros.value='';
+    }else{
+      _antecedentes=afAntecedentesClinicos();
+      _antecedentes.push(val);
+    }
+  }else{
+    _antecedentes.splice(idx,1);
+  }
+  afPaintAntecChips();
   syncObsGeclisaAntecedentes();
   if(typeof renderAlertasClinicas==='function')renderAlertasClinicas();
   if(typeof _sugerirDrogasPorTec==='function'&&document.getElementById('fj-tec-tipo')){
@@ -244,20 +309,114 @@ function syncObsGeclisaAntecedentes(){
   var ta=document.getElementById('fj-obs-geclisa');
   if(!ta)return;
   var extra=ta.value.replace(/^Antecedentes:[^.]*\.\s*/,'').trim();
+  if(afAntecEsNegados())extra='';
   ta.value=(_antecedentes.length?'Antecedentes: '+_antecedentes.join(', ')+'. ':'')+(extra?extra:'');
 }
 
-function restaurarAntecedentes(arr){
-  _antecedentes=Array.isArray(arr)?arr.slice():[];
-  document.querySelectorAll('#antec-chips button,#antec-chips-tec button').forEach(function(b){
-    var val=b.textContent.trim();
-    var on=_antecedentes.indexOf(val)>=0;
+function restaurarAntecedentes(arr, foja){
+  var list=Array.isArray(arr)?arr.slice():[];
+  var f=foja||((typeof S!=='undefined'&&S.cur&&S.cur.foja)?S.cur.foja:{});
+  if(f&&f.antec_negados&&!list.length)list=[AF_ANTEC_NEGADOS];
+  var clin=list.filter(function(a){return a&&a!==AF_ANTEC_NEGADOS;});
+  if(clin.length)_antecedentes=clin;
+  else if(list.indexOf(AF_ANTEC_NEGADOS)>=0||(f&&f.antec_negados))_antecedentes=[AF_ANTEC_NEGADOS];
+  else _antecedentes=[];
+  var otrosEl=document.getElementById('fj-antec-otros');
+  if(otrosEl)otrosEl.value=(f&&f.antec_otros)||'';
+  afPaintAntecChips();
+  syncObsGeclisaAntecedentes();
+  if(typeof renderAlertasClinicas==='function')renderAlertasClinicas();
+}
+
+function afProtDecubOn(){
+  var a=document.getElementById('prot-decub');
+  var b=document.getElementById('mon-decub');
+  return !!(a&&a.checked)||!!(b&&b.checked);
+}
+function afProtOcularOn(){
+  return _protOcular===true;
+}
+function afTextoProteccionesInner(){
+  var parts=[];
+  if(afProtDecubOn())parts.push(AF_PROT_DECUB);
+  if(afProtOcularOn())parts.push(AF_PROT_OCULAR);
+  return parts.join(' ');
+}
+function afMetodosSinTags(s){
+  return String(s||'').replace(/\s*\u00ABAF-PROT\u00BB\s*/g,' ').replace(/\s*\u00AB\/AF-PROT\u00BB\s*/g,' ').replace(/[ \t]+\n/g,'\n').replace(/ {2,}/g,' ').trim();
+}
+function afStripProtFromMetodos(s){
+  s=String(s||'');
+  s=s.replace(/\s*\u00ABAF-PROT\u00BB[\s\S]*?\u00AB\/AF-PROT\u00BB/g,'');
+  if(typeof AF_PROT_DECUB==='string'&&AF_PROT_DECUB)s=s.split(AF_PROT_DECUB).join('');
+  if(typeof AF_PROT_OCULAR==='string'&&AF_PROT_OCULAR)s=s.split(AF_PROT_OCULAR).join('');
+  return s.replace(/[ \t]+$/gm,'').replace(/\n{3,}/g,'\n\n').replace(/ {2,}/g,' ').trim();
+}
+function afApplyProtBlock(){
+  var ta=document.getElementById('fj-metodos');
+  if(!ta)return;
+  var body=afStripProtFromMetodos(ta.value);
+  var inner=afTextoProteccionesInner();
+  if(!inner){ta.value=body;return;}
+  ta.value=body?(body.replace(/\s*$/,'')+' '+inner):inner;
+}
+function afPaintProtOcularChips(){
+  var si=document.getElementById('prot-ocular-si');
+  var no=document.getElementById('prot-ocular-no');
+  function paint(b,on){
+    if(!b)return;
     b.style.background=on?'rgba(34,197,94,.15)':'var(--bg3)';
     b.style.borderColor=on?'var(--green)':'var(--border)';
     b.style.color=on?'var(--green)':'var(--text)';
-  });
-  syncObsGeclisaAntecedentes();
-  if(typeof renderAlertasClinicas==='function')renderAlertasClinicas();
+  }
+  paint(si,_protOcular===true);
+  paint(no,_protOcular===false);
+  var det=document.getElementById('prot-ocular-detalle');
+  if(det)det.style.display=_protOcular===true?'flex':'none';
+}
+function onProtDecubChange(fromMayo){
+  if(_protDecubSyncing)return;
+  _protDecubSyncing=true;
+  var tec=document.getElementById('prot-decub');
+  var mayo=document.getElementById('mon-decub');
+  var on=fromMayo?(mayo&&mayo.checked):(tec&&tec.checked);
+  if(tec)tec.checked=!!on;
+  if(mayo)mayo.checked=!!on;
+  _protDecubSyncing=false;
+  afApplyProtBlock();
+}
+function onProtOcularDetalleChange(){
+  afApplyProtBlock();
+}
+function setProtOcular(val,silent){
+  _protOcular=val===true?true:val===false?false:null;
+  if(_protOcular===true){
+    var u=document.getElementById('prot-ocular-unguento');
+    var c=document.getElementById('prot-ocular-cierre');
+    if(u&&c&&!u.checked&&!c.checked){u.checked=true;c.checked=true;}
+  }
+  afPaintProtOcularChips();
+  if(!silent)afApplyProtBlock();
+}
+function restaurarProtecciones(f){
+  f=f||{};
+  _protDecubSyncing=true;
+  var decub=!!f.mon_decub;
+  var tec=document.getElementById('prot-decub');
+  var mayo=document.getElementById('mon-decub');
+  if(tec)tec.checked=decub;
+  if(mayo)mayo.checked=decub;
+  _protDecubSyncing=false;
+  if(f.prot_ocular===true)_protOcular=true;
+  else if(f.prot_ocular===false)_protOcular=false;
+  else _protOcular=null;
+  var u=document.getElementById('prot-ocular-unguento');
+  var c=document.getElementById('prot-ocular-cierre');
+  if(u)u.checked=f.prot_ocular===true?(f.prot_ocular_unguento!==false):!!f.prot_ocular_unguento;
+  if(c)c.checked=f.prot_ocular===true?(f.prot_ocular_cierre!==false):!!f.prot_ocular_cierre;
+  if(_protOcular===true&&u&&c&&!u.checked&&!c.checked){u.checked=true;c.checked=true;}
+  afPaintProtOcularChips();
+  afApplyProtBlock();
 }
 
 // === GENERADOR DE CURVA DE SIGNOS VITALES ===
@@ -407,6 +566,7 @@ function tecNivel1(){
   if(typeof _tecRestaurando==='undefined'||!_tecRestaurando){
     var met=document.getElementById('fj-metodos');
     if(met)met.value='';
+    if(typeof afApplyProtBlock==='function')afApplyProtBlock();
   }
 
   if(!tipo){ n2wrap.style.display='none'; return; }
@@ -689,6 +849,7 @@ function tecNivel4Check(){
   }
   var metodos=document.getElementById('fj-metodos');
   if(metodos)metodos.value=txt;
+  if(typeof afApplyProtBlock==='function')afApplyProtBlock();
   actualizarMetodos(true);
 }
 

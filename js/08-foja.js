@@ -6,14 +6,14 @@ function resetFojaUIDom(){
    'fj-aldrete-sel','fj-bromage-sel','fj-ramsay-sel',
    'fj-suero-tipo','fj-suero','fj-sangre','fj-plasma','fj-otro','fj-obs-hemo',
    'fj-fluido1','fj-fluido2','fj-orina','fj-sangrado',
-   'fj-mayo-quir','fj-posicion','fj-nivel-regional','fj-obs-geclisa',
+   'fj-mayo-quir','fj-posicion','fj-nivel-regional','fj-obs-geclisa','fj-antec-otros',
    'fj-hint','fj-hext','fj-hint-vis','fj-hext-vis','foja-hora-inicio','foja-hora-fin',
    'vg-inicio','vg-fin',
    'fj-tec-bloqueo','fj-tec-espacio','fj-tec-lateral','fj-tec-aguja','fj-tec-calibre','fj-tec-guia','fj-tec-resultado',
    'fj-atb','metodos-tubo',
    'aero-sist','aero-diast','aero-fc','aero-sat','aero-eco2','aero-resp','aero-evol',
    'sv-sist','sv-diast','sv-fc','sv-sat','sv-eco2','sv-pam','sv-evol'].forEach(function(id){_fojaSv(id,'');});
-  ['mon-etco2','mon-pam','mon-decub','mon-emerg'].forEach(function(id){_fojaSv(id,false);});
+  ['mon-etco2','mon-pam','mon-decub','mon-emerg','prot-decub','prot-ocular-unguento','prot-ocular-cierre'].forEach(function(id){_fojaSv(id,false);});
   ['mon-ecg','mon-sato2','mon-pani'].forEach(function(id){_fojaSv(id,true);});
   if(typeof VG!=='undefined'){VG.cols=[];VG.cells={};VG.obs={};VG.fluidos={};}
   var vgBody=document.getElementById('vitals-body');if(vgBody)vgBody.innerHTML='';
@@ -33,7 +33,8 @@ function resetFojaUIDom(){
   if(typeof _monTecPrev!=='undefined')_monTecPrev='';
   if(typeof resetExamenAusc==='function')resetExamenAusc();
   if(typeof resetObsHemoSuger==='function')resetObsHemoSuger('');
-  if(typeof restaurarAntecedentes==='function')restaurarAntecedentes([]);
+  if(typeof restaurarAntecedentes==='function')restaurarAntecedentes([],{});
+  if(typeof restaurarProtecciones==='function')restaurarProtecciones({});
   if(typeof tecNivel1==='function')tecNivel1();
   var exReg=document.getElementById('examen-regional-wrap');if(exReg)exReg.style.display='none';
   var recupSel=document.getElementById('recup-selects');if(recupSel)recupSel.innerHTML='';
@@ -129,7 +130,8 @@ function cargarFojaUI(){
   sv('fj-suero-tipo',_balNormalizarSueroTipo(f.suero_tipo||'')||f.suero_tipo||'');sv('fj-suero',f.suero||'');sv('fj-sangre',f.sangre||'');sv('fj-plasma',f.plasma||'');sv('fj-otro',f.otro||'');
   sv('fj-obs-hemo',f.obs_hemo||'');
   if(typeof resetObsHemoSuger==='function')resetObsHemoSuger(f.obs_hemo||'');
-  if(typeof restaurarAntecedentes==='function')restaurarAntecedentes(f.antecedentes||[]);
+  if(typeof restaurarAntecedentes==='function')restaurarAntecedentes(f.antecedentes||[],f);
+  if(typeof restaurarProtecciones==='function')restaurarProtecciones(f);
   setTimeout(function(){
     if(typeof initExamenAuscUI==='function')initExamenAuscUI();
     if(typeof restaurarExamenAusc==='function')restaurarExamenAusc(f.examenAusc||null);
@@ -172,7 +174,7 @@ function flushFojaDomIntoCur(){
     tec_aguja:gv('fj-tec-aguja'),tec_calibre:gv('fj-tec-calibre'),tec_guia:gv('fj-tec-guia'),tec_resultado:gv('fj-tec-resultado'),
     asa:gv('fj-asa'),via:gv('fj-via'),fin:gv('fj-fin'),tubo:gv('metodos-tubo'),
     ind:gv('fj-ind'),hint:gv('fj-hint'),hext:gv('fj-hext'),
-    premed:gv('fj-premed'),atb:gv('fj-atb'),metodos:gv('fj-metodos'),recup:gv('fj-recup'),obs:gv('fj-obs'),examenFisico:gv('fj-examen-fisico'),mallampati:gv('fj-mallampati'),
+    premed:gv('fj-premed'),atb:gv('fj-atb'),metodos:typeof afMetodosSinTags==='function'?afMetodosSinTags(gv('fj-metodos')):gv('fj-metodos'),recup:gv('fj-recup'),obs:gv('fj-obs'),examenFisico:gv('fj-examen-fisico'),mallampati:gv('fj-mallampati'),
     aldrete:typeof _aldrete!=='undefined'?_aldrete:'',
     bromage:typeof _bromage!=='undefined'?_bromage:'',
     ramsay:typeof _ramsay!=='undefined'?_ramsay:'',
@@ -180,6 +182,12 @@ function flushFojaDomIntoCur(){
     suero:gv('fj-suero'),suero_tipo:gv('fj-suero-tipo'),sangre:gv('fj-sangre'),plasma:gv('fj-plasma'),otro:gv('fj-otro'),orina:gv('fj-orina'),sangrado:gv('fj-sangrado'),
     obs_hemo:gv('fj-obs-hemo'),
     antecedentes:typeof _antecedentes!=='undefined'?_antecedentes.slice():[],
+    antec_otros:gv('fj-antec-otros')||'',
+    antec_negados:typeof AF_ANTEC_NEGADOS!=='undefined'&&typeof _antecedentes!=='undefined'&&_antecedentes.indexOf(AF_ANTEC_NEGADOS)>=0,
+    mon_decub:(function(){var a=document.getElementById('prot-decub');var b=document.getElementById('mon-decub');return!!(a&&a.checked)||!!(b&&b.checked);})(),
+    prot_ocular:typeof _protOcular==='undefined'?null:_protOcular,
+    prot_ocular_unguento:(function(){var e=document.getElementById('prot-ocular-unguento');return e?!!e.checked:false;})(),
+    prot_ocular_cierre:(function(){var e=document.getElementById('prot-ocular-cierre');return e?!!e.checked:false;})(),
     drogas:S.cur.foja.drogas||[],vitals:S.vitals||[],sign:S.signData||null,
     vg_cols:_vgCols,vg_cells:_vgCells,vg_obs:_vgObs,vg_fluidos:_vgFluidos,
     aero_sist:_aeroBase.sist,aero_diast:_aeroBase.diast,aero_fc:_aeroBase.fc,

@@ -22,13 +22,16 @@ function _matchDrugRule(nombre){
 
 function getTextoClinicoCaso(){
   var parts=[];
-  if(typeof _antecedentes!=='undefined'&&_antecedentes.length)parts.push(_antecedentes.join(' '));
+  if(typeof _antecedentes!=='undefined'&&_antecedentes.length){
+    var clin=typeof afAntecedentesClinicos==='function'?afAntecedentesClinicos(_antecedentes):_antecedentes;
+    if(clin.length)parts.push(clin.join(' '));
+  }
   var i=S.cur||{};
   var f=i.foja||{};
   ['diag','ciru','pac'].forEach(function(k){if(i[k])parts.push(i[k]);});
-  ['obs','examenFisico','obs_geclisa','premed','metodos'].forEach(function(k){if(f[k])parts.push(f[k]);});
+  ['obs','examenFisico','obs_geclisa','premed','metodos','antec_otros'].forEach(function(k){if(f[k])parts.push(f[k]);});
   if(i.pracs&&i.pracs.length)i.pracs.forEach(function(p){if(p.desc)parts.push(p.desc);});
-  var ids=['fj-examen-fisico','fj-obs','fj-obs-geclisa'];
+  var ids=['fj-examen-fisico','fj-obs','fj-obs-geclisa','fj-antec-otros'];
   ids.forEach(function(id){
     var el=document.getElementById(id);
     if(el&&el.value)parts.push(el.value);
@@ -52,10 +55,11 @@ function getContextosActivos(){
     if(c.detect.test(texto))found.push(c.id);
   });
   if(typeof _antecedentes!=='undefined'){
-    if(_antecedentes.some(function(a){return a.indexOf('IRC')>=0;})&&found.indexOf('irc')<0)found.push('irc');
-    if(_antecedentes.some(function(a){return a==='IC'||/cardio|coronario/i.test(a);})&&found.indexOf('ic_cardio')<0)found.push('ic_cardio');
-    if(_antecedentes.some(function(a){return a==='Coronario';})&&found.indexOf('ic_cardio')<0)found.push('ic_cardio');
-    if(_antecedentes.some(function(a){return a==='Anticoagulado';})&&found.indexOf('anticoag')<0)found.push('anticoag');
+    var clinA=typeof afAntecedentesClinicos==='function'?afAntecedentesClinicos(_antecedentes):_antecedentes;
+    if(clinA.some(function(a){return a.indexOf('IRC')>=0;})&&found.indexOf('irc')<0)found.push('irc');
+    if(clinA.some(function(a){return a==='IC'||/cardio|coronario/i.test(a);})&&found.indexOf('ic_cardio')<0)found.push('ic_cardio');
+    if(clinA.some(function(a){return a==='Coronario';})&&found.indexOf('ic_cardio')<0)found.push('ic_cardio');
+    if(clinA.some(function(a){return a==='Anticoagulado';})&&found.indexOf('anticoag')<0)found.push('anticoag');
   }
   if(cvPat&&found.indexOf('ic_cardio')<0)found.push('ic_cardio');
   if((asa==='IV'||asa==='V')&&/cardio|coron|valv|cec|bypass/i.test(texto)&&found.indexOf('ic_cardio')<0)found.push('ic_cardio');

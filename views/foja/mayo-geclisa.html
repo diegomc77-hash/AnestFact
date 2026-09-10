@@ -8,23 +8,24 @@
 
       <div class="field">
         <label>Antecedentes del paciente</label>
-        <p style="font-size:11px;color:var(--text3);margin:0 0 6px">Única sección de antecedentes en Mayo (sincronizada con GECLISA). Los chips de Técnica se ocultan aquí para evitar duplicados.</p>
+        <p style="font-size:11px;color:var(--text3);margin:0 0 6px">Única sección de antecedentes en Mayo (sincronizada con GECLISA). Los chips de Técnica se ocultan aquí para evitar duplicados. Vacío = no consignado; «sin referidos» niega patologías y limpia los demás chips.</p>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px" id="antec-chips">
-          <button class="chip" onclick="toggleAntec(this,'HTA')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">HTA</button>
-          <button class="chip" onclick="toggleAntec(this,'DBT')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">DBT</button>
-          <button class="chip" onclick="toggleAntec(this,'IRC s/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC s/diálisis</button>
-          <button class="chip" onclick="toggleAntec(this,'IRC c/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC c/diálisis</button>
-          <button class="chip" onclick="toggleAntec(this,'IC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IC</button>
-          <button class="chip" onclick="toggleAntec(this,'Obesidad')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Obesidad</button>
-          <button class="chip" onclick="toggleAntec(this,'EPOC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">EPOC</button>
-          <button class="chip" onclick="toggleAntec(this,'Asma')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Asma</button>
-          <button class="chip" onclick="toggleAntec(this,'Coronario')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Coronario</button>
-          <button class="chip" onclick="toggleAntec(this,'ACV previo')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">ACV previo</button>
-          <button class="chip" onclick="toggleAntec(this,'Fumador')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Fumador</button>
-          <button class="chip" onclick="toggleAntec(this,'Anticoagulado')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Anticoagulado</button>
+          <button type="button" class="chip" data-antec="HTA" onclick="toggleAntec(this,'HTA')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">HTA</button>
+          <button type="button" class="chip" data-antec="DBT" onclick="toggleAntec(this,'DBT')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">DBT</button>
+          <button type="button" class="chip" data-antec="IRC s/diálisis" onclick="toggleAntec(this,'IRC s/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC s/diálisis</button>
+          <button type="button" class="chip" data-antec="IRC c/diálisis" onclick="toggleAntec(this,'IRC c/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC c/diálisis</button>
+          <button type="button" class="chip" data-antec="IC" onclick="toggleAntec(this,'IC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IC</button>
+          <button type="button" class="chip" data-antec="Obesidad" onclick="toggleAntec(this,'Obesidad')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Obesidad</button>
+          <button type="button" class="chip" data-antec="EPOC" onclick="toggleAntec(this,'EPOC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">EPOC</button>
+          <button type="button" class="chip" data-antec="Asma" onclick="toggleAntec(this,'Asma')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Asma</button>
+          <button type="button" class="chip" data-antec="Coronario" onclick="toggleAntec(this,'Coronario')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Coronario</button>
+          <button type="button" class="chip" data-antec="ACV previo" onclick="toggleAntec(this,'ACV previo')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">ACV previo</button>
+          <button type="button" class="chip" data-antec="Fumador" onclick="toggleAntec(this,'Fumador')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Fumador</button>
+          <button type="button" class="chip" data-antec="Anticoagulado" onclick="toggleAntec(this,'Anticoagulado')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Anticoagulado</button>
+          <button type="button" class="chip" data-antec="Sin antecedentes patológicos referidos" onclick="toggleAntec(this,'Sin antecedentes patológicos referidos')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Sin antecedentes patol&oacute;gicos referidos</button>
         </div>
         <div class="fr" style="align-items:flex-start">
-          <textarea class="fi" id="fj-obs-geclisa" placeholder="Otros antecedentes..." rows="2"></textarea>
+          <textarea class="fi" id="fj-obs-geclisa" placeholder="Otros antecedentes..." rows="2" oninput="onAntecOtrosInput()"></textarea>
           <button class="mic" id="m-obs-geclisa" onclick="mic('fj-obs-geclisa','m-obs-geclisa')">&#127897;</button>
         </div>
       </div>
@@ -37,7 +38,7 @@
           <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-ecg" checked> ECG</label>
           <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-sato2" checked> SAT O2</label>
           <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-pani" checked> PANI</label>
-          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-decub"> PROT.DECUB.</label>
+          <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-decub" onchange="onProtDecubChange(true)"> PROT.DECUB.</label>
           <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="mon-emerg"> EMERGENCIA</label>
         </div>
       </div>

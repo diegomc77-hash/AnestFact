@@ -100,16 +100,22 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-08:
 
-- PWA `CACHE_V`: **12.62** (nivel regional cola + alias PDF combinado)
+- PWA `CACHE_V`: **12.64** local (Lotes 1+2 foja; origin/main sigue **12.62** hasta publicar)
 - Extensión GECLISA: **0.5.15** (origin/main `5c874f8`; recargar local el viernes)
 
 ## En curso
 
-- **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo).
-- PWA **12.62** en origin/main (`25b8408`). Pendiente recargar Pages + checklist del viernes.
+- **Lotes 1+2 foja:** antecedentes + protecciones en PWA **12.64** (este commit, local). Impresiones de prueba OK (nombre **prueba**, Aero + Córdoba). **Sin push/Pages.** Origin/main sigue en **12.62** hasta publicar.
+- **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo). Origin/main sigue en **12.62** hasta publicar este lote.
 - Ext **0.5.15** en origin/main (`5c874f8`) como backup. El viernes: recargar local en `chrome://extensions`.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-09-10 — Impresiones de prueba (local): foja **prueba** Aero y Hospital Córdoba, VG 4 h / 49 cols, 12 chips + decúbito y ocular. 1 hoja cada una. PDFs no van a git. Sin nombres reales ni N° en este diario.
+
+- 2026-09-10 — PWA **12.64** Lote 2 (local, sin publicar): tira Protecciones en Técnica (todas); PROT. DECUB. espejado con Mayo `#mon-decub` (radios 8115/8116 intactos); ocular Sí/No + ungüento/cierre palpebral. Frases en Métodos, reaplicadas después de `tecNivel4Check`. Sin nombres ni N° en este diario.
+
+- 2026-09-10 — PWA **12.63** Lote 1 (local, sin publicar): 12 chips + «sin referidos» en Técnica (Aero/públicos) y el mismo chip en Mayo; `antec_otros` / `antec_negados`; fila Antecedentes en A4 (gráfico 124 px). Vacío ≠ negados. Sin nombres ni N° en este diario.
 
 - 2026-09-08 — Ext **0.5.15** en origin/main (`5c874f8`): 8b bolsa de tokens; Siguiente/Reanudar saltan `paused_error`. Backup; Chrome recarga carpeta local. Sin nombres ni N° en este diario.
 

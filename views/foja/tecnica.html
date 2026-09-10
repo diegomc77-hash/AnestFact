@@ -86,14 +86,43 @@
         <select class="fi" id="fj-mallampati" onchange="actualizarExamenFisico()"><option value="">&mdash;</option><option>I</option><option>II</option><option>III</option><option>IV</option></select>
       </div>
     </div>
+    <div class="field" style="margin-top:8px" id="prot-wrap">
+      <label>Protecciones</label>
+      <p style="font-size:11px;color:var(--text3);margin:0 0 6px">Las frases van a M&eacute;todos (papel y GECLISA 8070). En Mayo, PROT. DECUB. se espeja con el helper.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+        <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="prot-decub" onchange="onProtDecubChange()"> PROT. DECUB.</label>
+      </div>
+      <div style="font-size:12px;font-weight:600;margin:0 0 6px">PROT. OCULAR</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button type="button" id="prot-ocular-si" class="chip" onclick="setProtOcular(true)" style="border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">S&iacute;</button>
+        <button type="button" id="prot-ocular-no" class="chip" onclick="setProtOcular(false)" style="border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">No</button>
+      </div>
+      <div id="prot-ocular-detalle" style="display:none;flex-wrap:wrap;gap:6px">
+        <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="prot-ocular-unguento" onchange="onProtOcularDetalleChange()"> Ung&uuml;ento oft&aacute;lmico</label>
+        <label style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px"><input type="checkbox" id="prot-ocular-cierre" onchange="onProtOcularDetalleChange()"> Cierre palpebral</label>
+      </div>
+    </div>
     <div class="field" style="margin-top:4px" id="antec-tec-wrap">
-      <label>Antecedentes relevantes (alertas clínicas)</label>
+      <label>Antecedentes patol&oacute;gicos</label>
+      <p style="font-size:11px;color:var(--text3);margin:0 0 6px">Documentar chips o marcar que se pregunt&oacute; y no refiri&oacute; nada. Vac&iacute;o = no consignado.</p>
       <div style="display:flex;flex-wrap:wrap;gap:6px" id="antec-chips-tec">
-        <button type="button" class="chip" onclick="toggleAntec(this,'IRC s/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC s/diálisis</button>
-        <button type="button" class="chip" onclick="toggleAntec(this,'IRC c/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC c/diálisis</button>
-        <button type="button" class="chip" onclick="toggleAntec(this,'IC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IC</button>
-        <button type="button" class="chip" onclick="toggleAntec(this,'Coronario')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Coronario</button>
-        <button type="button" class="chip" onclick="toggleAntec(this,'Anticoagulado')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Anticoagulado</button>
+        <button type="button" class="chip" data-antec="HTA" onclick="toggleAntec(this,'HTA')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">HTA</button>
+        <button type="button" class="chip" data-antec="DBT" onclick="toggleAntec(this,'DBT')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">DBT</button>
+        <button type="button" class="chip" data-antec="IRC s/diálisis" onclick="toggleAntec(this,'IRC s/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC s/diálisis</button>
+        <button type="button" class="chip" data-antec="IRC c/diálisis" onclick="toggleAntec(this,'IRC c/diálisis')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IRC c/diálisis</button>
+        <button type="button" class="chip" data-antec="IC" onclick="toggleAntec(this,'IC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">IC</button>
+        <button type="button" class="chip" data-antec="Obesidad" onclick="toggleAntec(this,'Obesidad')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Obesidad</button>
+        <button type="button" class="chip" data-antec="EPOC" onclick="toggleAntec(this,'EPOC')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">EPOC</button>
+        <button type="button" class="chip" data-antec="Asma" onclick="toggleAntec(this,'Asma')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Asma</button>
+        <button type="button" class="chip" data-antec="Coronario" onclick="toggleAntec(this,'Coronario')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Coronario</button>
+        <button type="button" class="chip" data-antec="ACV previo" onclick="toggleAntec(this,'ACV previo')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">ACV previo</button>
+        <button type="button" class="chip" data-antec="Fumador" onclick="toggleAntec(this,'Fumador')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Fumador</button>
+        <button type="button" class="chip" data-antec="Anticoagulado" onclick="toggleAntec(this,'Anticoagulado')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Anticoagulado</button>
+        <button type="button" class="chip" data-antec="Sin antecedentes patológicos referidos" onclick="toggleAntec(this,'Sin antecedentes patológicos referidos')" style="border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--border)">Sin antecedentes patol&oacute;gicos referidos</button>
+      </div>
+      <div class="fr" style="align-items:flex-start;margin-top:8px">
+        <textarea class="fi" id="fj-antec-otros" placeholder="Otros antecedentes..." rows="2" oninput="onAntecOtrosInput()"></textarea>
+        <button class="mic" id="m-antec-otros" onclick="mic('fj-antec-otros','m-antec-otros')">&#127897;</button>
       </div>
     </div>
     <div class="field" style="margin-top:8px">

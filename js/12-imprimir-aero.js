@@ -318,15 +318,17 @@ function _buildFojaSheet(i,f,drogaLines,signImg,obsMain,obsFs,chartInner,pageLab
     +'<div style="flex:0 0 44px"><span class="l">Hora</span><div class="f">'+_printEsc(i.hora)+'</div></div></div>'
     +'<div class="r"><div style="flex:1"><span class="l">Hallazgos f&#237;sicos anormales</span>'
     +'<div class="f" style="min-height:22px;font-size:7px;line-height:1.35">'+_printEsc(getHallazgosFisicos(f))+'</div></div></div>'
+    +'<div class="r"><div style="flex:1"><span class="l">Antecedentes</span>'
+    +'<div class="f" style="min-height:14px;max-height:28px;overflow:hidden;font-size:7.5px;line-height:1.25">'+_printEsc(typeof afTextoAntecedentesFoja==='function'?afTextoAntecedentesFoja(f):'')+'</div></div></div>'
     +'<div style="margin:2px 0;font-size:9px"><b>Inducci&#243;n:</b>&nbsp;'
     +'<span class="chk">'+(f.ind==='Satisfactoria'?'&#10003;':'')+'</span>Satisfactoria&nbsp;&nbsp;'
     +'<span class="chk">'+(f.ind==='Prolongada'?'&#10003;':'')+'</span>Prolongada&nbsp;&nbsp;'
     +'<span class="chk">'+(f.ind==='Tormentosa'?'&#10003;':'')+'</span>Tormentosa</div>'
     +'<div class="r"><div style="flex:1"><span class="l">Inicio anestesia/intub.</span><div class="f">'+_printEsc(f.hint)+'</div></div>'
     +'<div style="flex:2"></div><div style="flex:1"><span class="l">Fin anestesia/extub.</span><div class="f">'+_printEsc(f.hext)+'</div></div></div>'
-    +_buildChartBlock(chartInner,_printChartH(i,140))
+    +_buildChartBlock(chartInner,_printChartH(i,124))
     +'<div class="s" style="margin-top:3px">Agentes Anest&#233;sicos:</div><div style="border-bottom:1px solid #ccc;padding:1px 3px;min-height:16px;font-size:9.5px;line-height:1.25">'+_printEsc(drogaLines)+'</div>'
-    +'<div class="s" style="margin-top:3px">M&#233;todos Anest&#233;sicos:</div><div style="border-bottom:1px solid #ccc;padding:1px 3px;min-height:16px;font-size:9.5px;line-height:1.25">'+_printEsc(f.metodos)+'</div>'
+    +'<div class="s" style="margin-top:3px">M&#233;todos Anest&#233;sicos:</div><div style="border-bottom:1px solid #ccc;padding:1px 3px;min-height:16px;font-size:9.5px;line-height:1.25">'+_printEsc(typeof afMetodosSinTags==='function'?afMetodosSinTags(f.metodos):f.metodos)+'</div>'
     +'<div class="s" style="margin-top:3px">Recuperaci&#243;n:</div><div style="border-bottom:1px solid #ccc;padding:1px 3px;min-height:16px;font-size:9.5px;line-height:1.25">'+_printEsc(f.recup)+'</div>'
     +'</div><div class="pg-footer">'
     +_buildObsSignRow(obsMain,obsFs,signImg,'min-height:58px;max-height:58px')

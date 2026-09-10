@@ -350,6 +350,7 @@ function renderFojaPorSanatorio(){
       actualizarMonitoreoMayo({init:true});
     }
   }
+  if(typeof restaurarProtecciones==='function'&&S.cur&&S.cur.foja)restaurarProtecciones(S.cur.foja);
 }
 
 var MAYO_MINS=[5,15,30,45,60,75,90,105,120,135,150,165,180,195,210,225,240];
