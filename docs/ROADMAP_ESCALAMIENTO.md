@@ -405,19 +405,11 @@ print A4 (upload SISalud vetado).
 ### P4 — Traditum APROSS · **grande** · reconocimiento 2026-09-10 (sin código)
 
 **Cierre:** `docs/CIERRE_ARQUITECTURA_FACTURACION.md` § APROSS / Traditum
-+ sub-estados `auth_status`. Flujo a implementar (sigue **0 líneas**
-en `js/` / `views/` / extensión):
-
-1. Buscar la autorización en **GECLISA**.
-2. Entrar a **Traditum** (login de la doctora, nunca secretaria).
-3. Buscar **esa** autorización en Traditum **o** cargar **Nueva
-   Solicitud** (mapa abajo).
-4. Registrar uno de los **3 resultados**: `validado` |
-   `sujeto_a_auditoria` | `rechazado` (en la UI: Validada / Sujeta a
-   Auditoría / Rechazada). No hay otro trío.
-5. `validado` → listo_evweb; auditoría → espera; rechazo → alerta y
-   reintento. `cirugia_autorizada` vs `cirugia_clinica` sin conciliar.
-   Parser = fila de prestaciones del PDF (cuando exista).
++ sub-estados `auth_status`. Sigue **0 líneas** en `js/` / `views/` /
+extensión. El ciclo operativo confirmado con Huerta (2026-09-10) está
+en «Ciclo de vida» más abajo; no contradice el cierre: lo detalla
+(foto → Nueva Solicitud → consultar → ramas, incluida validación
+parcial y baja de complejidad de a un nivel).
 
 **Por qué no antes:** APROSS-only. PAMI y ART no pasan por acá. P1 solo
 adjunta; P1b junta fojas para evweb **sin** Traditum.
@@ -439,15 +431,39 @@ extensión futura necesita un content script que matchee
 
 #### Gestor Ambulatorio — dos usos
 
-1. **Nueva Solicitud** — formulario mapeado abajo.
-2. **Consultar** solicitudes ya cargadas, filtro Estado: Validada /
-   Sujeta a Auditoría / Rechazada.
+1. **Nueva Solicitud** — formulario mapeado abajo (alta).
+2. **Consultar** las ya cargadas, filtro Estado: Validada / Sujeta a
+   Auditoría / Rechazada (resultado). El procedimiento de cada rama
+   está en «Ciclo de vida».
 
-**Pendiente (no bloquea el mapa):** confirmar con Huerta el
-procedimiento concreto al consultar — qué se hace si sale Sujeta a
-Auditoría o Rechazada (reintentar, corregir, escalar). El cierre ya
-dice: auditoría = espera pasiva; rechazo = alerta + ella decide baja
-de complejidad y reintenta.
+#### Ciclo de vida (confirmado Huerta)
+
+Reconocimiento en vivo; cuenta personal de la Dra. Huerta; no se
+tocaron credenciales. **Nada implementado.**
+
+1. En **AnesFact** se saca foto de la autorización que trae la
+   secretaria (hoy a mano; P1 = ranura auth cuando se use).
+2. Traditum → Gestor de Ambulatorio → **Nueva Solicitud**. Cargar
+   según el mapa: prestador fijo; afiliado / diagnóstico / fecha
+   desde la foto; Cód. Práctica = `1601` + complejidad del catálogo
+   ADAARC (`go('nom')`).
+3. **Hueco AnesFact:** no hay estado tipo «Pendiente de autorizar en
+   Traditum» (ni el `auth_status` del cierre en la foja). Terreno
+   nuevo a diseñar; no codear ahora.
+4. Más tarde se vuelve a Traditum a **consultar**, filtrando por
+   Validada / Sujeta a Auditoría / Rechazada.
+
+**Ramas al consultar**
+
+| Resultado | Qué se hace |
+|---|---|
+| **Validada** | Se exporta desde Traditum y se sube a **evweb**. |
+| **Rechazada** (por complejidad) | Se reclama como **evento nuevo**, bajando **un** nivel de complejidad por vez (`5→4`, si rechaza otra vez `4→3`, …). **Nunca saltar** niveles. Caso real confirmado (sin nombre acá): partió en 5 y validó en 3, de a uno. |
+| **Validación parcial** | Una misma cirugía, dos procedimientos / dos códigos (dos complejidades). En la **misma** solicitud una prestación puede validarse y la otra no. La parte validada **se sube igual a evweb**, sin esperar a que se resuelva la otra. |
+| **Sujeta a Auditoría** | No se actúa. Esperar a que APROSS resuelva (pasa a Validada o Rechazada). |
+
+Esto cierra el ciclo de vida documentado de P4. Sigue sin parser de
+foto, sin content script y sin estados en la foja.
 
 #### Nueva Solicitud — campos (confirmado Huerta)
 

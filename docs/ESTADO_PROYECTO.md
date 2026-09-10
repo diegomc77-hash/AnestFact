@@ -105,11 +105,13 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- **P4 Traditum:** reconocimiento de Nueva Solicitud anotado en `docs/ROADMAP_ESCALAMIENTO.md`. **Sin código.** Pendiente con Huerta: qué hacer al consultar Sujeta a Auditoría / Rechazada.
+- **P4 Traditum:** ciclo de vida + mapa Nueva Solicitud en `docs/ROADMAP_ESCALAMIENTO.md`. **Sin código.** Hueco a diseñar (no codear): estado tipo «Pendiente de autorizar en Traditum».
 - **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo 12.62 / 0.5.15). PWA **12.64** ya en origin (`7b3cc99`); recargar Pages aparte.
 - Ext **0.5.15** en origin/main (`5c874f8`) como backup. El viernes: recargar local en `chrome://extensions`.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-09-10 — Roadmap **P4**: ciclo de vida Traditum (foto → Nueva Solicitud → consultar; Validada / rechazo de a un nivel / validación parcial / auditoría). Hueco: estado «Pendiente de autorizar en Traditum». Solo doc. Sin nombres de pacientes ni credenciales.
 
 - 2026-09-10 — Roadmap **P4**: mapa Nueva Solicitud Traditum (IDs ASP.NET, fuentes afiliado/diagnóstico/práctica `1601`+comp, cross-origin `aprossgestores`). Solo doc; 0 automatización. Sin nombres de pacientes ni credenciales.
 
