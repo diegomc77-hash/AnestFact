@@ -483,10 +483,57 @@ matrícula **32393**. El prescriptor **no** es el cirujano.
 | Observaciones | `bodyContent_NTE_txtObservacion01` | Texto libre: qué cirugía hizo el cirujano |
 | Enviar | `bodyContent_btnAceptar` | Envía la solicitud |
 
+#### Catálogo evweb (ADAARC) — referencia permanente
+
+Extracción 2026-09-12 de los desplegables reales
+`select#body_cboObraSocial` y `select#body_cboSanatorios` en
+`frmCargaDeIntervencion.aspx?accion=agregar` (`adaarc.evweb.com.ar`).
+
+Archivo completo (307 obras sociales + 397 sanatorios, Córdoba):
+`docs/evweb_catalogo_completo.md`. Formato
+`value_interno|código_visible - Nombre` — el `value` HTML ≠ el código
+visible (ej. APROSS: `259` interno / `300` en pantalla).
+
+Al inicio del archivo: tabla de entradas de la práctica Huerta
+(APROSS, PAMI+Mayo, Mayo, Aeronáutico — typo real **HOSPITA** sin L,
+no corregir al automatizar —, OSPA, IOSFA, APOS+Mayo, Allende, 3 ART).
+Solo referencia; **no** codear fill de evweb desde acá.
+
+#### Carga en evweb — mecánica por obra social (confirmado 2026-09-12)
+
+Prueba en vivo en `frmCargaDeIntervencion.aspx` (modo agregar),
+cambiando la obra social:
+
+| Obra social (value interno) | ¿Campo «Transacción N°»? |
+|---|---|
+| APROSS (`259`) | **Sí** |
+| PAMI Sanatorio Mayo (`382`) | No |
+| Federación Patronal ART (`228`) | No |
+| IOSFA (`105`) | No |
+| SIPSSA-OSPA (`31`) | No |
+
+**Confirmado:** «Transacción N°» es **exclusivo de APROSS**. El resto
+muestra la misma sección genérica «Documentación electrónica»
+(Seleccionar archivos… / Cargar), **sin** etiqueta obligatoria distinta
+entre obras. Traditum + N° de Transacción = paso extra **solo** APROSS;
+la mecánica de adjuntos en evweb es la misma para las demás.
+
+**Corrección:** la etiqueta «AUTORIZACIÓN DE OBRA SOCIAL» vista en un
+caso APROSS ya cargado (modo *ver*) **no** aparece como campo fijo en
+modo *agregar*, ni siquiera en APROSS. Probable nombre escrito a mano
+al subir ese PDF — **no** darlo por etiqueta del sistema hasta ver más
+casos.
+
+**Pregunta abierta (humana, no software):** ¿hay forma de conseguir
+autorizaciones de obra social sin depender de la secretaria del
+sanatorio (p. ej. auditores de la asociación)? Que Huerta lo converse
+con ADAARC; no se resuelve en código.
+
 #### No es
 
 - No es `fill.js` ni IDs GECLISA.
-- No es evweb ADAARC (eso viene **después** de `validado`).
+- No es fill automático de evweb (eso viene **después** de `validado`
+  en APROSS; en el resto, sin Traditum).
 - No hay parser de foto ni content script todavía.
 
 ### P5 — Bloqueados / no ahora
