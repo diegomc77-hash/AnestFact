@@ -11,7 +11,7 @@ function adminClient() {
 }
 
 /**
- * Público: cabecera fojaQx para el cirujano (sin formulario aún — stub).
+ * Público: cabecera fojaQx para el cirujano (incl. horas si vienen en el token).
  * Rechaza tokens que no sean modo foja_qx.
  */
 Deno.serve(async (req) => {
@@ -55,9 +55,10 @@ Deno.serve(async (req) => {
     paciente: String(ctx.paciente || ctx.pac || '').trim(),
     dni: String(ctx.dni || '').trim(),
     fecha: String(ctx.fecha || '').trim(),
+    hora_ini: String(ctx.hora_ini || ctx.hora || '').trim(),
+    hora_fin: String(ctx.hora_fin || '').trim(),
     diag: String(ctx.diag || '').trim(),
     inter_id: String(ctx.inter_id || '').trim(),
     expires_at: qr.expires_at,
-    stub: true,
   });
 });

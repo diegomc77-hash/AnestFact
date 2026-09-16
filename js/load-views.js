@@ -44,6 +44,9 @@
         if (typeof renderHome === 'function') renderHome();
       });
     }
+    if (typeof afSyncFojaQxPull === 'function') {
+      afSyncFojaQxPull();
+    }
     if (typeof initAutoSync === 'function') initAutoSync();
     if (typeof planBadgeText === 'function') {
       var pb = document.getElementById('plan-badge');
@@ -73,7 +76,7 @@
   }
 
   function fetchHtml(url) {
-      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.68';
+      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.69';
     return fetch(bust).then(function (r) {
       if (!r.ok) throw new Error(url + ' HTTP ' + r.status);
       return r.text();

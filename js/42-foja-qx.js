@@ -4,6 +4,16 @@
  */
 function cargarFojaQxUI() {
   if (!S.cur) return;
+  if (typeof afSyncFojaQxPull === 'function') {
+    afSyncFojaQxPull().then(function () {
+      if (S.cur) _cargarFojaQxUIDom();
+    });
+  }
+  _cargarFojaQxUIDom();
+}
+
+function _cargarFojaQxUIDom() {
+  if (!S.cur) return;
   if (typeof afEnsureFojaQx === 'function') afEnsureFojaQx(S.cur);
   var i = S.cur;
   var f = i.foja || {};
@@ -27,31 +37,57 @@ function cargarFojaQxUI() {
   setTxt('qx-ciru', i.ciru);
   setTxt('qx-diag', i.diag);
 
+  var firmada = !!qx.firmada;
   var textoEl = document.getElementById('qx-texto');
   if (textoEl) {
     var t = qx.texto != null ? String(qx.texto).trim() : '';
-    textoEl.textContent = t || '(vacío — proformas en un paso posterior)';
+    textoEl.textContent = t || (firmada ? '(sin texto)' : '(vacío — proformas en un paso posterior)');
     textoEl.style.color = t ? 'var(--text)' : 'var(--text3)';
   }
 
-  var firmada = !!qx.firmada;
   var est = document.getElementById('qx-estado');
-  if (est) est.textContent = firmada ? 'Firmada / sellada' : 'Borrador (cáscara)';
+  if (est) {
+    est.textContent = firmada
+      ? ('Firmada / sellada' + (qx.firmada_at ? ' · ' + new Date(qx.firmada_at).toLocaleString('es-AR') : ''))
+      : 'Borrador (cáscara)';
+  }
   var ft = document.getElementById('qx-firmada-txt');
-  if (ft) ft.textContent = firmada ? 'firmada' : 'no firmada';
+  if (ft) {
+    if (firmada && qx.firma && qx.firma.nombre) {
+      ft.textContent = 'firmada · ' + qx.firma.nombre + (qx.firma.mp ? ' · MP ' + qx.firma.mp : '');
+    } else {
+      ft.textContent = firmada ? 'firmada' : 'no firmada';
+    }
+  }
 }
 
 /**
  * Copia superficial sin fojaQx si el sanatorio tiene flag off.
- * No muta la intervención local (localStorage puede seguir teniendo stub inerte).
+ * Con flag on: omite firma.png del payload nube (data URL pesada).
+ * No muta la intervención local.
  */
 function afIntervPayloadForSync(inter) {
   if (!inter) return inter;
-  if (typeof afFojaQxEnabled === 'function' && afFojaQxEnabled(inter.san)) return inter;
+  if (typeof afFojaQxEnabled === 'function' && afFojaQxEnabled(inter.san)) {
+    if (!inter.fojaQx || typeof inter.fojaQx !== 'object') return inter;
+    if (!inter.fojaQx.firma || !inter.fojaQx.firma.png) return inter;
+    var outOn = {};
+    for (var k in inter) {
+      if (!Object.prototype.hasOwnProperty.call(inter, k)) continue;
+      if (k === 'fojaQx') {
+        outOn.fojaQx = typeof afFojaQxForSyncPayload === 'function'
+          ? afFojaQxForSyncPayload(inter.fojaQx)
+          : inter.fojaQx;
+      } else {
+        outOn[k] = inter[k];
+      }
+    }
+    return outOn;
+  }
   if (!Object.prototype.hasOwnProperty.call(inter, 'fojaQx')) return inter;
   var out = {};
-  for (var k in inter) {
-    if (Object.prototype.hasOwnProperty.call(inter, k) && k !== 'fojaQx') out[k] = inter[k];
+  for (var k2 in inter) {
+    if (Object.prototype.hasOwnProperty.call(inter, k2) && k2 !== 'fojaQx') out[k2] = inter[k2];
   }
   return out;
 }
@@ -130,7 +166,7 @@ function mostrarModalQrFojaQx(data) {
   var exp = data.expires_at ? new Date(data.expires_at).toLocaleString('es-AR') : '';
   if (meta) {
     meta.textContent = (S.cur && S.cur.san ? S.cur.san + ' · ' : '') +
-      'un uso' + (exp ? ' · vence ' + exp : ' · 48 h') +
+      'un uso' + (exp ? ' · vence ' + exp : ' · 7 días') +
       ' · regenerar invalida el anterior';
   }
   var inp = document.getElementById('qr-qx-url');
@@ -185,6 +221,7 @@ function crearQrFojaQx() {
   }
   if (typeof afEnsureFojaQx === 'function') afEnsureFojaQx(S.cur);
 
+  var f = S.cur.foja || {};
   var contexto = {
     modo: 'foja_qx',
     max_uses: 1,
@@ -197,6 +234,9 @@ function crearQrFojaQx() {
     pac: S.cur.pac || '',
     dni: S.cur.dni || '',
     fecha: S.cur.fecha || '',
+    hora_ini: S.cur.hora || f.inicio || '',
+    hora_fin: f.fin || '',
+    hora: S.cur.hora || f.inicio || '',
     diag: S.cur.diag || '',
   };
 

@@ -51,11 +51,12 @@
     'js/37-firma-certificada.js',
     'js/38-sesiones.js',
     'js/42-foja-qx.js',
+    'js/43-foja-qx-sync.js',
     'js/load-views.js',
     'js/24-sw-register.js'
   ];
 
-  var CACHE_V = '12.68';
+  var CACHE_V = '12.69';
   window.AF_CACHE_V = CACHE_V;
   try { document.title = 'AnesFact v' + CACHE_V; } catch (eTit) {}
 

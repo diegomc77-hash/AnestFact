@@ -1,9 +1,8 @@
 # P2 — QR cirujano / `fojaQx` (diseño confirmado)
 
-**Estado (2026-09-16):** Paso 1 OK prod. **Paso 2.1 CERRADO en prod**
-(Pages 12.68 + Edge `af-qx-create`/`peek` + filtros `af-qr-*`). Smokes Diego:
-valoración «prueba», stub fojaQx, cruce 403×2. Siguiente: formulario/firma
-(entregas posteriores).
+**Estado (2026-09-16):** Paso 1–2.1 CERRADOS en prod. **Paso 2.2 en curso**
+(formulario+firma+`af-qx-submit`+pull). A–E OK Diego. Parte 1 SQL local
+(`022_foja_qx.sql`) — sin apply prod aún.
 
 Índice: `docs/ESTADO_PROYECTO.md` · Marco: `docs/ROADMAP_ESCALAMIENTO.md`.
 
@@ -95,7 +94,22 @@ iniciando foja quirúrgica sin intervención previa de anestesia — ver
 nota en `docs/ROADMAP_ESCALAMIENTO.md` § P2. Hoy fojaQx sigue atada a
 intervención nacida del flujo anestesia.
 
-## Paso 2.1 (esta entrega)
+## Paso 2.2 (en curso)
+
+A–E confirmados (cáscara completa sin CIE; sin proformas; canvas+MP;
+pull+sync misma entrega; contrato sync con diff literal + smoke «prueba»).
+
+- Parte 1: `022_foja_qx.sql` — **aplicada en prod** (tabla + RLS).
+- Parte 2 (código local): `af-qx-submit`; peek con `hora_ini`/`hora_fin`;
+  create contexto desde app con horas.
+- Parte 3 OK Diego: `foja-qx.html` form+canvas+submit; TTL foja_qx **7 días**.
+- Parte 4 (código local): `js/43-foja-qx-sync.js` pull → `S.cur.fojaQx`;
+  omite `firma.png` en sync nube; hook initApp + al abrir fojaQx.
+  **`js/17-sync-export.js` sin cambios** (usa `afIntervsPayloadForSync` ya existente).
+- **Pendiente:** bump CACHE_V + deploy Edge (`af-qx-submit`, `af-qx-peek`,
+  `af-qx-create` 7d) + Pages + smoke «prueba».
+
+## Paso 2.1 (cerrado)
 
 - Reutiliza `anesfact_qr_tokens` con `contexto.modo = 'foja_qx'`.
 - Edge nuevas: `af-qx-create`, `af-qx-peek`.
@@ -106,7 +120,7 @@ intervención nacida del flujo anestesia.
 
 ## No hacer aún
 
-- No `af-qx-submit` / formulario / firma (entregas siguientes).
+- No motor de proformas / slots / CIE (después de 2.2).
 - No inicio independiente de fojaQx sin intervención de anestesia
   (pendiente suite completa; ver ROADMAP).
 - No cambiar el flujo de valoración preop más allá del filtro de modo.

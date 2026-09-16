@@ -153,7 +153,7 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-08:
 
-- PWA `CACHE_V`: **12.68** local (Paso 2.1 QR cirujano; bumpear Pages al publicar)
+- PWA `CACHE_V`: **12.69** local (Paso 2.2 fojaQx form/firma/submit/pull; bumpear Pages al publicar)
 - Extensión GECLISA: **0.5.15** (origin/main `5c874f8`; recargar local el viernes)
 
 ## En curso
@@ -172,7 +172,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - **P2 Oftalmología (M18):** **OK de semilla** (`01-oftalmologia.md`). Validación criterio Diego/AnesFact (no oftalmólogo ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
 - **P2 Hemodinamia (M19):** **OK de semilla** §1–4 + §6 (`01-hemodinamia.md`). **§5 diferida** (solape M12; xref preferido; M12 no tocado). Validación criterio Diego/AnesFact — nota de cabecera se mantiene. Motor pendiente. 0 código.
 - **P2 Gastroenterología / endoscopia (M20):** **OK de semilla** (`01-endoscopia.md`). Validación criterio Diego/AnesFact (no gastroenterólogo ni Huerta) — nota de cabecera se mantiene. Sin solape real con CG. Motor pendiente. 0 código.
-- **P2 QR cirujano / fojaQx:** Paso 1 OK prod. **Paso 2.1 CERRADO en prod** (Pages 12.68 + Edge 5/5). Smokes OK Diego: (1) valoración «prueba» create/peek/submit; (2) QR cirujano Aero → stub cabecera; (3) cruce bidireccional 403. Siguiente: Paso 2.2+ (formulario/firma) cuando se pida.
+- **P2 QR cirujano / fojaQx:** Paso 1–2.1 CERRADOS. **Paso 2.2** en deploy (12.69 + Edge create/peek/submit) — smoke «prueba» pendiente Diego.
 - **P4 Traditum / evweb:** ciclo + mapa Nueva Solicitud + catálogo ADAARC (`docs/evweb_catalogo_completo.md`). **Sin código.** Hueco a diseñar: estado «Pendiente de autorizar en Traditum».
 - **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo 12.62 / 0.5.15). PWA **12.64** ya en origin (`7b3cc99`); recargar Pages aparte.
 - Ext **0.5.15** en origin/main (`5c874f8`) como backup. El viernes: recargar local en `chrome://extensions`.

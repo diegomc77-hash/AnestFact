@@ -12,7 +12,7 @@ function adminClient() {
 
 /**
  * QR cirujano / fojaQx — canal paralelo a af-qr-create.
- * Un solo uso · 48 h · invalida tokens foja_qx previos del mismo inter_id.
+ * Un solo uso · 7 días · invalida tokens foja_qx previos del mismo inter_id.
  */
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
   const token = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '');
   const hash = await tokenHash(token);
   const expires = new Date();
-  expires.setHours(expires.getHours() + 48);
+  expires.setDate(expires.getDate() + 7);
 
   const { data, error } = await admin
     .from('anesfact_qr_tokens')
