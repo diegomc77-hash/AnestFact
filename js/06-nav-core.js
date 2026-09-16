@@ -48,7 +48,7 @@ function afSetShellTitle(id){
   }
   var sec=document.getElementById('t-section');
   if(!sec)return;
-  var dockRoots={home:1,preop:1,sanatorios:1,geclisa:1,evweb:1,legales:1,herramientas:1};
+  var dockRoots={home:1,preop:1,sanatorios:1,geclisa:1,evweb:1,fojaQx:1,legales:1,herramientas:1};
   if(!id||dockRoots[id]){
     sec.textContent='';
     sec.style.display='none';
@@ -57,8 +57,8 @@ function afSetShellTitle(id){
   sec.textContent=(typeof TITLES!=='undefined'&&TITLES[id])?TITLES[id]:'';
   sec.style.display=sec.textContent?'block':'none';
 }
-var AF_DOCK_HIDE={foja:1,fojaQx:1,nueva:1,admin:1,facturacion:1,nom:1,resumen:1};
-var AF_DOCK_MAP={home:'home',preop:'preop',sanatorios:'sanatorios',geclisa:'geclisa',evweb:'evweb',legales:'legales',herramientas:'herramientas',escanear:'herramientas',config:'herramientas',ayuda:'herramientas'};
+var AF_DOCK_HIDE={foja:1,nueva:1,admin:1,facturacion:1,nom:1,resumen:1};
+var AF_DOCK_MAP={home:'home',preop:'preop',sanatorios:'sanatorios',geclisa:'geclisa',evweb:'evweb',fojaQx:'fojaQx',legales:'legales',herramientas:'herramientas',escanear:'herramientas',config:'herramientas',ayuda:'herramientas'};
 function afActiveViewId(){
   var el=document.querySelector('#views-mount .view.active');
   if(!el||!el.id)return '';
@@ -90,6 +90,7 @@ function afSyncDock(id){
     items[i].classList.toggle('active',items[i].getAttribute('data-dock')===active);
   }
   afSyncDockAlert();
+  if(typeof afSyncDockFojaQx==='function')afSyncDockFojaQx();
 }
 function goDock(id){
   try{
@@ -373,6 +374,11 @@ function onSanChange(){
   if(s==='Sanatorio Mayo')updateMayoCamas();
   if(typeof actualizarHintCirujano==='function')actualizarHintCirujano();
   if(typeof acCirujano==='function')acCirujano();
+  if(S.cur){
+    S.cur.san=s;
+    if(typeof afEnsureFojaQx==='function')afEnsureFojaQx(S.cur);
+  }
+  if(typeof afSyncDockFojaQx==='function')afSyncDockFojaQx();
 }
 function afSyncSalaInstUi(){
   var sanEl=document.getElementById('f-san');

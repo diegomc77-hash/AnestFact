@@ -457,15 +457,25 @@ M12 Vascular, xref preferido, M12 intacto).
 (`docs/cirugia-gastroenterologia/`; misma salvedad; sin solape CG).
 **Motor de código P2: pendiente** (gate §8 antes del primer commit).
 
-**P2 — QR cirujano / `fojaQx` (diseño 2026-09-16, 0 código):**
-`docs/P2_QR_CIRUJANO.md`. Canal paralelo (no tocar `af-qr-*` preop).
-Herramienta de suite (hermana de `foja`, no sub-función anestésica).
-**OK Huerta:** especialidad visible; nombre `fojaQx`; un solo uso;
-generación solo foja abierta; firma en celular; institución heredada.
-**Alcance:** Aero + públicos activos desde Paso 1 (públicos = solo
-documentación); Mayo off por ahora; gating = **flag por institución**
-(no `if` hardcodeado). Sync/export incluye `fojaQx` **solo** si el flag
-está on. Gate §8 Paso 1: revalidar en chat antes del primer diff.
+**P2 — QR cirujano / `fojaQx` (diseño 2026-09-16; Paso 1 en prod 12.66;
+dock Foja qx local 12.67):** `docs/P2_QR_CIRUJANO.md`. Canal paralelo
+(no tocar `af-qr-*` preop). Herramienta de suite (hermana de `foja`, no
+sub-función anestésica). **OK Huerta:** especialidad visible; nombre
+`fojaQx`; un solo uso; generación solo foja abierta; firma en celular;
+institución heredada. **Alcance:** Aero + públicos activos desde Paso 1
+(públicos = solo documentación); Mayo off por ahora; gating = **flag por
+institución** (no `if` hardcodeado). Sync/export incluye `fojaQx`
+**solo** si el flag está on.
+
+**P2 — Escalabilidad futura (no ahora):** hoy `fojaQx` es propiedad de la
+intervención, que siempre nace del flujo de anestesia; el cirujano no
+puede iniciar una foja quirúrgica sin esa intervención previa. Cuando
+exista la pantalla de entrada de suite completa (íconos independientes:
+Foja Anestésica, Foja Quirúrgica, evweb, GECLISA, Traditum), resolver de
+raíz para que **cualquiera de los dos roles** pueda iniciar el registro
+del paciente. Hasta entonces: fojaQx sigue dependiendo de intervención
+creada por anestesia — **no implementar** inicio independiente en este
+paso ni en el dock actual.
 
 **P2 — Coordinación anestesia ↔ qx (fase aparte, transversal):** diseño
 confirmado 2026-09-14. `S.cur.foja.consideraciones` aditivo; GECLISA lo

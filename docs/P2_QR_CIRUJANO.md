@@ -89,8 +89,14 @@ Contrato compartido (`MAPA_SECCIONES.md`): OK explícito antes de tocar
 
 ---
 
+**Pendiente futuro (escalabilidad; no implementar ahora):** cirujano
+iniciando foja quirúrgica sin intervención previa de anestesia — ver
+nota en `docs/ROADMAP_ESCALAMIENTO.md` § P2. Hoy fojaQx sigue atada a
+intervención nacida del flujo anestesia.
+
 ## No hacer aún
 
-- No Edge / PWA / tablas hasta OK al gate §8 Paso 1.
+- No QR cirujano / Edge hasta confirmación post-dock.
+- No inicio independiente de fojaQx sin intervención de anestesia
+  (pendiente suite completa; ver ROADMAP).
 - No modificar valoración preop.
-- No hardcodear gating a un solo nombre de sanatorio.

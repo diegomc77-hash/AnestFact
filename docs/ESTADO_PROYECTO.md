@@ -153,7 +153,7 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-08:
 
-- PWA `CACHE_V`: **12.66** local (Paso 1 fojaQx botón+sync omit; bumpear Pages al publicar)
+- PWA `CACHE_V`: **12.67** local (dock Foja qx; bumpear Pages al publicar)
 - Extensión GECLISA: **0.5.15** (origin/main `5c874f8`; recargar local el viernes)
 
 ## En curso
@@ -172,12 +172,16 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - **P2 Oftalmología (M18):** **OK de semilla** (`01-oftalmologia.md`). Validación criterio Diego/AnesFact (no oftalmólogo ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
 - **P2 Hemodinamia (M19):** **OK de semilla** §1–4 + §6 (`01-hemodinamia.md`). **§5 diferida** (solape M12; xref preferido; M12 no tocado). Validación criterio Diego/AnesFact — nota de cabecera se mantiene. Motor pendiente. 0 código.
 - **P2 Gastroenterología / endoscopia (M20):** **OK de semilla** (`01-endoscopia.md`). Validación criterio Diego/AnesFact (no gastroenterólogo ni Huerta) — nota de cabecera se mantiene. Sin solape real con CG. Motor pendiente. 0 código.
-- **P2 QR cirujano / fojaQx:** Paso 1 **cerrado en código** (12.66). Pausado: prueba en vivo Huerta (Aero/Córdoba) antes de Paso 2 QR. **0 código** hasta confirmación.
+- **P2 QR cirujano / fojaQx:** Paso 1 cerrado en vivo. Dock «Foja qx» (12.67) — esperando auditoría Diego.
 - **P4 Traditum / evweb:** ciclo + mapa Nueva Solicitud + catálogo ADAARC (`docs/evweb_catalogo_completo.md`). **Sin código.** Hueco a diseñar: estado «Pendiente de autorizar en Traditum».
 - **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo 12.62 / 0.5.15). PWA **12.64** ya en origin (`7b3cc99`); recargar Pages aparte.
 - Ext **0.5.15** en origin/main (`5c874f8`) como backup. El viernes: recargar local en `chrome://extensions`.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-09-16 — P2: nota ROADMAP escalabilidad futura — cirujano iniciando fojaQx sin intervención de anestesia (suite completa); no implementar ahora. Dock Foja qx en prueba local 12.67.
+
+- 2026-09-16 — P2 fojaQx: ítem dock «Foja qx» (siempre visible; disabled+toast sin foja / Mayo); fuera de `AF_DOCK_HIDE`; `onSanChange` actualiza `S.cur.san` + sync dock. CACHE_V **12.67**. Sin QR. Aviso: bump SW al publicar.
 
 - 2026-09-16 — P2 fojaQx Paso 1 **cerrado** (entregas 1–4 OK Diego). Pausa hasta prueba en vivo Huerta (Aero/Córdoba: botón, cáscara, Mayo sin botón, sync). Paso 2 QR no arranca sin esa confirmación.
 

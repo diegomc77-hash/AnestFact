@@ -218,6 +218,8 @@ body.has-dock #views-mount .view.active{padding-bottom:var(--dock-clear)}
 .dock-item .dock-lbl{font-size:var(--dock-lbl,12px);font-weight:600;letter-spacing:.01em;white-space:nowrap}
 .dock-item.active{background:rgba(34,197,94,.14);color:var(--green)}
 .dock-item.active svg{stroke:currentColor}
+.dock-item.is-disabled{opacity:.4}
+.dock-item.is-disabled:not(.active){color:var(--text3)}
 .dock-item .dock-alert{display:none;position:absolute;top:4px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--red);border:1px solid var(--bg)}
 .dock-item .dock-alert.on{display:block}
 .tile-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}

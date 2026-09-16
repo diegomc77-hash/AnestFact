@@ -59,3 +59,18 @@ function afIntervPayloadForSync(inter) {
 function afIntervsPayloadForSync(list) {
   return (list || []).map(afIntervPayloadForSync);
 }
+
+/**
+ * Dock «Foja qx»: siempre visible; disabled + toast vía go() si no hay
+ * S.cur usable o institución con foja_qx off (Mayo).
+ */
+function afSyncDockFojaQx() {
+  var btn = document.querySelector('#af-dock .dock-item[data-dock="fojaQx"]');
+  if (!btn) return;
+  var ok = !!(S.cur && typeof afFojaQxEnabled === 'function' && afFojaQxEnabled(S.cur.san));
+  btn.classList.toggle('is-disabled', !ok);
+  btn.setAttribute('aria-disabled', ok ? 'false' : 'true');
+  if (!S.cur) btn.title = 'Abrí una intervención primero';
+  else if (!ok) btn.title = 'Foja quirúrgica no habilitada en esta institución';
+  else btn.title = 'Foja quirúrgica';
+}
