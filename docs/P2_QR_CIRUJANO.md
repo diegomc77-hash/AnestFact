@@ -1,8 +1,9 @@
 # P2 — QR cirujano / `fojaQx` (diseño confirmado)
 
-**Estado (2026-09-16):** Paso 1 OK prod. **Paso 2.1 código** (create+peek+stub
-+filtros modo + UI QR + `tools/test-qr-modo.mjs`) — commit/push OK Diego.
-**Edge deploy pendiente** (bajo tráfico + smoke paciente «prueba» obligatorio).
+**Estado (2026-09-16):** Paso 1 OK prod. **Paso 2.1 CERRADO en prod**
+(Pages 12.68 + Edge `af-qx-create`/`peek` + filtros `af-qr-*`). Smokes Diego:
+valoración «prueba», stub fojaQx, cruce 403×2. Siguiente: formulario/firma
+(entregas posteriores).
 
 Índice: `docs/ESTADO_PROYECTO.md` · Marco: `docs/ROADMAP_ESCALAMIENTO.md`.
 
