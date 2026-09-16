@@ -1,8 +1,8 @@
 # P2 — QR cirujano / `fojaQx` (diseño confirmado)
 
-**Estado (2026-09-16):** Paso 1 **cerrado en código** (flag, stub,
-cáscara, botón, sync omit). Pausado hasta prueba en vivo Dra. Huerta
-(Aero/Córdoba). **Paso 2 (QR) no arranca** sin esa confirmación.
+**Estado (2026-09-16):** Paso 1 OK prod. **Paso 2.1 código** (create+peek+stub
++filtros modo + UI QR + `tools/test-qr-modo.mjs`) — commit/push OK Diego.
+**Edge deploy pendiente** (bajo tráfico + smoke paciente «prueba» obligatorio).
 
 Índice: `docs/ESTADO_PROYECTO.md` · Marco: `docs/ROADMAP_ESCALAMIENTO.md`.
 
@@ -94,9 +94,18 @@ iniciando foja quirúrgica sin intervención previa de anestesia — ver
 nota en `docs/ROADMAP_ESCALAMIENTO.md` § P2. Hoy fojaQx sigue atada a
 intervención nacida del flujo anestesia.
 
+## Paso 2.1 (esta entrega)
+
+- Reutiliza `anesfact_qr_tokens` con `contexto.modo = 'foja_qx'`.
+- Edge nuevas: `af-qx-create`, `af-qx-peek`.
+- Edge valoración endurecidas (misma entrega): `af-qr-peek` /
+  `af-qr-submit` / `af-qr-create` rechazan tokens `foja_qx`.
+- UI: botón «QR cirujano» + modal; stub público `foja-qx.html`.
+- Al regenerar: invalida tokens `foja_qx` previos del mismo `inter_id`.
+
 ## No hacer aún
 
-- No QR cirujano / Edge hasta confirmación post-dock.
+- No `af-qx-submit` / formulario / firma (entregas siguientes).
 - No inicio independiente de fojaQx sin intervención de anestesia
   (pendiente suite completa; ver ROADMAP).
-- No modificar valoración preop.
+- No cambiar el flujo de valoración preop más allá del filtro de modo.

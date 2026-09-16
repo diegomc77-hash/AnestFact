@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Foja Quirúrgica — AnesFact</title>
+<meta name="theme-color" content="#22c55e">
+<link rel="stylesheet" href="styles.css?v=12.68">
+<style>
+  body{max-width:520px;margin:0 auto;padding:16px;padding-bottom:48px}
+  .qx-err{display:none;padding:24px 16px;text-align:center}
+  .qx-ok{display:none}
+  .qx-banner{background:rgba(20,184,166,.1);border:1px solid rgba(20,184,166,.35);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:14px;line-height:1.45;color:var(--text)}
+</style>
+</head>
+<body>
+<div class="lockup" style="margin-bottom:16px">
+  <div class="syringe-badge" aria-hidden="true">&#128137;</div>
+  <div class="lockup-text">
+    <div class="brand">AnesFact</div>
+    <div class="tag">Foja Quirúrgica · QR cirujano</div>
+  </div>
+</div>
+
+<div id="qx-pub-err" class="qx-err card">
+  <div class="err-title" id="qx-pub-err-title">Enlace no válido</div>
+  <p class="err-msg" id="qx-pub-err-msg" style="margin-top:8px"></p>
+</div>
+
+<div id="qx-pub-ok" class="qx-ok">
+  <div class="qx-banner">
+    Stub de lectura (entrega 2.1). El formulario y la firma llegan en entregas siguientes.
+  </div>
+  <div class="card">
+    <div class="ct">FOJA QUIRÚRGICA</div>
+    <div id="qx-pub-san" style="font-size:13px;color:var(--text2);margin:6px 0 12px">—</div>
+    <div class="field"><label>Especialidad</label><div class="fi" id="qx-pub-serv" style="background:var(--bg2);font-size:16px;font-weight:600">—</div></div>
+    <div class="g2">
+      <div class="field"><label>Paciente</label><div class="fi" id="qx-pub-pac" style="background:var(--bg2)">—</div></div>
+      <div class="field"><label>DNI</label><div class="fi" id="qx-pub-dni" style="background:var(--bg2)">—</div></div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>Cirujano</label><div class="fi" id="qx-pub-ciru" style="background:var(--bg2)">—</div></div>
+      <div class="field"><label>Fecha</label><div class="fi" id="qx-pub-fecha" style="background:var(--bg2)">—</div></div>
+    </div>
+    <div class="field"><label>Diagnóstico / operación</label><div class="fi" id="qx-pub-diag" style="background:var(--bg2)">—</div></div>
+  </div>
+</div>
+
+<script src="js/supabase-keepalive.js?v=12.68"></script>
+<script src="js/00-env.js?v=12.68"></script>
+<script>
+(function () {
+  function $(id) { return document.getElementById(id); }
+  function showErr(title, msg) {
+    $('qx-pub-ok').style.display = 'none';
+    $('qx-pub-err').style.display = 'block';
+    $('qx-pub-err-title').textContent = title || 'Enlace no válido';
+    $('qx-pub-err-msg').textContent = msg || '';
+  }
+  function setTxt(id, v) {
+    var el = $(id);
+    if (!el) return;
+    var s = v == null ? '' : String(v).trim();
+    el.textContent = s || '—';
+  }
+  var params = new URLSearchParams(location.search);
+  var token = (params.get('t') || '').trim();
+  if (!token) {
+    showErr('Sin token', 'Abrí el enlace completo del QR generado en AnesFact.');
+    return;
+  }
+  var url = (typeof afSupabaseUrl === 'function' ? afSupabaseUrl() : '') + '/functions/v1/af-qx-peek';
+  fetch(url, {
+    method: 'POST',
+    headers: afSupabaseHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ token: token }),
+  })
+    .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+    .then(function (res) {
+      if (!res.ok || !res.j.ok) {
+        throw new Error((res.j && res.j.error) || 'No se pudo leer el enlace');
+      }
+      $('qx-pub-err').style.display = 'none';
+      $('qx-pub-ok').style.display = 'block';
+      setTxt('qx-pub-san', res.j.sanatorio);
+      setTxt('qx-pub-serv', res.j.especialidad);
+      setTxt('qx-pub-pac', res.j.paciente);
+      setTxt('qx-pub-dni', res.j.dni);
+      setTxt('qx-pub-ciru', res.j.cirujano);
+      setTxt('qx-pub-fecha', res.j.fecha);
+      setTxt('qx-pub-diag', res.j.diag);
+    })
+    .catch(function (err) {
+      showErr('No se pudo abrir', err.message || 'Error de red');
+    });
+})();
+</script>
+</body>
+</html>

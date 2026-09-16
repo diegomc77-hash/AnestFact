@@ -11,9 +11,8 @@ function adminClient() {
 }
 
 /**
- * Público: el paciente ve el lugar del QR sin PII.
- * Nunca completa sanatorio con Mayo — vacío si el token no trae lugar.
- * Rechaza tokens modo foja_qx (canal cirujano).
+ * Público: cabecera fojaQx para el cirujano (sin formulario aún — stub).
+ * Rechaza tokens que no sean modo foja_qx.
  */
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -33,23 +32,32 @@ Deno.serve(async (req) => {
   const admin = adminClient();
   const { data: qr, error } = await admin
     .from('anesfact_qr_tokens')
-    .select('expires_at, activo, contexto')
+    .select('expires_at, activo, max_uses, uses_count, contexto')
     .eq('token_hash', hash)
     .maybeSingle();
 
   if (error) return jsonResponse({ error: error.message }, 500);
   if (!qr || !qr.activo) return jsonResponse({ error: 'Enlace inválido o desactivado' }, 403);
   if (new Date(qr.expires_at) < new Date()) return jsonResponse({ error: 'Enlace expirado' }, 403);
+  if (qr.uses_count >= qr.max_uses) return jsonResponse({ error: 'Enlace agotado (ya fue usado)' }, 403);
 
   const ctx = (qr.contexto || {}) as Record<string, unknown>;
-  if (isFojaQxToken(ctx)) {
-    return jsonResponse({ error: 'Este enlace es de Foja Quirúrgica, no de valoración' }, 403);
+  if (!isFojaQxToken(ctx)) {
+    return jsonResponse({ error: 'Este enlace no es de Foja Quirúrgica' }, 403);
   }
 
-  const sanatorio = String(ctx.sanatorio || '').trim();
   return jsonResponse({
     ok: true,
-    sanatorio,
+    modo: 'foja_qx',
+    sanatorio: String(ctx.sanatorio || '').trim(),
+    especialidad: String(ctx.especialidad || ctx.serv || '').trim(),
+    cirujano: String(ctx.cirujano || '').trim(),
+    paciente: String(ctx.paciente || ctx.pac || '').trim(),
+    dni: String(ctx.dni || '').trim(),
+    fecha: String(ctx.fecha || '').trim(),
+    diag: String(ctx.diag || '').trim(),
+    inter_id: String(ctx.inter_id || '').trim(),
     expires_at: qr.expires_at,
+    stub: true,
   });
 });

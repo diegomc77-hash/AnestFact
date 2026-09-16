@@ -1,6 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
 import { dniHash, encryptField, normalizeDni, tokenHash } from '../_shared/crypto.ts';
+import { isFojaQxToken } from '../_shared/qr-modo.ts';
 import { evaluarReglas } from '../_shared/rules.ts';
 
 function adminClient() {
@@ -72,6 +73,11 @@ Deno.serve(async (req) => {
   if (!qr || !qr.activo) return jsonResponse({ error: 'Enlace inválido o desactivado' }, 403);
   if (new Date(qr.expires_at) < new Date()) return jsonResponse({ error: 'Enlace expirado' }, 403);
   if (qr.uses_count >= qr.max_uses) return jsonResponse({ error: 'Enlace agotado (ya fue usado)' }, 403);
+
+  const ctxQr = (qr.contexto || {}) as Record<string, unknown>;
+  if (isFojaQxToken(ctxQr)) {
+    return jsonResponse({ error: 'Este enlace es de Foja Quirúrgica, no de valoración' }, 403);
+  }
 
   const ownerId = qr.owner_id;
   const dbIn = (body.datos_basicos || {}) as Record<string, unknown>;

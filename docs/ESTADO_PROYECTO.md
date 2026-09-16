@@ -153,7 +153,7 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-08:
 
-- PWA `CACHE_V`: **12.67** local (dock Foja qx; bumpear Pages al publicar)
+- PWA `CACHE_V`: **12.68** local (Paso 2.1 QR cirujano; bumpear Pages al publicar)
 - Extensión GECLISA: **0.5.15** (origin/main `5c874f8`; recargar local el viernes)
 
 ## En curso
@@ -172,12 +172,16 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - **P2 Oftalmología (M18):** **OK de semilla** (`01-oftalmologia.md`). Validación criterio Diego/AnesFact (no oftalmólogo ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
 - **P2 Hemodinamia (M19):** **OK de semilla** §1–4 + §6 (`01-hemodinamia.md`). **§5 diferida** (solape M12; xref preferido; M12 no tocado). Validación criterio Diego/AnesFact — nota de cabecera se mantiene. Motor pendiente. 0 código.
 - **P2 Gastroenterología / endoscopia (M20):** **OK de semilla** (`01-endoscopia.md`). Validación criterio Diego/AnesFact (no gastroenterólogo ni Huerta) — nota de cabecera se mantiene. Sin solape real con CG. Motor pendiente. 0 código.
-- **P2 QR cirujano / fojaQx:** Paso 1 cerrado en vivo. Dock «Foja qx» (12.67) — esperando auditoría Diego.
+- **P2 QR cirujano / fojaQx:** Paso 1 OK prod. **Paso 2.1 código en push** (af-qx-create/peek, filtros modo, stub `foja-qx.html`, UI QR, test-qr-modo) — **Edge deploy pendiente** (horario bajo tráfico + smoke «prueba» obligatorio post-deploy; avisar antes).
 - **P4 Traditum / evweb:** ciclo + mapa Nueva Solicitud + catálogo ADAARC (`docs/evweb_catalogo_completo.md`). **Sin código.** Hueco a diseñar: estado «Pendiente de autorizar en Traditum».
 - **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo 12.62 / 0.5.15). PWA **12.64** ya en origin (`7b3cc99`); recargar Pages aparte.
 - Ext **0.5.15** en origin/main (`5c874f8`) como backup. El viernes: recargar local en `chrome://extensions`.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-09-16 — P2 fojaQx **Paso 2.1 listo local** (sin commit): `af-qx-create`/`af-qx-peek`; filtros `modo` en `af-qr-peek`/`submit`/`create`; stub `foja-qx.html`; botón+modal QR; invalida token previo; CACHE_V **12.68**. Checker OK. Edge deploy aparte tras OK.
+
+- 2026-09-16 — P2 fojaQx Paso 1 **OK prod** (Huerta/Diego): cáscara Aero, Mayo sin botón, dock «Foja qx» visible×8 ítems (v12.67). Falso positivo `#af-dock` null = timing pre-montaje topbar. Paso 2 QR no arranca sin pedido explícito.
 
 - 2026-09-16 — P2: nota ROADMAP escalabilidad futura — cirujano iniciando fojaQx sin intervención de anestesia (suite completa); no implementar ahora. Dock Foja qx en prueba local 12.67.
 
