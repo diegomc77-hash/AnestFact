@@ -62,7 +62,59 @@ Prueba con nombre **prueba** y DNI ficticio cuando se pueda; en Mayo real, no co
 | Archivo | Qué trata (una frase) |
 |---|---|
 | `docs/DISENO_PC_HOME.md` | **Home por institución, no por foja** (PC primero, misma lógica en móvil; PC hoy = columna 520px). Leer el archivo completo antes de tocar Home/dock/layout. |
-| `docs/ROADMAP_ESCALAMIENTO.md` | Fases P/U + empaquetado + P1b GET GECLISA + **P4 Traditum** (reconocimiento 2026-09-10, sin código) + **P6 buzón auth** (idea). |
+| `docs/ROADMAP_ESCALAMIENTO.md` | Fases P/U + empaquetado + P1b GET GECLISA + **P4 Traditum** (reconocimiento 2026-09-10, sin código) + **P6 buzón auth** (idea) + **P2 regla organización catálogo** (sin duplicar especialidades). |
+| `docs/P2_QR_CIRUJANO.md` | P2 QR cirujano / `fojaQx`: OK Huerta + alcance Aero/públicos/Mayo (flag); gate §8 Paso 1 en auditoría. |
+| `docs/P2_PROFORMAS_CYC.md` | Puntero → `docs/proformas-cyc/` (CyC). No editar clínica acá. |
+| `docs/proformas-cyc/README.md` | P2 CyC: **13 proformas OK de semilla**; motor de código pendiente. |
+| `docs/proformas-cyc/HALLAZGOS_ESQUELETO.md` | Tracking ampliaciones CyC post-OK (CEBC P7 ↔ Neuro M14). |
+| `docs/proformas-cyc/07-nariz-senos.md` | CyC P7 Nariz/Senos: OK + ampliación CEBC cierre (xref Neuro). |
+| `docs/cirugia-general/README.md` | P2 Cirugía General: **OK de semilla set** (M1–M6) + nota `foja.consideraciones`. |
+| `docs/cirugia-general/HALLAZGOS_ESQUELETO.md` | Hallazgos CG + handoffs unificados; **OK set** (2026-09-14). |
+| `docs/cirugia-general/01-pared-abdominal.md` | M1 Pared: **OK de semilla**. |
+| `docs/cirugia-general/02-gastrointestinal.md` | M2 GI: **OK de semilla**. |
+| `docs/cirugia-general/03-pancreato-biliar.md` | M3 Pancreato-biliar: **OK de semilla**. |
+| `docs/cirugia-general/04-proctologia.md` | M4 Proctología: **OK de semilla**. |
+| `docs/cirugia-general/05-retroperitoneo.md` | M5 Retroperitoneo: **OK de semilla**. |
+| `docs/cirugia-general/06-esofagogastrico.md` | M6 Esofagogástrico/Bariátrica/Hernias: **OK de semilla**. |
+| `docs/cirugia-toracica/README.md` | P2 Cirugía Torácica: **OK de semilla** + nota validación ≠ CyC/CG. |
+| `docs/cirugia-toracica/HALLAZGOS_ESQUELETO.md` | Tracking Tórax; salvedad validación (Diego, no torácico). |
+| `docs/cirugia-toracica/01-torax.md` | Tórax: **OK de semilla** (criterio Diego; no Huerta/torácico). |
+| `docs/cirugia-urologica/README.md` | P2 Cirugía Urológica: **OK de semilla** + nota validación ≠ CyC/CG. |
+| `docs/cirugia-urologica/HALLAZGOS_ESQUELETO.md` | Tracking Urología; salvedad validación (Diego, no urólogo). |
+| `docs/cirugia-urologica/01-urologia.md` | Urología: **OK de semilla** (criterio Diego; no Huerta/urólogo). |
+| `docs/cirugia-ginecologica/README.md` | P2 Cirugía Ginecológica: **OK de semilla** + nota validación ≠ CyC/CG. |
+| `docs/cirugia-ginecologica/HALLAZGOS_ESQUELETO.md` | Tracking Ginecología; salvedad validación (Diego, no ginecóloga). |
+| `docs/cirugia-ginecologica/01-ginecologia.md` | Ginecología: **OK de semilla** (criterio Diego; no Huerta/ginecóloga). |
+| `docs/cirugia-traumatologia/README.md` | P2 Traumatología: **OK de semilla** + nota validación ≠ CyC/CG. |
+| `docs/cirugia-traumatologia/HALLAZGOS_ESQUELETO.md` | Tracking Traumatología; salvedad validación (Diego, no traumatólogo). |
+| `docs/cirugia-traumatologia/01-traumatologia.md` | Traumatología: **OK de semilla** (criterio Diego; no Huerta/traumatólogo). |
+| `docs/cirugia-vascular/README.md` | P2 Vascular: **OK de semilla** + nota validación ≠ CyC/CG. |
+| `docs/cirugia-vascular/HALLAZGOS_ESQUELETO.md` | Tracking Vascular; salvedad validación (Diego, no cirujano vascular). |
+| `docs/cirugia-vascular/01-vascular.md` | Vascular: **OK de semilla** (criterio Diego; no Huerta/vascular). |
+| `docs/cirugia-plastica/README.md` | P2 Plástica: **OK de semilla** + nota validación ≠ CyC/CG. |
+| `docs/cirugia-plastica/HALLAZGOS_ESQUELETO.md` | Tracking Plástica; salvedad validación (Diego, no cirujano plástico); Surcolateral abierto. |
+| `docs/cirugia-plastica/01-plastica.md` | Plástica: **OK de semilla** (criterio Diego; no Huerta/plástico). |
+| `docs/cirugia-neurocirugia/README.md` | P2 Neurocirugía: **OK de semilla** + nota validación ≠ CyC/CG. |
+| `docs/cirugia-neurocirugia/HALLAZGOS_ESQUELETO.md` | Tracking Neuro; salvedad validación; CEBC/EET + xref CyC P7; neuromonitoreo intramedular; Osteoflácida abierto. |
+| `docs/cirugia-neurocirugia/01-neurocirugia.md` | Neurocirugía: **OK de semilla** + ampliación CEBC §1 (criterio Diego; no Huerta/neuro). |
+| `docs/cirugia-cardiovascular/README.md` | P2 Cardiovascular: **OK de semilla** + nota validación ≠ CyC/CG. |
+| `docs/cirugia-cardiovascular/HALLAZGOS_ESQUELETO.md` | Tracking CV; salvedad validación; gatillos consideraciones (mayor densidad). |
+| `docs/cirugia-cardiovascular/01-cardiovascular.md` | Cardiovascular: **OK de semilla** (criterio Diego; no Huerta/CV). |
+| `docs/cirugia-mano/README.md` | P2 Mano: **OK de semilla** + nota validación ≠ CyC/CG. |
+| `docs/cirugia-mano/HALLAZGOS_ESQUELETO.md` | Tracking Mano; salvedad validación (Diego, no cirujano de mano); tandas 1–3. |
+| `docs/cirugia-mano/01-mano.md` | Mano: **OK de semilla** (criterio Diego; no Huerta/mano). |
+| `docs/cirugia-orl/README.md` | P2 ORL general (M17): **OK de semilla** + nota validación ≠ CyC/CG; sin solape CyC. |
+| `docs/cirugia-orl/HALLAZGOS_ESQUELETO.md` | Tracking ORL; salvedad validación; coclear≠BAHA; indicación frenectomía. |
+| `docs/cirugia-orl/01-orl-general.md` | ORL general: **OK de semilla** (criterio Diego; no Huerta/ORL). |
+| `docs/cirugia-oftalmologia/README.md` | P2 Oftalmología (M18): **OK de semilla** + nota validación ≠ CyC/CG. |
+| `docs/cirugia-oftalmologia/HALLAZGOS_ESQUELETO.md` | Tracking Oftalmología; salvedad validación; EECC≠FLACS; antimetabolitos. |
+| `docs/cirugia-oftalmologia/01-oftalmologia.md` | Oftalmología: **OK de semilla** (criterio Diego; no Huerta/oftalmo). |
+| `docs/cirugia-hemodinamia/README.md` | P2 Hemodinamia (M19): **OK de semilla** §1–4+§6; **§5 diferida** (solape M12). |
+| `docs/cirugia-hemodinamia/HALLAZGOS_ESQUELETO.md` | Tracking Hemodinamia; salvedad validación; §5 pendiente vs M12. |
+| `docs/cirugia-hemodinamia/01-hemodinamia.md` | Hemodinamia: **OK de semilla** §1–4+§6 (criterio Diego; §5 no incluida). |
+| `docs/cirugia-gastroenterologia/README.md` | P2 Gastroenterología / endoscopia (M20): **OK de semilla** + nota validación ≠ CyC/CG. |
+| `docs/cirugia-gastroenterologia/HALLAZGOS_ESQUELETO.md` | Tracking Endoscopia; salvedad validación; biopsias transversales; París/Mayo. |
+| `docs/cirugia-gastroenterologia/01-endoscopia.md` | Endoscopia: **OK de semilla** (criterio Diego; no Huerta/gastro). |
 | `docs/evweb_catalogo_completo.md` | Catálogo ADAARC/evweb: 307 obras sociales + 397 sanatorios (`value` interno ≠ código visible). Referencia P4; no codear fill desde acá. |
 | `docs/CIERRE_ARQUITECTURA_FACTURACION.md` | Flujo Preop → foja → GECLISA/Traditum/evweb/SISalud × mutual. Diseño; no codear Traditum/foja qx desde ahí. |
 | `docs/ARQUITECTURA_INSTITUCIONES.md` | Tres patrones de HC (GECLISA / sistema propio / sin sistema) y `tipo_sistema` vs `destino_final`. No mezclar con el cierre de facturación. |
@@ -101,16 +153,161 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-08:
 
-- PWA `CACHE_V`: **12.64** local (Lotes 1+2 foja; origin/main sigue **12.62** hasta publicar)
+- PWA `CACHE_V`: **12.66** local (Paso 1 fojaQx botón+sync omit; bumpear Pages al publicar)
 - Extensión GECLISA: **0.5.15** (origin/main `5c874f8`; recargar local el viernes)
 
 ## En curso
 
+- **P2 Cirugía General:** **OK de semilla del set** (M1–M6). Soft handoffs aplicados. Motor pendiente. `foja.consideraciones` = fase aparte (0 código).
+- **P2 Cirugía Torácica:** **OK de semilla** (`01-torax.md`). Validación criterio Diego/AnesFact (no torácico ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
+- **P2 Cirugía Urológica:** **OK de semilla** (`01-urologia.md`). Validación criterio Diego/AnesFact (no urólogo ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
+- **P2 Cirugía Ginecológica:** **OK de semilla** (`01-ginecologia.md`). Validación criterio Diego/AnesFact (no ginecóloga ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
+- **P2 Traumatología:** **OK de semilla** (`01-traumatologia.md`). Validación criterio Diego/AnesFact (no traumatólogo ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
+- **P2 Cirugía Vascular:** **OK de semilla** (`01-vascular.md`). Validación criterio Diego/AnesFact (no cirujano vascular ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
+- **P2 Cirugía Plástica:** **OK de semilla** (`01-plastica.md`). Validación criterio Diego/AnesFact (no cirujano plástico ni Huerta) — nota de cabecera se mantiene. «Surcolateral» abierto. Motor pendiente. 0 código.
+- **P2 Neurocirugía:** **OK de semilla** (`01-neurocirugia.md`) + ampliación CEBC/EET §1 (xref CyC P7). Validación criterio Diego/AnesFact (no neurocirujano ni Huerta) — nota de cabecera se mantiene. Gatillos consideraciones en roadmap. Motor pendiente. 0 código.
+- **P2 Cirugía Cardiovascular:** **OK de semilla** (`01-cardiovascular.md`). Validación criterio Diego/AnesFact (no cirujano CV ni Huerta) — nota de cabecera se mantiene. Gatillos consideraciones (mayor densidad) en roadmap. Motor pendiente. 0 código.
+- **P2 Cirugía de Mano:** **OK de semilla** (`01-mano.md`). Validación criterio Diego/AnesFact (no cirujano de mano ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
+- **P2 ORL general (M17):** **OK de semilla** (`01-orl-general.md`). Validación criterio Diego/AnesFact (no ORL ni Huerta) — nota de cabecera se mantiene. Sin solape real con CyC. Motor pendiente. 0 código.
+- **P2 Oftalmología (M18):** **OK de semilla** (`01-oftalmologia.md`). Validación criterio Diego/AnesFact (no oftalmólogo ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
+- **P2 Hemodinamia (M19):** **OK de semilla** §1–4 + §6 (`01-hemodinamia.md`). **§5 diferida** (solape M12; xref preferido; M12 no tocado). Validación criterio Diego/AnesFact — nota de cabecera se mantiene. Motor pendiente. 0 código.
+- **P2 Gastroenterología / endoscopia (M20):** **OK de semilla** (`01-endoscopia.md`). Validación criterio Diego/AnesFact (no gastroenterólogo ni Huerta) — nota de cabecera se mantiene. Sin solape real con CG. Motor pendiente. 0 código.
+- **P2 QR cirujano / fojaQx:** Paso 1 **cerrado en código** (12.66). Pausado: prueba en vivo Huerta (Aero/Córdoba) antes de Paso 2 QR. **0 código** hasta confirmación.
 - **P4 Traditum / evweb:** ciclo + mapa Nueva Solicitud + catálogo ADAARC (`docs/evweb_catalogo_completo.md`). **Sin código.** Hueco a diseñar: estado «Pendiente de autorizar en Traditum».
 - **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo 12.62 / 0.5.15). PWA **12.64** ya en origin (`7b3cc99`); recargar Pages aparte.
 - Ext **0.5.15** en origin/main (`5c874f8`) como backup. El viernes: recargar local en `chrome://extensions`.
 
 ## Qué se hizo (más reciente primero)
+
+- 2026-09-16 — P2 fojaQx Paso 1 **cerrado** (entregas 1–4 OK Diego). Pausa hasta prueba en vivo Huerta (Aero/Córdoba: botón, cáscara, Mayo sin botón, sync). Paso 2 QR no arranca sin esa confirmación.
+
+- 2026-09-16 — P2 fojaQx Paso 1 entrega 4: botón «Foja quirúrgica» (gated `afFojaQxEnabled`); omit `fojaQx` en `buildSyncPayload`/`exportarDatos` si flag off. Stub enabled ≈ **62 bytes/interv** en JSON `datos` (misma fila upsert). Mayo +0. CACHE_V **12.66**.
+
+- 2026-09-16 — P2 fojaQx Paso 1 entrega 3: vista `fojaQx` + `views/fojaQx.html` + `js/42-foja-qx.js`; anillo VIEWS/SCRIPTS/SW; `go('fojaQx')` con guard enabled; dock hide. **CACHE_V 12.65**. Sin botón. Checker OK. Aviso: bump SW → re-descarga STATIC_CORE en clientes al publicar; sin Supabase.
+
+- 2026-09-16 — P2 fojaQx Paso 1 entrega 2: `afFojaQxStub` / `afEnsureFojaQx` + `TITLES.fojaQx`; ensure en `abrirInter`/`nuevaInter`. Sin UI / sin sync. Costo nube: nulo (solo localStorage al guardar foja enabled).
+
+- 2026-09-16 — P2 fojaQx Paso 1 entrega 1: `foja_qx` + `afFojaQxEnabled` en `data/instituciones-foja.js` (Aero+Córdoba+Misericordia+San Roque on; Mayo off). Sin UI. Sin impacto Supabase/GitHub. Gate §8 OK Diego.
+
+- 2026-09-16 — P2 QR cirujano: alcance Huerta — Aero+públicos activos Paso 1; Mayo off; gating por flag en catálogo instituciones; sync solo si enabled; fojaQx = herramienta de suite (no sub-foja anestésica). Gate §8 Paso 1 re-presentado. **0 código.**
+
+- 2026-09-16 — P2 QR cirujano: **gate §8 Paso 1** (modelo `fojaQx` + vista cáscara, sin QR) listado archivo-por-archivo en chat; esperando OK Diego. **0 código.**
+
+- 2026-09-15 — P2 QR cirujano: 6 decisiones OK Huerta en `docs/P2_QR_CIRUJANO.md` (especialidad visible; `fojaQx`; un solo uso; solo foja abierta; firma en celular; institución heredada). Gate §8 + código: próxima sesión. **0 código.**
+
+- 2026-09-15 — P2 QR cirujano: borrador de plan en `docs/P2_QR_CIRUJANO.md` (canal paralelo; 6 preguntas abiertas). **0 código.**
+
+- 2026-09-15 — P2 Gastroenterología / endoscopia (M20): **OK de semilla** (`cge-endoscopia-v1`). Biopsias transversales; París/Mayo estructurados; Celiaquía; profilaxis CPRE; carácter variceal; PEG. Tracking HALLAZGOS + README + roadmap. Salvedad validación se mantiene. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-15 — P2 Gastroenterología / endoscopia (M20): esqueleto `docs/cirugia-gastroenterologia/01-endoscopia.md` (4 correcciones: Celiaquía; profilaxis pancreatitis CPRE; carácter variceal; indicación PEG). Numeración M20 (no «13»). Sin solape CG. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-15 — P2 Hemodinamia (M19): **OK de semilla** §1–4 + §6 (`chem-hemodinamia-v1`). §5 diferida (solape M12; xref preferido). Hallazgos: stents multivaso; leak paravalvular; gradiente solo estructural. Tracking HALLAZGOS + README + roadmap. Salvedad validación se mantiene. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-15 — P2 Hemodinamia (M19): esqueleto `docs/cirugia-hemodinamia/01-hemodinamia.md` §1–4 (8 correcciones: carácter ACTP; Ellis; MP/IPV TAVI; leak LAAO; cierre septal; aislamiento PV; umbrales). §5 diferida (solape M12). §6 pendiente. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-15 — P2 Oftalmología (M18): **OK de semilla** (`coft-oftalmologia-v1`). Tandas 1–3 OK; post-Tanda 2: antimetabolitos sin «Sin…». EECC ≠ FLACS. Tracking HALLAZGOS + README + roadmap. Salvedad validación se mantiene. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-15 — P2 Oftalmología (M18): esqueleto `docs/cirugia-oftalmologia/01-oftalmologia.md` (13 correcciones: trasplante; complicación faco; retina final; DR/mácula; PIO; glaucoma; tumor/margen; implante; DCR; estrabismo/trauma zona). Numeración M18 (no «20»). Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 ORL general (M17): **OK de semilla** (`corl-orl-general-v1`). Tandas 1–2 OK; post-Tanda 2: `indicacion_frenectomia`. Coclear ≠ BAHA. Tracking HALLAZGOS + README + roadmap. Salvedad validación se mantiene. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 ORL general (M17): esqueleto `docs/cirugia-orl/01-orl-general.md` (11 correcciones: colesteatoma; VII; cadena/PORP-TORP; gusher; telemetría coclear; amigdalectomía; absceso; IAH; DISE). Sin solape CyC. Numeración M17 (no «19»). Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 CEBC: merge Neuro M14 §1 (`lesion_cebc`, `corredor_cebc`, xref cierre→CyC P7) + CyC P7 cierre base de cráneo (Hadad/injerto/sellante/taponamiento/CLD, xref→Neuro). Foja cada uno si equipo (Huerta). Sin módulo híbrido; M11 no tocado. HALLAZGOS + README + ESTADO. Solo doc.
+
+- 2026-09-14 — P2: **regla de organización del catálogo** en `docs/ROADMAP_ESCALAMIENTO.md` (dueño = especialidad auditada; documentar solape; no tocar OK ajenos sin OK explícito; ej. Mano M16 ↔ Trauma M11). También en §5 Qué no hacer. Solo doc.
+
+- 2026-09-14 — P2 Mano: **OK de semilla** (`cmano-mano-v1`). Tandas 1–3 OK; post-Tanda 2: `proc_reparacion_nerviosa` también si Amputación/reimplante (11 correcciones). Tracking HALLAZGOS + README + roadmap. Salvedad validación se mantiene. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Mano: esqueleto `docs/cirugia-mano/01-mano.md` (10→11 correcciones: reducción; escafoides; Dupuytren; Seddon; reimplante; Palmer; second-look; exanguinación; reparación nerviosa en reimplante; etc.). Validación ≠ CyC/CG. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Cardiovascular: **OK de semilla** (`ccv-cardiovascular-v1`). Post-tandas: `caracter_cirugia`; `resultado_revision_valvular`; `gradiente_septal_post_mmhg`. Tracking HALLAZGOS + README + roadmap (consideraciones CEC/ACT, paro hipotérmico, off-pump, protamina, ETE, destete). Salvedad validación se mantiene. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Cardiovascular: esqueleto `docs/cirugia-cardiovascular/01-cardiovascular.md` (9 correcciones: destete CEC; reesternotomía; indicación CRM; TTFM; indicación+ETE valvular; troncos supraaórticos; soporte; reexploración). Gatillos consideraciones (CEC/ACT, paro hipotérmico, off-pump, protamina, ETE, destete) en roadmap P2. Validación ≠ CyC/CG. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Neurocirugía: **OK de semilla** (`cneuro-neurocirugia-v1`). Post-tandas: posición multi-disparo; circulación; volumen hematoma vascular; neuromonitoreo required si intramedular; raíz schwannoma. Tracking HALLAZGOS + README + roadmap (consideraciones awake/DBS/VAE/clipado/HTE). Salvedad validación se mantiene. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Neurocirugía: esqueleto `docs/cirugia-neurocirugia/01-neurocirugia.md` (18 correcciones: pares/ACI-quiasma; Hunt-Hess/Fisher; clipado; GCS/midline; DBS; niveles raqui; posición; etc.). Gatillos consideraciones (awake/DBS/VAE/clipado/HTE) en roadmap P2. Validación ≠ CyC/CG. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Plástica: **OK de semilla** (`cpl-plastica-v1`). Post-tandas: nota Surcolateral; `indicacion_mamaria`; `indicacion_facial`; `tiempo_desde_quemadura`. Tracking HALLAZGOS + README + roadmap. Salvedad validación (Diego ≠ Huerta/plástico) se mantiene. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Plástica: esqueleto `docs/cirugia-plastica/01-plastica.md` (17 correcciones: indicación cobertura; isquemia/viabilidad colgajo; TRAM≠DIEP; mamaria; TEV contorno; n. facial; SCTQ; drenaje/TPN separados; etc.). Validación ≠ CyC/CG. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Vascular: **OK de semilla** (`cvasc-vascular-v1`). Post-tandas: tiempo clampeo; monitoreo sin «No utilizado»; protección CAS; heparinización sistémica. Tracking HALLAZGOS + README + roadmap. Salvedad validación (Diego ≠ Huerta/vascular) se mantiene. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Vascular: esqueleto `docs/cirugia-vascular/01-vascular.md` (12 correcciones: diámetro AAA; endoleak; Stanford; uréter; AMI; NASCET; nervios X/XII/VII; Rutherford; runoff; fasciotomía; CEAP; justificación amputación). Validación ≠ CyC/CG. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Traumatología: **OK de semilla** (`cto-traumatologia-v1`). Post-tandas: degenerativa por región; `resultado_reduccion_cadera`; `plexo_lumbar_xlif`. Tracking HALLAZGOS + README + roadmap. Salvedad validación (Diego ≠ Huerta/traumatólogo) se mantiene. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Traumatología: esqueleto `docs/cirugia-traumatologia/01-traumatologia.md` (21 correcciones: Gustilo; Garden/AO; LCA; menisco; Weber/LH; neuromonitoreo; niveles multi; etc.). Validación ≠ CyC/CG. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Ginecológica: **OK de semilla** (`cgine-pelviana-v1`). `cistoscopia_control_tvt` (TVT). Tracking HALLAZGOS + README + roadmap. Salvedad validación (Diego ≠ Huerta/ginecóloga) se mantiene. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Ginecológica: esqueleto `docs/cirugia-ginecologica/01-ginecologia.md` (12 correcciones: uréteres/vejiga histerectomía; márgenes radical; plantilla linfadenectomía; TVT≠TOT; POP-Q; etc.). Validación ≠ CyC/CG. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Urológica: **OK de semilla** (`cu-urologia-v1`). `lateralidad_genital` + orquiectomía simple/subcapsular. Tracking HALLAZGOS + README + roadmap. Salvedad validación (Diego ≠ Huerta/urólogo) se mantiene. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Urológica: esqueleto `docs/cirugia-urologica/01-urologia.md` (14 correcciones: márgenes; VCI Neves-Zincke; RTU-V a vesical; Foley/drenaje separados; Regla 1 Boari/cistectomía; etc.). Validación ≠ CyC/CG (salvedad como Tórax). Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Torácica: **OK de semilla** (`ct-torax-v1`). Tracking `HALLAZGOS_ESQUELETO.md` + README + roadmap. Salvedad validación (Diego ≠ Huerta/torácico) se mantiene en cabecera. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 Torácica: esqueleto `docs/cirugia-toracica/01-torax.md` (hermeticidad muñón; frénico/recurrente; indicaciones; drenaje Fr+ubicación; mediastino por compartimento; timectomía; fístula; reexpansión No evaluada). Nota: validación ≠ CyC/CG. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — CG: **OK de semilla del set** (6/6 módulos). Soft handoffs ya aplicados. Motor P2 pendiente. `foja.consideraciones` fase aparte. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — CG: soft pasada cruzada **aplicados** (M5 multivisceral+handoffs; wording Mn+id; M3 foco VBP; M1 Contaminado; M6 handoff_gi). Pendiente OK set. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — CG: **M6 OK de semilla**. Pasada cruzada handoffs (matriz + soft #1–5 en `HALLAZGOS_ESQUELETO.md`). Set CG pendiente cierre. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — CG: **M5 OK de semilla** (`ureter_gesto` solo gestos, no duplicar Regla 1 masa). M6 Esofagogástrico → esqueleto primera pasada (hermeticidad; Acalasia; vagos; Collis; OAGB sin YY forzada; Sleeve; revisional; sitio hernia; ventilación → consideraciones). Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — CG: **M4 OK de semilla** (hemostasia ampliada). M5 Retroperitoneo → esqueleto primera pasada (feocromo/tórax → consideraciones; dx masa; Regla 1; trombo VCI). Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — CG: **M3 OK de semilla**. M4 Proctología → esqueleto primera pasada (continencia pre, sin anestesia genérica, neoplasia ampliada, pilonidal, mutex hemorroides). Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — CG: **M2 OK de semilla** (cierre colostomía en asa; drenaje_gi + Ostomía). M3 Pancreato-biliar → esqueleto primera pasada. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — CG: **M1 OK de semilla**. M2 GI → esqueleto slots primera pasada (uréteres, L/LC/C+Hartmann, márgenes, hermeticidad, ostomías, apendicectomía, sleeve→M6). Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — CG M1: 1ª pasada → correcciones (vasos testiculares/cordón; `tecnica_con_malla` solo Abierto/Convertido). Pasada final pendiente. SCOPA/eTEP diástasis abierto. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — Cirugía General: 8 preguntas cerradas (apendicectomía M2; sleeve M6; diástasis; hermeticidad M3/M6; Collis; vagos; revisional). M1 Pared → esqueleto slots primera pasada (`01-pared-abdominal.md`). Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — Cirugía General: M6 confirmado (ventilación → consideraciones, no slot qx); consolidado `HALLAZGOS_ESQUELETO.md` + `06-esofagogastrico.md`; M5 realineado. Sin esqueleto ni semilla. 0 código. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — Cirugía General M6 Esofagogástrico/Bariátrica/Hernias: auditoría de bruto en chat (hermeticidad unificada, Acalasia tipografía, Regla 3 esofaguectomía, dueño sleeve vs M2, Petersen, etc.). Sin doc todavía. 0 código. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — P2 diseño: `S.cur.foja.consideraciones` (fase aparte; GECLISA ignora; sugerencia qx con confirmación; print sin fila nueva → Métodos). README `cirugia-general` + roadmap. 0 código. Sin nombres ni N° en este diario.
+
+- 2026-09-14 — Cirugía General M5 Retroperitoneo: auditoría confirmada (feocromo Regla 3, dx masa, integridad disección, vascular planificado vs no, Lateralidad, Sin drenaje). 2 preguntas abiertas Huerta (toracoabdominal; trombo VCI). Doc `05-retroperitoneo.md`. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — Cirugía General M3 pancreato-biliar: auditoría confirmada; `evento_vascular_no_planificado`, `piloro_final`, VBP≠CVS, textura+Wirsung, Kehr, etc. Doc `03-pancreato-biliar.md`. Sin esqueleto. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — Cirugía General M2 GI: ostomías `trayecto_muscular` + `fijacion_estoma` (corrige «transrectal»); hermeticidad = Fuga/Sin fuga/No realizada. Docs `cirugia-general/`. Sin esqueleto ni semilla. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — CyC: **OK de semilla** para las 13 proformas (`docs/proformas-cyc/`). Motor P2 pendiente. README + roadmap actualizados. Solo doc; 0 código. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — CyC P1: detalle paratiroidectomía (adenoma/hiperplasia subtotal) + nota Sistrunk embriológico; P12 `cantidad_lobulillos_estado`. 1–11 y 13 aprobadas; 12 pendiente confirmación. Sin OK de semilla. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — CyC P1: jerarquía vía→extensión (Huerta); Sistrunk/paratiroides separados. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — CyC tanda 3: P10 sub-sitios/tipo/abordaje/margen/cierre; P11 instrumentación/cuerda/lesión benigna/cordectomía; P12 sitio+lobulillos+objetivo Sjögren; P13 tipo_acto escisional/incisional/BAAF. Segunda pasada de las 13 pedida; sin OK de semilla. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — Auditoría CyC tanda 2: P5 oclusion required (sin empty_text falso); P7 ángulo/navegación/empaquetamiento; P8 condicionales glomus/schwannoma/branquial; P6 aprobada. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — Auditoría CyC tanda 1: P1 +slot NLR; P3 +lingual/hipogloso (submax); P4 `required_if_reseccion_includes` en extensiones. P2 y resto P3/P4 OK. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — Proformas CyC: monolito partido a `docs/proformas-cyc/` (13 archivos + README). `P2_PROFORMAS_CYC.md` = puntero. Sin OK de semilla. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — `docs/P2_PROFORMAS_CYC.md`: P7–P10 resueltos + extras (13 proformas). Piel amplía Mohs; Laringe/MLS separada de 4 (+ vía aérea); ortognática + oclusión. Sin OK de semilla. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — `docs/P2_PROFORMAS_CYC.md`: 4 áreas CyC pendientes (ortognática, nariz/senos, glómicos, benigna schwannomas/quistes branquiales) — solo anotadas, sin inventar clínica. Las 6 en revisión de slots; sin OK de semilla. Solo doc. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — Doc `docs/P2_PROFORMAS_CYC.md`: 6 proformas CyC (Huerta) bajadas a slots + plantilla; ganglios = semiología, no conteo AP. Semilla pendiente de OK. Solo doc; 0 código. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — Roadmap **P2** auditoría §8: GECLISA/`fill.js`/P1b/evweb/Traditum/print anestésico Mayo·Aero·públicos = **intactos** si P2 es código nuevo + anillo nav/caché + `S.cur` con OK; Mayo qx sigue GECLISA; no pisar alias `docs.qx`. Solo doc; 0 código. Sin nombres ni N° en este diario.
+
+- 2026-09-13 — Roadmap **P2**: 8 requisitos de fondo (un camino facturación; sync bidireccional qx↔anestesia con alerta suave; alergias UI; ítem dock; calidad; proformas configurables sin tocar motor; feedback; auditoría obligatoria pre-código) + cáscara A4 campo a campo antes de la descripción. Solo doc; 0 código. Sin nombres ni N° en este diario.
 
 - 2026-09-12 — Doc P4: «Transacción N°» en evweb es **solo APROSS** (probado PAMI/ART/IOSFA/OSPA = no). Misma Documentación electrónica genérica en el resto. Etiqueta «AUTORIZACIÓN DE OBRA SOCIAL» no confirmada como campo del form. Pregunta abierta a ADAARC: auth sin secretaria. Solo doc.
 
@@ -252,3 +449,4 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - Empaquetado de adjuntos **por institución** (no forzar 3 archivos): Mayo GECLISA = 1 PDF qx+anest + auth aparte; Aero = fojas AnesFact + foto auth (2 fotos si no hay qx nativa). Detalle: `docs/ROADMAP_ESCALAMIENTO.md` § 1c. P1 no lo implementa.
 - P1b (Mayo, fojas): GET `/Reporte/ReporteListadoInternado`. `pMeId` = N° por internación (confirmado en vivo). Ventana = fecha+hora de **esta** foja ± 8 h, no «ahora» ni ingreso/egreso. Persistido en 8b si el nombre coincidió. Fetch en la tab GECLISA del 1–12; sin botón extra; reintento si falta qx. Combinado → `docs.anest`. No es upload a evweb. `docs/ROADMAP_ESCALAMIENTO.md` P1b.
 - P6 buzón de mail AnesFact para **autorizaciones** (mutual): idea 2026-09-01, sin diseñar. No es P1b. Detalle y preguntas abiertas: `docs/ROADMAP_ESCALAMIENTO.md` P6.
+- **P2 catálogo de especialidades:** patología/procedimiento de una especialidad ya auditada vive ahí; no duplicar ni meter en módulo genérico. Antes de esqueleto nuevo: chequear solape y documentar si reemplaza / amplía / convive. No modificar OK de semilla ajenos sin OK explícito de Diego. Ejemplo: Mano (M16) detalle vs Trauma (M11) §2 básico. Fuente: `docs/ROADMAP_ESCALAMIENTO.md` § P2.

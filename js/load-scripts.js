@@ -50,11 +50,12 @@
     'js/36-identidad-anestesista.js',
     'js/37-firma-certificada.js',
     'js/38-sesiones.js',
+    'js/42-foja-qx.js',
     'js/load-views.js',
     'js/24-sw-register.js'
   ];
 
-  var CACHE_V = '12.64';
+  var CACHE_V = '12.66';
   window.AF_CACHE_V = CACHE_V;
   try { document.title = 'AnesFact v' + CACHE_V; } catch (eTit) {}
 

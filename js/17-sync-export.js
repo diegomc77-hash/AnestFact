@@ -130,8 +130,10 @@ function acCirujano(){
 // === EXPORT/IMPORT ===
 function exportarDatos(){
   var uid=(typeof AF_AUTH!=='undefined'&&AF_AUTH.getUserId)?AF_AUTH.getUserId():'';
+  var intervs=S.intervs||[];
+  if(typeof afIntervsPayloadForSync==='function')intervs=afIntervsPayloadForSync(intervs);
   var data={
-    intervs:S.intervs,
+    intervs:intervs,
     cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),
     key:S.key||'',
     owner_id:uid||null,
@@ -369,6 +371,7 @@ function copiarCodigoScript(){var ta=document.getElementById('script-code-text')
 
 function buildSyncPayload(){
   var intervs=afFilterDeletedIntervs(S.intervs||[]);
+  if(typeof afIntervsPayloadForSync==='function')intervs=afIntervsPayloadForSync(intervs);
   var data={
     intervs:intervs,
     cirujanos:(typeof cirujanos!=='undefined'?cirujanos:[]),

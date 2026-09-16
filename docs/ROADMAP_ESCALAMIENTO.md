@@ -390,12 +390,260 @@ foja anestesia nativa + foja cirugía (QR cirujano, pendiente) + foto
 auth → evweb. Sin GECLISA, sin Traditum, solo IOSFA.
 
 No incluye buscar nada en GECLISA (Mayo = **P1b**). No incluye Traditum
-(**P4**).
+(**P4**). Mayo: la qx sigue bajándose de GECLISA; **no** hay editor
+AnesFact de foja qx para Mayo salvo decisión explícita aparte.
 
-Formulario + print + QR distinto al de preop. Copia para el anestesista.
+Formulario + print A4 + QR distinto al de preop. Entidad propia (no un
+campo dentro de la foja de anestesia).
 
-**Riesgo:** alto. No mezclar con `valoracion.html`. Extender `S.cur` solo
-con OK explícito.
+**P2 — Regla de organización del catálogo (todas las especialidades;
+obligatoria desde 2026-09-14):**
+
+Cuando una patología o procedimiento pertenece claramente a una
+especialidad ya existente y auditada, **todo contenido nuevo**
+relacionado entra en esa especialidad específica — **no** se duplica ni
+se mezcla con otro módulo general o «relacionado por practicidad».
+
+1. **Antes** de bajar un bosquejo nuevo a esqueleto: revisar solapamiento
+   real con módulos ya existentes y auditados (OK de semilla o en
+   auditoría).
+2. Si hay solape: **decidir y documentar explícitamente** (en el módulo
+   nuevo y/o en `HALLAZGOS_ESQUELETO.md`) si el contenido nuevo
+   **reemplaza**, **amplía** o **convive** con lo ya existente. Nunca
+   dejarlo ambiguo ni duplicado sin nota.
+3. **Nunca** romper ni modificar contenido ya cerrado con OK de semilla
+   de otro módulo, salvo aprobación explícita de Diego (mismo criterio
+   que las correcciones cruzadas Traumatología ↔ Vascular ↔
+   Retroperitoneo).
+4. Lo que se sume de aquí en adelante vive en la **especialidad
+   correspondiente real**, no en un lugar genérico.
+
+**Ejemplo ya resuelto:** Traumatología (M11) §2 tiene cobertura básica
+de mano/muñeca; el detalle específico vive en Cirugía de Mano (M16).
+No se fusionaron; la nota 11 de `docs/cirugia-mano/01-mano.md` y
+`HALLAZGOS_ESQUELETO.md` lo documentan. Misma lógica para cualquier
+módulo futuro.
+
+**Ejemplo ya resuelto (equipo, 2026-09-14):** CEBC / EET — resección +
+corredor en Neurocirugía M14 §1; cierre/reconstrucción nasal en CyC
+Proforma 7. Xref cruzado (patrón Sleeve). Equipo neuro+ORL = **foja
+cada uno** (Huerta); sin foja compartida. Sin módulo híbrido.
+
+**Estado diseño (2026-09-14):** marco + cáscara A4 + requisitos §1–8.
+**Proformas CyC:** **13 / 13 OK de semilla** (`docs/proformas-cyc/`).
+**Cirugía General:** **6 / 6 OK de semilla del set**
+(`docs/cirugia-general/`). **Cirugía Torácica:** **1 / 1 OK de semilla**
+(`docs/cirugia-toracica/`; validación criterio AnesFact, no torácico /
+Huerta — ver cabecera). **Cirugía Urológica:** **1 / 1 OK de semilla**
+(`docs/cirugia-urologica/`; misma salvedad de validación). **Cirugía
+Ginecológica:** **1 / 1 OK de semilla** (`docs/cirugia-ginecologica/`;
+misma salvedad). **Traumatología:** **1 / 1 OK de semilla**
+(`docs/cirugia-traumatologia/`; misma salvedad). **Cirugía Vascular:**
+**1 / 1 OK de semilla** (`docs/cirugia-vascular/`; misma salvedad).
+**Cirugía Plástica:** **1 / 1 OK de semilla** (`docs/cirugia-plastica/`;
+misma salvedad). **Neurocirugía:** **1 / 1 OK de semilla**
+(`docs/cirugia-neurocirugia/`; misma salvedad; gatillos consideraciones
+anestesia documentados). **Cirugía Cardiovascular:** **1 / 1 OK de
+semilla** (`docs/cirugia-cardiovascular/`; misma salvedad; gatillos
+consideraciones anestesia — mayor densidad del catálogo). **Cirugía de
+Mano:** **1 / 1 OK de semilla** (`docs/cirugia-mano/`; misma salvedad).
+**ORL general (M17):** **1 / 1 OK de semilla** (`docs/cirugia-orl/`;
+misma salvedad; sin solape real con CyC). **Oftalmología (M18):**
+**1 / 1 OK de semilla** (`docs/cirugia-oftalmologia/`; misma salvedad).
+**Hemodinamia (M19):** **OK de semilla §1–4 + §6**
+(`docs/cirugia-hemodinamia/`; misma salvedad; **§5 diferida** — solape
+M12 Vascular, xref preferido, M12 intacto).
+**Gastroenterología / endoscopia (M20):** **1 / 1 OK de semilla**
+(`docs/cirugia-gastroenterologia/`; misma salvedad; sin solape CG).
+**Motor de código P2: pendiente** (gate §8 antes del primer commit).
+
+**P2 — QR cirujano / `fojaQx` (diseño 2026-09-16, 0 código):**
+`docs/P2_QR_CIRUJANO.md`. Canal paralelo (no tocar `af-qr-*` preop).
+Herramienta de suite (hermana de `foja`, no sub-función anestésica).
+**OK Huerta:** especialidad visible; nombre `fojaQx`; un solo uso;
+generación solo foja abierta; firma en celular; institución heredada.
+**Alcance:** Aero + públicos activos desde Paso 1 (públicos = solo
+documentación); Mayo off por ahora; gating = **flag por institución**
+(no `if` hardcodeado). Sync/export incluye `fojaQx` **solo** si el flag
+está on. Gate §8 Paso 1: revalidar en chat antes del primer diff.
+
+**P2 — Coordinación anestesia ↔ qx (fase aparte, transversal):** diseño
+confirmado 2026-09-14. `S.cur.foja.consideraciones` aditivo; GECLISA lo
+ignora; sugerencia desde qx con confirmación manual; print **sin fila
+nueva** (frase en Métodos). No bloquea Cirugía General ni CyC. **0 código.**
+Ver `docs/cirugia-general/README.md`. Versionado de proformas personales:
+no urgente.
+
+**P2 / consideraciones — gatillos Neurocirugía (M14; no son slots de la
+proforma qx; corrección posterior de drogas y cuidados específicos):**
+
+| Gatillo qx | Hacia consideraciones anestesia |
+|---|---|
+| Craneotomía despierta (awake) | Coordinación de sedación consciente y despertar intraoperatorio para mapeo |
+| DBS con testing intraoperatorio | Nivel de sedación que permita evaluación neurológica en tiempo real |
+| Posición sentada (fosa posterior) | Riesgo de embolismo aéreo venoso (VAE); monitoreo (Doppler precordial, capnografía, catéter central) |
+| Clipado de aneurisma | Manejo hemodinámico estricto (hipotensión controlada) |
+| Hipertensión endocraneana refractaria | Hiperventilación controlada y osmoterapia intraoperatoria |
+
+**P2 / consideraciones — gatillos Cirugía Cardiovascular (M15; no son
+slots de la proforma qx; mayor densidad de coordinación del catálogo;
+corrección posterior de drogas y cuidados específicos):**
+
+| Gatillo qx | Hacia consideraciones anestesia |
+|---|---|
+| Circulación extracorpórea (CEC) | Heparinización sistémica con control de ACT específico para bomba; manejo de temperatura; coordinación de despinzado / reperfusión |
+| Paro circulatorio hipotérmico | Protección cerebral; monitoreo EEG/BIS; manejo de temperatura central estricto |
+| Cirugía off-pump (corazón batiente) | Manejo hemodinámico durante manipulación / luxación del corazón para vasos posteriores, sin soporte de bomba |
+| Reversión de heparina con protamina | Riesgo de reacción anafilactoide / anafiláctica; disponibilidad inmediata de manejo |
+| ETE intraoperatoria | Frecuentemente colocada e interpretada por el anestesiólogo; coordinación de momento (pre y post-bypass) |
+| Destete de CEC con inotrópicos / soporte mecánico | Coordinación de drogas vasoactivas en tiempo real con el cirujano |
+
+**Riesgo:** alto. No mezclar con `valoracion.html`. Extender `S.cur` /
+contrato compartido solo con OK explícito. **Gate:** auditoría de no
+regresión (§8) antes de cualquier implementación.
+
+---
+
+#### P2 — Requisitos de fondo (marco; no inventar sobre la marcha)
+
+1. **Un solo camino de facturación.** La Foja Quirúrgica no abre un flujo
+   paralelo. Todo lo que produce termina en AnesFact para facturación
+   (evweb / Traditum según corresponda), igual que el resto del sistema.
+   Descargar / imprimir para que el cirujano se lo lleve es un **extra**,
+   no un camino alternativo de facturación.
+
+2. **Sincronización bidireccional con la foja de anestesia.** No alcanza
+   con lectura unidireccional. Si el cirujano completa diagnóstico y tipo
+   de cirugía en la qx, eso queda **disponible y utilizable** en la foja
+   del anestesista. Si difiere de lo que el anestesista ya tenía →
+   **alerta suave** (nunca bloqueo) para que alguno revise y corrija.
+   No dejar dos versiones contradictorias sin que nadie se entere.
+
+3. **Chequeo de alergias del paciente.** La Foja Qx (y el QR cirujano)
+   deben poder mostrar alergias ya registradas (p. ej. desde el QR de
+   valoración preanestésica). Es **alerta de seguridad**, no decoración.
+   En diseño actual: **UI**, no línea impresa de la cáscara A4 (salvo
+   decisión explícita posterior).
+
+4. **Ítem propio en el menú / dock de AnesFact.** Al mismo nivel que
+   «Preop.» o «evweb» — navegación vía `go(vista)` existente. No escondido
+   dentro de otra pantalla.
+
+5. **Calidad como diferencial.** QR del cirujano y Foja Quirúrgica se
+   tratan con el mismo cuidado que el resto de AnesFact. Pieza que puede
+   distinguir el producto; no resolver rápido y mal.
+
+6. **Configurable sin reprogramar el motor (no es ML).** Agregar o ajustar
+   proformas y campos (nuevas especialidades, nuevos slots, cambios de
+   texto) = editar **definiciones / datos**, sin tocar el código central
+   del motor cada vez. El diseño ya cerrado apunta a eso: slots tipados
+   (`single` / `multi` / `free`) + `plantilla_texto` con `{{id}}` +
+   filtro por especialidad (`i.serv`) + match por operación. **Requisito
+   explícito de diseño**, no solo implementación conveniente.
+
+7. **Canal de feedback de usuarios.** Lugar simple para que quien use la
+   Foja Qx (cirujano) u otras piezas de AnesFact deje observación /
+   sugerencia que llegue al administrador. No hace falta sofisticación;
+   tiene que existir y quedar registrado en un lado accesible.
+
+8. **Auditoría obligatoria antes de implementar.** Antes de una línea de
+   código de Foja Qx: confirmar explícitamente que no se rompe lo que ya
+   funciona — fojas Aeronáutico, Mayo + toda la integración GECLISA
+   (extensión, cola, `fill.js`, P1b), evweb, Traditum, hospitales
+   públicos. No es advertencia genérica: el visto bueno a implementar
+   exige listar **qué archivos/flujos se tocan (si alguno) y por qué es
+   seguro**. Hasta entonces: solo diseño / docs.
+
+##### Auditoría de no-regresión (2026-09-13) — diseño; 0 código
+
+**Veredicto:** P2 se puede implementar **sin tocar** GECLISA / P1b /
+`fill.js` / Traditum / print de foja anestésica Mayo·Aero·públicos, si se
+respeta el perímetro abajo. Lo que se toca es casi todo **nuevo** + un
+anillo fino de navegación/caché/contrato (con OK explícito).
+
+**Intacto a propósito (no tocar en P2):**
+
+| Flujo / pieza | Archivos / zona | Por qué queda intacto |
+|---|---|---|
+| GECLISA inyección + cola | `chrome-extension-geclisa-batch/**`, `fill.js`, `fill-dev.js`, `vendor/fill.js`, `js/10-geclisa-ui.js`, `js/20-geclisa-send.js`, `js/39-geclisa-queue.js`, `views/geclisa.html`, `views/foja/mayo-geclisa.html` | P2 = qx **nativa Aero** (y luego P3 públicos). Mayo no edita qx en AnesFact; no hay IDs ni fill nuevos. |
+| P1b PDF combinado | GET `ReporteListadoInternado` + alias `docs.qx = { aliasOf: 'anest' }` en sync/adjuntos (`js/17-sync-export.js` y caminos P1b ya cerrados) | Semántica Mayo: qx = PDF bajado de GECLISA / alias. P2 **no** reinterpreta ese alias ni escribe foja qx nativa para Mayo. |
+| Foja anestésica print | `js/12-imprimir-aero.js` (Aero + públicos), camino Mayo/examen | Print qx = **módulo nuevo** (cáscara quirúrgica). No clonar ni reescribir el print anestésico. |
+| Foja anestésica clínica | `js/08-foja.js`, `views/foja/**` (técnica, drogas, vitals, Mayo) | Editor qx aparte. Sync diag (§2) = lectura/alerta + escritura acotada a campos de intervención (`diag` / procedimiento), no al cuerpo de la foja anestésica. |
+| evweb hoy | Dock/lista, marcas locales, `go('nom')`, checklist | Misma tubería de facturación (§1). P2 aporta **documento** (PDF/adjunto) al paquete AnesFact; no automatiza ADAARC. |
+| Traditum (P4) | 0 código hoy; nomenclador `data/nomenclador.js` | P2 no implementa Traditum. Catálogo clínico ≠ `NOM`. No mezclar. |
+| QR preop paciente | `valoracion.html`, `js/valoracion-form.js`, `js/31-valoracion-qr.js`, `af-qr-*` | QR **cirujano** = canal distinto. Alergias = **leer** lo ya guardado; no reescribir submit preop ni `resetFojaUIDom`. |
+
+**Qué sí tocaría una implementación P2 (anillo + piezas nuevas):**
+
+| Zona | Qué | Riesgo / regla de seguridad |
+|---|---|---|
+| **Nuevo** | Vista `go('…')` foja qx, JS editor + print qx, datos de proformas, QR cirujano (página/función aparte), feedback simple, catálogo CIE (datos) | No pasa por `fill.js` ni extensión. |
+| Contrato caché / nav | `js/load-views.js` (`VIEWS`), `js/load-scripts.js`, `sw.js`, `js/01-state.js` (`TITLES`), dock en shell, `CACHE_V` | Obligatorio al sumar vista/script. Checker `check-version-sync.mjs` en verde. Navegación solo `go(vista)`. |
+| Contrato `S.cur` | Extender intervención con entidad foja qx (p. ej. objeto hermano de `foja`, no dentro del formulario anestésico) + sync suave de `diag` / cirugía hacia la ficha | **Contrato compartido** (`MAPA_SECCIONES.md`): listar impacto y OK explícito antes. No tocar `abrirInter` / `cargarFojaUI` de más. |
+| Adjuntos `docs.qx` | Aero (y P3): PDF nativo o foto puede alimentar la ranura qx del paquete facturación | **Gate por institución:** en Mayo, P1b/alias y adjunto manual siguen dueños. Código P2 no debe pisar alias P1b ni asumir “siempre editor nativo”. |
+| UI foja anestesia (mínimo) | Badge/alerta suave si qx trajo diag distinto; mostrar alergias en UI qx | Solo lectura + aviso; nunca bloqueo. No cambiar reglas GECLISA payload. |
+| Facturación UI | Tildef / ranura qx cuando el PDF nativo exista (Aero) | Misma ranura conceptual; sin segundo camino de facturación. |
+
+**Confirmaciones explícitas (marco P2):**
+
+- **GECLISA + extensión + cola + `fill.js`:** intactos.
+- **P1b (Mayo):** intacto; `docs.qx` alias no se redefine para Mayo.
+- **evweb:** intacto como destino; P2 no es fill evweb.
+- **Traditum:** intacto / sigue en P4; P2 no lo abre.
+- **Fojas Mayo / Aeronáutico / públicos (anestesia):** print y editor anestésicos intactos; qx nativa solo donde el cierre lo pide (Aero primero; públicos = P3).
+- **Mayo foja qx:** sigue GECLISA (baja/adjunto), no editor AnesFact en P2.
+
+**Gate pendiente antes del primer commit de código:** revalidar esta tabla contra el diff propuesto (sobre todo `S.cur` y cualquier toque a `js/17-sync-export.js` / `docs.qx`). Si el diff entra en zona «Intacto», no hay OK.
+
+---
+
+#### P2 — Cáscara A4 (misma para todas las especialidades)
+
+Regla: encabezado, datos, firma y pie **iguales** en todas las
+especialidades. Solo cambia el **texto** del bloque Descripción (armado
+desde proforma → slots → párrafo editable). Proformas filtradas por
+especialidad del caso (`i.serv`); oferta Usar / Editar y usar / Desde cero.
+
+**Orden impreso — campos exactos *antes* de la descripción:**
+
+| # | Bloque | Campo impreso | Origen / notas |
+|---|---|---|---|
+| 1 | Encabezado | Título `FOJA QUIRÚRGICA` (+ institución si aplica, mismo espíritu que Aero) | Cáscara fija |
+| 2 | Identidad | Paciente (apellido y nombre) | Intervención; solo lectura |
+| 3 | Identidad | DNI | Intervención; solo lectura |
+| 4 | Identidad | Sanatorio / institución | Intervención; solo lectura |
+| 5 | Identidad | Fecha | Intervención; solo lectura |
+| 6 | Identidad | Hora inicio de cirugía | Foja anestesia; **solo lectura** — la qx no escribe otro horario |
+| 7 | Identidad | Hora fin de cirugía | Foja anestesia; **solo lectura** |
+| 8 | Equipo | Cirujano | Editable en qx; puede partir de `i.ciru` |
+| 9 | Equipo | 1er ayudante | Editable |
+| 10 | Equipo | 2do ayudante | Editable (vacío si no hay) |
+| 11 | Equipo | 3er ayudante | Editable (vacío si no hay) |
+| 12 | Equipo | Instrumentador | Editable |
+| 13 | Dx / op. | Diagnóstico preoperatorio | + código CIE (buscador; catálogo CIE a armar) |
+| 14 | Dx / op. | Diagnóstico posoperatorio | + código CIE |
+| 15 | Dx / op. | Operación indicada | Catálogo clínico (`CIRUGIAS` / especialidad), no ADAARC `NOM` |
+| 16 | Dx / op. | Operación practicada | Idem; texto libre si no hay match |
+| 17 | Dx / op. | Riesgo quirúrgico | Campo propio qx |
+| 18 | Fijo clínico | Consentimiento informado firmado | **Sí / No** — obligatorio en todas |
+| 19 | Fijo clínico | Conteo de gasas y compresas | Texto corto — obligatorio en todas |
+| 20 | Fijo clínico | Antibiótico-profilaxis | **Sí / No** (+ detalle libre opcional si Sí) |
+
+**Inmediatamente debajo (no son “previos”, pero cierran el documento):**
+
+- **Descripción del procedimiento** — solo el texto final (sin UI de slots).
+- **Grado de dificultad operatoria.**
+- **Firma / sello virtual del cirujano** (nombre + M.P. + especialidad;
+  espíritu `AfIdentidad`, identidad distinta a la del anestesista).
+- **Pie** (mismo criterio de institución / colegio que el print Aero).
+
+**Fuera de la cáscara impresa (UI):** alerta de alergias (§3); alerta suave
+de discrepancia diag/cirugía vs foja anestesia (§2); formulario dinámico
+de slots de la proforma (nunca se imprime).
+
+**Catálogos (no mezclar):** clínico = `data/cirugias.js` (`CIRUGIAS`) +
+CIE nuevo para dx; facturación = `data/nomenclador.js` (`NOM` ADAARC) solo
+en el camino de complejidad / Traditum / evweb.
 
 ### P3 — Foja qx + QR cirujano · **públicos** · **mediano** (después de P2)
 
@@ -631,3 +879,7 @@ dolor de PC (columna 520px) y no completa ninguna tubería.
 - No un SKU «plan Cirugía» (visión en Home; planes hoy = cupo de lugares).
 - No Allende.
 - No «completar SISalud» = upload hasta que Diego quite el veto.
+- No duplicar ni mezclar patología/procedimiento en un módulo genérico
+  cuando ya existe especialidad auditada dueña (ver **P2 — Regla de
+  organización del catálogo**; no tocar OK de semilla ajenos sin OK
+  explícito).

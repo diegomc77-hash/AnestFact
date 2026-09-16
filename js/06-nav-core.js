@@ -57,7 +57,7 @@ function afSetShellTitle(id){
   sec.textContent=(typeof TITLES!=='undefined'&&TITLES[id])?TITLES[id]:'';
   sec.style.display=sec.textContent?'block':'none';
 }
-var AF_DOCK_HIDE={foja:1,nueva:1,admin:1,facturacion:1,nom:1,resumen:1};
+var AF_DOCK_HIDE={foja:1,fojaQx:1,nueva:1,admin:1,facturacion:1,nom:1,resumen:1};
 var AF_DOCK_MAP={home:'home',preop:'preop',sanatorios:'sanatorios',geclisa:'geclisa',evweb:'evweb',legales:'legales',herramientas:'herramientas',escanear:'herramientas',config:'herramientas',ayuda:'herramientas'};
 function afActiveViewId(){
   var el=document.querySelector('#views-mount .view.active');
@@ -108,6 +108,14 @@ function goDock(id){
 function go(id,addH){
   if(addH===undefined)addH=true;
   if(id==='facturacion'&&!S.cur){toast('Abrí una intervención primero');return false;}
+  if(id==='fojaQx'){
+    if(!S.cur){toast('Abrí una intervención primero');return false;}
+    if(typeof afFojaQxEnabled==='function'&&!afFojaQxEnabled(S.cur.san)){
+      toast('Foja quirúrgica no habilitada en esta institución');
+      return false;
+    }
+    if(typeof afEnsureFojaQx==='function')afEnsureFojaQx(S.cur);
+  }
   if(id==='geclisa'&&typeof checkPlan==='function'&&!checkPlan('geclisa'))return false;
   if(id==='admin'&&(typeof isAdmin!=='function'||!isAdmin())){toast('Acceso denegado');return false;}
   if(!afShowView(id))return false;
@@ -145,6 +153,7 @@ function go(id,addH){
     renderPesoChips();
     renderFojaPorSanatorio();
   }
+  if(id==='fojaQx'&&typeof cargarFojaQxUI==='function')cargarFojaQxUI();
   if(id==='geclisa'){
     window._geclisaTexto='';
     var mayo=S.cur&&typeof afIsMayoInterv==='function'&&afIsMayoInterv(S.cur);
