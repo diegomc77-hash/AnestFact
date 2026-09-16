@@ -1,8 +1,8 @@
 # P2 — QR cirujano / `fojaQx` (diseño confirmado)
 
-**Estado (2026-09-16):** Paso 1–2.1 CERRADOS en prod. **Paso 2.2 en curso**
-(formulario+firma+`af-qx-submit`+pull). A–E OK Diego. Parte 1 SQL local
-(`022_foja_qx.sql`) — sin apply prod aún.
+**Estado (2026-09-16):** Paso 1–**2.2 CERRADOS en prod** (Pages 12.69 +
+Edge create/peek/submit; TTL foja_qx 7 d; pull + skip Mayo). Smokes Diego OK.
+Siguiente: proformas / print / CIE (entregas posteriores).
 
 Índice: `docs/ESTADO_PROYECTO.md` · Marco: `docs/ROADMAP_ESCALAMIENTO.md`.
 
@@ -94,20 +94,11 @@ iniciando foja quirúrgica sin intervención previa de anestesia — ver
 nota en `docs/ROADMAP_ESCALAMIENTO.md` § P2. Hoy fojaQx sigue atada a
 intervención nacida del flujo anestesia.
 
-## Paso 2.2 (en curso)
+## Paso 2.2 (cerrado en prod — 2026-09-16)
 
-A–E confirmados (cáscara completa sin CIE; sin proformas; canvas+MP;
-pull+sync misma entrega; contrato sync con diff literal + smoke «prueba»).
-
-- Parte 1: `022_foja_qx.sql` — **aplicada en prod** (tabla + RLS).
-- Parte 2 (código local): `af-qx-submit`; peek con `hora_ini`/`hora_fin`;
-  create contexto desde app con horas.
-- Parte 3 OK Diego: `foja-qx.html` form+canvas+submit; TTL foja_qx **7 días**.
-- Parte 4 (código local): `js/43-foja-qx-sync.js` pull → `S.cur.fojaQx`;
-  omite `firma.png` en sync nube; hook initApp + al abrir fojaQx.
-  **`js/17-sync-export.js` sin cambios** (usa `afIntervsPayloadForSync` ya existente).
-- **Pendiente:** bump CACHE_V + deploy Edge (`af-qx-submit`, `af-qx-peek`,
-  `af-qx-create` 7d) + Pages + smoke «prueba».
+A–E confirmados. SQL `022` + Edge submit/peek/create (7 d) + form/firma +
+pull (`43-foja-qx-sync.js`; skip red si no hay foja_qx local). Smokes Diego:
+form+firma+pull+cruce; Mayo skip por code review. `17-sync-export.js` intacto.
 
 ## Paso 2.1 (cerrado)
 
