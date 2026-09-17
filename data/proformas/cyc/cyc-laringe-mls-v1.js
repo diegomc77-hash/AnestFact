@@ -119,6 +119,6 @@
     "Laringectomía total simple (sin reconstrucción compleja)"
   ],
   "titulo": "Laringe y microcirugía laríngea (MLS)",
-  "plantilla_texto": "Se realiza {{procedimiento}}\n(lesión benigna: {{lesion_benigna_tipo}}; parcial simple: {{parcial_simple_tipo}}).\nInstrumentación: {{instrumentacion}}.\nCuerda vocal / región: {{cuerda_vocal_eval}}.\nManejo de vía aérea (coordinado con anestesia): laringoscopio de\nsuspensión {{laringoscopio}}; ventilación {{ventilacion}}.\n{{ventilacion_detalle}}.\n\nHallazgos: {{hallazgos}}.\n{{hemostasia_cierre}}."
+  "plantilla_texto": "Se realiza {{procedimiento}}.\n{{#if_filled lesion_benigna_tipo}}Lesión benigna: {{lesion_benigna_tipo}}.{{/if_filled}}\n{{#if_filled parcial_simple_tipo}}Parcial simple: {{parcial_simple_tipo}}.{{/if_filled}}\nInstrumentación: {{instrumentacion}}.\nCuerda vocal / región: {{cuerda_vocal_eval}}.\nManejo de vía aérea (coordinado con anestesia): laringoscopio de\nsuspensión {{laringoscopio}}; ventilación {{ventilacion}}.\n{{ventilacion_detalle}}.\n\nHallazgos: {{hallazgos}}.\n{{hemostasia_cierre}}."
 };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -158,7 +158,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- **Paso 2.3** en deploy: Pages 12.70 + Edge peek/submit. Pendiente smoke Diego (CyC Aero «prueba» + print con firma).
+- **Hotfix ramas proforma** (12.71): if_eq + prune + PTH oculto fuera de paratiroides. Pendiente push Pages + smoke tiroides Diego.
 
 - **P2 Cirugía General:** **OK de semilla del set** (M1–M6). Soft handoffs aplicados. Motor pendiente. `foja.consideraciones` = fase aparte (0 código).
 - **P2 Cirugía Torácica:** **OK de semilla** (`01-torax.md`). Validación criterio Diego/AnesFact (no torácico ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.

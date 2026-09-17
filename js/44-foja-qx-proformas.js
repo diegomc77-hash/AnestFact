@@ -127,6 +127,43 @@
     return false;
   }
 
+  function _slotEmpty(raw) {
+    return (
+      raw == null ||
+      (typeof raw === 'string' && !String(raw).trim()) ||
+      (Array.isArray(raw) && !raw.length)
+    );
+  }
+
+  /**
+   * Quita valores de slots no visibles (iterativo: al cambiar de rama
+   * no quedan PTH/para_* “fantasma” ni hijos de un padre oculto).
+   */
+  function afProformaPruneValues(proforma, values) {
+    var v = {};
+    var src = values || {};
+    Object.keys(src).forEach(function (k) {
+      v[k] = Array.isArray(src[k]) ? src[k].slice() : src[k];
+    });
+    if (!proforma || !proforma.slots) return v;
+    var guard = 0;
+    var changed = true;
+    while (changed && guard < 20) {
+      guard++;
+      changed = false;
+      for (var i = 0; i < proforma.slots.length; i++) {
+        var sl = proforma.slots[i];
+        if (!sl || !sl.id) continue;
+        if (afProformaSlotIsVisible(sl, v)) continue;
+        if (!_slotEmpty(v[sl.id])) {
+          delete v[sl.id];
+          changed = true;
+        }
+      }
+    }
+    return v;
+  }
+
   function formatSlotValue(slot, raw) {
     if (!slot) return '';
     var empty = slot.empty_text != null ? String(slot.empty_text) : '';
@@ -140,10 +177,10 @@
       if (slot.suffix) s += String(slot.suffix);
       return s;
     }
-    var v = raw == null ? '' : String(raw).trim();
-    if (!v) return empty;
-    if (slot.suffix) v += String(slot.suffix);
-    return v;
+    var val = raw == null ? '' : String(raw).trim();
+    if (!val) return empty;
+    if (slot.suffix) val += String(slot.suffix);
+    return val;
   }
 
   /** Frases derivadas usadas en plantillas CyC (lado_frase, co2_frase, …). */
@@ -164,20 +201,65 @@
     return out;
   }
 
+  /**
+   * Bloques condicionales en plantilla:
+   *   {{#if_eq slotId "valor exacto"}}...{{/if_eq}}
+   *   {{#if_filled slotId}}...{{/if_filled}}
+   * Se evalúan después de prune; anidables (bucle hasta estabilizar).
+   */
+  function applyTemplateConditionals(text, values) {
+    var out = String(text || '');
+    var guard = 0;
+    // Cuerpo sin {{#if_ anidado → procesa de adentro hacia afuera
+    var reEq =
+      /\{\{#if_eq\s+([a-zA-Z0-9_]+)\s+"([^"]*)"\s*\}\}((?:(?!\{\{#if_)[\s\S])*?)\{\{\/if_eq\}\}/;
+    var reFilled =
+      /\{\{#if_filled\s+([a-zA-Z0-9_]+)\s*\}\}((?:(?!\{\{#if_)[\s\S])*?)\{\{\/if_filled\}\}/;
+    while (guard < 40) {
+      guard++;
+      var mEq = out.match(reEq);
+      if (mEq) {
+        var cur = slotValue(values, mEq[1]);
+        var ok = String(cur == null ? '' : cur) === String(mEq[2]);
+        out = out.slice(0, mEq.index) + (ok ? mEq[3] : '') + out.slice(mEq.index + mEq[0].length);
+        continue;
+      }
+      var mF = out.match(reFilled);
+      if (mF) {
+        var raw = slotValue(values, mF[1]);
+        var show = !_slotEmpty(raw);
+        out = out.slice(0, mF.index) + (show ? mF[2] : '') + out.slice(mF.index + mF[0].length);
+        continue;
+      }
+      break;
+    }
+    out = out
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .replace(/^\n+/, '')
+      .replace(/\n+$/, '');
+    return out;
+  }
+
   function afProformaRender(proforma, values) {
     if (!proforma || !proforma.plantilla_texto) return '';
-    var vals = values || {};
+    var vals = afProformaPruneValues(proforma, values || {});
     var map = {};
     var slots = proforma.slots || [];
     for (var i = 0; i < slots.length; i++) {
       var sl = slots[i];
+      if (!afProformaSlotIsVisible(sl, vals)) {
+        map[sl.id] = '';
+        continue;
+      }
       map[sl.id] = formatSlotValue(sl, slotValue(vals, sl.id));
     }
     var der = derivedFrases(proforma, vals);
     Object.keys(der).forEach(function (k) {
       map[k] = der[k];
     });
-    return String(proforma.plantilla_texto).replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, function (_, key) {
+    var body = applyTemplateConditionals(String(proforma.plantilla_texto), vals);
+    return body.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, function (_, key) {
       return map[key] != null ? map[key] : '';
     });
   }
@@ -186,16 +268,14 @@
   function afProformaMissingRequired(proforma, values) {
     var missing = [];
     if (!proforma) return missing;
+    var vals = afProformaPruneValues(proforma, values || {});
     var slots = proforma.slots || [];
     for (var i = 0; i < slots.length; i++) {
       var sl = slots[i];
-      if (!afProformaSlotIsRequired(sl, values)) continue;
-      var raw = slotValue(values, sl.id);
-      var empty =
-        raw == null ||
-        (typeof raw === 'string' && !raw.trim()) ||
-        (Array.isArray(raw) && !raw.length);
-      if (empty) missing.push(sl.label || sl.id);
+      if (!afProformaSlotIsRequired(sl, vals)) continue;
+      if (!afProformaSlotIsVisible(sl, vals)) continue;
+      var raw = slotValue(vals, sl.id);
+      if (_slotEmpty(raw)) missing.push(sl.label || sl.id);
     }
     return missing;
   }
@@ -211,12 +291,13 @@
     if (m === 'cero' || !proforma) {
       return { modo_armado: 'cero', proforma_id: null, texto: (values && values._texto) || '', slots: {} };
     }
-    var texto = afProformaRender(proforma, values);
+    var pruned = afProformaPruneValues(proforma, values || {});
+    var texto = afProformaRender(proforma, pruned);
     return {
       modo_armado: m === 'editar' ? 'editar' : 'usar',
       proforma_id: proforma.id,
       texto: texto,
-      slots: Object.assign({}, values || {}),
+      slots: pruned,
     };
   }
 
@@ -227,6 +308,7 @@
   g.afProformasMatchOperacion = afProformasMatchOperacion;
   g.afProformaSlotIsRequired = afProformaSlotIsRequired;
   g.afProformaSlotIsVisible = afProformaSlotIsVisible;
+  g.afProformaPruneValues = afProformaPruneValues;
   g.afProformaRender = afProformaRender;
   g.afProformaMissingRequired = afProformaMissingRequired;
   g.afProformaArmar = afProformaArmar;

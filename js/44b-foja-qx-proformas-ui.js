@@ -115,7 +115,12 @@
     function emit() {
       if (typeof opts.onChange === 'function') {
         var p = g.afProformaById(curId);
-        var vals = afProformaReadSlots(host.querySelector('[data-qx-slots]'));
+        var valsRaw = afProformaReadSlots(host.querySelector('[data-qx-slots]'));
+        var vals =
+          p && typeof g.afProformaPruneValues === 'function'
+            ? g.afProformaPruneValues(p, valsRaw)
+            : valsRaw;
+        values = vals;
         var textoEl = host.querySelector('[data-qx-preview]');
         var texto =
           modo === 'cero'
@@ -231,8 +236,12 @@
         }
       }
       wrap.onchange = wrap.oninput = function () {
-        values = afProformaReadSlots(wrap);
+        var raw = afProformaReadSlots(wrap);
         var pNow = g.afProformaById(curId);
+        values =
+          pNow && typeof g.afProformaPruneValues === 'function'
+            ? g.afProformaPruneValues(pNow, raw)
+            : raw;
         var vis = [];
         if (pNow) {
           for (var vi = 0; vi < (pNow.slots || []).length; vi++) {
@@ -353,7 +362,11 @@
       refresh: renderSlots,
       getState: function () {
         var p = g.afProformaById(curId);
-        var vals = afProformaReadSlots(host.querySelector('[data-qx-slots]'));
+        var valsRaw = afProformaReadSlots(host.querySelector('[data-qx-slots]'));
+        var vals =
+          p && typeof g.afProformaPruneValues === 'function'
+            ? g.afProformaPruneValues(p, valsRaw)
+            : valsRaw;
         var textoEl = host.querySelector('[data-qx-preview]');
         return {
           proforma_id: modo === 'cero' ? null : curId || null,

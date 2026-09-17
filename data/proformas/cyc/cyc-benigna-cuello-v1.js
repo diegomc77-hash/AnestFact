@@ -147,6 +147,6 @@
     "Cirugía de patología benigna / congénita de cuello"
   ],
   "titulo": "Patología benigna y congénita del cuello (quistes, schwannomas, glomus)",
-  "plantilla_texto": "Entidad: {{entidad}}. Procedimiento: {{procedimiento}}. Lateralidad: {{lateralidad}}.\nGlomus — ubicación: {{glomus_ubicacion}}; embolización previa: {{glomus_embolizacion}}.\nSchwannoma — nervio de origen: {{schwannoma_nervio}}; preservación nerviosa: {{schwannoma_preservacion}}.\nQuiste branquial — arco: {{branquial_arco}}.\nHallazgos: {{hallazgos_semiologia}}.\nEstructuras de riesgo: {{estructuras_riesgo}}.\nCierre: drenaje {{drenaje}}. Cierre por planos."
+  "plantilla_texto": "Entidad: {{entidad}}. Procedimiento: {{procedimiento}}. Lateralidad: {{lateralidad}}.\n{{#if_eq entidad \"Tumor glómico (glomus)\"}}\nGlomus — ubicación: {{glomus_ubicacion}}; embolización previa: {{glomus_embolizacion}}.\n{{/if_eq}}\n{{#if_eq entidad \"Schwannoma\"}}\nSchwannoma — nervio de origen: {{schwannoma_nervio}}; preservación nerviosa: {{schwannoma_preservacion}}.\n{{/if_eq}}\n{{#if_eq entidad \"Quiste branquial\"}}\nQuiste branquial — arco: {{branquial_arco}}.\n{{/if_eq}}\nHallazgos: {{hallazgos_semiologia}}.\nEstructuras de riesgo: {{estructuras_riesgo}}.\nCierre: drenaje {{drenaje}}. Cierre por planos."
 };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -215,7 +215,11 @@
     {
       "id": "nlr",
       "type": "single",
-      "required": true,
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía de tiroides (vía + extensión)",
+        "Paratiroidectomía"
+      ],
       "label": "Nervio laríngeo recurrente",
       "options": [
         "Identificado y preservado",
@@ -226,6 +230,9 @@
       "id": "vaciamiento_asoc",
       "type": "multi",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía de tiroides (vía + extensión)"
+      ],
       "label": "Vaciamiento ganglionar asociado",
       "options": [
         "Ninguno",
@@ -260,6 +267,9 @@
       "id": "pth_basal",
       "type": "free",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Paratiroidectomía"
+      ],
       "label": "PTH basal",
       "empty_text": ""
     },
@@ -267,6 +277,9 @@
       "id": "pth_post",
       "type": "free",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Paratiroidectomía"
+      ],
       "label": "PTH post-exéresis",
       "empty_text": ""
     },
@@ -274,6 +287,9 @@
       "id": "pth_pct",
       "type": "free",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Paratiroidectomía"
+      ],
       "label": "Variación PTH (%)",
       "suffix": " %",
       "empty_text": ""
@@ -317,6 +333,6 @@
     "Paratiroidectomía"
   ],
   "titulo": "Cirugía de patología tiroidea, paratiroidea y mínimamente invasiva",
-  "plantilla_texto": "Procedimiento: {{procedimiento_grupo}}.\nVía / abordaje: {{via}}. Extensión: {{extension}}{{extension_ablativa}}{{lado_frase}}.\n\nSi Sistrunk: resección de quiste tirogloso según técnica de Sistrunk.\n\nSi paratiroidectomía: enfoque {{para_tecnica}}; patología {{para_patologia}}.\nAdenoma — lado {{para_lado}}, cantidad {{para_cantidad}}, ubicación {{para_ubicacion}}.\nHiperplasia (paratiroidectomía subtotal, remanente mitad de una glándula) —\nlado del remanente {{para_subtotal_lado}}, glándula {{para_subtotal_ubicacion}}.\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\n\nSe desarrolla la técnica según la vía elegida (convencional abierta /\nTOETVA / ablación percutánea) o el procedimiento separado consignado arriba.\nExéresis o ablación con identificación de paratiroides cuando corresponde.\nNervio laríngeo recurrente: {{nlr}}.\nNeuromonitoreo (si aplica): {{nim_senales}}.\n\nVaciamiento ganglionar asociado: {{vaciamiento_asoc}}.\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nPTH basal {{pth_basal}}; PTH post-exéresis {{pth_post}} (variación {{pth_pct}}).\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos."
+  "plantilla_texto": "Procedimiento: {{procedimiento_grupo}}.\n\n{{#if_eq procedimiento_grupo \"Cirugía de tiroides (vía + extensión)\"}}\nVía / abordaje: {{via}}. Extensión: {{extension}}{{extension_ablativa}}{{lado_frase}}.\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\n\nSe desarrolla la técnica según la vía elegida (convencional abierta /\nTOETVA / ablación percutánea).\nExéresis o ablación con identificación de paratiroides cuando corresponde.\nNervio laríngeo recurrente: {{nlr}}.\nNeuromonitoreo (si aplica): {{nim_senales}}.\n\nVaciamiento ganglionar asociado: {{vaciamiento_asoc}}.\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos.\n{{/if_eq}}\n\n{{#if_eq procedimiento_grupo \"Resección de quiste tirogloso (Sistrunk)\"}}\nSe realiza resección de quiste tirogloso según técnica de Sistrunk.\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos.\n{{/if_eq}}\n\n{{#if_eq procedimiento_grupo \"Paratiroidectomía\"}}\nEnfoque quirúrgico: {{para_tecnica}}; patología: {{para_patologia}}.\n{{#if_eq para_patologia \"Adenoma\"}}\nAdenoma — lado {{para_lado}}, cantidad {{para_cantidad}}, ubicación {{para_ubicacion}}.\n{{/if_eq}}\n{{#if_eq para_patologia \"Hiperplasia (insuficiencia renal)\"}}\nHiperplasia (paratiroidectomía subtotal, remanente mitad de una glándula) —\nlado del remanente {{para_subtotal_lado}}, glándula {{para_subtotal_ubicacion}}.\n{{/if_eq}}\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\nNervio laríngeo recurrente: {{nlr}}.\nNeuromonitoreo (si aplica): {{nim_senales}}.\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nPTH basal {{pth_basal}}; PTH post-exéresis {{pth_post}} (variación {{pth_pct}}).\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos.\n{{/if_eq}}"
 };
 })(typeof window !== "undefined" ? window : globalThis);
