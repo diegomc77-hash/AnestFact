@@ -89,6 +89,154 @@ assert(texto.indexOf('Si paratiroid') < 0, 'tiroides: sin rama «Si paratiroid�
 assert(texto.indexOf('enfoque') < 0 || texto.indexOf('Enfoque quirúrgico') < 0, 'tiroides: sin bloque enfoque para');
 assert(texto.indexOf('PTH basal') < 0 && texto.indexOf('PTH post') < 0, 'tiroides: sin líneas PTH');
 
+// Redacción afirmativa (Huerta): sin listas de opciones ni condicionales vagos
+assert(texto.indexOf('según la vía elegida') < 0, 'tiroides: sin lista de vías');
+assert(texto.indexOf('TOETVA /') < 0 && texto.indexOf('/ ablación') < 0, 'tiroides: sin otras vías en prosa');
+assert(texto.indexOf('cuando corresponde') < 0, 'tiroides: sin «cuando corresponde»');
+assert(texto.indexOf('si aplica') < 0, 'tiroides: sin «si aplica»');
+assert(texto.indexOf('Se desarrolla la técnica por vía convencional (abierta).') >= 0, 'tiroides: vía afirmativa');
+assert(texto.indexOf('Exéresis con identificación de paratiroides.') >= 0, 'tiroides: exéresis afirmativa');
+assert(texto.indexOf('Se utilizó neuromonitoreo intraoperatorio (NIM).') >= 0, 'tiroides: NIM afirmativo');
+
+const textoSinNim = sandbox.afProformaRender(p, {
+  procedimiento_grupo: 'Cirugía de tiroides (vía + extensión)',
+  via: 'Convencional (abierta)',
+  extension: 'Tiroidectomía total',
+  intubacion: 'Orotraqueal estándar',
+  nlr: 'Identificado y preservado',
+  aparatologia: ['Bisturí ultrasónico'],
+});
+assert(
+  textoSinNim.indexOf('No se utilizó neuromonitoreo intraoperatorio.') >= 0,
+  'tiroides: aparatología sin NIM → afirmación de no uso'
+);
+assert(
+  textoSinNim.indexOf('Biopsia por congelación: no consignada') >= 0,
+  'tiroides: biopsia vacía → neutral (no afirmar No se realizó)'
+);
+assert(
+  textoSinNim.indexOf('No se realizó biopsia') < 0,
+  'tiroides: sin negación inventada de biopsia'
+);
+
+const textoAparaVacia = sandbox.afProformaRender(p, {
+  procedimiento_grupo: 'Cirugía de tiroides (vía + extensión)',
+  via: 'Convencional (abierta)',
+  extension: 'Tiroidectomía total',
+  intubacion: 'Orotraqueal estándar',
+  nlr: 'Identificado y preservado',
+});
+assert(
+  textoAparaVacia.indexOf('Neuromonitoreo: no consignado.') >= 0,
+  'tiroides: aparatología vacía → neuromonitoreo neutral'
+);
+assert(
+  textoAparaVacia.indexOf('No se utilizó neuromonitoreo') < 0,
+  'tiroides: aparatología vacía → no inventar No se utilizó NIM'
+);
+
+const textoAbl = sandbox.afProformaRender(p, {
+  procedimiento_grupo: 'Cirugía de tiroides (vía + extensión)',
+  via: 'Ablativa (percutánea)',
+  extension_ablativa: 'Nodulectomía por ablación',
+  intubacion: 'Orotraqueal estándar',
+  nlr: 'Identificado y preservado',
+});
+assert(textoAbl.indexOf('Ablación de la lesión.') >= 0, 'ablativa: Ablación, no Exéresis');
+assert(textoAbl.indexOf('Exéresis') < 0, 'ablativa: sin palabra Exéresis');
+
+const textoCm = sandbox.afProformaRender(p, {
+  procedimiento_grupo: 'Cirugía de tiroides (vía + extensión)',
+  via: 'Convencional (abierta)',
+  extension: 'Tiroidectomía total',
+  intubacion: 'Orotraqueal estándar',
+  nlr: 'Identificado y preservado',
+  hallazgo_tamano: '2cm',
+});
+assert(textoCm.indexOf('2cm cm') < 0, 'tiroides: sin unidad duplicada 2cm cm');
+assert(textoCm.indexOf('lesión de 2 cm') >= 0, 'tiroides: sanitiza 2cm → 2 cm');
+
+const textoToetva = sandbox.afProformaRender(p, {
+  procedimiento_grupo: 'Cirugía de tiroides (vía + extensión)',
+  via: 'TOETVA',
+  extension: 'Hemitiroidectomía',
+  lado: 'Izquierdo',
+  intubacion: 'Orotraqueal estándar',
+  nlr: 'Identificado y preservado',
+});
+assert(textoToetva.indexOf('vía TOETVA') >= 0, 'TOETVA: vía afirmativa');
+assert(textoToetva.indexOf('Convencional') < 0, 'TOETVA: sin mencionar convencional');
+assert(textoToetva.indexOf('ablativa') < 0 && textoToetva.indexOf('Ablación') < 0, 'TOETVA: sin ablativa');
+
+// Salivales: mon_facial + Enucleación
+const sal = sandbox.afProformaById('cyc-salivales-v1');
+const textoSalVacio = sandbox.afProformaRender(sal, {
+  procedimiento: 'Enucleación extracapsular',
+  lateralidad: 'Derecha',
+  facial_estado: 'Íntegro y funcional',
+});
+assert(
+  textoSalVacio.indexOf('Neuromonitoreo facial: no consignado.') >= 0,
+  'salivales: mon vacío → neutral'
+);
+assert(
+  textoSalVacio.indexOf('Neuromonitoreo continuo') < 0,
+  'salivales: mon vacío → no afirma continuo'
+);
+assert(
+  textoSalVacio.indexOf('Enucleación extracapsular de la lesión') >= 0,
+  'salivales: rama Enucleación presente'
+);
+assert(
+  textoSalVacio.indexOf('tragus') < 0 && textoSalVacio.indexOf('Wharton') < 0,
+  'salivales: Enucleación sin texto parótida/submaxilar'
+);
+
+const textoSalMon = sandbox.afProformaRender(sal, {
+  procedimiento: 'Parotidectomía superficial',
+  lateralidad: 'Izquierda',
+  facial_estado: 'Íntegro y funcional',
+  mon_facial: ['Frontal', 'Orbicular'],
+});
+assert(
+  textoSalMon.indexOf('Neuromonitoreo continuo del nervio facial (canales Frontal, Orbicular).') >= 0,
+  'salivales: mon filled → continuo'
+);
+
+// Oncología: required_if_reseccion_includes + if_filled
+const onc = sandbox.afProformaById('cyc-oncologia-reconstruccion-v1');
+const gExt = onc.slots.find((x) => x.id === 'glosectomia_ext');
+assert(
+  sandbox.afProformaSlotIsVisible(gExt, { reseccion: ['Glosectomía'] }) === true,
+  'onc: glosectomia_ext visible si reseccion includes Glosectomía'
+);
+assert(
+  sandbox.afProformaSlotIsVisible(gExt, { reseccion: ['Mandibulectomía'] }) === false,
+  'onc: glosectomia_ext oculto sin Glosectomía'
+);
+const textoOnc = sandbox.afProformaRender(onc, {
+  reseccion: ['Glosectomía'],
+  glosectomia_ext: 'Parcial',
+  recon_modo: 'Colgajo libre',
+});
+assert(textoOnc.indexOf('Glosectomía: Parcial.') >= 0, 'onc: extensión glosa en texto');
+assert(textoOnc.indexOf('Anastomosis:') < 0, 'onc: sin anastomosis si vacía');
+assert(textoOnc.indexOf('Márgenes por congelación') < 0, 'onc: sin márgenes si vacíos');
+assert(textoOnc.indexOf('Bloqueo intermaxilar') < 0, 'onc: N/A');
+
+// RIFO: sin afirmación fija de bloqueo; focos solo si filled
+const rifo = sandbox.afProformaById('cyc-rifo-v1');
+const textoRifo = sandbox.afProformaRender(rifo, {
+  fractura_grupo: ['Mandibular'],
+  mandib_sitio: ['Cuerpo'],
+  mandib_lado: 'Derecho',
+  intubacion: 'Nasotraqueal',
+  oclusion: 'Oclusión estable',
+});
+assert(textoRifo.indexOf('Bloqueo intermaxilar') < 0, 'rifo: sin Bloqueo fijo');
+assert(textoRifo.indexOf('CNEO') < 0 && textoRifo.indexOf('Maxilar:') < 0, 'rifo: sin focos no elegidos');
+assert(textoRifo.indexOf('Mandíbula: Cuerpo (Derecho).') >= 0, 'rifo: solo mandibular filled');
+
 const pthSlot = p.slots.find((s) => s.id === 'pth_basal');
 assert(
   sandbox.afProformaSlotIsVisible(pthSlot, values) === false,

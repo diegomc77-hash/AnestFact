@@ -136,13 +136,13 @@ slots:
     required: false
     label: Patencia por Doppler (colgajo libre)
     options: [Permeable, No permeable, No aplica]
-    empty_text: "no consignado"
+    empty_text: "Doppler no documentado"
 
   - id: pieza_macro
     type: free
     required: false
     label: Descripción macroscópica de la pieza
-    empty_text: "[descripción macroscópica a completar]"
+    empty_text: "Descripción macroscópica no documentada"
 
   - id: margen_cong
     type: single
@@ -174,21 +174,25 @@ slots:
 plantilla_texto: |
   Tiempo oncológico: se realiza {{reseccion}}.
   {{#if_filled glosectomia_ext}}Glosectomía: {{glosectomia_ext}}.{{/if_filled}}
-  {{#if_filled mandibulectomia_ext}}Mandibulectomía: {{mandibulectomia_ext}} {{mandib_desart}}.{{/if_filled}}
-  {{#if_filled maxilectomia_ext}}Maxilectomía: {{maxilectomia_ext}} {{maxil_exent}}.{{/if_filled}}
+  {{#if_filled mandibulectomia_ext}}Mandibulectomía: {{mandibulectomia_ext}}{{#if_filled mandib_desart}} {{mandib_desart}}{{/if_filled}}.{{/if_filled}}
+  {{#if_filled maxilectomia_ext}}Maxilectomía: {{maxilectomia_ext}}{{#if_filled maxil_exent}} {{maxil_exent}}{{/if_filled}}.{{/if_filled}}
   {{#if_filled laringectomia_ext}}Laringectomía: {{laringectomia_ext}}.{{/if_filled}}
 
   Hallazgos: {{pieza_macro}}.
-  Márgenes por congelación: {{margen_cong}} ({{margen_mm}}).
+  {{#if_filled margen_cong}}Márgenes por congelación: {{margen_cong}}{{#if_filled margen_mm}} ({{margen_mm}}){{/if_filled}}.{{/if_filled}}
 
   Tiempo reconstructivo: {{recon_modo}}.
   {{#if_filled colgajo_local}}Local: {{colgajo_local}}.{{/if_filled}}
   {{#if_filled colgajo_regional}}Regional: {{colgajo_regional}}.{{/if_filled}}
   {{#if_filled colgajo_libre}}Libre: {{colgajo_libre}}.{{/if_filled}}
   {{#if_filled protesis}}Protésico: {{protesis}}.{{/if_filled}}
-  Anastomosis: {{anastomosis}}. Isquemia: {{isquemia_min}}. Doppler: {{doppler}}.
+  {{#if_filled anastomosis}}Anastomosis: {{anastomosis}}.{{/if_filled}}
+  {{#if_filled isquemia_min}}Isquemia: {{isquemia_min}}.{{/if_filled}}
+  {{#if_filled doppler}}Doppler: {{doppler}}.{{/if_filled}}
 
-  Cierre con SNG: {{sng}}. Drenajes: {{drenajes}}. Cierre por planos.
+  {{#if_filled sng}}Sonda nasogástrica: {{sng}}.{{/if_filled}}
+  {{#if_filled drenajes}}Drenajes: {{drenajes}}.{{/if_filled}}
+  Cierre por planos.
 ```
 
 **Validación condicional (obligatoria en UI / antes de armar texto):**

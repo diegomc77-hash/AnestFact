@@ -76,7 +76,7 @@
     return [v];
   }
 
-  /** Evalúa required / required_if_<slotId> contra valores actuales. */
+  /** Evalúa required / required_if_<slotId>[_includes] contra valores actuales. */
   function afProformaSlotIsRequired(slot, values) {
     if (!slot) return false;
     if (slot.required === true) return true;
@@ -85,6 +85,7 @@
       var k = keys[i];
       if (k.indexOf('required_if_') !== 0) continue;
       var depId = k.slice('required_if_'.length);
+      if (depId.slice(-9) === '_includes') depId = depId.slice(0, -9);
       var need = asArray(slot[k]);
       var cur = asArray(slotValue(values, depId));
       for (var a = 0; a < need.length; a++) {
@@ -116,6 +117,7 @@
       var k = keys[i];
       if (k.indexOf('required_if_') !== 0) continue;
       var depId = k.slice('required_if_'.length);
+      if (depId.slice(-9) === '_includes') depId = depId.slice(0, -9);
       var need = asArray(slot[k]);
       var cur = asArray(slotValue(values, depId));
       for (var a = 0; a < need.length; a++) {
@@ -164,6 +166,21 @@
     return v;
   }
 
+  function stripUnitSuffix(val, suffix) {
+    var s = String(val == null ? '' : val).trim();
+    if (!s) return '';
+    var suf = String(suffix || '').trim();
+    if (!suf) return s;
+    var esc = suf.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    s = s.replace(new RegExp('\\s*' + esc + '\\s*$', 'i'), '').trim();
+    // aliases frecuentes si el usuario escribió la unidad en el campo
+    if (/cm/i.test(suf)) s = s.replace(/\s*cm\.?\s*$/i, '').trim();
+    if (/mm/i.test(suf)) s = s.replace(/\s*mm\.?\s*$/i, '').trim();
+    if (/%/.test(suf)) s = s.replace(/\s*%\s*$/i, '').trim();
+    if (/min/i.test(suf)) s = s.replace(/\s*min(utos?)?\.?\s*$/i, '').trim();
+    return s;
+  }
+
   function formatSlotValue(slot, raw) {
     if (!slot) return '';
     var empty = slot.empty_text != null ? String(slot.empty_text) : '';
@@ -179,15 +196,19 @@
     }
     var val = raw == null ? '' : String(raw).trim();
     if (!val) return empty;
-    if (slot.suffix) val += String(slot.suffix);
+    if (slot.suffix) {
+      val = stripUnitSuffix(val, slot.suffix);
+      if (!val) return empty;
+      val += String(slot.suffix);
+    }
     return val;
   }
 
-  /** Frases derivadas usadas en plantillas CyC (lado_frase, co2_frase, …). */
+  /** Frases derivadas usadas en plantillas CyC. */
   function derivedFrases(proforma, values) {
     var out = {};
     var lado = slotValue(values, 'lado');
-    out.lado_frase = lado ? ' Lado: ' + lado + '.' : '';
+    out.lado_frase = lado ? ' Lado: ' + lado : '';
     var aparat = asArray(slotValue(values, 'aparatologia'));
     var co2 = slotValue(values, 'co2_param');
     var hasInsu = aparat.some(function (x) {
@@ -198,6 +219,70 @@
     var det = slotValue(values, 'drenaje_detalle');
     out.drenaje_detalle_frase =
       String(dren) === 'Sí' && det ? ' (' + det + ')' : '';
+
+    // Vía tiroides → afirmación única (sin listar opciones no elegidas)
+    var via = String(slotValue(values, 'via') || '');
+    if (via === 'Convencional (abierta)') {
+      out.via_tecnica_frase = 'Se desarrolla la técnica por vía convencional (abierta).';
+      out.exeresis_frase =
+        'Exéresis con identificación de paratiroides.';
+    } else if (via === 'TOETVA') {
+      out.via_tecnica_frase = 'Se desarrolla la técnica por vía TOETVA.';
+      out.exeresis_frase =
+        'Exéresis con identificación de paratiroides.';
+    } else if (via === 'Ablativa (percutánea)') {
+      out.via_tecnica_frase = 'Se desarrolla la técnica por vía ablativa (percutánea).';
+      out.exeresis_frase = 'Ablación de la lesión.';
+    } else {
+      out.via_tecnica_frase = '';
+      out.exeresis_frase = '';
+    }
+
+    var hasNim = aparat.some(function (x) {
+      return String(x).toLowerCase().indexOf('nim') >= 0;
+    });
+    var nim = slotValue(values, 'nim_senales');
+    if (!_slotEmpty(nim)) {
+      out.neuromonitoreo_frase = 'Neuromonitoreo: ' + String(nim).trim() + '.';
+    } else if (hasNim) {
+      out.neuromonitoreo_frase = 'Se utilizó neuromonitoreo intraoperatorio (NIM).';
+    } else if (aparat.length) {
+      // Aparatología consignada sin NIM → afirmación de no uso
+      out.neuromonitoreo_frase = 'No se utilizó neuromonitoreo intraoperatorio.';
+    } else {
+      // Sin aparatología tipiada: no inventar la negación
+      out.neuromonitoreo_frase = 'Neuromonitoreo: no consignado.';
+    }
+
+    var monFac = asArray(slotValue(values, 'mon_facial')).filter(function (x) {
+      return x != null && String(x).trim() !== '';
+    });
+    if (monFac.length) {
+      out.mon_facial_frase =
+        'Neuromonitoreo continuo del nervio facial (canales ' +
+        monFac.join(', ') +
+        ').';
+    } else if (proforma && String(proforma.id || '').indexOf('salivales') >= 0) {
+      out.mon_facial_frase = 'Neuromonitoreo facial: no consignado.';
+    } else {
+      out.mon_facial_frase = '';
+    }
+
+    var margenMm = slotValue(values, 'margen_mm');
+    if (!_slotEmpty(margenMm)) {
+      out.margen_frase =
+        ' con margen de ' + stripUnitSuffix(margenMm, ' mm') + ' mm';
+    } else {
+      out.margen_frase = '';
+    }
+
+    var cantEstado = String(slotValue(values, 'cantidad_lobulillos_estado') || '');
+    var cantN = slotValue(values, 'cantidad_lobulillos');
+    out.cantidad_frase =
+      cantEstado === 'Cuantificado' && !_slotEmpty(cantN)
+        ? ', n = ' + String(cantN).trim()
+        : '';
+
     return out;
   }
 

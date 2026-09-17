@@ -161,7 +161,7 @@ slots:
       - Ecógrafo intraoperatorio
       - Insuflador CO2
     join: ", "
-    empty_text: "sin aparatología adicional consignada"
+    empty_text: "no consignada"
 
   - id: co2_param
     type: free
@@ -173,7 +173,7 @@ slots:
     type: free
     required: false
     label: Señales NIM (V1 / R1 / R2 / V2 y mA)
-    empty_text: "señales de neuromonitoreo no consignadas en detalle"
+    empty_text: ""
 
   - id: nlr
     type: single
@@ -183,8 +183,6 @@ slots:
     options:
       - Identificado y preservado
       - Lesionado/sacrificado
-    # Independiente de NIM: documenta el estado del nervio aunque
-    # la cirugía se haga sin neuromonitoreo.
 
   - id: vaciamiento_asoc
     type: multi
@@ -197,35 +195,35 @@ slots:
       - Laterocervical unilateral
       - Laterocervical bilateral
     join: "; "
-    empty_text: "sin vaciamiento ganglionar asociado"
+    empty_text: "no consignado"
 
   - id: hallazgo_tamano
     type: free
     required: false
     label: Tamaño de la lesión (cm)
     suffix: " cm"
-    empty_text: "[tamaño no consignado]"
+    empty_text: "tamaño no documentado"
 
   - id: hallazgo_caract
     type: single
     required: false
     label: Características
     options: [Sólido, Quístico, Mixto]
-    empty_text: ""
+    empty_text: "características no documentadas"
 
   - id: pth_basal
     type: free
     required: false
     required_if_procedimiento_grupo: [Paratiroidectomía]
     label: PTH basal
-    empty_text: ""
+    empty_text: "no documentada"
 
   - id: pth_post
     type: free
     required: false
     required_if_procedimiento_grupo: [Paratiroidectomía]
     label: PTH post-exéresis
-    empty_text: ""
+    empty_text: "no documentada"
 
   - id: pth_pct
     type: free
@@ -233,20 +231,22 @@ slots:
     required_if_procedimiento_grupo: [Paratiroidectomía]
     label: Variación PTH (%)
     suffix: " %"
-    empty_text: ""
+    empty_text: "no documentada"
 
   - id: biopsia_cong
     type: free
     required: false
     label: Biopsia por congelación (resultado)
-    empty_text: "sin biopsia por congelación consignada"
+    # Neutral si vacío: no afirmar «No se realizó» (mismo criterio que
+    # oclusión RIFO — el cirujano pudo hacerla sin tipiar el resultado).
+    empty_text: "no consignada"
 
   - id: drenaje
     type: single
     required: false
     label: Drenaje
     options: [Sí, No]
-    empty_text: ""
+    empty_text: "no consignado"
 
   - id: drenaje_detalle
     type: free
@@ -262,11 +262,10 @@ plantilla_texto: |
 
   Intubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.
 
-  Se desarrolla la técnica según la vía elegida (convencional abierta /
-  TOETVA / ablación percutánea).
-  Exéresis o ablación con identificación de paratiroides cuando corresponde.
+  {{via_tecnica_frase}}
+  {{exeresis_frase}}
   Nervio laríngeo recurrente: {{nlr}}.
-  Neuromonitoreo (si aplica): {{nim_senales}}.
+  {{neuromonitoreo_frase}}
 
   Vaciamiento ganglionar asociado: {{vaciamiento_asoc}}.
 
@@ -299,7 +298,7 @@ plantilla_texto: |
 
   Intubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.
   Nervio laríngeo recurrente: {{nlr}}.
-  Neuromonitoreo (si aplica): {{nim_senales}}.
+  {{neuromonitoreo_frase}}
 
   Hallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.
   PTH basal {{pth_basal}}; PTH post-exéresis {{pth_post}} (variación {{pth_pct}}).
@@ -314,13 +313,12 @@ plantilla_texto: |
 - `via` = Convencional o TOETVA → `extension` required.
 - `via` = Ablativa → `extension_ablativa` required (= Nodulectomía por ablación).
 - `extension` = Hemitiroidectomía → `lado` required.
-- `Paratiroidectomía` → `para_tecnica` + `para_patologia` + PTH fields (visibles solo en esa rama).
-- `Adenoma` → `para_lado`, `para_cantidad`, `para_ubicacion` required
-  (`para_ubicacion` es multi; útil si cantidad = Múltiple).
-- `Hiperplasia (insuficiencia renal)` → `para_subtotal_lado` +
-  `para_subtotal_ubicacion` required (subtotal: se deja mitad de una glándula).
-- Sistrunk: sin vía/extensión de tiroidectomía ni bloque paratiroides/PTH.
-- Plantilla: bloques `{{#if_eq procedimiento_grupo "…"}}` — solo la rama elegida entra al texto firmado.
+- `Paratiroidectomía` → `para_tecnica` + `para_patologia` + PTH (visibles solo en esa rama).
+- `Adenoma` → `para_lado`, `para_cantidad`, `para_ubicacion` required.
+- `Hiperplasia` → `para_subtotal_lado` + `para_subtotal_ubicacion` required.
+- Sistrunk: sin vía/extensión ni bloque paratiroides/PTH.
+- Redacción: afirmaciones definitivas; `via_tecnica_frase` / `exeresis_frase` /
+  `neuromonitoreo_frase` según valores (sin listar opciones no elegidas).
 
-Notas de armado: `lado_frase` / `co2_frase` / `drenaje_detalle_frase` =
-sufijos opcionales; el cirujano siempre edita el párrafo final.
+Notas: `lado_frase` / `co2_frase` / `drenaje_detalle_frase` = sufijos opcionales;
+el cirujano siempre puede editar el párrafo final (modo Editar y usar).

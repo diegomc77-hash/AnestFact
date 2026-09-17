@@ -100,7 +100,7 @@ slots:
     type: free
     required: false
     label: Hallazgos / lesión
-    empty_text: "[hallazgos a completar]"
+    empty_text: "Hallazgos no documentados"
 
   - id: hemostasia_cierre
     type: free
@@ -113,13 +113,13 @@ plantilla_texto: |
   {{#if_filled lesion_benigna_tipo}}Lesión benigna: {{lesion_benigna_tipo}}.{{/if_filled}}
   {{#if_filled parcial_simple_tipo}}Parcial simple: {{parcial_simple_tipo}}.{{/if_filled}}
   Instrumentación: {{instrumentacion}}.
-  Cuerda vocal / región: {{cuerda_vocal_eval}}.
+  {{#if_filled cuerda_vocal_eval}}Cuerda vocal / región: {{cuerda_vocal_eval}}.{{/if_filled}}
   Manejo de vía aérea (coordinado con anestesia): laringoscopio de
   suspensión {{laringoscopio}}; ventilación {{ventilacion}}.
-  {{ventilacion_detalle}}.
+  {{#if_filled ventilacion_detalle}}{{ventilacion_detalle}}.{{/if_filled}}
 
-  Hallazgos: {{hallazgos}}.
-  {{hemostasia_cierre}}.
+  {{#if_filled hallazgos}}Hallazgos: {{hallazgos}}.{{/if_filled}}
+  {{#if_filled hemostasia_cierre}}{{hemostasia_cierre}}.{{/if_filled}}
 ```
 
 **Validación condicional:** `Exéresis de lesión benigna` →

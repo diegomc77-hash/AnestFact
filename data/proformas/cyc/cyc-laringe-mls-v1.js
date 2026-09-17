@@ -99,7 +99,7 @@
       "type": "free",
       "required": false,
       "label": "Hallazgos / lesión",
-      "empty_text": "[hallazgos a completar]"
+      "empty_text": "Hallazgos no documentados"
     },
     {
       "id": "hemostasia_cierre",
@@ -119,6 +119,6 @@
     "Laringectomía total simple (sin reconstrucción compleja)"
   ],
   "titulo": "Laringe y microcirugía laríngea (MLS)",
-  "plantilla_texto": "Se realiza {{procedimiento}}.\n{{#if_filled lesion_benigna_tipo}}Lesión benigna: {{lesion_benigna_tipo}}.{{/if_filled}}\n{{#if_filled parcial_simple_tipo}}Parcial simple: {{parcial_simple_tipo}}.{{/if_filled}}\nInstrumentación: {{instrumentacion}}.\nCuerda vocal / región: {{cuerda_vocal_eval}}.\nManejo de vía aérea (coordinado con anestesia): laringoscopio de\nsuspensión {{laringoscopio}}; ventilación {{ventilacion}}.\n{{ventilacion_detalle}}.\n\nHallazgos: {{hallazgos}}.\n{{hemostasia_cierre}}."
+  "plantilla_texto": "Se realiza {{procedimiento}}.\n{{#if_filled lesion_benigna_tipo}}Lesión benigna: {{lesion_benigna_tipo}}.{{/if_filled}}\n{{#if_filled parcial_simple_tipo}}Parcial simple: {{parcial_simple_tipo}}.{{/if_filled}}\nInstrumentación: {{instrumentacion}}.\n{{#if_filled cuerda_vocal_eval}}Cuerda vocal / región: {{cuerda_vocal_eval}}.{{/if_filled}}\nManejo de vía aérea (coordinado con anestesia): laringoscopio de\nsuspensión {{laringoscopio}}; ventilación {{ventilacion}}.\n{{#if_filled ventilacion_detalle}}{{ventilacion_detalle}}.{{/if_filled}}\n\n{{#if_filled hallazgos}}Hallazgos: {{hallazgos}}.{{/if_filled}}\n{{#if_filled hemostasia_cierre}}{{hemostasia_cierre}}.{{/if_filled}}"
 };
 })(typeof window !== "undefined" ? window : globalThis);

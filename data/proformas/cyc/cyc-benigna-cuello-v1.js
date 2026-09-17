@@ -21,7 +21,7 @@
       "type": "free",
       "required": false,
       "label": "Procedimiento concreto (ej. Sistrunk)",
-      "empty_text": "exéresis según técnica habitual de la entidad"
+      "empty_text": "Exéresis de la entidad consignada"
     },
     {
       "id": "lateralidad",
@@ -116,7 +116,7 @@
       "type": "free",
       "required": false,
       "label": "Hallazgos (tamaño visto, relación con vecinos, aspecto — no conteo AP)",
-      "empty_text": "[hallazgos a completar]"
+      "empty_text": "Hallazgos semiológicos no documentados"
     },
     {
       "id": "estructuras_riesgo",
@@ -147,6 +147,6 @@
     "Cirugía de patología benigna / congénita de cuello"
   ],
   "titulo": "Patología benigna y congénita del cuello (quistes, schwannomas, glomus)",
-  "plantilla_texto": "Entidad: {{entidad}}. Procedimiento: {{procedimiento}}. Lateralidad: {{lateralidad}}.\n{{#if_eq entidad \"Tumor glómico (glomus)\"}}\nGlomus — ubicación: {{glomus_ubicacion}}; embolización previa: {{glomus_embolizacion}}.\n{{/if_eq}}\n{{#if_eq entidad \"Schwannoma\"}}\nSchwannoma — nervio de origen: {{schwannoma_nervio}}; preservación nerviosa: {{schwannoma_preservacion}}.\n{{/if_eq}}\n{{#if_eq entidad \"Quiste branquial\"}}\nQuiste branquial — arco: {{branquial_arco}}.\n{{/if_eq}}\nHallazgos: {{hallazgos_semiologia}}.\nEstructuras de riesgo: {{estructuras_riesgo}}.\nCierre: drenaje {{drenaje}}. Cierre por planos."
+  "plantilla_texto": "Entidad: {{entidad}}.\n{{#if_filled procedimiento}}Procedimiento: {{procedimiento}}.{{/if_filled}}\n{{#if_filled lateralidad}}Lateralidad: {{lateralidad}}.{{/if_filled}}\n{{#if_eq entidad \"Tumor glómico (glomus)\"}}\nGlomus — ubicación: {{glomus_ubicacion}}; embolización previa: {{glomus_embolizacion}}.\n{{/if_eq}}\n{{#if_eq entidad \"Schwannoma\"}}\nSchwannoma — nervio de origen: {{schwannoma_nervio}}; preservación nerviosa: {{schwannoma_preservacion}}.\n{{/if_eq}}\n{{#if_eq entidad \"Quiste branquial\"}}\nQuiste branquial — arco: {{branquial_arco}}.\n{{/if_eq}}\nHallazgos: {{hallazgos_semiologia}}.\n{{#if_filled estructuras_riesgo}}Estructuras de riesgo: {{estructuras_riesgo}}.{{/if_filled}}\n{{#if_filled drenaje}}Cierre: drenaje {{drenaje}}.{{/if_filled}}\nCierre por planos."
 };
 })(typeof window !== "undefined" ? window : globalThis);

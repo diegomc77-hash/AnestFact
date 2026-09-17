@@ -56,7 +56,7 @@
       "type": "free",
       "required": false,
       "label": "Resultado por capa / cuadrantes horarios (comprometido o libre)",
-      "empty_text": "detalle de capas Mohs a completar si aplica"
+      "empty_text": "No se documentó resultado por capas Mohs"
     },
     {
       "id": "defecto_tamano",
@@ -99,6 +99,6 @@
     "Exéresis de lesión cutánea de cabeza y cuello"
   ],
   "titulo": "Patología quirúrgica de piel y faneras (Mohs / convencional + reconstrucción)",
-  "plantilla_texto": "Diagnóstico presuntivo: {{diag_presuntivo}}. Lesión en {{localizacion}}.\nTécnica: {{tecnica}}{{margen_frase}}.\n\nMarcación por cuadrantes horarios. Resultado de capas / márgenes:\n{{mohs_capas}}.\n\nEvaluación del defecto: tamaño {{defecto_tamano}}; profundidad {{defecto_prof}}.\nReconstrucción: {{reconstruccion}}.\n\nCierre con sutura por planos."
+  "plantilla_texto": "Diagnóstico presuntivo: {{diag_presuntivo}}. Lesión en {{localizacion}}.\nTécnica: {{tecnica}}{{margen_frase}}.\n\n{{#if_eq tecnica \"Cirugía micrográfica de Mohs (evaluación 100% márgenes)\"}}\nMarcación por cuadrantes horarios. Resultado de capas / márgenes:\n{{mohs_capas}}.\n{{/if_eq}}\n\n{{#if_filled defecto_tamano}}Tamaño del defecto: {{defecto_tamano}}.{{/if_filled}}\n{{#if_filled defecto_prof}}Profundidad del defecto: {{defecto_prof}}.{{/if_filled}}\nReconstrucción: {{reconstruccion}}.\n\nCierre con sutura por planos."
 };
 })(typeof window !== "undefined" ? window : globalThis);

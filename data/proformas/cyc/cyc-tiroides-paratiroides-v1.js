@@ -196,7 +196,7 @@
         "Insuflador CO2"
       ],
       "join": ", ",
-      "empty_text": "sin aparatología adicional consignada"
+      "empty_text": "no consignada"
     },
     {
       "id": "co2_param",
@@ -210,7 +210,7 @@
       "type": "free",
       "required": false,
       "label": "Señales NIM (V1 / R1 / R2 / V2 y mA)",
-      "empty_text": "señales de neuromonitoreo no consignadas en detalle"
+      "empty_text": ""
     },
     {
       "id": "nlr",
@@ -241,7 +241,7 @@
         "Laterocervical bilateral"
       ],
       "join": "; ",
-      "empty_text": "sin vaciamiento ganglionar asociado"
+      "empty_text": "no consignado"
     },
     {
       "id": "hallazgo_tamano",
@@ -249,7 +249,7 @@
       "required": false,
       "label": "Tamaño de la lesión (cm)",
       "suffix": " cm",
-      "empty_text": "[tamaño no consignado]"
+      "empty_text": "tamaño no documentado"
     },
     {
       "id": "hallazgo_caract",
@@ -261,7 +261,7 @@
         "Quístico",
         "Mixto"
       ],
-      "empty_text": ""
+      "empty_text": "características no documentadas"
     },
     {
       "id": "pth_basal",
@@ -271,7 +271,7 @@
         "Paratiroidectomía"
       ],
       "label": "PTH basal",
-      "empty_text": ""
+      "empty_text": "no documentada"
     },
     {
       "id": "pth_post",
@@ -281,7 +281,7 @@
         "Paratiroidectomía"
       ],
       "label": "PTH post-exéresis",
-      "empty_text": ""
+      "empty_text": "no documentada"
     },
     {
       "id": "pth_pct",
@@ -292,14 +292,14 @@
       ],
       "label": "Variación PTH (%)",
       "suffix": " %",
-      "empty_text": ""
+      "empty_text": "no documentada"
     },
     {
       "id": "biopsia_cong",
       "type": "free",
       "required": false,
       "label": "Biopsia por congelación (resultado)",
-      "empty_text": "sin biopsia por congelación consignada"
+      "empty_text": "no consignada"
     },
     {
       "id": "drenaje",
@@ -310,7 +310,7 @@
         "Sí",
         "No"
       ],
-      "empty_text": ""
+      "empty_text": "no consignado"
     },
     {
       "id": "drenaje_detalle",
@@ -333,6 +333,6 @@
     "Paratiroidectomía"
   ],
   "titulo": "Cirugía de patología tiroidea, paratiroidea y mínimamente invasiva",
-  "plantilla_texto": "Procedimiento: {{procedimiento_grupo}}.\n\n{{#if_eq procedimiento_grupo \"Cirugía de tiroides (vía + extensión)\"}}\nVía / abordaje: {{via}}. Extensión: {{extension}}{{extension_ablativa}}{{lado_frase}}.\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\n\nSe desarrolla la técnica según la vía elegida (convencional abierta /\nTOETVA / ablación percutánea).\nExéresis o ablación con identificación de paratiroides cuando corresponde.\nNervio laríngeo recurrente: {{nlr}}.\nNeuromonitoreo (si aplica): {{nim_senales}}.\n\nVaciamiento ganglionar asociado: {{vaciamiento_asoc}}.\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos.\n{{/if_eq}}\n\n{{#if_eq procedimiento_grupo \"Resección de quiste tirogloso (Sistrunk)\"}}\nSe realiza resección de quiste tirogloso según técnica de Sistrunk.\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos.\n{{/if_eq}}\n\n{{#if_eq procedimiento_grupo \"Paratiroidectomía\"}}\nEnfoque quirúrgico: {{para_tecnica}}; patología: {{para_patologia}}.\n{{#if_eq para_patologia \"Adenoma\"}}\nAdenoma — lado {{para_lado}}, cantidad {{para_cantidad}}, ubicación {{para_ubicacion}}.\n{{/if_eq}}\n{{#if_eq para_patologia \"Hiperplasia (insuficiencia renal)\"}}\nHiperplasia (paratiroidectomía subtotal, remanente mitad de una glándula) —\nlado del remanente {{para_subtotal_lado}}, glándula {{para_subtotal_ubicacion}}.\n{{/if_eq}}\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\nNervio laríngeo recurrente: {{nlr}}.\nNeuromonitoreo (si aplica): {{nim_senales}}.\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nPTH basal {{pth_basal}}; PTH post-exéresis {{pth_post}} (variación {{pth_pct}}).\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos.\n{{/if_eq}}"
+  "plantilla_texto": "Procedimiento: {{procedimiento_grupo}}.\n\n{{#if_eq procedimiento_grupo \"Cirugía de tiroides (vía + extensión)\"}}\nVía / abordaje: {{via}}. Extensión: {{extension}}{{extension_ablativa}}{{lado_frase}}.\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\n\n{{via_tecnica_frase}}\n{{exeresis_frase}}\nNervio laríngeo recurrente: {{nlr}}.\n{{neuromonitoreo_frase}}\n\nVaciamiento ganglionar asociado: {{vaciamiento_asoc}}.\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos.\n{{/if_eq}}\n\n{{#if_eq procedimiento_grupo \"Resección de quiste tirogloso (Sistrunk)\"}}\nSe realiza resección de quiste tirogloso según técnica de Sistrunk.\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos.\n{{/if_eq}}\n\n{{#if_eq procedimiento_grupo \"Paratiroidectomía\"}}\nEnfoque quirúrgico: {{para_tecnica}}; patología: {{para_patologia}}.\n{{#if_eq para_patologia \"Adenoma\"}}\nAdenoma — lado {{para_lado}}, cantidad {{para_cantidad}}, ubicación {{para_ubicacion}}.\n{{/if_eq}}\n{{#if_eq para_patologia \"Hiperplasia (insuficiencia renal)\"}}\nHiperplasia (paratiroidectomía subtotal, remanente mitad de una glándula) —\nlado del remanente {{para_subtotal_lado}}, glándula {{para_subtotal_ubicacion}}.\n{{/if_eq}}\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\nNervio laríngeo recurrente: {{nlr}}.\n{{neuromonitoreo_frase}}\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nPTH basal {{pth_basal}}; PTH post-exéresis {{pth_post}} (variación {{pth_pct}}).\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos.\n{{/if_eq}}"
 };
 })(typeof window !== "undefined" ? window : globalThis);

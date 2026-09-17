@@ -97,7 +97,7 @@
         "Lingual"
       ],
       "join": ", ",
-      "empty_text": "otros nervios según disección habitual del tipo elegido"
+      "empty_text": "Nervios según disección del tipo de vaciamiento"
     },
     {
       "id": "incision",
@@ -127,7 +127,7 @@
       "type": "free",
       "required": false,
       "label": "Detalle semiológico (nivel, tamaño visto/palpado, ruptura capsular, fijación a vecinos — NO conteo AP)",
-      "empty_text": "sin adenopatías sospechosas al examen intraoperatorio"
+      "empty_text": ""
     },
     {
       "id": "pieza_rotulada",
@@ -168,7 +168,7 @@
         "Realizado — con fuga",
         "No aplica"
       ],
-      "empty_text": "no consignado"
+      "empty_text": "No se documentó chequeo de Valsalva / quilo"
     }
   ],
   "id": "cyc-vaciamiento-cervical-v1",
@@ -182,6 +182,6 @@
     "Vaciamiento central"
   ],
   "titulo": "Vaciamientos ganglionares cervicales (linfadenectomías)",
-  "plantilla_texto": "Se realiza vaciamiento ganglionar cervical tipo {{tipo}}, lado {{lateralidad}}.\nNiveles disecados: {{niveles}}. Incisión: {{incision}}.\n\nDisección sistemática por niveles (cadena yugulocarotídea, triángulo\nposterior y/o compartimento central según el tipo). Estructuras:\nnervio espinal accesorio {{n_espinal}}; vena yugular interna {{vyi}}\n{{vyi_lado}}; ECM {{ecm}}. Nervios identificados y preservados: {{nervios_id}}.\n\nHallazgos semiológicos: adenopatías sospechosas {{adenopatias}}.\n{{adenopatias_semiologia}}.\n(No se consigna conteo ganglionar de anatomía patológica; solo lo\nobservado/palpado en el acto.)\n\nPieza quirúrgica rotulada por niveles: {{pieza_rotulada}}.\nCierre con {{drenajes_n}} drenaje(s) tipo {{drenajes_tipo}}.\nValsalva / control de quilo: {{valsalva_quilo}}."
+  "plantilla_texto": "Se realiza vaciamiento ganglionar cervical tipo {{tipo}}, lado {{lateralidad}}.\nNiveles disecados: {{niveles}}. Incisión: {{incision}}.\n\nDisección sistemática por niveles. Estructuras:\nnervio espinal accesorio {{n_espinal}}; vena yugular interna {{vyi}}{{#if_filled vyi_lado}} ({{vyi_lado}}){{/if_filled}}; ECM {{ecm}}.\n{{#if_filled nervios_id}}Nervios identificados y preservados: {{nervios_id}}.{{/if_filled}}\n\nHallazgos semiológicos: adenopatías sospechosas {{adenopatias}}.\n{{#if_filled adenopatias_semiologia}}{{adenopatias_semiologia}}.{{/if_filled}}\n(Sin conteo ganglionar de anatomía patológica; solo lo observado/palpado en el acto.)\n\nPieza quirúrgica rotulada por niveles: {{pieza_rotulada}}.\n{{#if_filled drenajes_n}}Cierre con {{drenajes_n}} drenaje(s){{#if_filled drenajes_tipo}} tipo {{drenajes_tipo}}{{/if_filled}}.{{/if_filled}}\n{{#if_filled valsalva_quilo}}Valsalva / control de quilo: {{valsalva_quilo}}.{{/if_filled}}"
 };
 })(typeof window !== "undefined" ? window : globalThis);

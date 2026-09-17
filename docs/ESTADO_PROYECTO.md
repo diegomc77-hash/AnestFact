@@ -153,12 +153,13 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-08:
 
-- PWA `CACHE_V`: **12.70** local (Paso 2.3 proformas+CIE+print; ~470 KB `proformas-bundle.js` en STATIC_CORE)
+- PWA `CACHE_V`: **12.72** local (prosa CyC afirmativa + `required_if_*_includes`)
 - Extensión GECLISA: **0.5.15** (origin/main `5c874f8`; recargar local el viernes)
 
 ## En curso
 
-- **Hotfix ramas proforma** (12.71): if_eq + prune + PTH oculto fuera de paratiroides. Pendiente push Pages + smoke tiroides Diego.
+- **P2 QR cirujano / fojaQx Paso 2.3:** prosa CyC + motor (`required_if_*_includes`) en **12.72** (push). **Retomar smoke** Aero «prueba» + print.
+- **Hotfix ramas** (12.71) ya en Pages; prosa encima en 12.72.
 
 - **P2 Cirugía General:** **OK de semilla del set** (M1–M6). Soft handoffs aplicados. Motor pendiente. `foja.consideraciones` = fase aparte (0 código).
 - **P2 Cirugía Torácica:** **OK de semilla** (`01-torax.md`). Validación criterio Diego/AnesFact (no torácico ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
@@ -174,7 +175,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - **P2 Oftalmología (M18):** **OK de semilla** (`01-oftalmologia.md`). Validación criterio Diego/AnesFact (no oftalmólogo ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
 - **P2 Hemodinamia (M19):** **OK de semilla** §1–4 + §6 (`01-hemodinamia.md`). **§5 diferida** (solape M12; xref preferido; M12 no tocado). Validación criterio Diego/AnesFact — nota de cabecera se mantiene. Motor pendiente. 0 código.
 - **P2 Gastroenterología / endoscopia (M20):** **OK de semilla** (`01-endoscopia.md`). Validación criterio Diego/AnesFact (no gastroenterólogo ni Huerta) — nota de cabecera se mantiene. Sin solape real con CG. Motor pendiente. 0 código.
-- **P2 QR cirujano / fojaQx:** Paso 1–2.2 CERRADOS. **Paso 2.3 en deploy** (12.70 + Edge peek/submit). Pendiente smoke CyC Aero «prueba» + print.
+- **P2 QR cirujano / fojaQx:** Paso 1–2.2 CERRADOS. **Paso 2.3 en deploy** (12.72 prosa CyC). Pendiente smoke Aero «prueba» + print.
 
 - **P4 Traditum / evweb:** ciclo + mapa Nueva Solicitud + catálogo ADAARC (`docs/evweb_catalogo_completo.md`). **Sin código.** Hueco a diseñar: estado «Pendiente de autorizar en Traditum».
 - **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo 12.62 / 0.5.15). PWA **12.64** ya en origin (`7b3cc99`); recargar Pages aparte.
@@ -182,6 +183,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## Qué se hizo (más reciente primero)
 
+- 2026-09-16 — PWA **12.72**: prosa CyC afirmativa (13 plantillas + barrido if_filled/if_eq); `stripUnitSuffix`; fix motor `required_if_*_includes` (Oncología); tests + `_audit-cyc-plantillas.mjs`. Sin nombres/DNI reales. Pendiente smoke.
 - 2026-09-16 — P2 fojaQx **Paso 2.3 deploy** (12.70): proformas×32 + motor/UI + CIE + print; Edge peek/submit. Pendiente smoke Diego. Sin nombres/DNI reales.
 - 2026-09-16 — P2 fojaQx **Paso 2.3 listo local** (12.70): schema+32 JSON, motor+tests, UI app+QR, CIE, print, peek snapshot, submit slots/CIE. Bundle ~470 KB en STATIC_CORE. Sin commit/deploy. Sin nombres/DNI reales.
 - 2026-09-16 — P2 fojaQx **Paso 2.2 CERRADO en prod** (12.69): form+firma+submit+pull; TTL 7d; smokes Diego OK (punto 5 Mayo skip = code review). Sin nombres/DNI reales en este diario.

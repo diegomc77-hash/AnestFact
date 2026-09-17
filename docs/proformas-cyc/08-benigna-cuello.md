@@ -39,7 +39,7 @@ slots:
     type: free
     required: false
     label: Procedimiento concreto (ej. Sistrunk)
-    empty_text: "exéresis según técnica habitual de la entidad"
+    empty_text: "Exéresis de la entidad consignada"
 
   - id: lateralidad
     type: single
@@ -92,7 +92,7 @@ slots:
     type: free
     required: false
     label: Hallazgos (tamaño visto, relación con vecinos, aspecto — no conteo AP)
-    empty_text: "[hallazgos a completar]"
+    empty_text: "Hallazgos semiológicos no documentados"
 
   - id: estructuras_riesgo
     type: free
@@ -108,7 +108,9 @@ slots:
     empty_text: ""
 
 plantilla_texto: |
-  Entidad: {{entidad}}. Procedimiento: {{procedimiento}}. Lateralidad: {{lateralidad}}.
+  Entidad: {{entidad}}.
+  {{#if_filled procedimiento}}Procedimiento: {{procedimiento}}.{{/if_filled}}
+  {{#if_filled lateralidad}}Lateralidad: {{lateralidad}}.{{/if_filled}}
   {{#if_eq entidad "Tumor glómico (glomus)"}}
   Glomus — ubicación: {{glomus_ubicacion}}; embolización previa: {{glomus_embolizacion}}.
   {{/if_eq}}
@@ -119,8 +121,9 @@ plantilla_texto: |
   Quiste branquial — arco: {{branquial_arco}}.
   {{/if_eq}}
   Hallazgos: {{hallazgos_semiologia}}.
-  Estructuras de riesgo: {{estructuras_riesgo}}.
-  Cierre: drenaje {{drenaje}}. Cierre por planos.
+  {{#if_filled estructuras_riesgo}}Estructuras de riesgo: {{estructuras_riesgo}}.{{/if_filled}}
+  {{#if_filled drenaje}}Cierre: drenaje {{drenaje}}.{{/if_filled}}
+  Cierre por planos.
 ```
 
 **Validación condicional:** si `entidad` = Tumor glómico (glomus) →

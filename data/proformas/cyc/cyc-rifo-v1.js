@@ -119,14 +119,14 @@
         "Transconjuntival"
       ],
       "join": ", ",
-      "empty_text": "abordajes según focos"
+      "empty_text": "Abordajes según focos fracturarios"
     },
     {
       "id": "osteosintesis",
       "type": "free",
       "required": false,
       "label": "Osteosíntesis (sistema, orificios, tornillos por foco)",
-      "empty_text": "[detalle de placas/tornillos por foco]"
+      "empty_text": "Detalle de osteosíntesis no documentado"
     },
     {
       "id": "oclusion",
@@ -145,6 +145,6 @@
     "Tratamiento quirúrgico de fractura maxilar"
   ],
   "titulo": "Traumatología maxilofacial (RIFO)",
-  "plantilla_texto": "Fractura(s): {{fractura_grupo}}.\nMandíbula: {{mandib_sitio}} ({{mandib_lado}}). CNEO/orbitomalar: {{cneo_sitio}}\n({{cneo_lado}}). Maxilar: {{maxilar_tipo}}.\n\nIntubación: {{intubacion}}. Fijación intermaxilar transitoria: {{fim}}.\nBloqueo intermaxilar según técnica elegida. Abordajes: {{abordajes}}.\n\nReducción y osteosíntesis con placas de titanio: {{osteosintesis}}.\nComprobación de oclusión final: {{oclusion}}.\n\nCierre por planos."
+  "plantilla_texto": "Fractura(s): {{fractura_grupo}}.\n{{#if_filled mandib_sitio}}Mandíbula: {{mandib_sitio}}{{#if_filled mandib_lado}} ({{mandib_lado}}){{/if_filled}}.{{/if_filled}}\n{{#if_filled cneo_sitio}}CNEO/orbitomalar: {{cneo_sitio}}{{#if_filled cneo_lado}} ({{cneo_lado}}){{/if_filled}}.{{/if_filled}}\n{{#if_filled maxilar_tipo}}Maxilar: {{maxilar_tipo}}.{{/if_filled}}\n\nIntubación: {{intubacion}}.\n{{#if_filled fim}}Fijación intermaxilar transitoria: {{fim}}.{{/if_filled}}\n{{#if_filled abordajes}}Abordajes: {{abordajes}}.{{/if_filled}}\n{{#if_filled osteosintesis}}Reducción y osteosíntesis con placas de titanio: {{osteosintesis}}.{{/if_filled}}\nComprobación de oclusión final: {{oclusion}}.\n\nCierre por planos."
 };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -1,0 +1,150 @@
+# Proforma 2 — Vaciamientos ganglionares cervicales
+
+**id:** cyc-vaciamiento-cervical-v1 · especialidad: Cirugía de Cabeza y Cuello · **OK de semilla** (definición aprobada; motor P2 pendiente)
+
+Índice: [README.md](README.md)
+
+---
+
+## Proforma 2 — Vaciamientos ganglionares cervicales
+
+```text
+id:            cyc-vaciamiento-cervical-v1
+especialidad:  "Cirugía de Cabeza y Cuello"
+operaciones: [
+  "Vaciamiento ganglionar cervical",
+  "Linfadenectomía cervical",
+  "Vaciamiento radical de cuello",
+  "Vaciamiento radical modificado",
+  "Vaciamiento selectivo de cuello",
+  "Vaciamiento central"
+]
+titulo: "Vaciamientos ganglionares cervicales (linfadenectomías)"
+
+slots:
+  - id: tipo
+    type: single
+    required: true
+    label: Tipo de vaciamiento
+    options:
+      - Radical clásico
+      - Radical modificado tipo I (funcional)
+      - Radical modificado tipo II (funcional)
+      - Radical modificado tipo III (funcional)
+      - Selectivo (por niveles)
+      - Central (VI/VII)
+
+  - id: lateralidad
+    type: single
+    required: true
+    label: Lateralidad
+    options:
+      - Derecha
+      - Izquierda
+      - Bilateral simultánea
+      - Bilateral secuencial
+
+  - id: niveles
+    type: multi
+    required: true
+    label: Niveles disecados
+    options: [IA, IB, IIA, IIB, III, IV, VA, VB, VI, VII]
+    join: ", "
+
+  - id: n_espinal
+    type: single
+    required: true
+    label: Nervio espinal accesorio
+    options: [Preservado, Seccionado]
+
+  - id: vyi
+    type: single
+    required: true
+    label: Vena yugular interna
+    options: [Preservada, Ligada]
+
+  - id: vyi_lado
+    type: free
+    required: false
+    label: Lado VYI (si ligada / bilateral)
+    empty_text: ""
+
+  - id: ecm
+    type: single
+    required: true
+    label: Músculo esternocleidomastoideo
+    options: [Preservado, Resecado]
+
+  - id: nervios_id
+    type: multi
+    required: false
+    label: Nervios identificados y preservados
+    options: [Frénico, Simpático cervical, Hipogloso, Lingual]
+    join: ", "
+    empty_text: "Nervios según disección del tipo de vaciamiento"
+
+  - id: incision
+    type: single
+    required: true
+    label: Incisión
+    options:
+      - MacFee
+      - Crile
+      - En Y
+      - Utility
+      - Otra (detallar en texto)
+
+  - id: adenopatias
+    type: single
+    required: true
+    label: Adenopatías sospechosas (semiología)
+    options: [Ausentes, Presentes]
+
+  - id: adenopatias_semiologia
+    type: free
+    required: false
+    label: Detalle semiológico (nivel, tamaño visto/palpado, ruptura capsular, fijación a vecinos — NO conteo AP)
+    empty_text: ""
+
+  - id: pieza_rotulada
+    type: single
+    required: true
+    label: Pieza rotulada por niveles
+    options: [Sí, No]
+
+  - id: drenajes_n
+    type: free
+    required: false
+    label: Cantidad de drenajes (1–2)
+    empty_text: ""
+
+  - id: drenajes_tipo
+    type: single
+    required: false
+    label: Tipo de drenaje
+    options: [Hemosuctor, Jackson-Pratt, Otro]
+    empty_text: ""
+
+  - id: valsalva_quilo
+    type: single
+    required: false
+    label: Chequeo de Valsalva (quilo; nivel IV/V izquierdo)
+    options: [Realizado — sin fuga, Realizado — con fuga, No aplica]
+    empty_text: "No se documentó chequeo de Valsalva / quilo"
+
+plantilla_texto: |
+  Se realiza vaciamiento ganglionar cervical tipo {{tipo}}, lado {{lateralidad}}.
+  Niveles disecados: {{niveles}}. Incisión: {{incision}}.
+
+  Disección sistemática por niveles. Estructuras:
+  nervio espinal accesorio {{n_espinal}}; vena yugular interna {{vyi}}{{#if_filled vyi_lado}} ({{vyi_lado}}){{/if_filled}}; ECM {{ecm}}.
+  {{#if_filled nervios_id}}Nervios identificados y preservados: {{nervios_id}}.{{/if_filled}}
+
+  Hallazgos semiológicos: adenopatías sospechosas {{adenopatias}}.
+  {{#if_filled adenopatias_semiologia}}{{adenopatias_semiologia}}.{{/if_filled}}
+  (Sin conteo ganglionar de anatomía patológica; solo lo observado/palpado en el acto.)
+
+  Pieza quirúrgica rotulada por niveles: {{pieza_rotulada}}.
+  {{#if_filled drenajes_n}}Cierre con {{drenajes_n}} drenaje(s){{#if_filled drenajes_tipo}} tipo {{drenajes_tipo}}{{/if_filled}}.{{/if_filled}}
+  {{#if_filled valsalva_quilo}}Valsalva / control de quilo: {{valsalva_quilo}}.{{/if_filled}}
+```

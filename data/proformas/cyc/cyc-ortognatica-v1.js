@@ -20,7 +20,7 @@
       "id": "lateralidad_osrm",
       "type": "single",
       "required": false,
-      "label": "Lateralidad OSRM (si aplica)",
+      "label": "Lateralidad OSRM",
       "options": [
         "Derecha",
         "Izquierda",
@@ -33,14 +33,14 @@
       "type": "free",
       "required": false,
       "label": "Fijación / osteosíntesis (detalle)",
-      "empty_text": "[fijación a completar]"
+      "empty_text": "Detalle de fijación / osteosíntesis no documentado"
     },
     {
       "id": "oclusion",
       "type": "free",
       "required": true,
       "label": "Comprobación de oclusión final",
-      "empty_text": "oclusión comprobada al cierre"
+      "empty_text": "Oclusión comprobada al cierre"
     }
   ],
   "id": "cyc-ortognatica-v1",
@@ -52,6 +52,6 @@
     "Mentoplastia"
   ],
   "titulo": "Cirugía ortognática (Le Fort I, OSRM, mentoplastia)",
-  "plantilla_texto": "Se realiza cirugía ortognática: {{procedimiento}} ({{lateralidad_osrm}}).\nOsteotomías y fijación: {{fijacion}}.\nComprobación de oclusión final: {{oclusion}}.\nCierre por planos."
+  "plantilla_texto": "Se realiza cirugía ortognática: {{procedimiento}}{{#if_filled lateralidad_osrm}} ({{lateralidad_osrm}}){{/if_filled}}.\nOsteotomías y fijación: {{fijacion}}.\nComprobación de oclusión final: {{oclusion}}.\nCierre por planos."
 };
 })(typeof window !== "undefined" ? window : globalThis);

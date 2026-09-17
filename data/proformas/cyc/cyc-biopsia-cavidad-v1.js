@@ -95,7 +95,7 @@
       "type": "free",
       "required": false,
       "label": "Hallazgos",
-      "empty_text": "[hallazgos a completar]"
+      "empty_text": "Hallazgos no documentados"
     }
   ],
   "id": "cyc-biopsia-cavidad-v1",
@@ -109,6 +109,6 @@
     "Exéresis de lesión de rinofaringe"
   ],
   "titulo": "Biopsias / exéresis en cavidad oral, orofaringe y rinofaringe",
-  "plantilla_texto": "Se realiza {{tipo_acto}} en {{sitio}}.\n{{#if_filled sitio_oral}}Cavidad oral: {{sitio_oral}}.{{/if_filled}}\n{{#if_filled sitio_oro}}Orofaringe: {{sitio_oro}}.{{/if_filled}}\nAbordaje: {{abordaje}}.\nMargen marcado: {{margen_marcado}}. Cierre del defecto: {{cierre_defecto}}.\nHallazgos: {{hallazgos}}."
+  "plantilla_texto": "Se realiza {{tipo_acto}} en {{sitio}}.\n{{#if_filled sitio_oral}}Cavidad oral: {{sitio_oral}}.{{/if_filled}}\n{{#if_filled sitio_oro}}Orofaringe: {{sitio_oro}}.{{/if_filled}}\nAbordaje: {{abordaje}}.\nMargen marcado: {{margen_marcado}}. Cierre del defecto: {{cierre_defecto}}.\n{{#if_filled hallazgos}}Hallazgos: {{hallazgos}}.{{/if_filled}}"
 };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -21,7 +21,7 @@
       "id": "lateralidad",
       "type": "single",
       "required": false,
-      "label": "Lateralidad (si aplica)",
+      "label": "Lateralidad",
       "options": [
         "Derecha",
         "Izquierda",
@@ -160,7 +160,7 @@
       "type": "free",
       "required": false,
       "label": "Hallazgos intraoperatorios",
-      "empty_text": "[hallazgos a completar]"
+      "empty_text": "Hallazgos intraoperatorios no documentados"
     },
     {
       "id": "hemostasia_cierre",
@@ -180,6 +180,6 @@
     "Cierre / reconstrucción de base de cráneo (vía nasal)"
   ],
   "titulo": "Nariz y senos paranasales",
-  "plantilla_texto": "Se realiza {{procedimiento}} ({{lateralidad}}). Senos abordados: {{senos}}.\nEndoscopio: {{angulo_endoscopio}}. Navegación intraoperatoria: {{navegacion}}.\nBase de cráneo (vía nasal): {{cebc_reseccion_xref_nota}}; cierre {{proc_cierre_base_craneo}}; Hadad {{lateralidad_colgajo_nasoseptal}}; injerto {{tipo_injerto_libre_base_craneo}}; sellante {{tipo_sellante_base_craneo}}.\nHallazgos: {{hallazgos}}.\nEmpaquetamiento: {{empaquetamiento}}. {{hemostasia_cierre}}."
+  "plantilla_texto": "Se realiza {{procedimiento}}{{#if_filled lateralidad}} ({{lateralidad}}){{/if_filled}}.\n{{#if_filled senos}}Senos abordados: {{senos}}.{{/if_filled}}\n{{#if_filled angulo_endoscopio}}Endoscopio: {{angulo_endoscopio}}.{{/if_filled}}\n{{#if_filled navegacion}}Navegación intraoperatoria: {{navegacion}}.{{/if_filled}}\n{{#if_filled cebc_reseccion_xref_nota}}Base de cráneo — resección/corredor (xref Neuro): {{cebc_reseccion_xref_nota}}.{{/if_filled}}\n{{#if_filled proc_cierre_base_craneo}}Cierre / reconstrucción de base de cráneo: {{proc_cierre_base_craneo}}.{{/if_filled}}\n{{#if_filled lateralidad_colgajo_nasoseptal}}Colgajo nasoseptal (Hadad): {{lateralidad_colgajo_nasoseptal}}.{{/if_filled}}\n{{#if_filled tipo_injerto_libre_base_craneo}}Injerto libre: {{tipo_injerto_libre_base_craneo}}.{{/if_filled}}\n{{#if_filled tipo_sellante_base_craneo}}Sellante / sustituto dural: {{tipo_sellante_base_craneo}}.{{/if_filled}}\nHallazgos: {{hallazgos}}.\n{{#if_filled empaquetamiento}}Empaquetamiento: {{empaquetamiento}}.{{/if_filled}}\n{{#if_filled hemostasia_cierre}}{{hemostasia_cierre}}.{{/if_filled}}"
 };
 })(typeof window !== "undefined" ? window : globalThis);

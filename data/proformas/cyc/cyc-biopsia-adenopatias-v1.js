@@ -50,7 +50,7 @@
       "type": "free",
       "required": false,
       "label": "Semiología (tamaño visto/palpado, fijación, aspecto — no conteo AP)",
-      "empty_text": "[semiología a completar]"
+      "empty_text": "Semiología no documentada"
     },
     {
       "id": "destino_muestra",
@@ -73,6 +73,6 @@
     "Exéresis de adenopatía cervical"
   ],
   "titulo": "Biopsias de adenopatías cervicales",
-  "plantilla_texto": "Se realiza {{tipo_acto}} de adenopatía cervical, lado {{lateralidad}},\nnivel(es) {{nivel}}.\nHallazgos semiológicos: {{semiologia}}.\n(Sin conteo ganglionar de anatomía patológica.)\nDestino de la muestra: {{destino_muestra}}."
+  "plantilla_texto": "Se realiza {{tipo_acto}} de adenopatía cervical, lado {{lateralidad}}{{#if_filled nivel}}, nivel(es) {{nivel}}{{/if_filled}}.\n{{#if_filled semiologia}}Hallazgos semiológicos: {{semiologia}}.{{/if_filled}}\n(Sin conteo ganglionar de anatomía patológica.)\nDestino de la muestra: {{destino_muestra}}."
 };
 })(typeof window !== "undefined" ? window : globalThis);

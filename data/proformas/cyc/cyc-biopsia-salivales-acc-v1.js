@@ -62,6 +62,6 @@
     "Biopsia de glándulas salivales accesorias"
   ],
   "titulo": "Biopsia de glándulas salivales accesorias",
-  "plantilla_texto": "Se realiza biopsia de glándulas salivales accesorias en {{sitio}}.\nLobulillos: {{cantidad_lobulillos_estado}}{{cantidad_frase}}.\nObjetivo diagnóstico: {{objetivo_diagnostico}}.\nHallazgos: {{hallazgos}}.\n{{hemostasia}}."
+  "plantilla_texto": "Se realiza biopsia de glándulas salivales accesorias en {{sitio}}.\nLobulillos: {{cantidad_lobulillos_estado}}{{cantidad_frase}}.\nObjetivo diagnóstico: {{objetivo_diagnostico}}.\n{{#if_filled hallazgos}}Hallazgos: {{hallazgos}}.{{/if_filled}}\n{{#if_filled hemostasia}}{{hemostasia}}.{{/if_filled}}"
 };
 })(typeof window !== "undefined" ? window : globalThis);

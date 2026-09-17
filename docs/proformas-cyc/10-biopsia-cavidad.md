@@ -83,7 +83,7 @@ slots:
     type: free
     required: false
     label: Hallazgos
-    empty_text: "[hallazgos a completar]"
+    empty_text: "Hallazgos no documentados"
 
 plantilla_texto: |
   Se realiza {{tipo_acto}} en {{sitio}}.
@@ -91,7 +91,7 @@ plantilla_texto: |
   {{#if_filled sitio_oro}}Orofaringe: {{sitio_oro}}.{{/if_filled}}
   Abordaje: {{abordaje}}.
   Margen marcado: {{margen_marcado}}. Cierre del defecto: {{cierre_defecto}}.
-  Hallazgos: {{hallazgos}}.
+  {{#if_filled hallazgos}}Hallazgos: {{hallazgos}}.{{/if_filled}}
 ```
 
 **Validación condicional:** si `sitio` = Cavidad oral → `sitio_oral` required;

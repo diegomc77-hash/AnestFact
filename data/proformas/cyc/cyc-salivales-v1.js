@@ -38,14 +38,14 @@
         "Marginal"
       ],
       "join": ", ",
-      "empty_text": "neuromonitoreo facial no detallado por canales"
+      "empty_text": "no consignado"
     },
     {
       "id": "hallazgo_lesion",
       "type": "free",
       "required": false,
       "label": "Lesión — tamaño / consistencia / localización",
-      "empty_text": "[hallazgos de la lesión a completar]"
+      "empty_text": "Lesión: hallazgos no documentados"
     },
     {
       "id": "facial_estado",
@@ -114,6 +114,6 @@
     "Submaxilectomía"
   ],
   "titulo": "Glándulas salivales (parótida y submaxilar)",
-  "plantilla_texto": "Se realiza {{procedimiento}}, lado {{lateralidad}}.\nNeuromonitoreo continuo del nervio facial (canales {{mon_facial}}).\n\nIdentificación del tronco del facial con referentes anatómicos\n(tragus, vientre posterior del digástrico, sutura timpanomastoidea,\napófisis estiloides) cuando el procedimiento es parotídeo; disección\nanterógrada por ramas. En abordaje submandibular: identificación de\nnervio lingual, hipogloso y conducto de Wharton.\n\nHallazgos: {{hallazgo_lesion}}.\nNervio facial: {{facial_estado}}. {{facial_detalle}}.\nNervio lingual: {{lingual_estado}}. Nervio hipogloso: {{hipogloso_estado}}.\n\nHemostasia. Cierre con drenaje: {{drenaje}}. Cierre por planos."
+  "plantilla_texto": "Se realiza {{procedimiento}}, lado {{lateralidad}}.\n{{mon_facial_frase}}\n\n{{#if_eq procedimiento \"Submaxilectomía\"}}\nAbordaje submandibular: identificación de nervio lingual, hipogloso y\nconducto de Wharton.\nNervio lingual: {{lingual_estado}}. Nervio hipogloso: {{hipogloso_estado}}.\n{{/if_eq}}\n{{#if_eq procedimiento \"Parotidectomía superficial\"}}\nIdentificación del tronco del facial con referentes anatómicos\n(tragus, vientre posterior del digástrico, sutura timpanomastoidea,\napófisis estiloides); disección anterógrada por ramas.\n{{/if_eq}}\n{{#if_eq procedimiento \"Parotidectomía total\"}}\nIdentificación del tronco del facial con referentes anatómicos\n(tragus, vientre posterior del digástrico, sutura timpanomastoidea,\napófisis estiloides); disección anterógrada por ramas.\n{{/if_eq}}\n{{#if_eq procedimiento \"Parotidectomía parcial / lobectomía\"}}\nIdentificación del tronco del facial con referentes anatómicos\n(tragus, vientre posterior del digástrico, sutura timpanomastoidea,\napófisis estiloides); disección anterógrada por ramas.\n{{/if_eq}}\n{{#if_eq procedimiento \"Enucleación extracapsular\"}}\nEnucleación extracapsular de la lesión, con disección en el plano\nextracapsular preservando el parénquima glandular adyacente y las\nestructuras nerviosas en continuidad.\n{{/if_eq}}\n\nHallazgos: {{hallazgo_lesion}}.\nNervio facial: {{facial_estado}}.{{#if_filled facial_detalle}} {{facial_detalle}}.{{/if_filled}}\n\n{{#if_filled drenaje}}Cierre con drenaje: {{drenaje}}.{{/if_filled}}\nCierre por planos."
 };
 })(typeof window !== "undefined" ? window : globalThis);

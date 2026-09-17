@@ -191,14 +191,14 @@
         "No permeable",
         "No aplica"
       ],
-      "empty_text": "no consignado"
+      "empty_text": "Doppler no documentado"
     },
     {
       "id": "pieza_macro",
       "type": "free",
       "required": false,
       "label": "Descripción macroscópica de la pieza",
-      "empty_text": "[descripción macroscópica a completar]"
+      "empty_text": "Descripción macroscópica no documentada"
     },
     {
       "id": "margen_cong",
@@ -248,6 +248,6 @@
     "Resección oncológica cervicofacial con reconstrucción"
   ],
   "titulo": "Oncología cervicofacial compleja (resección + reconstrucción)",
-  "plantilla_texto": "Tiempo oncológico: se realiza {{reseccion}}.\n{{#if_filled glosectomia_ext}}Glosectomía: {{glosectomia_ext}}.{{/if_filled}}\n{{#if_filled mandibulectomia_ext}}Mandibulectomía: {{mandibulectomia_ext}} {{mandib_desart}}.{{/if_filled}}\n{{#if_filled maxilectomia_ext}}Maxilectomía: {{maxilectomia_ext}} {{maxil_exent}}.{{/if_filled}}\n{{#if_filled laringectomia_ext}}Laringectomía: {{laringectomia_ext}}.{{/if_filled}}\n\nHallazgos: {{pieza_macro}}.\nMárgenes por congelación: {{margen_cong}} ({{margen_mm}}).\n\nTiempo reconstructivo: {{recon_modo}}.\n{{#if_filled colgajo_local}}Local: {{colgajo_local}}.{{/if_filled}}\n{{#if_filled colgajo_regional}}Regional: {{colgajo_regional}}.{{/if_filled}}\n{{#if_filled colgajo_libre}}Libre: {{colgajo_libre}}.{{/if_filled}}\n{{#if_filled protesis}}Protésico: {{protesis}}.{{/if_filled}}\nAnastomosis: {{anastomosis}}. Isquemia: {{isquemia_min}}. Doppler: {{doppler}}.\n\nCierre con SNG: {{sng}}. Drenajes: {{drenajes}}. Cierre por planos."
+  "plantilla_texto": "Tiempo oncológico: se realiza {{reseccion}}.\n{{#if_filled glosectomia_ext}}Glosectomía: {{glosectomia_ext}}.{{/if_filled}}\n{{#if_filled mandibulectomia_ext}}Mandibulectomía: {{mandibulectomia_ext}}{{#if_filled mandib_desart}} {{mandib_desart}}{{/if_filled}}.{{/if_filled}}\n{{#if_filled maxilectomia_ext}}Maxilectomía: {{maxilectomia_ext}}{{#if_filled maxil_exent}} {{maxil_exent}}{{/if_filled}}.{{/if_filled}}\n{{#if_filled laringectomia_ext}}Laringectomía: {{laringectomia_ext}}.{{/if_filled}}\n\nHallazgos: {{pieza_macro}}.\n{{#if_filled margen_cong}}Márgenes por congelación: {{margen_cong}}{{#if_filled margen_mm}} ({{margen_mm}}){{/if_filled}}.{{/if_filled}}\n\nTiempo reconstructivo: {{recon_modo}}.\n{{#if_filled colgajo_local}}Local: {{colgajo_local}}.{{/if_filled}}\n{{#if_filled colgajo_regional}}Regional: {{colgajo_regional}}.{{/if_filled}}\n{{#if_filled colgajo_libre}}Libre: {{colgajo_libre}}.{{/if_filled}}\n{{#if_filled protesis}}Protésico: {{protesis}}.{{/if_filled}}\n{{#if_filled anastomosis}}Anastomosis: {{anastomosis}}.{{/if_filled}}\n{{#if_filled isquemia_min}}Isquemia: {{isquemia_min}}.{{/if_filled}}\n{{#if_filled doppler}}Doppler: {{doppler}}.{{/if_filled}}\n\n{{#if_filled sng}}Sonda nasogástrica: {{sng}}.{{/if_filled}}\n{{#if_filled drenajes}}Drenajes: {{drenajes}}.{{/if_filled}}\nCierre por planos."
 };
 })(typeof window !== "undefined" ? window : globalThis);
