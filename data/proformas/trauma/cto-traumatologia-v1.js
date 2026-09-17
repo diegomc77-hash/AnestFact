@@ -21,6 +21,13 @@
       "id": "lateralidad",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro superior — hombro / brazo / codo",
+        "Miembro superior — antebrazo / muñeca / mano",
+        "Pelvis / acetábulo / cadera",
+        "Miembro inferior — muslo / rodilla / pierna",
+        "Miembro inferior — tobillo / pie"
+      ],
       "label": "Lateralidad",
       "options": [
         "Derecha",
@@ -152,6 +159,12 @@
       "id": "resultado_reduccion_hombro",
       "type": "single",
       "required": false,
+      "required_if_proc_osteosintesis_hombro": [
+        "Placa bloqueada anatómica + tornillos",
+        "Clavo endomedular (bloqueado)",
+        "Agujas de Kirschner / cerclaje en 8 (tirante)",
+        "Fijación externa"
+      ],
       "label": "Resultado de la reducción",
       "options": [
         "Anatómica",
@@ -362,6 +375,12 @@
       "id": "resultado_reduccion_cadera",
       "type": "single",
       "required": false,
+      "required_if_proc_osteosintesis_cadera": [
+        "Clavo cefalomedular (PFN / Gamma nail)",
+        "Tornillo deslizante de cadera (DHS) / tornillos canulados",
+        "RAFI de pelvis / acetábulo con placas y tornillos",
+        "Tornillos sacroilíacos percutáneos"
+      ],
       "label": "Resultado de la reducción",
       "options": [
         "Anatómica",
@@ -374,6 +393,11 @@
       "id": "longitud_implante_cadera",
       "type": "free",
       "required": false,
+      "required_if_proc_osteosintesis_cadera": [
+        "Clavo cefalomedular (PFN / Gamma nail)",
+        "Tornillo deslizante de cadera (DHS) / tornillos canulados",
+        "Tornillos sacroilíacos percutáneos"
+      ],
       "label": "Longitud de tornillos / implante",
       "empty_text": ""
     },
@@ -411,6 +435,10 @@
       "id": "indicacion_artroplastia_cadera",
       "type": "single",
       "required": false,
+      "required_if_artroplastia_cadera": [
+        "Reemplazo total de cadera (RTC)",
+        "Reemplazo parcial / bipolar"
+      ],
       "label": "Indicación de artroplastia",
       "options": [
         "Fractura aguda",
@@ -435,6 +463,10 @@
       "id": "abordaje_cadera",
       "type": "single",
       "required": false,
+      "required_if_artroplastia_cadera": [
+        "Reemplazo total de cadera (RTC)",
+        "Reemplazo parcial / bipolar"
+      ],
       "label": "Abordaje de cadera",
       "options": [
         "Anterior directo",
@@ -955,6 +987,16 @@
       "id": "estado_neurologico_post_descompresion",
       "type": "single",
       "required": false,
+      "required_if_proc_columna": [
+        "Discectomía / microdiscectomía",
+        "Laminectomía / descompresión del canal",
+        "Fijación / artrodesis posterior (tornillos pediculados y barras)",
+        "Fusión intersomática — TLIF",
+        "Fusión intersomática — PLIF",
+        "Fusión intersomática — ALIF",
+        "Fusión intersomática — XLIF / OLIF",
+        "Corrección de deformidad (escoliosis / cifosis)"
+      ],
       "label": "Estado neurológico post-descompresión",
       "options": [
         "Sin déficit nuevo",

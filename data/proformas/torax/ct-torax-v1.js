@@ -152,6 +152,12 @@
       "id": "hermeticidad_munon_bronquial",
       "type": "single",
       "required": false,
+      "required_if_tipo_reseccion_pulmonar": [
+        "Neumonectomía",
+        "Lobectomía",
+        "Segmentectomía",
+        "Resección en manguito (sleeve bronquial / broncoplástica)"
+      ],
       "label": "Prueba de hermeticidad (muñón bronquial / línea de sutura pulmonar)",
       "options": [
         "Fuga demostrada",

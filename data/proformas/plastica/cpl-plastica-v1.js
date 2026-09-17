@@ -179,6 +179,12 @@
       "id": "colgajo_irrigacion",
       "type": "single",
       "required": false,
+      "required_if_colgajo_diseno": [
+        "De avance",
+        "De rotación",
+        "De transposición",
+        "En Z (Z-plastia) / V-Y"
+      ],
       "label": "Colgajo — tipo por irrigación",
       "options": [
         "Aleatorio",
@@ -304,6 +310,21 @@
       "id": "viabilidad_final_colgajo",
       "type": "single",
       "required": false,
+      "required_if_colgajo_diseno": [
+        "De avance",
+        "De rotación",
+        "De transposición",
+        "En Z (Z-plastia) / V-Y"
+      ],
+      "required_if_colgajo_denominacion": [
+        "Inguinal",
+        "Surcolateral",
+        "Anterolateral de muslo (ALT)",
+        "TRAM",
+        "DIEP",
+        "Dorsal ancho",
+        "Otro"
+      ],
       "required_if_colgajo_libre": [
         "Sí"
       ],
@@ -426,6 +447,10 @@
       "required_if_proc_mamario": [
         "Mamoplastia de aumento (implantes)"
       ],
+      "required_if_tipo_reconstruccion_mama": [
+        "Basada en implante",
+        "Combinada (implante + colgajo)"
+      ],
       "label": "Plano de colocación del implante / expansor",
       "options": [
         "Subglandular",
@@ -438,6 +463,11 @@
       "id": "via_abordaje_mama",
       "type": "single",
       "required": false,
+      "required_if_proc_mamario": [
+        "Mamoplastia de aumento (implantes)",
+        "Mamoplastia reductiva / mastopexia",
+        "Reconstrucción mamaria post-mastectomía"
+      ],
       "label": "Vía de abordaje",
       "options": [
         "Periareolar",
@@ -468,6 +498,10 @@
       "required_if_proc_mamario": [
         "Mamoplastia de aumento (implantes)"
       ],
+      "required_if_tipo_reconstruccion_mama": [
+        "Basada en implante",
+        "Combinada (implante + colgajo)"
+      ],
       "label": "Tipo / perfil de implante",
       "options": [
         "Liso — redondo",
@@ -483,6 +517,10 @@
       "required": false,
       "required_if_proc_mamario": [
         "Mamoplastia de aumento (implantes)"
+      ],
+      "required_if_tipo_reconstruccion_mama": [
+        "Basada en implante",
+        "Combinada (implante + colgajo)"
       ],
       "label": "Marca y volumen de prótesis / expansor (cc)",
       "empty_text": ""

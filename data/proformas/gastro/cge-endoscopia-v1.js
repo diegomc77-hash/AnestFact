@@ -20,6 +20,12 @@
       "id": "sedacion_endoscopia",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva alta (VEDA)",
+        "Endoscopia digestiva baja (colonoscopia / rectosigmoidoscopia)",
+        "Endoscopia de emergencia / hemorragia",
+        "Endoscopia terapéutica / avanzada / CPRE"
+      ],
       "label": "Sedación / anestesia",
       "options": [
         "Tópica (lidocaína spray)",
@@ -397,6 +403,12 @@
       "id": "sitio_biopsia",
       "type": "multi",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva alta (VEDA)",
+        "Endoscopia digestiva baja (colonoscopia / rectosigmoidoscopia)",
+        "Endoscopia de emergencia / hemorragia",
+        "Endoscopia terapéutica / avanzada / CPRE"
+      ],
       "label": "Sitio de toma de biopsia",
       "options": [
         "Esófago",
@@ -416,6 +428,17 @@
       "id": "tecnica_biopsia",
       "type": "multi",
       "required": false,
+      "required_if_sitio_biopsia": [
+        "Esófago",
+        "Estómago (cuerpo / antro — protocolo de Sydney)",
+        "Duodeno (2.ª porción)",
+        "Íleon",
+        "Colon derecho",
+        "Colon transverso",
+        "Colon izquierdo",
+        "Sigmoides",
+        "Recto"
+      ],
       "label": "Técnica / dispositivo de biopsia",
       "options": [
         "Pinza de biopsia estándar",
@@ -429,6 +452,17 @@
       "id": "objetivo_biopsia",
       "type": "multi",
       "required": false,
+      "required_if_sitio_biopsia": [
+        "Esófago",
+        "Estómago (cuerpo / antro — protocolo de Sydney)",
+        "Duodeno (2.ª porción)",
+        "Íleon",
+        "Colon derecho",
+        "Colon transverso",
+        "Colon izquierdo",
+        "Sigmoides",
+        "Recto"
+      ],
       "label": "Objetivo diagnóstico de la biopsia",
       "options": [
         "Detección de Helicobacter pylori",
@@ -529,6 +563,11 @@
       "id": "caracter_hemorragia_variceal",
       "type": "single",
       "required": false,
+      "required_if_manejo_hemorragia_variceal": [
+        "Ligadura elástica de várices esofágicas (LEVE)",
+        "Inyección de cianoacrilato (várices gástricas / fúndicas)",
+        "Sonda de Sengstaken-Blakemore / Linton"
+      ],
       "label": "Carácter de la hemorragia variceal",
       "options": [
         "Profilaxis primaria (sin sangrado activo)",
@@ -727,6 +766,13 @@
       "id": "complicacion_endoscopia",
       "type": "multi",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva alta (VEDA)",
+        "Endoscopia digestiva baja (colonoscopia / rectosigmoidoscopia)",
+        "Endoscopia de emergencia / hemorragia",
+        "Endoscopia terapéutica / avanzada / CPRE",
+        "Complicaciones / incidencias post-procedimiento"
+      ],
       "label": "Complicaciones intraprocedimiento",
       "options": [
         "Sangrado controlado",
@@ -741,6 +787,12 @@
       "id": "medidas_correccion_complicacion",
       "type": "free",
       "required": false,
+      "required_if_complicacion_endoscopia": [
+        "Sangrado controlado",
+        "Perforación",
+        "Hipoxemia transitoria / laringoespasmo",
+        "Aspiración"
+      ],
       "label": "Medidas de corrección aplicadas",
       "empty_text": ""
     },
@@ -748,6 +800,13 @@
       "id": "estado_retiro_servicio",
       "type": "multi",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva alta (VEDA)",
+        "Endoscopia digestiva baja (colonoscopia / rectosigmoidoscopia)",
+        "Endoscopia de emergencia / hemorragia",
+        "Endoscopia terapéutica / avanzada / CPRE",
+        "Complicaciones / incidencias post-procedimiento"
+      ],
       "label": "Estado al retiro del servicio",
       "options": [
         "Recuperación anestésica satisfactoria",

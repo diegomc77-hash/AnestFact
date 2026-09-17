@@ -216,6 +216,11 @@
       "id": "continencia_pre",
       "type": "single",
       "required": false,
+      "required_if_tecnica_fistula": [
+        "Fistulotomía (puesta a plano)",
+        "Fistulectomía",
+        "Setón cortante (terapéutico)"
+      ],
       "label": "Continencia previa (antes del gesto sobre el esfínter)",
       "options": [
         "Continente",
@@ -229,6 +234,11 @@
       "id": "factores_riesgo_continencia",
       "type": "multi",
       "required": false,
+      "required_if_tecnica_fistula": [
+        "Fistulotomía (puesta a plano)",
+        "Fistulectomía",
+        "Setón cortante (terapéutico)"
+      ],
       "label": "Factores de riesgo de continencia",
       "options": [
         "Partos / traumatismo obstétrico",
@@ -304,6 +314,10 @@
       "id": "continencia_pre_eli",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_fisura": [
+        "Esfinterotomía lateral interna (ELI) abierta",
+        "Esfinterotomía lateral interna (ELI) percutánea / cerrada"
+      ],
       "label": "Continencia previa (antes de ELI)",
       "options": [
         "Continente",
@@ -317,6 +331,10 @@
       "id": "factores_riesgo_continencia_eli",
       "type": "multi",
       "required": false,
+      "required_if_procedimiento_fisura": [
+        "Esfinterotomía lateral interna (ELI) abierta",
+        "Esfinterotomía lateral interna (ELI) percutánea / cerrada"
+      ],
       "label": "Factores de riesgo de continencia (ELI)",
       "options": [
         "Partos / traumatismo obstétrico",
@@ -541,6 +559,11 @@
       "id": "esfinter_estado_post",
       "type": "single",
       "required": false,
+      "required_if_tecnica_fistula": [
+        "Fistulotomía (puesta a plano)",
+        "Fistulectomía",
+        "Setón cortante (terapéutico)"
+      ],
       "label": "Estado del esfínter al cierre",
       "options": [
         "Íntegro (preservado)",
@@ -553,6 +576,10 @@
       "id": "esfinter_estado_post_eli",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_fisura": [
+        "Esfinterotomía lateral interna (ELI) abierta",
+        "Esfinterotomía lateral interna (ELI) percutánea / cerrada"
+      ],
       "label": "Estado del esfínter al cierre (ELI)",
       "options": [
         "Íntegro (preservado)",
@@ -565,6 +592,12 @@
       "id": "hemostasia_metodo",
       "type": "multi",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Patología hemorroidal",
+        "Absceso / fístula perianal",
+        "Fisura anal",
+        "Otras lesiones / neoplasia / esfinteroplastia"
+      ],
       "label": "Hemostasia",
       "options": [
         "Electrocauterio",
@@ -581,6 +614,12 @@
       "id": "taponamiento_anal",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Patología hemorroidal",
+        "Absceso / fístula perianal",
+        "Fisura anal",
+        "Otras lesiones / neoplasia / esfinteroplastia"
+      ],
       "label": "Taponamiento anal",
       "options": [
         "Sí (gasa / esponja / tubo de descompresión)",

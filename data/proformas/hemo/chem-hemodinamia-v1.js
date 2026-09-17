@@ -40,6 +40,12 @@
       "id": "via_acceso",
       "type": "multi",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Accesos vasculares / hemostasia",
+        "Intervencionismo coronario",
+        "Cardiopatía estructural",
+        "Electrofisiología / dispositivos"
+      ],
       "label": "Vía de acceso",
       "options": [
         "Radial derecho",
@@ -56,6 +62,12 @@
       "id": "calibre_introductor",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Accesos vasculares / hemostasia",
+        "Intervencionismo coronario",
+        "Cardiopatía estructural",
+        "Electrofisiología / dispositivos"
+      ],
       "label": "Calibre del introductor",
       "options": [
         "4 Fr",
@@ -71,6 +83,12 @@
       "id": "cierre_vascular",
       "type": "multi",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Accesos vasculares / hemostasia",
+        "Intervencionismo coronario",
+        "Cardiopatía estructural",
+        "Electrofisiología / dispositivos"
+      ],
       "label": "Dispositivo / técnica de cierre vascular",
       "options": [
         "Compresión neumática / banda radial (TR Band)",
@@ -195,6 +213,10 @@
       "id": "numero_stents",
       "type": "free",
       "required": false,
+      "required_if_implante_stent_balon": [
+        "Stent liberador de fármaco (DES)",
+        "Stent convencional (BMS)"
+      ],
       "label": "Número de stents (si multivaso, especificar por vaso — ej. DA: 2; Cx: 1)",
       "empty_text": ""
     },
@@ -202,6 +224,11 @@
       "id": "marca_medidas_stent",
       "type": "free",
       "required": false,
+      "required_if_implante_stent_balon": [
+        "Stent liberador de fármaco (DES)",
+        "Stent convencional (BMS)",
+        "Balón liberador de fármaco (DEB)"
+      ],
       "label": "Marca / medidas (si multivaso, por vaso — ej. DA: 2 stents 3.0×18 mm; Cx: 1 stent 2.5×15 mm)",
       "empty_text": ""
     },
@@ -225,6 +252,12 @@
       "id": "complicacion_intraprocedimiento",
       "type": "multi",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Accesos vasculares / hemostasia",
+        "Intervencionismo coronario",
+        "Cardiopatía estructural",
+        "Electrofisiología / dispositivos"
+      ],
       "label": "Complicaciones intraprocedimiento",
       "options": [
         "Espasmo arterial",
@@ -548,6 +581,10 @@
       "id": "umbrales_estimulacion_sensado",
       "type": "free",
       "required": false,
+      "required_if_proc_electrofisiologia": [
+        "Implante de marcapasos definitivo",
+        "Implante de cardiodesfibrilador (CDI)"
+      ],
       "label": "Umbrales de estimulación y sensado",
       "empty_text": ""
     },
@@ -555,6 +592,12 @@
       "id": "volumen_contraste_cc",
       "type": "free",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Accesos vasculares / hemostasia",
+        "Intervencionismo coronario",
+        "Cardiopatía estructural",
+        "Electrofisiología / dispositivos"
+      ],
       "label": "Volumen de contraste (cc)",
       "empty_text": ""
     },
@@ -562,6 +605,12 @@
       "id": "tipo_contraste",
       "type": "free",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Accesos vasculares / hemostasia",
+        "Intervencionismo coronario",
+        "Cardiopatía estructural",
+        "Electrofisiología / dispositivos"
+      ],
       "label": "Tipo de contraste",
       "empty_text": ""
     },
@@ -569,6 +618,12 @@
       "id": "dap_mgy_cm2",
       "type": "free",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Accesos vasculares / hemostasia",
+        "Intervencionismo coronario",
+        "Cardiopatía estructural",
+        "Electrofisiología / dispositivos"
+      ],
       "label": "Producto dosis-área — DAP (mGy·cm²)",
       "empty_text": ""
     },
@@ -576,6 +631,12 @@
       "id": "tiempo_fluoroscopia_min",
       "type": "free",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Accesos vasculares / hemostasia",
+        "Intervencionismo coronario",
+        "Cardiopatía estructural",
+        "Electrofisiología / dispositivos"
+      ],
       "label": "Tiempo de fluoroscopia (min)",
       "empty_text": ""
     },
@@ -583,6 +644,12 @@
       "id": "presion_aortica_mmhg",
       "type": "free",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Accesos vasculares / hemostasia",
+        "Intervencionismo coronario",
+        "Cardiopatía estructural",
+        "Electrofisiología / dispositivos"
+      ],
       "label": "Presión aórtica (mmHg)",
       "empty_text": ""
     },
@@ -590,6 +657,12 @@
       "id": "presion_vi_mmhg",
       "type": "free",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Accesos vasculares / hemostasia",
+        "Intervencionismo coronario",
+        "Cardiopatía estructural",
+        "Electrofisiología / dispositivos"
+      ],
       "label": "Presión ventricular izquierda (mmHg)",
       "empty_text": ""
     },

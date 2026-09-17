@@ -457,6 +457,18 @@ M12 Vascular, xref preferido, M12 intacto).
 (`docs/cirugia-gastroenterologia/`; misma salvedad; sin solape CG).
 **Motor de código P2: pendiente** (gate §8 antes del primer commit).
 
+**P2 — Smoke e2e por especialidad (2026-09-17; no ahora):** el fix del
+parser `required_if_*` multilínea (12.73) recuperó claves en **18**
+proformas no-CyC que estaban mal generadas en el bundle. **No** hay
+evidencia de uso real QR→formulario→firma en esas especialidades (solo
+semilla + CyC ejercitado). Cuando se active de verdad cualquiera de
+esas 18 (CG, Tórax, Uro, Gine, Trauma, Vascular, Plástica, Neuro, CV,
+Mano, Oftalmo, Hemodinamia, Endoscopia, …), **no** asumir “lista para
+producción real” solo porque el JS regeneró bien: hace falta **smoke
+end-to-end propio** (QR Aero «prueba», completar slots de esa
+especialidad, firmar, pull, print) — mismo rigor que CyC/tiroides.
+Pendiente hasta el primer uso clínico de cada una.
+
 **P2 — QR cirujano / `fojaQx` (diseño 2026-09-16; Paso 1 en prod 12.66;
 dock Foja qx local 12.67):** `docs/P2_QR_CIRUJANO.md`. Canal paralelo
 (no tocar `af-qr-*` preop). Herramienta de suite (hermana de `foja`, no

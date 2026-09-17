@@ -66,6 +66,8 @@ Prueba con nombre **prueba** y DNI ficticio cuando se pueda; en Mayo real, no co
 | `docs/P2_QR_CIRUJANO.md` | P2 QR cirujano / `fojaQx`: OK Huerta + alcance Aero/públicos/Mayo (flag); gate §8 Paso 1 en auditoría. |
 | `docs/P2_PROFORMAS_CYC.md` | Puntero → `docs/proformas-cyc/` (CyC). No editar clínica acá. |
 | `docs/proformas-cyc/README.md` | P2 CyC: **13 proformas OK de semilla**; motor de código pendiente. |
+| `docs/proformas-cyc/01-tiroides-paratiroides.md` | CyC tiroides **Huerta v2** (6 variantes, texto fijo). Prod. |
+| `docs/proformas-cyc/_01-tiroides-paratiroides-v2-APLICADO.md` | Historial auditoría v2 (sin bloque text; collector salta `_`). |
 | `docs/proformas-cyc/HALLAZGOS_ESQUELETO.md` | Tracking ampliaciones CyC post-OK (CEBC P7 ↔ Neuro M14). |
 | `docs/proformas-cyc/07-nariz-senos.md` | CyC P7 Nariz/Senos: OK + ampliación CEBC cierre (xref Neuro). |
 | `docs/cirugia-general/README.md` | P2 Cirugía General: **OK de semilla set** (M1–M6) + nota `foja.consideraciones`. |
@@ -153,13 +155,13 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-08:
 
-- PWA `CACHE_V`: **12.72** local (prosa CyC afirmativa + `required_if_*_includes`)
+- PWA `CACHE_V`: **12.73** local (tiroides Huerta v2 + fix parser `required_if_*` multilínea ×19 + guard if 200)
 - Extensión GECLISA: **0.5.15** (origin/main `5c874f8`; recargar local el viernes)
 
 ## En curso
 
-- **P2 QR cirujano / fojaQx Paso 2.3:** prosa CyC + motor (`required_if_*_includes`) en **12.72** (push). **Retomar smoke** Aero «prueba» + print.
-- **Hotfix ramas** (12.71) ya en Pages; prosa encima en 12.72.
+- **P2 QR cirujano / fojaQx Paso 2.3:** **12.73** listo para Pages. Pendiente smoke Aero «prueba» + print (CyC/tiroides v2).
+- **18 especialidades no-CyC:** JS regenerado OK (fix multilínea); **smoke e2e propio pendiente** al primer uso real — ver ROADMAP § P2 smoke por especialidad. No asumir prod-ready.
 
 - **P2 Cirugía General:** **OK de semilla del set** (M1–M6). Soft handoffs aplicados. Motor pendiente. `foja.consideraciones` = fase aparte (0 código).
 - **P2 Cirugía Torácica:** **OK de semilla** (`01-torax.md`). Validación criterio Diego/AnesFact (no torácico ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
@@ -175,7 +177,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - **P2 Oftalmología (M18):** **OK de semilla** (`01-oftalmologia.md`). Validación criterio Diego/AnesFact (no oftalmólogo ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
 - **P2 Hemodinamia (M19):** **OK de semilla** §1–4 + §6 (`01-hemodinamia.md`). **§5 diferida** (solape M12; xref preferido; M12 no tocado). Validación criterio Diego/AnesFact — nota de cabecera se mantiene. Motor pendiente. 0 código.
 - **P2 Gastroenterología / endoscopia (M20):** **OK de semilla** (`01-endoscopia.md`). Validación criterio Diego/AnesFact (no gastroenterólogo ni Huerta) — nota de cabecera se mantiene. Sin solape real con CG. Motor pendiente. 0 código.
-- **P2 QR cirujano / fojaQx:** Paso 1–2.2 CERRADOS. **Paso 2.3 en deploy** (12.72 prosa CyC). Pendiente smoke Aero «prueba» + print.
+- **P2 QR cirujano / fojaQx:** Paso 1–2.2 CERRADOS. **Paso 2.3 en 12.73** (tiroides v2 + fix parser multilínea). Pendiente smoke Aero «prueba» + print.
 
 - **P4 Traditum / evweb:** ciclo + mapa Nueva Solicitud + catálogo ADAARC (`docs/evweb_catalogo_completo.md`). **Sin código.** Hueco a diseñar: estado «Pendiente de autorizar en Traditum».
 - **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo 12.62 / 0.5.15). PWA **12.64** ya en origin (`7b3cc99`); recargar Pages aparte.
@@ -183,6 +185,8 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## Qué se hizo (más reciente primero)
 
+- 2026-09-17 — PWA **12.73**: tiroides CyC Huerta v2 (6 variantes); fix `md-proforma-to-js` listas `required_if_*` multilínea (19 proformas recuperadas; 12 CyC + ORL intactos); motor `if_eq` guard 200 (solo tiroides v2 lo necesita); tests v2; ROADMAP nota smoke e2e por especialidad no-CyC. Bundle ~534 KB. Sin Edge. Sin nombres/DNI reales. Pendiente smoke Aero.
+- 2026-09-17 — Tiroides CyC **Huerta v2** local (sin bump): reemplazo `01-tiroides-paratiroides.md` (6 variantes); fix `md-proforma-to-js` listas `required_if_*` multilínea; motor `if_eq` guard 200; tests v2. Bundle ~473→~534 KB. Archivo auditoría `_01-tiroides-paratiroides-v2-APLICADO.md`. **Pendiente bump 12.73 + Pages.** Sin nombres/DNI reales.
 - 2026-09-16 — PWA **12.72**: prosa CyC afirmativa (13 plantillas + barrido if_filled/if_eq); `stripUnitSuffix`; fix motor `required_if_*_includes` (Oncología); tests + `_audit-cyc-plantillas.mjs`. Sin nombres/DNI reales. Pendiente smoke.
 - 2026-09-16 — P2 fojaQx **Paso 2.3 deploy** (12.70): proformas×32 + motor/UI + CIE + print; Edge peek/submit. Pendiente smoke Diego. Sin nombres/DNI reales.
 - 2026-09-16 — P2 fojaQx **Paso 2.3 listo local** (12.70): schema+32 JSON, motor+tests, UI app+QR, CIE, print, peek snapshot, submit slots/CIE. Bundle ~470 KB en STATIC_CORE. Sin commit/deploy. Sin nombres/DNI reales.

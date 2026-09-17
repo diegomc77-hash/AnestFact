@@ -1,8 +1,8 @@
-// AnesFact Service Worker — CACHE_NAME bumpea junto con CACHE_V (load-scripts.js)
+﻿// AnesFact Service Worker — CACHE_NAME bumpea junto con CACHE_V (load-scripts.js)
 // STATIC_CORE: shell + SCRIPTS (js/load-scripts.js) + vistas (js/load-views.js).
 // Si agregás un script o vista nueva, actualizá AMBOS lados (lista acá + SCRIPTS/VIEWS/FOJA_PARTS).
 // No incluir scripts propios de valoracion.html ni CDNs (QR paciente = online).
-var CACHE_NAME = 'anesfact-v12.72';
+var CACHE_NAME = 'anesfact-v12.73';
 var STATIC_CORE = [
   'index.html',
   'valoracion.html',

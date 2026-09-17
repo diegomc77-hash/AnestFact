@@ -779,6 +779,11 @@
       "id": "indicacion_soporte_circulatorio",
       "type": "single",
       "required": false,
+      "required_if_soporte_circulatorio": [
+        "Balón de contrapulsación intraaórtico (BCIAo)",
+        "ECMO veno-arterial (VA)",
+        "Impella"
+      ],
       "label": "Indicación del soporte circulatorio",
       "options": [
         "Profiláctico (preoperatorio)",

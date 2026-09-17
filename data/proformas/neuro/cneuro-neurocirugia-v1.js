@@ -374,6 +374,10 @@
       "id": "ubicacion_circulacion",
       "type": "single",
       "required": false,
+      "required_if_patologia_vascular_craneal": [
+        "Aneurisma cerebral",
+        "Malformación arteriovenosa (MAV)"
+      ],
       "label": "Ubicación — circulación",
       "options": [
         "Circulación anterior",
@@ -561,6 +565,11 @@
       "id": "volumen_hematoma_cc",
       "type": "free",
       "required": false,
+      "required_if_indicacion_neurotrauma": [
+        "Hematoma epidural (HED)",
+        "Hematoma subdural agudo (HSDA)",
+        "Hematoma subdural crónico (HSDC)"
+      ],
       "label": "Volumen del hematoma evacuado (cc)",
       "empty_text": ""
     },
@@ -658,6 +667,11 @@
       "id": "indicacion_hidrocefalia",
       "type": "single",
       "required": false,
+      "required_if_proc_hidrocefalia": [
+        "Derivación ventriculoperitoneal (DVP)",
+        "Derivación ventriculoatrial (DVA) / lumboperitoneal",
+        "Tercerventriculostomía endoscópica (TVE)"
+      ],
       "label": "Indicación de hidrocefalia",
       "options": [
         "Comunicante",

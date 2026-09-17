@@ -20,7 +20,7 @@ Motor previsto: `single` | `multi` | `free` + `plantilla_texto` +
 - **Piel y faneras** (`06`) amplía/reemplaza Mohs; no convive aparte.
 - **Ortognática** (`09`): oclusión final (mismo chequeo que RIFO `05`).
 - **Laringe / MLS** (`11`): manejo de vía aérea (sync cirujano↔anestesia).
-- **Sistrunk** (en `01`): procedimiento separado de vía/extensión tiroidea
+- **Sistrunk:** fuera de `01` (tiroides v2). Quiste tirogloso = otra rama
   (patología congénita embriológica ≠ enfermedad nodular del adulto).
 - **CEBC / base de cráneo:** cierre nasal dueño en P7; resección/corredor
   en Neuro M14. Equipo = foja cada uno (Huerta). Ver
@@ -30,7 +30,7 @@ Motor previsto: `single` | `multi` | `free` + `plantilla_texto` +
 
 | # | id | Archivo | Semilla |
 |---|---|---|---|
-| 1 | `cyc-tiroides-paratiroides-v1` | [01-tiroides-paratiroides.md](01-tiroides-paratiroides.md) | OK |
+| 1 | `cyc-tiroides-paratiroides-v1` | [01-tiroides-paratiroides.md](01-tiroides-paratiroides.md) | OK Huerta v2 (6 variantes) |
 | 2 | `cyc-vaciamiento-cervical-v1` | [02-vaciamiento-cervical.md](02-vaciamiento-cervical.md) | OK |
 | 3 | `cyc-salivales-v1` | [03-salivales.md](03-salivales.md) | OK |
 | 4 | `cyc-oncologia-reconstruccion-v1` | [04-oncologia-reconstruccion.md](04-oncologia-reconstruccion.md) | OK |

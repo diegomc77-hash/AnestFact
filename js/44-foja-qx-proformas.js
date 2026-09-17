@@ -296,11 +296,12 @@
     var out = String(text || '');
     var guard = 0;
     // Cuerpo sin {{#if_ anidado → procesa de adentro hacia afuera
+    // Tope alto: plantillas multi-variante (p.ej. tiroides v2) tienen ~80+ bloques.
     var reEq =
       /\{\{#if_eq\s+([a-zA-Z0-9_]+)\s+"([^"]*)"\s*\}\}((?:(?!\{\{#if_)[\s\S])*?)\{\{\/if_eq\}\}/;
     var reFilled =
       /\{\{#if_filled\s+([a-zA-Z0-9_]+)\s*\}\}((?:(?!\{\{#if_)[\s\S])*?)\{\{\/if_filled\}\}/;
-    while (guard < 40) {
+    while (guard < 200) {
       guard++;
       var mEq = out.match(reEq);
       if (mEq) {

@@ -10,11 +10,9 @@
     "operaciones": [
       "Tiroidectomía total",
       "Hemitiroidectomía",
-      "Istmectomía",
-      "Nodulectomía por ablación",
       "TOETVA",
       "Ablación térmica percutánea",
-      "Resección de quiste tirogloso (Sistrunk)",
+      "Nodulectomía por ablación",
       "Paratiroidectomía"
     ]
   },

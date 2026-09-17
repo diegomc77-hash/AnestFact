@@ -1,5 +1,5 @@
 /**
- * Tests Node del motor de proformas (CyC tiroides + condicionales).
+ * Tests Node del motor de proformas (CyC tiroides v2 + condicionales).
  * Uso: node tools/test-foja-qx-proformas.mjs
  */
 import fs from 'fs';
@@ -44,129 +44,232 @@ assert(matched.length >= 1 && matched[0].id === 'cyc-tiroides-paratiroides-v1', 
 
 const p = sandbox.afProformaById('cyc-tiroides-paratiroides-v1');
 assert(!!p, 'carga tiroides');
+assert(p.operaciones.indexOf('Sistrunk') < 0 && !p.operaciones.some((o) => /Sistrunk|Istmectomía/.test(o)), 'ops: sin Sistrunk/Istmectomía');
+assert(p.slots.some((s) => s.id === 'variante'), 'slot variante top-level');
 
-const viaSlot = p.slots.find((s) => s.id === 'via');
+const varSlot = p.slots.find((s) => s.id === 'variante');
+assert(sandbox.afProformaSlotIsRequired(varSlot, {}) === true, 'variante siempre required');
+
+const nimDer = p.slots.find((s) => s.id === 'senal_nim_derecha');
 assert(
-  sandbox.afProformaSlotIsRequired(viaSlot, {
-    procedimiento_grupo: 'Cirugía de tiroides (vía + extensión)',
+  sandbox.afProformaSlotIsRequired(nimDer, {
+    variante: 'Tiroidectomía total con neuromonitoreo',
   }) === true,
-  'via required_if tiroides'
+  'NIM der required en V1'
 );
 assert(
-  sandbox.afProformaSlotIsRequired(viaSlot, {
-    procedimiento_grupo: 'Resección de quiste tirogloso (Sistrunk)',
+  sandbox.afProformaSlotIsRequired(nimDer, {
+    variante: 'Tiroidectomía total sin neuromonitoreo',
   }) === false,
-  'via no required si Sistrunk'
+  'NIM der no required en V2'
 );
 
-const extSlot = p.slots.find((s) => s.id === 'extension');
-assert(
-  sandbox.afProformaSlotIsRequired(extSlot, {
-    via: 'Convencional (abierta)',
-  }) === true,
-  'extension required_if convencional'
-);
-
-const values = {
-  procedimiento_grupo: 'Cirugía de tiroides (vía + extensión)',
-  via: 'Convencional (abierta)',
-  extension: 'Hemitiroidectomía',
-  lado: 'Derecho',
-  intubacion: 'Orotraqueal estándar',
-  nlr: 'Identificado y preservado',
-  aparatologia: ['NIM intraoperatorio'],
-  vaciamiento_asoc: ['Ninguno'],
+const valuesV1 = {
+  variante: 'Tiroidectomía total con neuromonitoreo',
+  caracteristica_glandula_v1: 'Multinodular',
+  signos_tiroiditis: 'Sin signos de tiroiditis',
+  tamano_nodulo_cm: '2cm',
+  lado_nodulo_predominante: 'Derecho',
+  senal_nim_derecha: 'Positiva',
+  senal_nim_izquierda: 'Adecuada',
+  hallazgo_exploracion: 'Sin adenopatías ni lesiones adicionales',
+  nodulo_adherencias: 'Sin adherencias',
+  nervio_recurrente_estado_derecha: 'Identificado y preservado',
+  nervio_recurrente_estado_izquierda: 'Identificado y preservado',
+  paratiroides_estado_sd: 'Identificada y preservada in situ',
+  paratiroides_estado_id: 'Identificada y preservada in situ',
+  paratiroides_estado_si: 'Identificada y preservada in situ',
+  paratiroides_estado_ii: 'Identificada y preservada in situ',
+  cierre_muscular_posible: 'Cierre muscular posible',
+  material_muscular_subcutaneo: 'Vicryl 3-0',
+  material_piel: 'Nylon 4-0',
+  tecnica_sutura: 'Puntos separados',
+  tipo_drenaje_v1: 'Sin drenaje',
 };
-const missing = sandbox.afProformaMissingRequired(p, values);
-assert(missing.length === 0, 'sin faltantes con set completo (' + missing.join(',') + ')');
+const missing = sandbox.afProformaMissingRequired(p, valuesV1);
+assert(missing.length === 0, 'V1 sin faltantes (' + missing.join(',') + ')');
 
-const texto = sandbox.afProformaRender(p, values);
-assert(texto.indexOf('Hemitiroidectomía') >= 0, 'render incluye extensión');
-assert(texto.indexOf('Lado: Derecho') >= 0, 'render lado_frase');
-assert(texto.indexOf('{{') < 0, 'sin placeholders crudos');
-assert(texto.indexOf('Sistrunk') < 0, 'tiroides: sin mención Sistrunk');
-assert(texto.indexOf('Si paratiroid') < 0, 'tiroides: sin rama «Si paratiroid…»');
-assert(texto.indexOf('enfoque') < 0 || texto.indexOf('Enfoque quirúrgico') < 0, 'tiroides: sin bloque enfoque para');
-assert(texto.indexOf('PTH basal') < 0 && texto.indexOf('PTH post') < 0, 'tiroides: sin líneas PTH');
+const texto = sandbox.afProformaRender(p, valuesV1);
+assert(texto.indexOf('{{') < 0, 'V1: sin placeholders crudos');
+assert(texto.indexOf('neuromonitoreo') >= 0, 'V1: menciona neuromonitoreo');
+assert(texto.indexOf('incisión cervical transversa tipo Kocher') >= 0, 'V1: Kocher fijo');
+assert(texto.indexOf('polo superior de lóbulo derecho') >= 0, 'V1: marca polo der fija');
+assert(texto.indexOf('Sistrunk') < 0, 'V1: sin Sistrunk');
+assert(texto.indexOf('PTH basal') < 0, 'V1: sin PTH');
+assert(texto.indexOf('2cm cm') < 0, 'V1: sin unidad duplicada 2cm cm');
+assert(texto.indexOf('Nódulo predominante de 2 cm') >= 0, 'V1: sanitiza 2cm → 2 cm');
+assert(texto.indexOf('Señal NIM derecha: Positiva') >= 0, 'V1: NIM der');
+assert(texto.indexOf('TOETVA') < 0, 'V1: sin TOETVA');
+assert(texto.indexOf('Ablación') < 0 && texto.indexOf('ablación') < 0, 'V1: sin ablación');
 
-// Redacción afirmativa (Huerta): sin listas de opciones ni condicionales vagos
-assert(texto.indexOf('según la vía elegida') < 0, 'tiroides: sin lista de vías');
-assert(texto.indexOf('TOETVA /') < 0 && texto.indexOf('/ ablación') < 0, 'tiroides: sin otras vías en prosa');
-assert(texto.indexOf('cuando corresponde') < 0, 'tiroides: sin «cuando corresponde»');
-assert(texto.indexOf('si aplica') < 0, 'tiroides: sin «si aplica»');
-assert(texto.indexOf('Se desarrolla la técnica por vía convencional (abierta).') >= 0, 'tiroides: vía afirmativa');
-assert(texto.indexOf('Exéresis con identificación de paratiroides.') >= 0, 'tiroides: exéresis afirmativa');
-assert(texto.indexOf('Se utilizó neuromonitoreo intraoperatorio (NIM).') >= 0, 'tiroides: NIM afirmativo');
-
-const textoSinNim = sandbox.afProformaRender(p, {
-  procedimiento_grupo: 'Cirugía de tiroides (vía + extensión)',
-  via: 'Convencional (abierta)',
-  extension: 'Tiroidectomía total',
-  intubacion: 'Orotraqueal estándar',
-  nlr: 'Identificado y preservado',
-  aparatologia: ['Bisturí ultrasónico'],
+const textoV2 = sandbox.afProformaRender(p, {
+  variante: 'Tiroidectomía total sin neuromonitoreo',
+  caracteristica_glandula_v2: 'Nodular',
+  signos_tiroiditis: 'Sin signos de tiroiditis',
+  tamano_nodulo_cm: '3',
+  lado_nodulo_predominante: 'Izquierdo',
+  hallazgo_exploracion: 'Sin adenopatías ni lesiones adicionales',
+  nodulo_adherencias: 'Sin adherencias',
+  nervio_recurrente_estado_derecha: 'Identificado y preservado',
+  nervio_recurrente_estado_izquierda: 'Identificado y preservado',
+  paratiroides_estado_sd: 'Identificada y preservada in situ',
+  paratiroides_estado_id: 'Identificada y preservada in situ',
+  paratiroides_estado_si: 'Identificada y preservada in situ',
+  paratiroides_estado_ii: 'Identificada y preservada in situ',
+  cierre_muscular_posible: 'Cierre muscular posible',
+  material_muscular_subcutaneo: 'Vicryl 3-0',
+  material_piel: 'Nylon 4-0',
+  tecnica_sutura: 'Puntos separados',
+  tipo_drenaje_v2: 'Sin drenaje',
 });
-assert(
-  textoSinNim.indexOf('No se utilizó neuromonitoreo intraoperatorio.') >= 0,
-  'tiroides: aparatología sin NIM → afirmación de no uso'
-);
-assert(
-  textoSinNim.indexOf('Biopsia por congelación: no consignada') >= 0,
-  'tiroides: biopsia vacía → neutral (no afirmar No se realizó)'
-);
-assert(
-  textoSinNim.indexOf('No se realizó biopsia') < 0,
-  'tiroides: sin negación inventada de biopsia'
-);
+assert(textoV2.indexOf('sin neuromonitoreo') >= 0, 'V2: identificación sin NIM');
+assert(textoV2.indexOf('Señal NIM') < 0, 'V2: sin líneas Señal NIM');
+assert(textoV2.indexOf('Colocación de electrodos de neuromonitoreo') < 0, 'V2: sin electrodos NIM');
 
-const textoAparaVacia = sandbox.afProformaRender(p, {
-  procedimiento_grupo: 'Cirugía de tiroides (vía + extensión)',
-  via: 'Convencional (abierta)',
-  extension: 'Tiroidectomía total',
-  intubacion: 'Orotraqueal estándar',
-  nlr: 'Identificado y preservado',
+const textoHemi = sandbox.afProformaRender(p, {
+  variante: 'Hemitiroidectomía',
+  usa_nim: 'Sí',
+  lado_hemitiroidectomia: 'Derecho',
+  signos_tiroiditis: 'Sin signos de tiroiditis',
+  tamano_nodulo_cm: '1.5',
+  caracteristicas_nodulo: 'Sólido',
+  hallazgo_exploracion: 'Sin adenopatías ni lesiones adicionales',
+  nodulo_adherencias: 'Sin adherencias',
+  nervio_recurrente_estado_hemi: 'Identificado y preservado',
+  senal_nim_hemi: 'Positiva',
+  paratiroides_estado_hemi_sup: 'Identificada y preservada in situ',
+  paratiroides_estado_hemi_inf: 'Identificada y preservada in situ',
+  cierre_muscular_posible: 'Cierre muscular posible',
+  material_muscular_subcutaneo: 'Vicryl 3-0',
+  material_piel: 'Nylon 4-0',
+  tecnica_sutura: 'Puntos separados',
+  tipo_drenaje_hemi: 'Sin drenaje',
 });
-assert(
-  textoAparaVacia.indexOf('Neuromonitoreo: no consignado.') >= 0,
-  'tiroides: aparatología vacía → neuromonitoreo neutral'
-);
-assert(
-  textoAparaVacia.indexOf('No se utilizó neuromonitoreo') < 0,
-  'tiroides: aparatología vacía → no inventar No se utilizó NIM'
-);
+assert(textoHemi.indexOf('hemitiroidectomía lado Derecho') >= 0, 'hemi: lado');
+assert(textoHemi.indexOf('electrodos de neuromonitoreo') >= 0, 'hemi: NIM si usa_nim Sí');
+assert(textoHemi.indexOf('Señal NIM: Positiva') >= 0, 'hemi: señal');
+assert(textoHemi.indexOf('tiroidectomía total') < 0, 'hemi: sin total');
 
-const textoAbl = sandbox.afProformaRender(p, {
-  procedimiento_grupo: 'Cirugía de tiroides (vía + extensión)',
-  via: 'Ablativa (percutánea)',
-  extension_ablativa: 'Nodulectomía por ablación',
-  intubacion: 'Orotraqueal estándar',
-  nlr: 'Identificado y preservado',
+const textoPara = sandbox.afProformaRender(p, {
+  variante: 'Paratiroidectomía',
+  paratiroidectomia_alcance: 'Unilateral',
+  paratiroidectomia_lado: 'Izquierdo',
+  paratiroidectomia_cual: 'Inferior',
+  paratiroidectomia_extension: 'Resección de adenoma',
+  paratiroides_descripcion: 'Adenoma de 1 cm',
+  pth_basal: '80',
+  pth_10min: '20',
+  pth_caida_porcentaje: '75',
+  incluir_evaluacion_nlr_para: 'No',
+  cierre_muscular_posible: 'Cierre muscular posible',
+  material_muscular_subcutaneo: 'Vicryl 3-0',
+  material_piel: 'Nylon 4-0',
+  tecnica_sutura: 'Puntos separados',
+  tipo_drenaje_para: 'Sin drenaje',
 });
-assert(textoAbl.indexOf('Ablación de la lesión.') >= 0, 'ablativa: Ablación, no Exéresis');
-assert(textoAbl.indexOf('Exéresis') < 0, 'ablativa: sin palabra Exéresis');
-
-const textoCm = sandbox.afProformaRender(p, {
-  procedimiento_grupo: 'Cirugía de tiroides (vía + extensión)',
-  via: 'Convencional (abierta)',
-  extension: 'Tiroidectomía total',
-  intubacion: 'Orotraqueal estándar',
-  nlr: 'Identificado y preservado',
-  hallazgo_tamano: '2cm',
-});
-assert(textoCm.indexOf('2cm cm') < 0, 'tiroides: sin unidad duplicada 2cm cm');
-assert(textoCm.indexOf('lesión de 2 cm') >= 0, 'tiroides: sanitiza 2cm → 2 cm');
+assert(textoPara.indexOf('Paratiroidectomía Unilateral') >= 0, 'para: alcance');
+assert(textoPara.indexOf('PTH basal 80') >= 0, 'para: PTH basal');
+assert(textoPara.indexOf('PTH a los 10 min 20') >= 0, 'para: PTH 10min');
+assert(textoPara.indexOf('caída 75 %') >= 0 || textoPara.indexOf('caída 75%') >= 0, 'para: % caída');
+assert(textoPara.indexOf('Nervio laríngeo recurrente:') < 0, 'para: NLR oculto si No');
+assert(textoPara.indexOf('Sistrunk') < 0, 'para: sin Sistrunk');
+assert(textoPara.indexOf('Kocher') >= 0, 'para: menciona Kocher en prosa fija');
 
 const textoToetva = sandbox.afProformaRender(p, {
-  procedimiento_grupo: 'Cirugía de tiroides (vía + extensión)',
-  via: 'TOETVA',
-  extension: 'Hemitiroidectomía',
-  lado: 'Izquierdo',
-  intubacion: 'Orotraqueal estándar',
-  nlr: 'Identificado y preservado',
+  variante: 'TOETVA',
+  trocar_central_mm: '10',
+  co2_mmhg: '6',
+  trocar_lateral_mm: '5',
+  tamano_nodulo_toetva_cm: '2',
+  lado_nodulo_toetva: 'Derecho',
+  hallazgo_exploracion: 'Sin adenopatías ni lesiones adicionales',
+  nodulo_adherencias: 'Sin adherencias',
+  lobulo_abordado_primero: 'Derecho',
+  conversion_toetva: 'Sin conversión',
+  instrumento_hemostasia: 'Ligasure',
+  nervio_recurrente_estado_derecha: 'Identificado y preservado',
+  nervio_recurrente_estado_izquierda: 'Identificado y preservado',
+  paratiroides_estado_sd: 'Identificada y preservada in situ',
+  paratiroides_estado_id: 'Identificada y preservada in situ',
+  paratiroides_estado_si: 'Identificada y preservada in situ',
+  paratiroides_estado_ii: 'Identificada y preservada in situ',
 });
-assert(textoToetva.indexOf('vía TOETVA') >= 0, 'TOETVA: vía afirmativa');
-assert(textoToetva.indexOf('Convencional') < 0, 'TOETVA: sin mencionar convencional');
-assert(textoToetva.indexOf('ablativa') < 0 && textoToetva.indexOf('Ablación') < 0, 'TOETVA: sin ablativa');
+assert(textoToetva.indexOf('incisión en región vestibular inferior') >= 0, 'TOETVA: vestibular literal');
+assert(textoToetva.indexOf('trocar de 10 mm') >= 0, 'TOETVA: trocar central');
+assert(textoToetva.indexOf('CO₂ a 6 mmHg') >= 0 || textoToetva.indexOf('CO2 a 6 mmHg') >= 0, 'TOETVA: CO2');
+assert(textoToetva.indexOf('Sin conversión') < 0 || textoToetva.indexOf('endobag') >= 0, 'TOETVA: rama sin conversión');
+assert(textoToetva.indexOf('endobag') >= 0, 'TOETVA: endobag');
+assert(textoToetva.indexOf('cervicotomía abierta') < 0, 'TOETVA sin conversión: sin texto conversión');
+
+const textoToetvaConv = sandbox.afProformaRender(p, {
+  variante: 'TOETVA',
+  trocar_central_mm: '10',
+  co2_mmhg: '6',
+  trocar_lateral_mm: '5',
+  tamano_nodulo_toetva_cm: '2',
+  lado_nodulo_toetva: 'Izquierdo',
+  hallazgo_exploracion: 'Sin adenopatías ni lesiones adicionales',
+  nodulo_adherencias: 'Sin adherencias',
+  lobulo_abordado_primero: 'Izquierdo',
+  conversion_toetva: 'Convertida a cervicotomía abierta',
+  motivo_conversion: 'sangrado',
+  instrumento_hemostasia: 'Bisturí armónico',
+  nervio_recurrente_estado_derecha: 'Identificado y preservado',
+  nervio_recurrente_estado_izquierda: 'Identificado y preservado',
+  paratiroides_estado_sd: 'Identificada y preservada in situ',
+  paratiroides_estado_id: 'Identificada y preservada in situ',
+  paratiroides_estado_si: 'Identificada y preservada in situ',
+  paratiroides_estado_ii: 'Identificada y preservada in situ',
+  cierre_muscular_posible: 'Cierre muscular posible',
+  material_muscular_subcutaneo: 'Vicryl 3-0',
+  material_piel: 'Nylon 4-0',
+  tecnica_sutura: 'Puntos separados',
+  tipo_drenaje_toetva: 'Blake',
+});
+assert(textoToetvaConv.indexOf('Ante sangrado, se convierte a cervicotomía abierta') >= 0, 'TOETVA conv: motivo');
+assert(textoToetvaConv.indexOf('endobag') < 0, 'TOETVA conv: sin endobag');
+
+const baseAbl = {
+  variante: 'Ablación percutánea',
+  ablacion_lado: 'Derecho',
+  ablacion_tamano_a_cm: '2',
+  ablacion_tamano_b_cm: '1.5',
+  ablacion_caracteristicas: 'Sólido',
+  ablacion_ciclos: '3',
+  ablacion_watts: '40',
+  ablacion_tiempo_min: '8',
+  componente_quistico: 'Sin componente quístico',
+  hidrodiseccion_realizada: 'No',
+  resultado_final_ablacion: 'Sin vascularización interna residual',
+  complicacion_hemorragia: 'Sin sangrado significativo',
+};
+const textoRf = sandbox.afProformaRender(p, Object.assign({}, baseAbl, { tecnica_ablacion: 'Radiofrecuencia' }));
+assert(textoRf.indexOf('mediante radiofrecuencia') >= 0, 'Abl RF: literal radiofrecuencia');
+assert(textoRf.indexOf('microondas') < 0, 'Abl RF: sin microondas');
+assert(textoRf.indexOf('2 cm x 1.5 cm') >= 0 || textoRf.indexOf('2 cm x 1.5') >= 0, 'Abl RF: tamaños con cm');
+
+const textoMw = sandbox.afProformaRender(p, Object.assign({}, baseAbl, { tecnica_ablacion: 'Microondas' }));
+assert(textoMw.indexOf('mediante microondas') >= 0, 'Abl MW: literal microondas');
+assert(textoMw.indexOf('radiofrecuencia') < 0, 'Abl MW: sin radiofrecuencia');
+assert(textoMw.indexOf('buen despertar anestésico') >= 0, 'Abl MW: cierre Huerta');
+
+// Prune: valores de otra variante no aparecen
+const ghost = Object.assign({}, valuesV1, {
+  tecnica_ablacion: 'Radiofrecuencia',
+  pth_basal: '99',
+  trocar_central_mm: '10',
+});
+const pruned = sandbox.afProformaPruneValues(p, ghost);
+assert(pruned.pth_basal == null && pruned.tecnica_ablacion == null && pruned.trocar_central_mm == null, 'prune limpia ramas ajenas');
+const textoPruned = sandbox.afProformaRender(p, ghost);
+assert(textoPruned.indexOf('PTH basal') < 0 && textoPruned.indexOf('radiofrecuencia') < 0, 'render ignora fantasmas');
+assert(textoPruned.indexOf('trocar') < 0, 'render V1 sin trocar fantasma');
+
+const arm = sandbox.afProformaArmar(p, valuesV1, 'usar');
+assert(arm.proforma_id === p.id && arm.modo_armado === 'usar' && arm.texto === texto, 'armar usar');
+
+const cero = sandbox.afProformaArmar(null, { _texto: 'libre' }, 'cero');
+assert(cero.modo_armado === 'cero' && cero.texto === 'libre', 'armar cero');
 
 // Salivales: mon_facial + Enucleación
 const sal = sandbox.afProformaById('cyc-salivales-v1');
@@ -236,61 +339,6 @@ const textoRifo = sandbox.afProformaRender(rifo, {
 assert(textoRifo.indexOf('Bloqueo intermaxilar') < 0, 'rifo: sin Bloqueo fijo');
 assert(textoRifo.indexOf('CNEO') < 0 && textoRifo.indexOf('Maxilar:') < 0, 'rifo: sin focos no elegidos');
 assert(textoRifo.indexOf('Mandíbula: Cuerpo (Derecho).') >= 0, 'rifo: solo mandibular filled');
-
-const pthSlot = p.slots.find((s) => s.id === 'pth_basal');
-assert(
-  sandbox.afProformaSlotIsVisible(pthSlot, values) === false,
-  'PTH oculto si rama tiroides'
-);
-const viaSlot2 = p.slots.find((s) => s.id === 'via');
-assert(sandbox.afProformaSlotIsVisible(viaSlot2, values) === true, 'vía visible en tiroides');
-const paraSlot = p.slots.find((s) => s.id === 'para_tecnica');
-assert(
-  sandbox.afProformaSlotIsVisible(paraSlot, values) === false,
-  'para_tecnica oculto en tiroides'
-);
-
-const ghost = Object.assign({}, values, {
-  para_tecnica: 'Targeted',
-  para_patologia: 'Adenoma',
-  pth_basal: '40',
-});
-const pruned = sandbox.afProformaPruneValues(p, ghost);
-assert(pruned.pth_basal == null && pruned.para_tecnica == null, 'prune limpia rama ajena');
-const textoPruned = sandbox.afProformaRender(p, ghost);
-assert(textoPruned.indexOf('PTH basal') < 0 && textoPruned.indexOf('Targeted') < 0, 'render ignora valores fantasma');
-
-const textoPara = sandbox.afProformaRender(p, {
-  procedimiento_grupo: 'Paratiroidectomía',
-  para_tecnica: 'Targeted',
-  para_patologia: 'Adenoma',
-  para_lado: 'Izquierdo',
-  para_cantidad: 'Única',
-  para_ubicacion: ['Inferior'],
-  intubacion: 'Orotraqueal estándar',
-  nlr: 'Identificado y preservado',
-  pth_basal: '80',
-  pth_post: '20',
-  pth_pct: '75',
-});
-assert(textoPara.indexOf('Paratiroidectomía') >= 0, 'para: menciona rama');
-assert(textoPara.indexOf('PTH basal 80') >= 0, 'para: incluye PTH');
-assert(textoPara.indexOf('Sistrunk') < 0, 'para: sin Sistrunk');
-assert(textoPara.indexOf('Vía / abordaje') < 0, 'para: sin vía de tiroides');
-
-const textoSis = sandbox.afProformaRender(p, {
-  procedimiento_grupo: 'Resección de quiste tirogloso (Sistrunk)',
-  intubacion: 'Orotraqueal estándar',
-});
-assert(textoSis.indexOf('Sistrunk') >= 0, 'sistrunk: menciona técnica');
-assert(textoSis.indexOf('PTH basal') < 0 && textoSis.indexOf('PTH post') < 0, 'sistrunk: sin PTH');
-assert(textoSis.indexOf('Vía / abordaje') < 0, 'sistrunk: sin vía');
-
-const arm = sandbox.afProformaArmar(p, values, 'usar');
-assert(arm.proforma_id === p.id && arm.modo_armado === 'usar' && arm.texto === texto, 'armar usar');
-
-const cero = sandbox.afProformaArmar(null, { _texto: 'libre' }, 'cero');
-assert(cero.modo_armado === 'cero' && cero.texto === 'libre', 'armar cero');
 
 if (failed) {
   console.error(failed + ' fallos');

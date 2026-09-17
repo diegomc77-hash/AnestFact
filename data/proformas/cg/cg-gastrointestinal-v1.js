@@ -143,6 +143,10 @@
       "id": "escision_mesorrectal",
       "type": "single",
       "required": false,
+      "required_if_proc_colorrecto": [
+        "Resección anterior de recto (baja / ultrabaja)",
+        "Operación de Miles (resección abdominoperineal)"
+      ],
       "label": "Escisión mesorrectal",
       "options": [
         "Total (TME)",
@@ -154,6 +158,13 @@
       "id": "ureter_derecho",
       "type": "single",
       "required": false,
+      "required_if_proc_colorrecto": [
+        "Hemicolectomía derecha",
+        "Colectomía transversa",
+        "Colectomía subtotal / total",
+        "Resección anterior de recto (baja / ultrabaja)",
+        "Operación de Miles (resección abdominoperineal)"
+      ],
       "label": "Uréter derecho",
       "options": [
         "Identificado y preservado",
@@ -166,6 +177,14 @@
       "id": "ureter_izquierdo",
       "type": "single",
       "required": false,
+      "required_if_proc_colorrecto": [
+        "Hemicolectomía izquierda",
+        "Sigmoidectomía",
+        "Colectomía transversa",
+        "Colectomía subtotal / total",
+        "Resección anterior de recto (baja / ultrabaja)",
+        "Operación de Miles (resección abdominoperineal)"
+      ],
       "label": "Uréter izquierdo",
       "options": [
         "Identificado y preservado",
@@ -242,6 +261,12 @@
       "id": "config_anastomosis_cr",
       "type": "single",
       "required": false,
+      "required_if_tipo_anastomosis_cr": [
+        "Íleo-cólica",
+        "Colo-cólica",
+        "Colo-rectal",
+        "Íleo-rectal"
+      ],
       "label": "Configuración de anastomosis",
       "options": [
         "Término-terminal",
@@ -255,6 +280,12 @@
       "id": "tecnica_anastomosis_cr",
       "type": "single",
       "required": false,
+      "required_if_tipo_anastomosis_cr": [
+        "Íleo-cólica",
+        "Colo-cólica",
+        "Colo-rectal",
+        "Íleo-rectal"
+      ],
       "label": "Técnica de confección",
       "options": [
         "Mecánica / engrapadora",
@@ -314,6 +345,12 @@
       "id": "hermeticidad_cr",
       "type": "single",
       "required": false,
+      "required_if_tipo_anastomosis_cr": [
+        "Íleo-cólica",
+        "Colo-cólica",
+        "Colo-rectal",
+        "Íleo-rectal"
+      ],
       "label": "Prueba de hermeticidad",
       "options": [
         "Fuga demostrada",
@@ -372,6 +409,11 @@
       "id": "linfadenectomia_gastrica",
       "type": "single",
       "required": false,
+      "required_if_tipo_reseccion_gastrica": [
+        "Gastrectomía total",
+        "Gastrectomía subtotal / parcial (distal)",
+        "Gastrectomía subtotal / parcial (proximal)"
+      ],
       "label": "Linfadenectomía (neoplasia)",
       "options": [
         "D1",
@@ -385,6 +427,11 @@
       "id": "margen_proximal",
       "type": "single",
       "required": false,
+      "required_if_tipo_reseccion_gastrica": [
+        "Gastrectomía total",
+        "Gastrectomía subtotal / parcial (distal)",
+        "Gastrectomía subtotal / parcial (proximal)"
+      ],
       "label": "Margen proximal",
       "options": [
         "Libre",
@@ -408,6 +455,11 @@
       "id": "margen_distal",
       "type": "single",
       "required": false,
+      "required_if_tipo_reseccion_gastrica": [
+        "Gastrectomía total",
+        "Gastrectomía subtotal / parcial (distal)",
+        "Gastrectomía subtotal / parcial (proximal)"
+      ],
       "label": "Margen distal",
       "options": [
         "Libre",
@@ -431,6 +483,11 @@
       "id": "reconstruccion_gastrica",
       "type": "single",
       "required": false,
+      "required_if_tipo_reseccion_gastrica": [
+        "Gastrectomía total",
+        "Gastrectomía subtotal / parcial (distal)",
+        "Gastrectomía subtotal / parcial (proximal)"
+      ],
       "label": "Reconstrucción del tránsito",
       "options": [
         "Y de Roux (yeyunal)",
@@ -445,6 +502,12 @@
       "id": "tecnica_anastomosis_gastrica",
       "type": "single",
       "required": false,
+      "required_if_reconstruccion_gastrica": [
+        "Y de Roux (yeyunal)",
+        "Billroth I (gastroduodenoanastomosis)",
+        "Billroth II (gastroenteroanastomosis)",
+        "Asa al brown / interposición yeyunal"
+      ],
       "label": "Confección de anastomosis",
       "options": [
         "Mecánica",
@@ -456,6 +519,12 @@
       "id": "refuerzo_linea_sutura",
       "type": "single",
       "required": false,
+      "required_if_reconstruccion_gastrica": [
+        "Y de Roux (yeyunal)",
+        "Billroth I (gastroduodenoanastomosis)",
+        "Billroth II (gastroenteroanastomosis)",
+        "Asa al brown / interposición yeyunal"
+      ],
       "label": "Refuerzo de línea de sutura",
       "options": [
         "Sí",
@@ -467,6 +536,12 @@
       "id": "hermeticidad_gastrica",
       "type": "single",
       "required": false,
+      "required_if_reconstruccion_gastrica": [
+        "Y de Roux (yeyunal)",
+        "Billroth I (gastroduodenoanastomosis)",
+        "Billroth II (gastroenteroanastomosis)",
+        "Asa al brown / interposición yeyunal"
+      ],
       "label": "Prueba de hermeticidad",
       "options": [
         "Fuga demostrada",
@@ -604,6 +679,10 @@
       "id": "campo_delgado",
       "type": "single",
       "required": false,
+      "required_if_indicacion_delgado": [
+        "Isquemia / necrosis",
+        "Perforación / trauma"
+      ],
       "label": "Clasificación del campo",
       "options": [
         "Limpio",
@@ -747,6 +826,11 @@
       "id": "campo_exploradora",
       "type": "single",
       "required": false,
+      "required_if_objetivo_exploradora": [
+        "Síndrome abdomen agudo indeterminado",
+        "Trauma abdominal",
+        "Evaluación de peritonitis"
+      ],
       "label": "Clasificación del campo",
       "options": [
         "Limpio",
@@ -959,6 +1043,14 @@
       "id": "drenaje_gi",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Colectomía / resección colorrectal",
+        "Gastrectomía / procedimiento gástrico",
+        "Resección de intestino delgado / enterectomía",
+        "Laparotomía / laparoscopía exploradora",
+        "Ostomía (confección / cierre)",
+        "Apendicectomía"
+      ],
       "label": "Drenaje",
       "options": [
         "Sí",

@@ -4,319 +4,1132 @@
   g.AF_PROFORMAS["cyc-tiroides-paratiroides-v1"] = {
   "slots": [
     {
-      "id": "procedimiento_grupo",
+      "id": "variante",
       "type": "single",
       "required": true,
-      "label": "Procedimiento",
+      "label": "Variante de protocolo",
       "options": [
-        "Cirugía de tiroides (vía + extensión)",
-        "Resección de quiste tirogloso (Sistrunk)",
-        "Paratiroidectomía"
-      ]
-    },
-    {
-      "id": "via",
-      "type": "single",
-      "required": false,
-      "required_if_procedimiento_grupo": [
-        "Cirugía de tiroides (vía + extensión)"
-      ],
-      "label": "Vía / abordaje",
-      "options": [
-        "Convencional (abierta)",
-        "TOETVA",
-        "Ablativa (percutánea)"
-      ]
-    },
-    {
-      "id": "extension",
-      "type": "single",
-      "required": false,
-      "required_if_via": [
-        "Convencional (abierta)",
-        "TOETVA"
-      ],
-      "label": "Extensión",
-      "options": [
-        "Tiroidectomía total",
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
         "Hemitiroidectomía",
-        "Istmectomía"
-      ],
-      "empty_text": ""
+        "Paratiroidectomía",
+        "TOETVA",
+        "Ablación percutánea"
+      ]
     },
     {
-      "id": "extension_ablativa",
+      "id": "caracteristica_glandula_v1",
       "type": "single",
       "required": false,
-      "required_if_via": [
-        "Ablativa (percutánea)"
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo"
       ],
-      "label": "Extensión (ablativa)",
+      "label": "Característica de la glándula",
       "options": [
-        "Nodulectomía por ablación"
-      ],
-      "empty_text": ""
+        "Aumentada de tamaño",
+        "Multinodular"
+      ]
     },
     {
-      "id": "lado",
+      "id": "caracteristica_glandula_v2",
       "type": "single",
       "required": false,
-      "required_if_extension": [
+      "required_if_variante": [
+        "Tiroidectomía total sin neuromonitoreo"
+      ],
+      "label": "Característica de la glándula",
+      "options": [
+        "Multinodular",
+        "Nodular",
+        "Difuso"
+      ]
+    },
+    {
+      "id": "signos_tiroiditis",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
         "Hemitiroidectomía"
       ],
-      "label": "Lateralidad (si hemitiroidectomía)",
+      "label": "Signos de tiroiditis",
       "options": [
-        "Derecho",
-        "Izquierdo"
+        "Sin signos de tiroiditis",
+        "Con signos de tiroiditis"
+      ]
+    },
+    {
+      "id": "tamano_nodulo_cm",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
+        "Hemitiroidectomía"
       ],
+      "label": "Tamaño del nódulo (cm)",
+      "suffix": " cm",
       "empty_text": ""
     },
     {
-      "id": "para_tecnica",
+      "id": "lado_nodulo_predominante",
       "type": "single",
       "required": false,
-      "required_if_procedimiento_grupo": [
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo"
+      ],
+      "label": "Lado del nódulo predominante",
+      "options": [
+        "Derecho",
+        "Izquierdo"
+      ]
+    },
+    {
+      "id": "caracteristicas_nodulo",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "Hemitiroidectomía"
+      ],
+      "label": "Características del nódulo",
+      "empty_text": ""
+    },
+    {
+      "id": "senal_nim_derecha",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo"
+      ],
+      "label": "Señal NIM — nervio recurrente derecho",
+      "options": [
+        "Positiva",
+        "Adecuada"
+      ]
+    },
+    {
+      "id": "senal_nim_izquierda",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo"
+      ],
+      "label": "Señal NIM — nervio recurrente izquierdo",
+      "options": [
+        "Positiva",
+        "Adecuada"
+      ]
+    },
+    {
+      "id": "hallazgo_exploracion",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
+        "Hemitiroidectomía",
+        "TOETVA"
+      ],
+      "label": "Hallazgo en exploración cervical",
+      "options": [
+        "Sin adenopatías ni lesiones adicionales",
+        "Adenopatías",
+        "Lesiones adicionales"
+      ]
+    },
+    {
+      "id": "nodulo_adherencias",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
+        "Hemitiroidectomía",
+        "TOETVA"
+      ],
+      "label": "Adherencias del nódulo",
+      "options": [
+        "Sin adherencias",
+        "Con adherencias a estructuras adyacentes"
+      ]
+    },
+    {
+      "id": "nodulo_resecado_con_estructuras",
+      "type": "free",
+      "required": false,
+      "required_if_nodulo_adherencias": [
+        "Con adherencias a estructuras adyacentes"
+      ],
+      "label": "Estructuras resecadas en bloque con el nódulo",
+      "empty_text": ""
+    },
+    {
+      "id": "adenopatia_adherencias",
+      "type": "single",
+      "required": false,
+      "required_if_hallazgo_exploracion": [
+        "Adenopatías"
+      ],
+      "label": "Adherencias de adenopatía",
+      "options": [
+        "Sin adherencias",
+        "Con adherencias a estructuras adyacentes"
+      ]
+    },
+    {
+      "id": "adenopatia_resecado_con_estructuras",
+      "type": "free",
+      "required": false,
+      "required_if_adenopatia_adherencias": [
+        "Con adherencias a estructuras adyacentes"
+      ],
+      "label": "Estructuras resecadas en bloque con la adenopatía",
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_recurrente_estado_derecha",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
+        "TOETVA"
+      ],
+      "label": "Nervio laríngeo recurrente derecho",
+      "options": [
+        "Identificado y preservado",
+        "No identificado — preservado por técnica extracapsular",
+        "Lesionado o sacrificado"
+      ]
+    },
+    {
+      "id": "nervio_recurrente_motivo_derecha",
+      "type": "free",
+      "required": false,
+      "required_if_nervio_recurrente_estado_derecha": [
+        "No identificado — preservado por técnica extracapsular",
+        "Lesionado o sacrificado"
+      ],
+      "label": "Detalle / motivo (NLR derecho)",
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_recurrente_estado_izquierda",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
+        "TOETVA"
+      ],
+      "label": "Nervio laríngeo recurrente izquierdo",
+      "options": [
+        "Identificado y preservado",
+        "No identificado — preservado por técnica extracapsular",
+        "Lesionado o sacrificado"
+      ]
+    },
+    {
+      "id": "nervio_recurrente_motivo_izquierda",
+      "type": "free",
+      "required": false,
+      "required_if_nervio_recurrente_estado_izquierda": [
+        "No identificado — preservado por técnica extracapsular",
+        "Lesionado o sacrificado"
+      ],
+      "label": "Detalle / motivo (NLR izquierdo)",
+      "empty_text": ""
+    },
+    {
+      "id": "usa_nim",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Hemitiroidectomía"
+      ],
+      "label": "Neuromonitoreo (NIM)",
+      "options": [
+        "Sí",
+        "No"
+      ]
+    },
+    {
+      "id": "lado_hemitiroidectomia",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Hemitiroidectomía"
+      ],
+      "label": "Lado de hemitiroidectomía",
+      "options": [
+        "Derecho",
+        "Izquierdo"
+      ]
+    },
+    {
+      "id": "senal_nim_hemi",
+      "type": "single",
+      "required": false,
+      "required_if_usa_nim": [
+        "Sí"
+      ],
+      "label": "Señal NIM (lado operado)",
+      "options": [
+        "Positiva",
+        "Adecuada"
+      ]
+    },
+    {
+      "id": "nervio_recurrente_estado_hemi",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Hemitiroidectomía"
+      ],
+      "label": "Nervio laríngeo recurrente (lado operado)",
+      "options": [
+        "Identificado y preservado",
+        "No identificado — preservado por técnica extracapsular",
+        "Lesionado o sacrificado"
+      ]
+    },
+    {
+      "id": "nervio_recurrente_motivo_hemi",
+      "type": "free",
+      "required": false,
+      "required_if_nervio_recurrente_estado_hemi": [
+        "No identificado — preservado por técnica extracapsular",
+        "Lesionado o sacrificado"
+      ],
+      "label": "Detalle / motivo (NLR lado operado)",
+      "empty_text": ""
+    },
+    {
+      "id": "paratiroides_estado_sd",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
+        "TOETVA"
+      ],
+      "label": "Paratiroides superior derecha",
+      "options": [
+        "Identificada y preservada in situ",
+        "Identificada y reimplantada",
+        "No identificada"
+      ]
+    },
+    {
+      "id": "paratiroides_sitio_reimplante_sd",
+      "type": "free",
+      "required": false,
+      "required_if_paratiroides_estado_sd": [
+        "Identificada y reimplantada"
+      ],
+      "label": "Sitio de reimplante (paratiroides SD)",
+      "empty_text": ""
+    },
+    {
+      "id": "paratiroides_motivo_sd",
+      "type": "free",
+      "required": false,
+      "required_if_paratiroides_estado_sd": [
+        "No identificada"
+      ],
+      "label": "Motivo no identificación (paratiroides SD)",
+      "empty_text": ""
+    },
+    {
+      "id": "paratiroides_estado_id",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
+        "TOETVA"
+      ],
+      "label": "Paratiroides inferior derecha",
+      "options": [
+        "Identificada y preservada in situ",
+        "Identificada y reimplantada",
+        "No identificada"
+      ]
+    },
+    {
+      "id": "paratiroides_sitio_reimplante_id",
+      "type": "free",
+      "required": false,
+      "required_if_paratiroides_estado_id": [
+        "Identificada y reimplantada"
+      ],
+      "label": "Sitio de reimplante (paratiroides ID)",
+      "empty_text": ""
+    },
+    {
+      "id": "paratiroides_motivo_id",
+      "type": "free",
+      "required": false,
+      "required_if_paratiroides_estado_id": [
+        "No identificada"
+      ],
+      "label": "Motivo no identificación (paratiroides ID)",
+      "empty_text": ""
+    },
+    {
+      "id": "paratiroides_estado_si",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
+        "TOETVA"
+      ],
+      "label": "Paratiroides superior izquierda",
+      "options": [
+        "Identificada y preservada in situ",
+        "Identificada y reimplantada",
+        "No identificada"
+      ]
+    },
+    {
+      "id": "paratiroides_sitio_reimplante_si",
+      "type": "free",
+      "required": false,
+      "required_if_paratiroides_estado_si": [
+        "Identificada y reimplantada"
+      ],
+      "label": "Sitio de reimplante (paratiroides SI)",
+      "empty_text": ""
+    },
+    {
+      "id": "paratiroides_motivo_si",
+      "type": "free",
+      "required": false,
+      "required_if_paratiroides_estado_si": [
+        "No identificada"
+      ],
+      "label": "Motivo no identificación (paratiroides SI)",
+      "empty_text": ""
+    },
+    {
+      "id": "paratiroides_estado_ii",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
+        "TOETVA"
+      ],
+      "label": "Paratiroides inferior izquierda",
+      "options": [
+        "Identificada y preservada in situ",
+        "Identificada y reimplantada",
+        "No identificada"
+      ]
+    },
+    {
+      "id": "paratiroides_sitio_reimplante_ii",
+      "type": "free",
+      "required": false,
+      "required_if_paratiroides_estado_ii": [
+        "Identificada y reimplantada"
+      ],
+      "label": "Sitio de reimplante (paratiroides II)",
+      "empty_text": ""
+    },
+    {
+      "id": "paratiroides_motivo_ii",
+      "type": "free",
+      "required": false,
+      "required_if_paratiroides_estado_ii": [
+        "No identificada"
+      ],
+      "label": "Motivo no identificación (paratiroides II)",
+      "empty_text": ""
+    },
+    {
+      "id": "paratiroides_estado_hemi_sup",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Hemitiroidectomía"
+      ],
+      "label": "Paratiroides superior (lado operado)",
+      "options": [
+        "Identificada y preservada in situ",
+        "Identificada y reimplantada",
+        "No identificada"
+      ]
+    },
+    {
+      "id": "paratiroides_sitio_reimplante_hemi_sup",
+      "type": "free",
+      "required": false,
+      "required_if_paratiroides_estado_hemi_sup": [
+        "Identificada y reimplantada"
+      ],
+      "label": "Sitio de reimplante (paratiroides superior hemi)",
+      "empty_text": ""
+    },
+    {
+      "id": "paratiroides_motivo_hemi_sup",
+      "type": "free",
+      "required": false,
+      "required_if_paratiroides_estado_hemi_sup": [
+        "No identificada"
+      ],
+      "label": "Motivo no identificación (paratiroides superior hemi)",
+      "empty_text": ""
+    },
+    {
+      "id": "paratiroides_estado_hemi_inf",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Hemitiroidectomía"
+      ],
+      "label": "Paratiroides inferior (lado operado)",
+      "options": [
+        "Identificada y preservada in situ",
+        "Identificada y reimplantada",
+        "No identificada"
+      ]
+    },
+    {
+      "id": "paratiroides_sitio_reimplante_hemi_inf",
+      "type": "free",
+      "required": false,
+      "required_if_paratiroides_estado_hemi_inf": [
+        "Identificada y reimplantada"
+      ],
+      "label": "Sitio de reimplante (paratiroides inferior hemi)",
+      "empty_text": ""
+    },
+    {
+      "id": "paratiroides_motivo_hemi_inf",
+      "type": "free",
+      "required": false,
+      "required_if_paratiroides_estado_hemi_inf": [
+        "No identificada"
+      ],
+      "label": "Motivo no identificación (paratiroides inferior hemi)",
+      "empty_text": ""
+    },
+    {
+      "id": "cierre_muscular_posible",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
+        "Hemitiroidectomía",
+        "Paratiroidectomía",
+        "TOETVA"
+      ],
+      "label": "Cierre muscular",
+      "options": [
+        "Sí, cierre habitual",
+        "No, resección impide cierre en ese plano"
+      ]
+    },
+    {
+      "id": "material_muscular_subcutaneo",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
+        "Hemitiroidectomía",
+        "Paratiroidectomía",
+        "TOETVA"
+      ],
+      "label": "Material plano muscular / subcutáneo (con calibre)",
+      "empty_text": ""
+    },
+    {
+      "id": "material_piel",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
+        "Hemitiroidectomía",
+        "Paratiroidectomía",
+        "TOETVA"
+      ],
+      "label": "Material de piel (con calibre)",
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_sutura",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo",
+        "Tiroidectomía total sin neuromonitoreo",
+        "Hemitiroidectomía",
+        "Paratiroidectomía",
+        "TOETVA"
+      ],
+      "label": "Técnica de sutura cutánea",
+      "options": [
+        "Surget",
+        "Puntos separados"
+      ]
+    },
+    {
+      "id": "tipo_drenaje_v1",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total con neuromonitoreo"
+      ],
+      "label": "Tipo de drenaje",
+      "options": [
+        "Tubular aspirativo",
+        "Laminar",
+        "Rubber"
+      ]
+    },
+    {
+      "id": "tipo_drenaje_v2",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Tiroidectomía total sin neuromonitoreo"
+      ],
+      "label": "Tipo de drenaje",
+      "options": [
+        "Tubular aspirativo",
+        "Laminar",
+        "Rubber",
+        "No corresponde"
+      ]
+    },
+    {
+      "id": "tipo_drenaje_hemi",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Hemitiroidectomía"
+      ],
+      "label": "Tipo de drenaje",
+      "options": [
+        "Tubular aspirativo",
+        "Laminar",
+        "Rubber",
+        "No se coloca drenaje"
+      ]
+    },
+    {
+      "id": "tipo_drenaje_para",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
         "Paratiroidectomía"
       ],
-      "label": "Enfoque quirúrgico (paratiroidectomía)",
+      "label": "Tipo de drenaje",
       "options": [
-        "Targeted",
-        "Selectiva",
-        "Exploración de 4 glándulas"
-      ],
-      "empty_text": ""
+        "Tubular aspirativo",
+        "Laminar",
+        "Rubber",
+        "No se coloca drenaje"
+      ]
     },
     {
-      "id": "para_patologia",
+      "id": "tipo_drenaje_toetva",
       "type": "single",
       "required": false,
-      "required_if_procedimiento_grupo": [
+      "required_if_variante": [
+        "TOETVA"
+      ],
+      "label": "Tipo de drenaje",
+      "options": [
+        "Tubular aspirativo",
+        "Laminar",
+        "Rubber",
+        "No se coloca drenaje"
+      ]
+    },
+    {
+      "id": "paratiroidectomia_alcance",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
         "Paratiroidectomía"
       ],
-      "label": "Patología de base (paratiroidectomía)",
+      "label": "Alcance",
       "options": [
-        "Adenoma",
-        "Hiperplasia (insuficiencia renal)"
-      ],
-      "empty_text": ""
+        "Unilateral",
+        "Bilateral"
+      ]
     },
     {
-      "id": "para_lado",
+      "id": "paratiroidectomia_lado",
       "type": "single",
       "required": false,
-      "required_if_para_patologia": [
-        "Adenoma"
+      "required_if_paratiroidectomia_alcance": [
+        "Unilateral"
       ],
-      "label": "Lado (adenoma)",
+      "label": "Lado",
       "options": [
         "Derecho",
         "Izquierdo"
-      ],
-      "empty_text": ""
+      ]
     },
     {
-      "id": "para_cantidad",
+      "id": "paratiroidectomia_cual",
       "type": "single",
       "required": false,
-      "required_if_para_patologia": [
-        "Adenoma"
+      "required_if_paratiroidectomia_alcance": [
+        "Unilateral"
       ],
-      "label": "Cantidad (adenoma)",
-      "options": [
-        "Única",
-        "Múltiple"
-      ],
-      "empty_text": ""
-    },
-    {
-      "id": "para_ubicacion",
-      "type": "multi",
-      "required": false,
-      "required_if_para_patologia": [
-        "Adenoma"
-      ],
-      "label": "Ubicación (adenoma; multi si múltiple)",
-      "options": [
-        "Superior",
-        "Inferior",
-        "Ectópica"
-      ],
-      "join": ", ",
-      "empty_text": ""
-    },
-    {
-      "id": "para_subtotal_lado",
-      "type": "single",
-      "required": false,
-      "required_if_para_patologia": [
-        "Hiperplasia (insuficiencia renal)"
-      ],
-      "label": "Lado del remanente (paratiroidectomía subtotal)",
-      "options": [
-        "Derecho",
-        "Izquierdo"
-      ],
-      "empty_text": ""
-    },
-    {
-      "id": "para_subtotal_ubicacion",
-      "type": "single",
-      "required": false,
-      "required_if_para_patologia": [
-        "Hiperplasia (insuficiencia renal)"
-      ],
-      "label": "Glándula remanente (subtotal)",
+      "label": "Glándula",
       "options": [
         "Superior",
         "Inferior"
-      ],
-      "empty_text": ""
-    },
-    {
-      "id": "intubacion",
-      "type": "single",
-      "required": true,
-      "label": "Intubación",
-      "options": [
-        "Orotraqueal estándar",
-        "Orotraqueal con tubo electrodado (neuromonitoreo)",
-        "Nasotraqueal",
-        "Vía aérea difícil"
       ]
     },
     {
-      "id": "aparatologia",
-      "type": "multi",
-      "required": false,
-      "label": "Neuromonitoreo / aparatología",
-      "options": [
-        "NIM intraoperatorio",
-        "Bisturí ultrasónico",
-        "Ecógrafo intraoperatorio",
-        "Insuflador CO2"
-      ],
-      "join": ", ",
-      "empty_text": "no consignada"
-    },
-    {
-      "id": "co2_param",
+      "id": "paratiroides_descripcion",
       "type": "free",
       "required": false,
-      "label": "CO2 — presión / flujo (si insuflador)",
-      "empty_text": ""
-    },
-    {
-      "id": "nim_senales",
-      "type": "free",
-      "required": false,
-      "label": "Señales NIM (V1 / R1 / R2 / V2 y mA)",
-      "empty_text": ""
-    },
-    {
-      "id": "nlr",
-      "type": "single",
-      "required": false,
-      "required_if_procedimiento_grupo": [
-        "Cirugía de tiroides (vía + extensión)",
+      "required_if_variante": [
         "Paratiroidectomía"
       ],
-      "label": "Nervio laríngeo recurrente",
+      "label": "Descripción de la glándula patológica (tamaño / aspecto / consistencia)",
+      "empty_text": ""
+    },
+    {
+      "id": "paratiroidectomia_extension",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Paratiroidectomía"
+      ],
+      "label": "Extensión de la paratiroidectomía",
       "options": [
-        "Identificado y preservado",
-        "Lesionado/sacrificado"
+        "Única",
+        "Doble",
+        "Subtotal (3 glándulas + mitad de la 4ª)",
+        "Total (las 4)"
       ]
     },
     {
-      "id": "vaciamiento_asoc",
-      "type": "multi",
-      "required": false,
-      "required_if_procedimiento_grupo": [
-        "Cirugía de tiroides (vía + extensión)"
-      ],
-      "label": "Vaciamiento ganglionar asociado",
-      "options": [
-        "Ninguno",
-        "Central",
-        "Laterocervical unilateral",
-        "Laterocervical bilateral"
-      ],
-      "join": "; ",
-      "empty_text": "no consignado"
-    },
-    {
-      "id": "hallazgo_tamano",
+      "id": "paratiroides_remanente_cual",
       "type": "free",
       "required": false,
-      "label": "Tamaño de la lesión (cm)",
-      "suffix": " cm",
-      "empty_text": "tamaño no documentado"
+      "required_if_paratiroidectomia_extension": [
+        "Subtotal (3 glándulas + mitad de la 4ª)"
+      ],
+      "label": "Remanente (cuál / dónde)",
+      "empty_text": ""
     },
     {
-      "id": "hallazgo_caract",
-      "type": "single",
+      "id": "biopsia_congelacion_resultado",
+      "type": "free",
       "required": false,
-      "label": "Características",
-      "options": [
-        "Sólido",
-        "Quístico",
-        "Mixto"
+      "required_if_variante": [
+        "Paratiroidectomía"
       ],
-      "empty_text": "características no documentadas"
+      "label": "Biopsia por congelación (resultado)",
+      "empty_text": ""
     },
     {
       "id": "pth_basal",
       "type": "free",
       "required": false,
-      "required_if_procedimiento_grupo": [
+      "required_if_variante": [
         "Paratiroidectomía"
       ],
       "label": "PTH basal",
-      "empty_text": "no documentada"
+      "empty_text": ""
     },
     {
-      "id": "pth_post",
+      "id": "pth_10min",
       "type": "free",
       "required": false,
-      "required_if_procedimiento_grupo": [
+      "required_if_variante": [
         "Paratiroidectomía"
       ],
-      "label": "PTH post-exéresis",
-      "empty_text": "no documentada"
+      "label": "PTH a los 10 minutos post-exéresis",
+      "empty_text": ""
     },
     {
-      "id": "pth_pct",
+      "id": "pth_caida_porcentaje",
       "type": "free",
       "required": false,
-      "required_if_procedimiento_grupo": [
+      "required_if_variante": [
         "Paratiroidectomía"
       ],
-      "label": "Variación PTH (%)",
+      "label": "Caída de PTH (%)",
       "suffix": " %",
-      "empty_text": "no documentada"
+      "empty_text": ""
     },
     {
-      "id": "biopsia_cong",
-      "type": "free",
-      "required": false,
-      "label": "Biopsia por congelación (resultado)",
-      "empty_text": "no consignada"
-    },
-    {
-      "id": "drenaje",
+      "id": "incluir_evaluacion_nlr_para",
       "type": "single",
       "required": false,
-      "label": "Drenaje",
+      "required_if_variante": [
+        "Paratiroidectomía"
+      ],
+      "label": "¿Se evaluó nervio laríngeo recurrente en la disección?",
       "options": [
         "Sí",
         "No"
-      ],
-      "empty_text": "no consignado"
+      ]
     },
     {
-      "id": "drenaje_detalle",
+      "id": "nervio_recurrente_estado_para",
+      "type": "single",
+      "required": false,
+      "required_if_incluir_evaluacion_nlr_para": [
+        "Sí"
+      ],
+      "label": "Nervio laríngeo recurrente",
+      "options": [
+        "Identificado y preservado",
+        "No identificado — preservado por técnica extracapsular",
+        "Lesionado o sacrificado"
+      ]
+    },
+    {
+      "id": "nervio_recurrente_motivo_para",
       "type": "free",
       "required": false,
-      "label": "Detalle de drenaje (si Sí)",
+      "required_if_nervio_recurrente_estado_para": [
+        "No identificado — preservado por técnica extracapsular",
+        "Lesionado o sacrificado"
+      ],
+      "label": "Detalle / motivo (NLR)",
+      "empty_text": ""
+    },
+    {
+      "id": "trocar_central_mm",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "TOETVA"
+      ],
+      "label": "Trocar central (mm) — tip. 10",
+      "empty_text": ""
+    },
+    {
+      "id": "co2_mmhg",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "TOETVA"
+      ],
+      "label": "Insuflación CO₂ (mmHg) — tip. 6",
+      "empty_text": ""
+    },
+    {
+      "id": "trocar_lateral_mm",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "TOETVA"
+      ],
+      "label": "Trocares laterales (mm) — tip. 5",
+      "empty_text": ""
+    },
+    {
+      "id": "tamano_nodulo_toetva_cm",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "TOETVA"
+      ],
+      "label": "Tamaño del nódulo (cm)",
+      "suffix": " cm",
+      "empty_text": ""
+    },
+    {
+      "id": "lado_nodulo_toetva",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "TOETVA"
+      ],
+      "label": "Lóbulo del nódulo",
+      "options": [
+        "Lóbulo derecho",
+        "Lóbulo izquierdo"
+      ]
+    },
+    {
+      "id": "lobulo_abordado_primero",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "TOETVA"
+      ],
+      "label": "Lóbulo abordado primero",
+      "options": [
+        "Derecho",
+        "Izquierdo"
+      ]
+    },
+    {
+      "id": "conversion_toetva",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "TOETVA"
+      ],
+      "label": "Conversión",
+      "options": [
+        "Sin conversión",
+        "Convertida a cervicotomía abierta"
+      ]
+    },
+    {
+      "id": "motivo_conversion",
+      "type": "free",
+      "required": false,
+      "required_if_conversion_toetva": [
+        "Convertida a cervicotomía abierta"
+      ],
+      "label": "Motivo de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "instrumento_hemostasia",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "TOETVA"
+      ],
+      "label": "Instrumento de hemostasia / sección pedículos",
+      "options": [
+        "Ligasure",
+        "Bisturí armónico",
+        "Electrocoagulación convencional"
+      ]
+    },
+    {
+      "id": "tecnica_ablacion",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Ablación percutánea"
+      ],
+      "label": "Técnica de ablación",
+      "options": [
+        "Radiofrecuencia",
+        "Microondas"
+      ]
+    },
+    {
+      "id": "ablacion_lado",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Ablación percutánea"
+      ],
+      "label": "Lado del nódulo",
+      "options": [
+        "Derecho",
+        "Izquierdo"
+      ]
+    },
+    {
+      "id": "ablacion_tamano_a_cm",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "Ablación percutánea"
+      ],
+      "label": "Tamaño nódulo — eje A (cm)",
+      "suffix": " cm",
+      "empty_text": ""
+    },
+    {
+      "id": "ablacion_tamano_b_cm",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "Ablación percutánea"
+      ],
+      "label": "Tamaño nódulo — eje B (cm)",
+      "suffix": " cm",
+      "empty_text": ""
+    },
+    {
+      "id": "ablacion_caracteristicas",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Ablación percutánea"
+      ],
+      "label": "Características del nódulo",
+      "options": [
+        "Sólido",
+        "Sólido-quístico",
+        "Quístico"
+      ]
+    },
+    {
+      "id": "ablacion_ciclos",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "Ablación percutánea"
+      ],
+      "label": "Cantidad de ciclos",
+      "empty_text": ""
+    },
+    {
+      "id": "ablacion_watts",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "Ablación percutánea"
+      ],
+      "label": "Watts",
+      "empty_text": ""
+    },
+    {
+      "id": "ablacion_tiempo_min",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "Ablación percutánea"
+      ],
+      "label": "Tiempo total de ablación (minutos)",
+      "suffix": " minutos",
+      "empty_text": ""
+    },
+    {
+      "id": "componente_quistico",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Ablación percutánea"
+      ],
+      "label": "Componente quístico (manejo previo)",
+      "options": [
+        "Sin componente quístico",
+        "Con componente quístico"
+      ]
+    },
+    {
+      "id": "manejo_quiste",
+      "type": "single",
+      "required": false,
+      "required_if_componente_quistico": [
+        "Con componente quístico"
+      ],
+      "label": "Manejo del componente quístico",
+      "options": [
+        "Aspiración + alcoholización",
+        "Aspiración + termoablación"
+      ]
+    },
+    {
+      "id": "volumen_etanol_ml",
+      "type": "free",
+      "required": false,
+      "required_if_manejo_quiste": [
+        "Aspiración + alcoholización"
+      ],
+      "label": "Volumen de etanol (ml)",
+      "suffix": " ml",
+      "empty_text": ""
+    },
+    {
+      "id": "volumen_aspirado_ml",
+      "type": "free",
+      "required": false,
+      "required_if_manejo_quiste": [
+        "Aspiración + termoablación"
+      ],
+      "label": "Volumen aspirado (ml)",
+      "suffix": " ml",
+      "empty_text": ""
+    },
+    {
+      "id": "hidrodiseccion_realizada",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Ablación percutánea"
+      ],
+      "label": "Hidrodisección",
+      "options": [
+        "Sí",
+        "No"
+      ]
+    },
+    {
+      "id": "hidrodiseccion_compartimento",
+      "type": "free",
+      "required": false,
+      "required_if_hidrodiseccion_realizada": [
+        "Sí"
+      ],
+      "label": "Estructura protegida / compartimento",
+      "empty_text": ""
+    },
+    {
+      "id": "hidrodiseccion_volumen_ml",
+      "type": "free",
+      "required": false,
+      "required_if_hidrodiseccion_realizada": [
+        "Sí"
+      ],
+      "label": "Volumen de dextrosa 5% (ml)",
+      "suffix": " ml",
+      "empty_text": ""
+    },
+    {
+      "id": "variante_dosis",
+      "type": "free",
+      "required": false,
+      "required_if_variante": [
+        "Ablación percutánea"
+      ],
+      "label": "Ajuste de dosis durante el procedimiento (si hubo)",
+      "empty_text": ""
+    },
+    {
+      "id": "resultado_final_ablacion",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Ablación percutánea"
+      ],
+      "label": "Control ecográfico postablación",
+      "options": [
+        "Sin vascularización interna residual",
+        "Vascularización residual — requiere control posterior"
+      ]
+    },
+    {
+      "id": "complicacion_hemorragia",
+      "type": "single",
+      "required": false,
+      "required_if_variante": [
+        "Ablación percutánea"
+      ],
+      "label": "Hemorragia",
+      "options": [
+        "Sin sangrado significativo",
+        "Hemorragia"
+      ]
+    },
+    {
+      "id": "complicacion_hemorragia_detalle",
+      "type": "free",
+      "required": false,
+      "required_if_complicacion_hemorragia": [
+        "Hemorragia"
+      ],
+      "label": "Manejo de la hemorragia",
       "empty_text": ""
     }
   ],
@@ -325,14 +1138,12 @@
   "operaciones": [
     "Tiroidectomía total",
     "Hemitiroidectomía",
-    "Istmectomía",
-    "Nodulectomía por ablación",
     "TOETVA",
     "Ablación térmica percutánea",
-    "Resección de quiste tirogloso (Sistrunk)",
+    "Nodulectomía por ablación",
     "Paratiroidectomía"
   ],
   "titulo": "Cirugía de patología tiroidea, paratiroidea y mínimamente invasiva",
-  "plantilla_texto": "Procedimiento: {{procedimiento_grupo}}.\n\n{{#if_eq procedimiento_grupo \"Cirugía de tiroides (vía + extensión)\"}}\nVía / abordaje: {{via}}. Extensión: {{extension}}{{extension_ablativa}}{{lado_frase}}.\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\n\n{{via_tecnica_frase}}\n{{exeresis_frase}}\nNervio laríngeo recurrente: {{nlr}}.\n{{neuromonitoreo_frase}}\n\nVaciamiento ganglionar asociado: {{vaciamiento_asoc}}.\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos.\n{{/if_eq}}\n\n{{#if_eq procedimiento_grupo \"Resección de quiste tirogloso (Sistrunk)\"}}\nSe realiza resección de quiste tirogloso según técnica de Sistrunk.\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos.\n{{/if_eq}}\n\n{{#if_eq procedimiento_grupo \"Paratiroidectomía\"}}\nEnfoque quirúrgico: {{para_tecnica}}; patología: {{para_patologia}}.\n{{#if_eq para_patologia \"Adenoma\"}}\nAdenoma — lado {{para_lado}}, cantidad {{para_cantidad}}, ubicación {{para_ubicacion}}.\n{{/if_eq}}\n{{#if_eq para_patologia \"Hiperplasia (insuficiencia renal)\"}}\nHiperplasia (paratiroidectomía subtotal, remanente mitad de una glándula) —\nlado del remanente {{para_subtotal_lado}}, glándula {{para_subtotal_ubicacion}}.\n{{/if_eq}}\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\nNervio laríngeo recurrente: {{nlr}}.\n{{neuromonitoreo_frase}}\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nPTH basal {{pth_basal}}; PTH post-exéresis {{pth_post}} (variación {{pth_pct}}).\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos.\n{{/if_eq}}"
+  "plantilla_texto": "{{#if_eq variante \"Tiroidectomía total con neuromonitoreo\"}}\nPaciente bajo anestesia general, intubación orotraqueal. Colocación de electrodos de neuromonitoreo para identificación y control funcional de los nervios laríngeos recurrentes. Asepsia y antisepsia de la piel. Colocación de campos quirúrgicos estériles. Se realiza incisión cervical transversa tipo Kocher. Se tallan colgajos cutáneos superior e inferior en plano subplatismal. Se aborda la glándula tiroides por el rafe medio, separando los músculos pretiroideos.\n\nSe identifica glándula tiroides {{caracteristica_glandula_v1}}. {{signos_tiroiditis}}. Nódulo predominante de {{tamano_nodulo_cm}}, lado {{lado_nodulo_predominante}}.\n{{#if_eq nodulo_adherencias \"Sin adherencias\"}}Sin adherencias del nódulo a estructuras adyacentes.{{/if_eq}}\n{{#if_eq nodulo_adherencias \"Con adherencias a estructuras adyacentes\"}}Nódulo con adherencias a estructuras adyacentes; se reseca en bloque con {{nodulo_resecado_con_estructuras}}.{{/if_eq}}\n\nExploración: {{hallazgo_exploracion}}.\n{{#if_eq hallazgo_exploracion \"Adenopatías\"}}\n{{#if_eq adenopatia_adherencias \"Sin adherencias\"}}Adenopatías sin adherencias a estructuras adyacentes.{{/if_eq}}\n{{#if_eq adenopatia_adherencias \"Con adherencias a estructuras adyacentes\"}}Adenopatías con adherencias; se resecan en bloque con {{adenopatia_resecado_con_estructuras}}.{{/if_eq}}\n{{/if_eq}}\n\nNervio laríngeo recurrente derecho: {{nervio_recurrente_estado_derecha}}. Señal NIM derecha: {{senal_nim_derecha}}.{{#if_filled nervio_recurrente_motivo_derecha}} {{nervio_recurrente_motivo_derecha}}.{{/if_filled}}\nNervio laríngeo recurrente izquierdo: {{nervio_recurrente_estado_izquierda}}. Señal NIM izquierda: {{senal_nim_izquierda}}.{{#if_filled nervio_recurrente_motivo_izquierda}} {{nervio_recurrente_motivo_izquierda}}.{{/if_filled}}\n\nParatiroides superior derecha: {{paratiroides_estado_sd}}.{{#if_filled paratiroides_sitio_reimplante_sd}} Reimplante en {{paratiroides_sitio_reimplante_sd}}.{{/if_filled}}{{#if_filled paratiroides_motivo_sd}} {{paratiroides_motivo_sd}}.{{/if_filled}}\nParatiroides inferior derecha: {{paratiroides_estado_id}}.{{#if_filled paratiroides_sitio_reimplante_id}} Reimplante en {{paratiroides_sitio_reimplante_id}}.{{/if_filled}}{{#if_filled paratiroides_motivo_id}} {{paratiroides_motivo_id}}.{{/if_filled}}\nParatiroides superior izquierda: {{paratiroides_estado_si}}.{{#if_filled paratiroides_sitio_reimplante_si}} Reimplante en {{paratiroides_sitio_reimplante_si}}.{{/if_filled}}{{#if_filled paratiroides_motivo_si}} {{paratiroides_motivo_si}}.{{/if_filled}}\nParatiroides inferior izquierda: {{paratiroides_estado_ii}}.{{#if_filled paratiroides_sitio_reimplante_ii}} Reimplante en {{paratiroides_sitio_reimplante_ii}}.{{/if_filled}}{{#if_filled paratiroides_motivo_ii}} {{paratiroides_motivo_ii}}.{{/if_filled}}\n\nSe completa tiroidectomía total. Hemostasia. Se envía material a anatomía patológica identificado en polo superior de lóbulo derecho tiroideo.\n\nCierre muscular: {{cierre_muscular_posible}}. Plano muscular/subcutáneo con {{material_muscular_subcutaneo}}. Piel con {{material_piel}}, técnica {{tecnica_sutura}}. Drenaje: {{tipo_drenaje_v1}}.\n{{/if_eq}}\n\n{{#if_eq variante \"Tiroidectomía total sin neuromonitoreo\"}}\nPaciente bajo anestesia general, intubación orotraqueal. Asepsia y antisepsia de la piel. Colocación de campos quirúrgicos estériles. Se realiza incisión cervical transversa tipo Kocher. Se tallan colgajos cutáneos superior e inferior en plano subplatismal. Se aborda la glándula tiroides por el rafe medio, separando los músculos pretiroideos.\n\nSe identifica glándula tiroides {{caracteristica_glandula_v2}}. {{signos_tiroiditis}}. Nódulo predominante de {{tamano_nodulo_cm}}, lado {{lado_nodulo_predominante}}.\n{{#if_eq nodulo_adherencias \"Sin adherencias\"}}Sin adherencias del nódulo a estructuras adyacentes.{{/if_eq}}\n{{#if_eq nodulo_adherencias \"Con adherencias a estructuras adyacentes\"}}Nódulo con adherencias a estructuras adyacentes; se reseca en bloque con {{nodulo_resecado_con_estructuras}}.{{/if_eq}}\n\nExploración: {{hallazgo_exploracion}}.\n{{#if_eq hallazgo_exploracion \"Adenopatías\"}}\n{{#if_eq adenopatia_adherencias \"Sin adherencias\"}}Adenopatías sin adherencias a estructuras adyacentes.{{/if_eq}}\n{{#if_eq adenopatia_adherencias \"Con adherencias a estructuras adyacentes\"}}Adenopatías con adherencias; se resecan en bloque con {{adenopatia_resecado_con_estructuras}}.{{/if_eq}}\n{{/if_eq}}\n\nNervio laríngeo recurrente derecho: {{nervio_recurrente_estado_derecha}} (identificación por disección anatómica, sin neuromonitoreo).{{#if_filled nervio_recurrente_motivo_derecha}} {{nervio_recurrente_motivo_derecha}}.{{/if_filled}}\nNervio laríngeo recurrente izquierdo: {{nervio_recurrente_estado_izquierda}} (identificación por disección anatómica, sin neuromonitoreo).{{#if_filled nervio_recurrente_motivo_izquierda}} {{nervio_recurrente_motivo_izquierda}}.{{/if_filled}}\n\nParatiroides superior derecha: {{paratiroides_estado_sd}}.{{#if_filled paratiroides_sitio_reimplante_sd}} Reimplante en {{paratiroides_sitio_reimplante_sd}}.{{/if_filled}}{{#if_filled paratiroides_motivo_sd}} {{paratiroides_motivo_sd}}.{{/if_filled}}\nParatiroides inferior derecha: {{paratiroides_estado_id}}.{{#if_filled paratiroides_sitio_reimplante_id}} Reimplante en {{paratiroides_sitio_reimplante_id}}.{{/if_filled}}{{#if_filled paratiroides_motivo_id}} {{paratiroides_motivo_id}}.{{/if_filled}}\nParatiroides superior izquierda: {{paratiroides_estado_si}}.{{#if_filled paratiroides_sitio_reimplante_si}} Reimplante en {{paratiroides_sitio_reimplante_si}}.{{/if_filled}}{{#if_filled paratiroides_motivo_si}} {{paratiroides_motivo_si}}.{{/if_filled}}\nParatiroides inferior izquierda: {{paratiroides_estado_ii}}.{{#if_filled paratiroides_sitio_reimplante_ii}} Reimplante en {{paratiroides_sitio_reimplante_ii}}.{{/if_filled}}{{#if_filled paratiroides_motivo_ii}} {{paratiroides_motivo_ii}}.{{/if_filled}}\n\nSe completa tiroidectomía total. Hemostasia. Se envía material a anatomía patológica identificado en polo superior de lóbulo derecho tiroideo.\n\nCierre muscular: {{cierre_muscular_posible}}. Plano muscular/subcutáneo con {{material_muscular_subcutaneo}}. Piel con {{material_piel}}, técnica {{tecnica_sutura}}. Drenaje: {{tipo_drenaje_v2}}.\n{{/if_eq}}\n\n{{#if_eq variante \"Hemitiroidectomía\"}}\nPaciente bajo anestesia general, intubación orotraqueal. {{#if_eq usa_nim \"Sí\"}}Colocación de electrodos de neuromonitoreo de los nervios laríngeos recurrentes. {{/if_eq}}Asepsia y antisepsia de la piel. Colocación de campos quirúrgicos estériles. Incisión cervical tipo Kocher. Se tallan colgajos cutáneos superior e inferior. Se aborda la glándula por el rafe medio, separando los músculos pretiroideos.\n\nSe realiza hemitiroidectomía lado {{lado_hemitiroidectomia}}. {{signos_tiroiditis}}. Nódulo de {{tamano_nodulo_cm}}: {{caracteristicas_nodulo}}.\n{{#if_eq nodulo_adherencias \"Sin adherencias\"}}Sin adherencias del nódulo a estructuras adyacentes.{{/if_eq}}\n{{#if_eq nodulo_adherencias \"Con adherencias a estructuras adyacentes\"}}Nódulo con adherencias a estructuras adyacentes; se reseca en bloque con {{nodulo_resecado_con_estructuras}}.{{/if_eq}}\n\nExploración: {{hallazgo_exploracion}}.\n{{#if_eq hallazgo_exploracion \"Adenopatías\"}}\n{{#if_eq adenopatia_adherencias \"Sin adherencias\"}}Adenopatías sin adherencias a estructuras adyacentes.{{/if_eq}}\n{{#if_eq adenopatia_adherencias \"Con adherencias a estructuras adyacentes\"}}Adenopatías con adherencias; se resecan en bloque con {{adenopatia_resecado_con_estructuras}}.{{/if_eq}}\n{{/if_eq}}\n\nNervio laríngeo recurrente (lado {{lado_hemitiroidectomia}}): {{nervio_recurrente_estado_hemi}}.{{#if_eq usa_nim \"Sí\"}} Señal NIM: {{senal_nim_hemi}}.{{/if_eq}}{{#if_filled nervio_recurrente_motivo_hemi}} {{nervio_recurrente_motivo_hemi}}.{{/if_filled}}\n\nParatiroides superior (lado operado): {{paratiroides_estado_hemi_sup}}.{{#if_filled paratiroides_sitio_reimplante_hemi_sup}} Reimplante en {{paratiroides_sitio_reimplante_hemi_sup}}.{{/if_filled}}{{#if_filled paratiroides_motivo_hemi_sup}} {{paratiroides_motivo_hemi_sup}}.{{/if_filled}}\nParatiroides inferior (lado operado): {{paratiroides_estado_hemi_inf}}.{{#if_filled paratiroides_sitio_reimplante_hemi_inf}} Reimplante en {{paratiroides_sitio_reimplante_hemi_inf}}.{{/if_filled}}{{#if_filled paratiroides_motivo_hemi_inf}} {{paratiroides_motivo_hemi_inf}}.{{/if_filled}}\n\nHemostasia.\nCierre muscular: {{cierre_muscular_posible}}. Plano muscular/subcutáneo con {{material_muscular_subcutaneo}}. Piel con {{material_piel}}, técnica {{tecnica_sutura}}. Drenaje: {{tipo_drenaje_hemi}}.\n{{/if_eq}}\n\n{{#if_eq variante \"Paratiroidectomía\"}}\nPaciente bajo anestesia general, intubación orotraqueal. Asepsia y antisepsia de la piel. Colocación de campos quirúrgicos estériles. Se obtiene muestra basal de sangre para dosaje de PTH intraoperatoria. Se realiza incisión cervical de menor tamaño que la vía Kocher estándar. Se aborda la glándula tiroides por el rafe medio.\n\nParatiroidectomía {{paratiroidectomia_alcance}}{{#if_eq paratiroidectomia_alcance \"Unilateral\"}}, lado {{paratiroidectomia_lado}}, glándula {{paratiroidectomia_cual}}{{/if_eq}}. Extensión: {{paratiroidectomia_extension}}.{{#if_filled paratiroides_remanente_cual}} Remanente: {{paratiroides_remanente_cual}}.{{/if_filled}}\nGlándula patológica: {{paratiroides_descripcion}}.\n{{#if_filled biopsia_congelacion_resultado}}Biopsia por congelación: {{biopsia_congelacion_resultado}}.{{/if_filled}}\nPTH basal {{pth_basal}}; PTH a los 10 min {{pth_10min}} (caída {{pth_caida_porcentaje}}).\n\n{{#if_eq incluir_evaluacion_nlr_para \"Sí\"}}Nervio laríngeo recurrente: {{nervio_recurrente_estado_para}}.{{#if_filled nervio_recurrente_motivo_para}} {{nervio_recurrente_motivo_para}}.{{/if_filled}}{{/if_eq}}\n\nHemostasia.\nCierre muscular: {{cierre_muscular_posible}}. Plano muscular/subcutáneo con {{material_muscular_subcutaneo}}. Piel con {{material_piel}}, técnica {{tecnica_sutura}}. Drenaje: {{tipo_drenaje_para}}.\n{{/if_eq}}\n\n{{#if_eq variante \"TOETVA\"}}\nPaciente bajo anestesia general, intubación orotraqueal. Colocación de electrodos de neuromonitoreo de los nervios laríngeos recurrentes. Asepsia y antisepsia de cavidad oral y región cervical. Colocación de campos quirúrgicos estériles. Se realiza incisión en región vestibular inferior, aproximadamente a 1 cm por fuera del frenillo, efectuando disección y dilatación. Se coloca trocar de {{trocar_central_mm}} mm e insuflación con CO₂ a {{co2_mmhg}} mmHg. Se realizan incisiones vestibulares inferiores derecha e izquierda, por fuera de los caninos, con colocación de trocares de {{trocar_lateral_mm}} mm. Se ingresa al plano subplatismal y se progresa hacia la región cervical anterior. Se identifica y secciona la línea media entre los músculos pretiroideos, exponiendo la glándula tiroides. Se objetiva glándula tiroides con nódulo de aproximadamente {{tamano_nodulo_toetva_cm}} a nivel de {{lado_nodulo_toetva}}.\n{{#if_eq nodulo_adherencias \"Sin adherencias\"}}Sin adherencias del nódulo a estructuras adyacentes.{{/if_eq}}\n{{#if_eq nodulo_adherencias \"Con adherencias a estructuras adyacentes\"}}Nódulo con adherencias a estructuras adyacentes; se reseca en bloque con {{nodulo_resecado_con_estructuras}}.{{/if_eq}}\n{{#if_eq hallazgo_exploracion \"Adenopatías\"}}\n{{#if_eq adenopatia_adherencias \"Sin adherencias\"}}Adenopatías sin adherencias a estructuras adyacentes.{{/if_eq}}\n{{#if_eq adenopatia_adherencias \"Con adherencias a estructuras adyacentes\"}}Adenopatías con adherencias; se resecan en bloque con {{adenopatia_resecado_con_estructuras}}.{{/if_eq}}\n{{/if_eq}}\nSe colocan puntos tractores de los músculos pretiroideos hacia la piel. Se procede a la disección y sección del istmo. Se aborda el lóbulo {{lobulo_abordado_primero}}, comenzando por el polo superior, ligando y seccionando los pedículos tiroideos con instrumental endoscópico ({{instrumento_hemostasia}}). Se progresa en sentido superior-inferior.\n\nNervio laríngeo recurrente derecho: {{nervio_recurrente_estado_derecha}}.{{#if_filled nervio_recurrente_motivo_derecha}} {{nervio_recurrente_motivo_derecha}}.{{/if_filled}}\nNervio laríngeo recurrente izquierdo: {{nervio_recurrente_estado_izquierda}}.{{#if_filled nervio_recurrente_motivo_izquierda}} {{nervio_recurrente_motivo_izquierda}}.{{/if_filled}}\n\nParatiroides superior derecha: {{paratiroides_estado_sd}}.{{#if_filled paratiroides_sitio_reimplante_sd}} Reimplante en {{paratiroides_sitio_reimplante_sd}}.{{/if_filled}}{{#if_filled paratiroides_motivo_sd}} {{paratiroides_motivo_sd}}.{{/if_filled}}\nParatiroides inferior derecha: {{paratiroides_estado_id}}.{{#if_filled paratiroides_sitio_reimplante_id}} Reimplante en {{paratiroides_sitio_reimplante_id}}.{{/if_filled}}{{#if_filled paratiroides_motivo_id}} {{paratiroides_motivo_id}}.{{/if_filled}}\nParatiroides superior izquierda: {{paratiroides_estado_si}}.{{#if_filled paratiroides_sitio_reimplante_si}} Reimplante en {{paratiroides_sitio_reimplante_si}}.{{/if_filled}}{{#if_filled paratiroides_motivo_si}} {{paratiroides_motivo_si}}.{{/if_filled}}\nParatiroides inferior izquierda: {{paratiroides_estado_ii}}.{{#if_filled paratiroides_sitio_reimplante_ii}} Reimplante en {{paratiroides_sitio_reimplante_ii}}.{{/if_filled}}{{#if_filled paratiroides_motivo_ii}} {{paratiroides_motivo_ii}}.{{/if_filled}}\n\n{{#if_eq conversion_toetva \"Sin conversión\"}}\nSe completa la resección del lóbulo y se repite el procedimiento contralateral. Se extraen ambas piezas mediante endobag a través del trocar de {{trocar_central_mm}} mm. Control estricto de hemostasia bajo visión endoscópica. Lavado y aspiración del campo quirúrgico. Desinsuflación. Retiro de trocares. Cierre por planos de las incisiones vestibulares. Se envía material a anatomía patológica. Paciente con buena tolerancia al procedimiento y pasa a sala de recuperación en condiciones estables.\n{{/if_eq}}\n{{#if_eq conversion_toetva \"Convertida a cervicotomía abierta\"}}\nAnte {{motivo_conversion}}, se convierte a cervicotomía abierta. Se completa la exéresis por vía cervical. Control de hemostasia.\nCierre muscular: {{cierre_muscular_posible}}. Plano muscular/subcutáneo con {{material_muscular_subcutaneo}}. Piel con {{material_piel}}, técnica {{tecnica_sutura}}. Drenaje: {{tipo_drenaje_toetva}}. Se envía material a anatomía patológica. Paciente con buena tolerancia al procedimiento y pasa a sala de recuperación en condiciones estables.\n{{/if_eq}}\n{{/if_eq}}\n\n{{#if_eq variante \"Ablación percutánea\"}}\n{{#if_eq tecnica_ablacion \"Radiofrecuencia\"}}\nPaciente bajo anestesia general, intubación orotraqueal. Se realiza ecografía intraoperatoria identificándose nódulo tiroideo {{ablacion_lado}} de aproximadamente {{ablacion_tamano_a_cm}} x {{ablacion_tamano_b_cm}}, de características {{ablacion_caracteristicas}}.\n{{#if_eq componente_quistico \"Con componente quístico\"}}Componente quístico: {{manejo_quiste}}.{{#if_eq manejo_quiste \"Aspiración + alcoholización\"}} Volumen de etanol: {{volumen_etanol_ml}}.{{/if_eq}}{{#if_eq manejo_quiste \"Aspiración + termoablación\"}} Volumen aspirado: {{volumen_aspirado_ml}}.{{/if_eq}}{{/if_eq}}\n{{#if_eq hidrodiseccion_realizada \"Sí\"}}Hidrodisección: protección de {{hidrodiseccion_compartimento}} con dextrosa al 5% ({{hidrodiseccion_volumen_ml}}).{{/if_eq}}\nAsepsia y antisepsia de la región cervical. Colocación de campos estériles. Bajo guía ecográfica se realiza termoablación del nódulo tiroideo mediante radiofrecuencia, efectuándose {{ablacion_ciclos}} ciclos de {{ablacion_watts}} watts, con tiempo total de ablación de aproximadamente {{ablacion_tiempo_min}}.{{#if_filled variante_dosis}} Ajuste durante el procedimiento: {{variante_dosis}}.{{/if_filled}}\nSe realiza control ecográfico postablación, evidenciándose área tratada correspondiente al nódulo. Resultado: {{resultado_final_ablacion}}. Control de estructuras cervicales adyacentes.\n{{#if_eq complicacion_hemorragia \"Sin sangrado significativo\"}}Ausencia de complicaciones inmediatas.{{/if_eq}}\n{{#if_eq complicacion_hemorragia \"Hemorragia\"}}Hemorragia: {{complicacion_hemorragia_detalle}}.{{/if_eq}}\nSe coloca hielo local.\n{{/if_eq}}\n{{#if_eq tecnica_ablacion \"Microondas\"}}\nPaciente bajo anestesia general, intubación orotraqueal. Se realiza ecografía cervical intraoperatoria, identificándose nódulo tiroideo {{ablacion_lado}} de aproximadamente {{ablacion_tamano_a_cm}} x {{ablacion_tamano_b_cm}}, de características {{ablacion_caracteristicas}}.\n{{#if_eq componente_quistico \"Con componente quístico\"}}Componente quístico: {{manejo_quiste}}.{{#if_eq manejo_quiste \"Aspiración + alcoholización\"}} Volumen de etanol: {{volumen_etanol_ml}}.{{/if_eq}}{{#if_eq manejo_quiste \"Aspiración + termoablación\"}} Volumen aspirado: {{volumen_aspirado_ml}}.{{/if_eq}}{{/if_eq}}\n{{#if_eq hidrodiseccion_realizada \"Sí\"}}Hidrodisección: protección de {{hidrodiseccion_compartimento}} con dextrosa al 5% ({{hidrodiseccion_volumen_ml}}).{{/if_eq}}\nAsepsia y antisepsia de la región cervical. Colocación de campos quirúrgicos estériles. Bajo guía ecográfica se realiza termoablación del nódulo mediante microondas. Se efectúan {{ablacion_ciclos}} ciclos a {{ablacion_watts}} watts, con un tiempo total de ablación de aproximadamente {{ablacion_tiempo_min}}.{{#if_filled variante_dosis}} Ajuste durante el procedimiento: {{variante_dosis}}.{{/if_filled}}\nSe realiza control ecográfico postablación, evidenciándose nódulo tratado. Resultado: {{resultado_final_ablacion}}. Control de estructuras anatómicas adyacentes.\n{{#if_eq complicacion_hemorragia \"Sin sangrado significativo\"}}No se evidencian complicaciones inmediatas.{{/if_eq}}\n{{#if_eq complicacion_hemorragia \"Hemorragia\"}}Hemorragia: {{complicacion_hemorragia_detalle}}.{{/if_eq}}\nSe coloca hielo local. Paciente con buen despertar anestésico, pasa a sala de recuperación en condiciones estables.\n{{/if_eq}}\n{{/if_eq}}"
 };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -659,6 +659,14 @@
       "id": "lateralidad_genital",
       "type": "single",
       "required": false,
+      "required_if_proc_genital": [
+        "Orquiectomía radical (vía inguinal — neoplasia)",
+        "Orquiectomía simple / subcapsular (vía escrotal)",
+        "Orquidopexia (torsión / criptorquidia)",
+        "Hidrocelectomía",
+        "Varicocelectomía",
+        "Exéresis de quiste de epidídimo / spermatocele"
+      ],
       "label": "Lateralidad",
       "options": [
         "Derecha",

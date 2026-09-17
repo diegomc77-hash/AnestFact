@@ -21,6 +21,13 @@
       "id": "lateralidad",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Osteoarticular / traumatológica",
+        "Tendones / partes blandas",
+        "Nervio periférico / microcirugía",
+        "Artroscopia de muñeca",
+        "Infecciones / cobertura"
+      ],
       "label": "Lateralidad",
       "options": [
         "Derecha",
@@ -185,6 +192,12 @@
       "id": "resultado_reduccion_mano",
       "type": "single",
       "required": false,
+      "required_if_proc_osteosintesis_mano": [
+        "RAFI con placa bloqueada / volar de radio",
+        "Enclavijado percutáneo (K-wires)",
+        "Tornillo canulado de compresión (Herbert)",
+        "Fijación externa"
+      ],
       "label": "Resultado de la reducción",
       "options": [
         "Anatómica",
@@ -408,6 +421,10 @@
       "id": "proc_gatillo_dequervain",
       "type": "multi",
       "required": false,
+      "required_if_patologia_tendinosa": [
+        "Tenosinovitis / dedo en gatillo",
+        "Enfermedad de De Quervain"
+      ],
       "label": "Procedimiento (gatillo / De Quervain)",
       "options": [
         "Liberación de polea / tenosinovectomía",
@@ -649,6 +666,11 @@
       "id": "hallazgo_io_infeccion",
       "type": "single",
       "required": false,
+      "required_if_proc_infeccion_mano": [
+        "Drenaje de panadizo / paroniquia",
+        "Lavado y drenaje de tenosinovitis infecciosa de flexores (Kanavel)",
+        "Drenaje de absceso de espacios cóncavos (thenar / hipotenar / midpalmar)"
+      ],
       "label": "Hallazgo intraoperatorio",
       "options": [
         "Purulento",

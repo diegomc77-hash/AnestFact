@@ -191,17 +191,10 @@ function parseProformaText(text) {
       const key = sm[1];
       let val = sm[2].trim();
 
-      if (key === 'options' && (val === '' || val === null)) {
-        listKey = 'options';
-        currentSlot.options = [];
-        continue;
-      }
+      // Lista YAML multilínea: `options:` / `required_if_*: ` + ítems `- …`
       if (val === '' || val == null) {
-        // possible nested list start next lines
-        if (key === 'options') {
-          listKey = 'options';
-          currentSlot.options = [];
-        }
+        listKey = key;
+        currentSlot[key] = [];
         continue;
       }
       listKey = null;

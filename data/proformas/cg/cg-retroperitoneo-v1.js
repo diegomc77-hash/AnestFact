@@ -138,6 +138,12 @@
       "id": "campo_multivisceral",
       "type": "single",
       "required": false,
+      "required_if_resecciones_multiviscerales": [
+        "Hemicolectomía derecha",
+        "Hemicolectomía izquierda",
+        "Sigmoidectomía",
+        "Pancreatectomía corporocaudal (distal)"
+      ],
       "label": "Clasificación del campo (víscera hueca / contaminación)",
       "options": [
         "Limpio",
@@ -150,6 +156,11 @@
       "id": "handoff_gi",
       "type": "single",
       "required": false,
+      "required_if_resecciones_multiviscerales": [
+        "Hemicolectomía derecha",
+        "Hemicolectomía izquierda",
+        "Sigmoidectomía"
+      ],
       "label": "Handoff",
       "options": [
         "Sí — completar en M2 Gastrointestinal (cg-gastrointestinal-v1)"
@@ -160,6 +171,10 @@
       "id": "handoff_pancreato",
       "type": "single",
       "required": false,
+      "required_if_resecciones_multiviscerales": [
+        "Pancreatectomía corporocaudal (distal)",
+        "Esplenectomía (asociada)"
+      ],
       "label": "Handoff",
       "options": [
         "Sí — completar en M3 Pancreato-biliar (cg-pancreato-biliar-v1)"
@@ -303,6 +318,11 @@
       "id": "evento_vascular_no_planificado",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de masa / tumor retroperitoneal",
+        "Adrenalectomía / cirugía suprarrenal",
+        "Gestos vasculares / urológicos asociados"
+      ],
       "label": "Evento vascular no planificado",
       "options": [
         "Sin eventos",

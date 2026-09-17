@@ -20,6 +20,13 @@
       "id": "ojo_afectado",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Segmento anterior / cristalino / córnea",
+        "Segmento posterior / vitreorretiniana",
+        "Glaucoma / drenaje",
+        "Oculoplastia / vía lagrimal / órbita",
+        "Estrabismo / traumatología ocular"
+      ],
       "label": "Ojo / anexo afectado",
       "options": [
         "Derecho (OD)",
@@ -77,6 +84,11 @@
       "id": "modelo_lio",
       "type": "free",
       "required": false,
+      "required_if_proc_segmento_anterior": [
+        "Facoemulsificación + implante de LIO",
+        "Extracción extracapsular de catarata (EECC)",
+        "Femto-catarata (FLACS)"
+      ],
       "label": "LIO — modelo / dioptrías",
       "empty_text": ""
     },
@@ -84,6 +96,11 @@
       "id": "ubicacion_lio",
       "type": "single",
       "required": false,
+      "required_if_proc_segmento_anterior": [
+        "Facoemulsificación + implante de LIO",
+        "Extracción extracapsular de catarata (EECC)",
+        "Femto-catarata (FLACS)"
+      ],
       "label": "Ubicación del LIO",
       "options": [
         "Saco capsular",
@@ -96,6 +113,11 @@
       "id": "complicacion_faco",
       "type": "single",
       "required": false,
+      "required_if_proc_segmento_anterior": [
+        "Facoemulsificación + implante de LIO",
+        "Extracción extracapsular de catarata (EECC)",
+        "Femto-catarata (FLACS)"
+      ],
       "label": "Complicación intraoperatoria (catarata)",
       "options": [
         "Sin complicaciones",
@@ -108,6 +130,11 @@
       "id": "indicacion_trasplante_corneal",
       "type": "single",
       "required": false,
+      "required_if_proc_segmento_anterior": [
+        "Queratoplastia penetrante (PKP)",
+        "Queratoplastia lamelar anterior (DALK)",
+        "Queratoplastia endotelial (DSAEK / DMEK)"
+      ],
       "label": "Indicación de trasplante corneal",
       "options": [
         "Queratocono",
@@ -570,6 +597,11 @@
       "id": "clasificacion_zona_trauma",
       "type": "single",
       "required": false,
+      "required_if_proc_estrabismo_trauma": [
+        "Cierre / sutura de herida corneo-escleral",
+        "Extracción de cuerpo extraño intraocular (CEIO)",
+        "Reconstrucción de cámara anterior / iridoplastia"
+      ],
       "label": "Clasificación de zona (trauma ocular abierto)",
       "options": [
         "Zona I",
@@ -582,6 +614,11 @@
       "id": "agudeza_visual_preop_trauma",
       "type": "free",
       "required": false,
+      "required_if_proc_estrabismo_trauma": [
+        "Cierre / sutura de herida corneo-escleral",
+        "Extracción de cuerpo extraño intraocular (CEIO)",
+        "Reconstrucción de cámara anterior / iridoplastia"
+      ],
       "label": "Agudeza visual preoperatoria (trauma)",
       "empty_text": ""
     },

@@ -21,6 +21,12 @@
       "id": "lateralidad",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Arterial periférico",
+        "Accesos vasculares para hemodiálisis",
+        "Venosa / linfática",
+        "Salvataje / amputaciones"
+      ],
       "label": "Lateralidad",
       "options": [
         "Derecha",
@@ -55,6 +61,11 @@
       "id": "heparinizacion_sistemica",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Aórtico / abdominal",
+        "Troncos supraaórticos / carotídeo",
+        "Arterial periférico"
+      ],
       "label": "Heparinización sistémica",
       "options": [
         "Administrada — ACT confirmado",
@@ -148,6 +159,10 @@
       "id": "endoleak_control",
       "type": "single",
       "required": false,
+      "required_if_proc_endovascular_aortico": [
+        "EVAR (reparación endovascular de AAA)",
+        "F/BEVAR (EVAR fenestrado / con ramas viscerales)"
+      ],
       "label": "Endoleak en angiografía de control",
       "options": [
         "Sin endoleak",
@@ -287,6 +302,10 @@
       "id": "estenosis_nascet",
       "type": "single",
       "required": false,
+      "required_if_indicacion_carotidea": [
+        "Estenosis carotídea sintomática",
+        "Estenosis carotídea asintomática"
+      ],
       "label": "Porcentaje de estenosis (NASCET)",
       "options": [
         "<50%",
@@ -350,6 +369,10 @@
       "id": "shunt_carotideo",
       "type": "single",
       "required": false,
+      "required_if_tecnica_carotidea": [
+        "Endarterectomía carotídea (EAC) convencional",
+        "Endarterectomía carotídea por eversión"
+      ],
       "label": "Shunt / derivación carotídea (T-Javid / Pruitt-Inahara)",
       "options": [
         "Utilizado",
@@ -375,6 +398,11 @@
       "id": "nervio_vago_x",
       "type": "single",
       "required": false,
+      "required_if_tecnica_carotidea": [
+        "Endarterectomía carotídea (EAC) convencional",
+        "Endarterectomía carotídea por eversión",
+        "Bypass subclavio-carotídeo / carotídeo-carotídeo"
+      ],
       "label": "Nervio vago (X)",
       "options": [
         "Identificado y preservado",
@@ -387,6 +415,11 @@
       "id": "nervio_hipogloso_xii",
       "type": "single",
       "required": false,
+      "required_if_tecnica_carotidea": [
+        "Endarterectomía carotídea (EAC) convencional",
+        "Endarterectomía carotídea por eversión",
+        "Bypass subclavio-carotídeo / carotídeo-carotídeo"
+      ],
       "label": "Nervio hipogloso (XII)",
       "options": [
         "Identificado y preservado",
@@ -399,6 +432,11 @@
       "id": "rama_marginal_mandibular_vii",
       "type": "single",
       "required": false,
+      "required_if_tecnica_carotidea": [
+        "Endarterectomía carotídea (EAC) convencional",
+        "Endarterectomía carotídea por eversión",
+        "Bypass subclavio-carotídeo / carotídeo-carotídeo"
+      ],
       "label": "Rama marginal mandibular del facial (VII)",
       "options": [
         "Identificada y preservada",
@@ -494,6 +532,11 @@
       "id": "material_injerto",
       "type": "single",
       "required": false,
+      "required_if_proc_revasc_abierta": [
+        "Bypass aorto-bifemoral / aorto-monofemoral",
+        "Bypass femoro-poplíteo",
+        "Bypass femoro-distal / tibial"
+      ],
       "label": "Material del injerto",
       "options": [
         "Vena safena magna autóloga — in situ",
@@ -681,6 +724,10 @@
       "id": "fremito_soplo_io",
       "type": "single",
       "required": false,
+      "required_if_tipo_acceso_hd": [
+        "Fístula arteriovenosa autóloga (FAV)",
+        "Acceso protésico (graft / PTFE)"
+      ],
       "label": "Evaluación del frémito / soplo intraoperatorio",
       "options": [
         "Presente y adecuado",

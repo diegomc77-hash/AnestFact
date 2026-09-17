@@ -445,6 +445,13 @@
       "id": "malla_tipo_ventral",
       "type": "single",
       "required": false,
+      "required_if_plano_malla": [
+        "Onlay (supraaponeurótica)",
+        "Inlay (bridging)",
+        "Sublay / retromuscular (Rives-Stoppa)",
+        "Preperitoneal",
+        "Intraabdominal / IPOM"
+      ],
       "label": "Tipo de malla (ventral)",
       "options": [
         "Polipropileno",
@@ -457,6 +464,13 @@
       "id": "malla_medidas_ventral",
       "type": "free",
       "required": false,
+      "required_if_plano_malla": [
+        "Onlay (supraaponeurótica)",
+        "Inlay (bridging)",
+        "Sublay / retromuscular (Rives-Stoppa)",
+        "Preperitoneal",
+        "Intraabdominal / IPOM"
+      ],
       "label": "Medidas de la malla (cm × cm)",
       "empty_text": ""
     },
@@ -464,6 +478,13 @@
       "id": "malla_overlap_cm",
       "type": "free",
       "required": false,
+      "required_if_plano_malla": [
+        "Onlay (supraaponeurótica)",
+        "Inlay (bridging)",
+        "Sublay / retromuscular (Rives-Stoppa)",
+        "Preperitoneal",
+        "Intraabdominal / IPOM"
+      ],
       "label": "Overlap / traslape mínimo (cm)",
       "empty_text": ""
     },
@@ -471,6 +492,13 @@
       "id": "fijacion_ventral",
       "type": "multi",
       "required": false,
+      "required_if_plano_malla": [
+        "Onlay (supraaponeurótica)",
+        "Inlay (bridging)",
+        "Sublay / retromuscular (Rives-Stoppa)",
+        "Preperitoneal",
+        "Intraabdominal / IPOM"
+      ],
       "label": "Fijación (ventral)",
       "options": [
         "Puntos transfasciales",
@@ -655,6 +683,11 @@
       "id": "drenaje",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernias complejas / reconstrucción",
+        "Eventroplastia / hernia ventral",
+        "Urgencia de pared / eventración estrangulada"
+      ],
       "label": "Drenaje",
       "options": [
         "Sí",
@@ -752,6 +785,9 @@
       "id": "handoff_gi",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_asociado_urgencia": [
+        "Resección intestinal (± anastomosis) — completar en M2 Gastrointestinal (cg-gastrointestinal-v1)"
+      ],
       "label": "Handoff",
       "options": [
         "Sí — completar en M2 Gastrointestinal (cg-gastrointestinal-v1)"

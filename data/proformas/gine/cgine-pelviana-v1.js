@@ -121,6 +121,11 @@
       "id": "anexectomia_asociada",
       "type": "single",
       "required": false,
+      "required_if_proc_uterino": [
+        "Histerectomía total",
+        "Histerectomía subtotal / supracervical",
+        "Histerectomía radical (parametrectomía / Wertheim-Meigs)"
+      ],
       "label": "Anexectomía asociada",
       "options": [
         "Salpingooforectomía bilateral (SOB)",
@@ -147,6 +152,12 @@
       "id": "control_vasos_uterinos",
       "type": "single",
       "required": false,
+      "required_if_proc_uterino": [
+        "Histerectomía total",
+        "Histerectomía subtotal / supracervical",
+        "Histerectomía radical (parametrectomía / Wertheim-Meigs)",
+        "Miomectomía"
+      ],
       "label": "Sellado / ligadura de vasos uterino-ováricos y arterias uterinas",
       "options": [
         "Sutura manual",
@@ -158,6 +169,11 @@
       "id": "ureter_derecho_histerectomia",
       "type": "single",
       "required": false,
+      "required_if_proc_uterino": [
+        "Histerectomía total",
+        "Histerectomía subtotal / supracervical",
+        "Histerectomía radical (parametrectomía / Wertheim-Meigs)"
+      ],
       "label": "Uréter derecho",
       "options": [
         "Identificado y preservado",
@@ -170,6 +186,11 @@
       "id": "ureter_izquierdo_histerectomia",
       "type": "single",
       "required": false,
+      "required_if_proc_uterino": [
+        "Histerectomía total",
+        "Histerectomía subtotal / supracervical",
+        "Histerectomía radical (parametrectomía / Wertheim-Meigs)"
+      ],
       "label": "Uréter izquierdo",
       "options": [
         "Identificado y preservado",
@@ -182,6 +203,11 @@
       "id": "vejiga_histerectomia",
       "type": "single",
       "required": false,
+      "required_if_proc_uterino": [
+        "Histerectomía total",
+        "Histerectomía subtotal / supracervical",
+        "Histerectomía radical (parametrectomía / Wertheim-Meigs)"
+      ],
       "label": "Vejiga (espacio vesicouterino)",
       "options": [
         "Identificada y preservada",
@@ -293,6 +319,10 @@
       "id": "contenido_lesion_anexial",
       "type": "single",
       "required": false,
+      "required_if_proc_anexial": [
+        "Quistectomía ovárica / cistectomía",
+        "Ooforectomía parcial / monolateral"
+      ],
       "label": "Contenido de la lesión",
       "options": [
         "Seroso",
@@ -518,6 +548,12 @@
       "id": "grado_popq",
       "type": "single",
       "required": false,
+      "required_if_indicacion_piso_pelvico": [
+        "Cistocele",
+        "Rectocele",
+        "Enterocele",
+        "Prolapso apical (uterino o de cúpula)"
+      ],
       "label": "Grado POP-Q",
       "options": [
         "I",
@@ -630,6 +666,10 @@
       "id": "cierre_cupula_vaginal",
       "type": "single",
       "required": false,
+      "required_if_proc_uterino": [
+        "Histerectomía total",
+        "Histerectomía radical (parametrectomía / Wertheim-Meigs)"
+      ],
       "label": "Cierre de cúpula vaginal",
       "options": [
         "Vía vaginal",

@@ -372,6 +372,11 @@
       "id": "pouch_volumen_cc",
       "type": "free",
       "required": false,
+      "required_if_tipo_bariatrica": [
+        "Bypass gástrico en Y de Roux (RYGB)",
+        "Bypass de anastomosis única (OAGB / BAGUA / mini-bypass)",
+        "Cirugía revisional bariátrica"
+      ],
       "label": "Reservorio / pouch — volumen estimado (cc)",
       "empty_text": ""
     },
@@ -379,6 +384,12 @@
       "id": "calibracion_pouch",
       "type": "single",
       "required": false,
+      "required_if_tipo_bariatrica": [
+        "Bypass gástrico en Y de Roux (RYGB)",
+        "Bypass de anastomosis única (OAGB / BAGUA / mini-bypass)",
+        "Sleeve gástrico",
+        "Cirugía revisional bariátrica"
+      ],
       "label": "Calibración con sonda",
       "options": [
         "Sí",
@@ -400,6 +411,12 @@
       "id": "refuerzo_linea_grapado",
       "type": "single",
       "required": false,
+      "required_if_tipo_bariatrica": [
+        "Bypass gástrico en Y de Roux (RYGB)",
+        "Bypass de anastomosis única (OAGB / BAGUA / mini-bypass)",
+        "Sleeve gástrico",
+        "Cirugía revisional bariátrica"
+      ],
       "label": "Refuerzo de línea de engrapado / sutura continua",
       "options": [
         "Sí",
@@ -411,6 +428,11 @@
       "id": "asa_biliopancreatica_cm",
       "type": "free",
       "required": false,
+      "required_if_tipo_bariatrica": [
+        "Bypass gástrico en Y de Roux (RYGB)",
+        "Bypass de anastomosis única (OAGB / BAGUA / mini-bypass)",
+        "Cirugía revisional bariátrica"
+      ],
       "label": "Asa biliopancreática — longitud (cm)",
       "empty_text": ""
     },
@@ -418,6 +440,10 @@
       "id": "asa_alimentaria_cm",
       "type": "free",
       "required": false,
+      "required_if_tipo_bariatrica": [
+        "Bypass gástrico en Y de Roux (RYGB)",
+        "Cirugía revisional bariátrica"
+      ],
       "label": "Asa alimentaria — longitud (cm)",
       "empty_text": ""
     },
@@ -425,6 +451,11 @@
       "id": "anastomosis_gy",
       "type": "single",
       "required": false,
+      "required_if_tipo_bariatrica": [
+        "Bypass gástrico en Y de Roux (RYGB)",
+        "Bypass de anastomosis única (OAGB / BAGUA / mini-bypass)",
+        "Cirugía revisional bariátrica"
+      ],
       "label": "Anastomosis gastroyeyunal",
       "options": [
         "Mecánica circular",
@@ -447,6 +478,10 @@
       "id": "anastomosis_yy",
       "type": "single",
       "required": false,
+      "required_if_tipo_bariatrica": [
+        "Bypass gástrico en Y de Roux (RYGB)",
+        "Cirugía revisional bariátrica"
+      ],
       "label": "Anastomosis yeyunoyeyunal (Y de Roux)",
       "options": [
         "Mecánica lineal",
@@ -459,6 +494,11 @@
       "id": "brecha_petersen",
       "type": "single",
       "required": false,
+      "required_if_tipo_bariatrica": [
+        "Bypass gástrico en Y de Roux (RYGB)",
+        "Bypass de anastomosis única (OAGB / BAGUA / mini-bypass)",
+        "Cirugía revisional bariátrica"
+      ],
       "label": "Brecha intermesentérica (Petersen)",
       "options": [
         "Cerrada",
@@ -471,6 +511,10 @@
       "id": "brecha_mesenterio_yeyunal",
       "type": "single",
       "required": false,
+      "required_if_tipo_bariatrica": [
+        "Bypass gástrico en Y de Roux (RYGB)",
+        "Cirugía revisional bariátrica"
+      ],
       "label": "Brecha del mesenterio yeyunal",
       "options": [
         "Cerrada",
@@ -483,6 +527,12 @@
       "id": "hermeticidad_bariatrica",
       "type": "single",
       "required": false,
+      "required_if_tipo_bariatrica": [
+        "Bypass gástrico en Y de Roux (RYGB)",
+        "Bypass de anastomosis única (OAGB / BAGUA / mini-bypass)",
+        "Sleeve gástrico",
+        "Cirugía revisional bariátrica"
+      ],
       "label": "Prueba de hermeticidad (azul de metileno / neumática)",
       "options": [
         "Fuga demostrada",
@@ -778,6 +828,9 @@
       "id": "handoff_gi",
       "type": "single",
       "required": false,
+      "required_if_manejo_contenido_hernia_interna": [
+        "Isquemia / necrosis — resección intestinal — completar en M2 Gastrointestinal (cg-gastrointestinal-v1)"
+      ],
       "label": "Handoff",
       "options": [
         "Sí — completar en M2 Gastrointestinal (cg-gastrointestinal-v1)"
@@ -788,6 +841,9 @@
       "id": "campo_hernia_interna",
       "type": "single",
       "required": false,
+      "required_if_manejo_contenido_hernia_interna": [
+        "Isquemia / necrosis — resección intestinal — completar en M2 Gastrointestinal (cg-gastrointestinal-v1)"
+      ],
       "label": "Clasificación del campo",
       "options": [
         "Limpio",
@@ -814,6 +870,11 @@
       "id": "drenaje_modulo",
       "type": "single",
       "required": false,
+      "required_if_procedimiento_grupo": [
+        "Funduplicatura / hiato / reflujo",
+        "Cirugía bariátrica (RYGB / OAGB / Sleeve / revisional)",
+        "Hernia interna / defecto mesentérico"
+      ],
       "label": "Drenaje",
       "options": [
         "Sí",

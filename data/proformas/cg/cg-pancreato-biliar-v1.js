@@ -117,6 +117,10 @@
       "id": "reconstruccion_vascular",
       "type": "single",
       "required": false,
+      "required_if_reseccion_vascular_electiva": [
+        "Venosa (VMS / porta)",
+        "Arterial (hepática / tronco celíaco)"
+      ],
       "label": "Reconstrucción vascular",
       "options": [
         "Anastomosis primaria",
@@ -143,6 +147,12 @@
       "id": "pancreas_textura",
       "type": "single",
       "required": false,
+      "required_if_tipo_reseccion_pancreas": [
+        "Duodenopancreatectomía cefálica (DPC / Whipple)",
+        "DPC con preservación pilórica (Traverso-Longmire)",
+        "Pancreatectomía corporocaudal (distal)",
+        "Pancreatectomía central / resección segmentaria"
+      ],
       "label": "Textura del páncreas remanente",
       "options": [
         "Blando",
@@ -154,6 +164,12 @@
       "id": "wirsung_mm",
       "type": "free",
       "required": false,
+      "required_if_tipo_reseccion_pancreas": [
+        "Duodenopancreatectomía cefálica (DPC / Whipple)",
+        "DPC con preservación pilórica (Traverso-Longmire)",
+        "Pancreatectomía corporocaudal (distal)",
+        "Pancreatectomía central / resección segmentaria"
+      ],
       "label": "Diámetro Wirsung (mm)",
       "empty_text": ""
     },
@@ -161,6 +177,10 @@
       "id": "anastomosis_pancreatica_tipo",
       "type": "single",
       "required": false,
+      "required_if_tipo_reseccion_pancreas": [
+        "Duodenopancreatectomía cefálica (DPC / Whipple)",
+        "DPC con preservación pilórica (Traverso-Longmire)"
+      ],
       "label": "Anastomosis pancreática — tipo",
       "options": [
         "Pancreatoyeyunoanastomosis",
@@ -172,6 +192,10 @@
       "id": "anastomosis_pancreatica_tecnica",
       "type": "multi",
       "required": false,
+      "required_if_anastomosis_pancreatica_tipo": [
+        "Pancreatoyeyunoanastomosis",
+        "Pancreatogastroanastomosis"
+      ],
       "label": "Anastomosis pancreática — técnica",
       "options": [
         "Invaginante",
@@ -185,6 +209,10 @@
       "id": "anastomosis_biliar_dpc",
       "type": "single",
       "required": false,
+      "required_if_tipo_reseccion_pancreas": [
+        "Duodenopancreatectomía cefálica (DPC / Whipple)",
+        "DPC con preservación pilórica (Traverso-Longmire)"
+      ],
       "label": "Anastomosis biliar (DPC)",
       "options": [
         "Hepaticoyeyunoanastomosis (término-lateral en Y de Roux)",
@@ -196,6 +224,10 @@
       "id": "hermeticidad_biliar_dpc",
       "type": "single",
       "required": false,
+      "required_if_anastomosis_biliar_dpc": [
+        "Hepaticoyeyunoanastomosis (término-lateral en Y de Roux)",
+        "Coledocoyeyunoanastomosis"
+      ],
       "label": "Prueba de hermeticidad (anastomosis biliar)",
       "options": [
         "Fuga demostrada",
@@ -208,6 +240,10 @@
       "id": "anastomosis_digestiva_dpc",
       "type": "single",
       "required": false,
+      "required_if_tipo_reseccion_pancreas": [
+        "Duodenopancreatectomía cefálica (DPC / Whipple)",
+        "DPC con preservación pilórica (Traverso-Longmire)"
+      ],
       "label": "Anastomosis digestiva (DPC)",
       "options": [
         "Gastroyeyunoanastomosis",
@@ -219,6 +255,10 @@
       "id": "anastomosis_digestiva_ruta",
       "type": "single",
       "required": false,
+      "required_if_anastomosis_digestiva_dpc": [
+        "Gastroyeyunoanastomosis",
+        "Duodenoyeyunoanastomosis"
+      ],
       "label": "Ruta de la anastomosis digestiva",
       "options": [
         "Antecólica",
@@ -230,6 +270,10 @@
       "id": "hermeticidad_digestiva_dpc",
       "type": "single",
       "required": false,
+      "required_if_anastomosis_digestiva_dpc": [
+        "Gastroyeyunoanastomosis",
+        "Duodenoyeyunoanastomosis"
+      ],
       "label": "Prueba de hermeticidad (anastomosis digestiva)",
       "options": [
         "Fuga demostrada",
@@ -519,6 +563,13 @@
       "id": "campo_cole",
       "type": "single",
       "required": false,
+      "required_if_hallazgos_vesicula": [
+        "Colecistitis aguda",
+        "Colecistitis aguda enfisematosa",
+        "Colecistitis aguda gangrenosa",
+        "Piocolecisto",
+        "Plastrón"
+      ],
       "label": "Clasificación del campo",
       "options": [
         "Limpio",
