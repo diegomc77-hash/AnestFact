@@ -1,17 +1,17 @@
 <div id="view-fojaQx" class="view">
   <div style="font-size:11px;color:var(--text3);margin:0 0 10px;line-height:1.4">
-    Foja Quir&uacute;rgica (suite) &mdash; m&oacute;dulo independiente.
-    Proformas y firma del cirujano: en el QR (pr&oacute;ximas entregas).
+    Foja Quir&uacute;rgica (suite). Proformas ac&aacute;; firma del cirujano solo en el QR.
   </div>
 
-  <div class="brow" style="margin-bottom:12px">
+  <div class="brow" style="margin-bottom:12px;gap:8px;flex-wrap:wrap">
     <button type="button" class="btn btn-s" id="btn-qx-qr" onclick="crearQrFojaQx()">QR cirujano</button>
+    <button type="button" class="btn btn-s" id="btn-qx-print" style="display:none" onclick="imprimirFojaQx()">Imprimir A4</button>
   </div>
 
   <div class="card">
     <div class="ct" style="margin-bottom:4px">FOJA QUIR&Uacute;RGICA</div>
     <div id="qx-inst-line" style="font-size:12px;color:var(--text2);margin-bottom:10px">—</div>
-    <div id="qx-estado" style="font-size:11px;color:var(--text3);margin-bottom:12px">Borrador (c&aacute;scara)</div>
+    <div id="qx-estado" style="font-size:11px;color:var(--text3);margin-bottom:12px">Borrador</div>
 
     <div class="g2">
       <div class="field"><label>Paciente</label><div class="fi" id="qx-pac" style="background:var(--bg2)">—</div></div>
@@ -33,8 +33,15 @@
   </div>
 
   <div class="card">
+    <div class="ct">CIE quir&uacute;rgico</div>
+    <div class="field"><label>Preoperatorio</label><div id="qx-cie-pre"></div></div>
+    <div class="field" style="margin-top:10px"><label>Posoperatorio</label><div id="qx-cie-post"></div></div>
+  </div>
+
+  <div class="card">
     <div class="ct">Descripci&oacute;n del procedimiento</div>
-    <p id="qx-texto" style="font-size:13px;color:var(--text3);line-height:1.45;margin:0;min-height:48px">(vac&iacute;o — proformas en un paso posterior)</p>
+    <div id="qx-proforma-host"></div>
+    <p id="qx-texto" style="display:none;font-size:13px;color:var(--text3);line-height:1.45;margin:0;min-height:48px"></p>
   </div>
 
   <div class="card" style="opacity:.85">

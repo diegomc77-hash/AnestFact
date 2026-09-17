@@ -1,7 +1,10 @@
 /**
- * Foja Quirúrgica (suite) — cáscara UI.
- * Entidad: S.cur.fojaQx (hermana de foja). Gating: afFojaQxEnabled(san).
+ * Foja Quirúrgica (suite) — cáscara + proformas + CIE + print.
+ * Entidad: S.cur.fojaQx. Gating: afFojaQxEnabled(san). Firma solo en QR.
  */
+var _qxProformaUi = null;
+var _qxProformaState = null;
+
 function cargarFojaQxUI() {
   if (!S.cur) return;
   if (typeof afSyncFojaQxPull === 'function') {
@@ -10,6 +13,26 @@ function cargarFojaQxUI() {
     });
   }
   _cargarFojaQxUIDom();
+}
+
+function _qxPersistLocal() {
+  if (!S.cur || !S.cur.fojaQx) return;
+  if (typeof saveIntervsToStorage === 'function') {
+    var ix = (S.intervs || []).findIndex(function (x) { return x.id === S.cur.id; });
+    if (ix >= 0) S.intervs[ix] = S.cur;
+    saveIntervsToStorage();
+  }
+  if (typeof syncAutoPushDebounced === 'function') syncAutoPushDebounced();
+}
+
+function _qxApplyProformaState(st) {
+  if (!S.cur || !S.cur.fojaQx || S.cur.fojaQx.firmada) return;
+  _qxProformaState = st;
+  S.cur.fojaQx.proforma_id = st.proforma_id;
+  S.cur.fojaQx.modo_armado = st.modo_armado;
+  S.cur.fojaQx.slots = st.slots || {};
+  S.cur.fojaQx.texto = st.texto || '';
+  _qxPersistLocal();
 }
 
 function _cargarFojaQxUIDom() {
@@ -38,18 +61,12 @@ function _cargarFojaQxUIDom() {
   setTxt('qx-diag', i.diag);
 
   var firmada = !!qx.firmada;
-  var textoEl = document.getElementById('qx-texto');
-  if (textoEl) {
-    var t = qx.texto != null ? String(qx.texto).trim() : '';
-    textoEl.textContent = t || (firmada ? '(sin texto)' : '(vacío — proformas en un paso posterior)');
-    textoEl.style.color = t ? 'var(--text)' : 'var(--text3)';
-  }
 
   var est = document.getElementById('qx-estado');
   if (est) {
     est.textContent = firmada
       ? ('Firmada / sellada' + (qx.firmada_at ? ' · ' + new Date(qx.firmada_at).toLocaleString('es-AR') : ''))
-      : 'Borrador (cáscara)';
+      : 'Borrador';
   }
   var ft = document.getElementById('qx-firmada-txt');
   if (ft) {
@@ -58,6 +75,65 @@ function _cargarFojaQxUIDom() {
     } else {
       ft.textContent = firmada ? 'firmada' : 'no firmada';
     }
+  }
+
+  var printBtn = document.getElementById('btn-qx-print');
+  if (printBtn) {
+    var canPrint = firmada && typeof afFojaQxEnabled === 'function' && afFojaQxEnabled(i.san);
+    printBtn.style.display = canPrint ? '' : 'none';
+    printBtn.disabled = !canPrint;
+  }
+
+  if (typeof afMountCieQxField === 'function') {
+    afMountCieQxField('qx-cie-pre', {
+      fieldKey: 'cie_pre',
+      manualKey: 'cie_pre_manual',
+      readonly: firmada,
+      getDx: function () { return (S.cur.fojaQx && S.cur.fojaQx.dx) || {}; },
+      setDx: function (key, code, manual) {
+        if (!S.cur.fojaQx || S.cur.fojaQx.firmada) return;
+        if (!S.cur.fojaQx.dx) S.cur.fojaQx.dx = {};
+        S.cur.fojaQx.dx[key] = code;
+        S.cur.fojaQx.dx[key === 'cie_pre' ? 'cie_pre_manual' : 'cie_post_manual'] = manual;
+      },
+      persist: _qxPersistLocal,
+    });
+    afMountCieQxField('qx-cie-post', {
+      fieldKey: 'cie_post',
+      manualKey: 'cie_post_manual',
+      readonly: firmada,
+      getDx: function () { return (S.cur.fojaQx && S.cur.fojaQx.dx) || {}; },
+      setDx: function (key, code, manual) {
+        if (!S.cur.fojaQx || S.cur.fojaQx.firmada) return;
+        if (!S.cur.fojaQx.dx) S.cur.fojaQx.dx = {};
+        S.cur.fojaQx.dx[key] = code;
+        S.cur.fojaQx.dx[key === 'cie_pre' ? 'cie_pre_manual' : 'cie_post_manual'] = manual;
+      },
+      persist: _qxPersistLocal,
+    });
+  }
+
+  var host = document.getElementById('qx-proforma-host');
+  var legacy = document.getElementById('qx-texto');
+  if (legacy) legacy.style.display = 'none';
+
+  if (host && typeof afProformaMountUI === 'function') {
+    _qxProformaUi = afProformaMountUI(host, {
+      especialidad: i.serv || '',
+      operacion: i.diag || '',
+      proformaId: qx.proforma_id || null,
+      modo: qx.modo_armado || (qx.texto && !qx.proforma_id ? 'cero' : 'usar'),
+      values: qx.slots || {},
+      texto: qx.texto || '',
+      readonly: firmada,
+      onChange: function (st) {
+        _qxApplyProformaState(st);
+      },
+    });
+  } else if (legacy) {
+    legacy.style.display = '';
+    var t = qx.texto != null ? String(qx.texto).trim() : '';
+    legacy.textContent = t || (firmada ? '(sin texto)' : '(vacío)');
   }
 }
 
@@ -221,7 +297,14 @@ function crearQrFojaQx() {
   }
   if (typeof afEnsureFojaQx === 'function') afEnsureFojaQx(S.cur);
 
+  // Flush estado UI proforma antes del snapshot
+  if (_qxProformaUi && typeof _qxProformaUi.getState === 'function') {
+    _qxApplyProformaState(_qxProformaUi.getState());
+  }
+
   var f = S.cur.foja || {};
+  var qx = S.cur.fojaQx || {};
+  var dx = qx.dx || {};
   var contexto = {
     modo: 'foja_qx',
     max_uses: 1,
@@ -238,6 +321,20 @@ function crearQrFojaQx() {
     hora_fin: f.fin || '',
     hora: S.cur.hora || f.inicio || '',
     diag: S.cur.diag || '',
+    // Puente Huerta → cirujano (sin firma): proforma prearmada
+    texto: qx.texto || '',
+    proforma_id: qx.proforma_id || null,
+    slots: qx.slots || {},
+    modo_armado: qx.modo_armado || null,
+    cie_pre: dx.cie_pre || '',
+    cie_post: dx.cie_post || '',
+    cie_pre_manual: !!dx.cie_pre_manual,
+    cie_post_manual: !!dx.cie_post_manual,
+    dx_preop: dx.preop || '',
+    dx_postop: dx.postop || '',
+    op_indicada: dx.op_indicada || '',
+    op_practicada: dx.op_practicada || '',
+    riesgo: dx.riesgo || '',
   };
 
   if (typeof toast === 'function') toast('Generando QR cirujano…');
@@ -254,12 +351,7 @@ function crearQrFojaQx() {
       if (S.cur.fojaQx) {
         S.cur.fojaQx.last_qr_token_id = res.j.token_id || null;
       }
-      if (typeof saveIntervsToStorage === 'function') {
-        var ix = (S.intervs || []).findIndex(function (x) { return x.id === S.cur.id; });
-        if (ix >= 0) S.intervs[ix] = S.cur;
-        saveIntervsToStorage();
-      }
-      if (typeof syncAutoPushDebounced === 'function') syncAutoPushDebounced();
+      _qxPersistLocal();
       mostrarModalQrFojaQx(res.j);
       if (typeof toast === 'function') toast('QR cirujano listo (un uso)');
     })
@@ -267,4 +359,9 @@ function crearQrFojaQx() {
       if (typeof toast === 'function') toast(err.message || 'Error al crear QR');
       console.error('crearQrFojaQx', err);
     });
+}
+
+function imprimirFojaQx() {
+  if (typeof afImprimirFojaQx === 'function') return afImprimirFojaQx();
+  if (typeof toast === 'function') toast('Módulo de impresión no cargado');
 }

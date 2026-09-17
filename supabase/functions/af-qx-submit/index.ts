@@ -60,6 +60,9 @@ type SubmitBody = {
   texto?: string;
   grado_dificultad?: string;
   firma?: Record<string, unknown>;
+  proforma_id?: unknown;
+  modo_armado?: unknown;
+  slots?: Record<string, unknown>;
 };
 
 /**
@@ -121,6 +124,10 @@ Deno.serve(async (req) => {
     op_indicada: str(dxIn.op_indicada, 2000),
     op_practicada: str(dxIn.op_practicada, 2000),
     riesgo: str(dxIn.riesgo, 500),
+    cie_pre: str(dxIn.cie_pre, 40),
+    cie_post: str(dxIn.cie_post, 40),
+    cie_pre_manual: !!dxIn.cie_pre_manual,
+    cie_post_manual: !!dxIn.cie_post_manual,
   };
   if (!dx.preop) return jsonResponse({ error: 'Diagnóstico preoperatorio obligatorio' }, 400);
   if (!dx.postop) return jsonResponse({ error: 'Diagnóstico posoperatorio obligatorio' }, 400);
@@ -166,11 +173,16 @@ Deno.serve(async (req) => {
     diag: str(ctx.diag, 2000),
   };
 
+  const slotsIn = (body.slots && typeof body.slots === 'object') ? body.slots : {};
   const payload = {
-    version: 1,
-    slots: {},
+    version: 2,
+    slots: slotsIn,
     texto,
     firmada: true,
+    proforma_id: body.proforma_id != null && String(body.proforma_id).trim() !== ''
+      ? str(body.proforma_id, 60)
+      : null,
+    modo_armado: body.modo_armado != null ? str(body.modo_armado, 40) : null,
     equipo,
     dx,
     clinicos: {

@@ -91,9 +91,59 @@ function afFojaQxEnabled(san) {
   return !!(inst && inst.foja_qx === true);
 }
 
-/** Stub tipado mínimo de S.cur.fojaQx (Paso 1). */
+/** Stub tipado de S.cur.fojaQx (Paso 2.3: proformas + CIE opcionales). */
 function afFojaQxStub() {
-  return { version: 1, slots: {}, texto: '', firmada: false };
+  return {
+    version: 2,
+    slots: {},
+    texto: '',
+    firmada: false,
+    proforma_id: null,
+    modo_armado: null,
+    dx: {
+      preop: '',
+      postop: '',
+      op_indicada: '',
+      op_practicada: '',
+      riesgo: '',
+      cie_pre: '',
+      cie_pre_manual: false,
+      cie_post: '',
+      cie_post_manual: false,
+    },
+  };
+}
+
+/**
+ * Migra stubs v1 → v2 sin pisar datos ya firmados / con texto.
+ */
+function afEnsureFojaQxShape(qx) {
+  if (!qx || typeof qx !== 'object') return afFojaQxStub();
+  if (qx.version == null || Number(qx.version) < 2) qx.version = 2;
+  if (!qx.slots || typeof qx.slots !== 'object') qx.slots = {};
+  if (qx.texto == null) qx.texto = '';
+  if (qx.firmada == null) qx.firmada = false;
+  if (!Object.prototype.hasOwnProperty.call(qx, 'proforma_id')) qx.proforma_id = null;
+  if (!Object.prototype.hasOwnProperty.call(qx, 'modo_armado')) qx.modo_armado = null;
+  if (!qx.dx || typeof qx.dx !== 'object') {
+    qx.dx = {
+      preop: '',
+      postop: '',
+      op_indicada: '',
+      op_practicada: '',
+      riesgo: '',
+      cie_pre: '',
+      cie_pre_manual: false,
+      cie_post: '',
+      cie_post_manual: false,
+    };
+  } else {
+    if (qx.dx.cie_pre == null) qx.dx.cie_pre = '';
+    if (qx.dx.cie_post == null) qx.dx.cie_post = '';
+    if (qx.dx.cie_pre_manual == null) qx.dx.cie_pre_manual = false;
+    if (qx.dx.cie_post_manual == null) qx.dx.cie_post_manual = false;
+  }
+  return qx;
 }
 
 /**
@@ -105,6 +155,8 @@ function afEnsureFojaQx(inter) {
   if (!afFojaQxEnabled(inter.san)) return inter.fojaQx || null;
   if (!inter.fojaQx || typeof inter.fojaQx !== 'object') {
     inter.fojaQx = afFojaQxStub();
+  } else {
+    afEnsureFojaQxShape(inter.fojaQx);
   }
   return inter.fojaQx;
 }

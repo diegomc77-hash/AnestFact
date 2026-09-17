@@ -52,11 +52,17 @@
     'js/38-sesiones.js',
     'js/42-foja-qx.js',
     'js/43-foja-qx-sync.js',
+    'data/proformas-bundle.js',
+    'data/cie-quirurgico.js',
+    'js/44-foja-qx-proformas.js',
+    'js/44b-foja-qx-proformas-ui.js',
+    'js/45-imprimir-foja-qx.js',
+    'js/46-foja-qx-cie-ui.js',
     'js/load-views.js',
     'js/24-sw-register.js'
   ];
 
-  var CACHE_V = '12.69';
+  var CACHE_V = '12.70';
   window.AF_CACHE_V = CACHE_V;
   try { document.title = 'AnesFact v' + CACHE_V; } catch (eTit) {}
 

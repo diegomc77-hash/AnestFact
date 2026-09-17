@@ -10,3 +10,9 @@ verify_jwt = false
 
 [functions.af-estudio-extract]
 verify_jwt = false
+
+[functions.af-qx-peek]
+verify_jwt = false
+
+[functions.af-qx-submit]
+verify_jwt = false

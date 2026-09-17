@@ -61,10 +61,12 @@ function afApplyFojaQxRow(row) {
   var firmaIn = p.firma && typeof p.firma === 'object' ? p.firma : {};
 
   inter.fojaQx = {
-    version: p.version != null ? p.version : 1,
+    version: p.version != null ? p.version : 2,
     slots: p.slots && typeof p.slots === 'object' ? p.slots : {},
     texto: p.texto != null ? String(p.texto) : '',
     firmada: true,
+    proforma_id: p.proforma_id != null ? p.proforma_id : null,
+    modo_armado: p.modo_armado != null ? String(p.modo_armado) : null,
     equipo: p.equipo && typeof p.equipo === 'object' ? p.equipo : {},
     dx: p.dx && typeof p.dx === 'object' ? p.dx : {},
     clinicos: p.clinicos && typeof p.clinicos === 'object' ? p.clinicos : {},
@@ -80,6 +82,7 @@ function afApplyFojaQxRow(row) {
     firmada_at: rowAt || null,
     last_qr_token_id: existing.last_qr_token_id || null,
   };
+  if (typeof afEnsureFojaQxShape === 'function') afEnsureFojaQxShape(inter.fojaQx);
 
   list[ix] = inter;
   if (S.cur && String(S.cur.id) === interId) S.cur = inter;

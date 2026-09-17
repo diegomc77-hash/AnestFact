@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Foja Quirúrgica — AnesFact</title>
 <meta name="theme-color" content="#22c55e">
-<link rel="stylesheet" href="styles.css?v=12.69">
+<link rel="stylesheet" href="styles.css?v=12.70">
 <style>
   body{max-width:520px;margin:0 auto;padding:16px;padding-bottom:72px}
   .qx-err{display:none;padding:24px 16px;text-align:center}
@@ -67,7 +67,19 @@
     <div class="card">
       <div class="ct">Diagnóstico / operación</div>
       <div class="field"><label>Diagnóstico preoperatorio *</label><textarea class="fi" id="qx-dx-pre" rows="2" required></textarea></div>
+      <div class="field"><label>CIE pre (opcional)</label>
+        <input class="fi" id="qx-cie-pre" placeholder="código o buscar abajo">
+        <input class="fi" id="qx-cie-pre-q" placeholder="Buscar CIE…" style="margin-top:6px">
+        <div id="qx-cie-pre-hits" style="font-size:12px;max-height:100px;overflow:auto"></div>
+        <label style="font-size:12px;display:flex;gap:6px;margin-top:4px"><input type="checkbox" id="qx-cie-pre-man"> Otro a mano</label>
+      </div>
       <div class="field"><label>Diagnóstico posoperatorio *</label><textarea class="fi" id="qx-dx-post" rows="2" required></textarea></div>
+      <div class="field"><label>CIE post (opcional)</label>
+        <input class="fi" id="qx-cie-post" placeholder="código">
+        <input class="fi" id="qx-cie-post-q" placeholder="Buscar CIE…" style="margin-top:6px">
+        <div id="qx-cie-post-hits" style="font-size:12px;max-height:100px;overflow:auto"></div>
+        <label style="font-size:12px;display:flex;gap:6px;margin-top:4px"><input type="checkbox" id="qx-cie-post-man"> Otro a mano</label>
+      </div>
       <div class="field"><label>Operación indicada *</label><textarea class="fi" id="qx-op-ind" rows="2" required></textarea></div>
       <div class="field"><label>Operación practicada *</label><textarea class="fi" id="qx-op-prac" rows="2" required></textarea></div>
       <div class="field"><label>Riesgo quirúrgico *</label><input class="fi" id="qx-riesgo" required></div>
@@ -98,7 +110,8 @@
 
     <div class="card">
       <div class="ct">Descripción del procedimiento *</div>
-      <textarea class="fi" id="qx-texto" rows="6" required placeholder="Texto libre (proformas en un paso posterior)"></textarea>
+      <div id="qx-proforma-host"></div>
+      <textarea class="fi" id="qx-texto" rows="6" style="display:none" placeholder="Texto"></textarea>
       <div class="field" style="margin-top:10px">
         <label>Grado de dificultad operatoria *</label>
         <input class="fi" id="qx-grado" required>
@@ -125,8 +138,12 @@
   </form>
 </div>
 
-<script src="js/supabase-keepalive.js?v=12.69"></script>
-<script src="js/00-env.js?v=12.69"></script>
+<script src="js/supabase-keepalive.js?v=12.70"></script>
+<script src="js/00-env.js?v=12.70"></script>
+<script src="data/proformas-bundle.js?v=12.70"></script>
+<script src="data/cie-quirurgico.js?v=12.70"></script>
+<script src="js/44-foja-qx-proformas.js?v=12.70"></script>
+<script src="js/44b-foja-qx-proformas-ui.js?v=12.70"></script>
 <script>
 (function () {
   function $(id) { return document.getElementById(id); }
@@ -157,6 +174,9 @@
   var canvas = null;
   var ctx = null;
   var hasStroke = false;
+  var peekData = null;
+  var proformaUi = null;
+  var proformaState = { texto: '', slots: {}, proforma_id: null, modo_armado: 'usar' };
 
   function initCanvas() {
     canvas = $('qx-sign-canvas');
@@ -216,6 +236,28 @@
     return canvas.toDataURL() === blank.toDataURL();
   }
 
+  function wireCie(prefix) {
+    var code = $(prefix);
+    var q = $(prefix + '-q');
+    var hits = $(prefix + '-hits');
+    var man = $(prefix + '-man');
+    if (!q || !hits) return;
+    function search() {
+      if (typeof afCieQxSearch !== 'function') return;
+      var rows = afCieQxSearch(q.value, 10);
+      hits.innerHTML = rows.map(function (r) {
+        return '<button type="button" class="btn btn-s" data-c="' + r.c + '" style="display:block;width:100%;text-align:left;margin:2px 0;font-size:12px">' + r.c + ' — ' + r.d + '</button>';
+      }).join('');
+    }
+    q.addEventListener('input', search);
+    hits.addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-c]');
+      if (!b || !code) return;
+      code.value = b.getAttribute('data-c');
+      if (man) man.checked = false;
+    });
+  }
+
   $('qx-sign-clear').addEventListener('click', clearCanvas);
 
   document.querySelectorAll('input[name="qx-atb"]').forEach(function (el) {
@@ -229,6 +271,21 @@
     var msg = $('qx-submit-msg');
     msg.style.color = 'var(--text3)';
     msg.textContent = '';
+
+    if (proformaUi && typeof proformaUi.getState === 'function') {
+      proformaState = proformaUi.getState();
+    }
+    var textoFinal = (proformaState && proformaState.texto) || val('qx-texto');
+    if (!textoFinal) {
+      msg.style.color = 'var(--red)';
+      msg.textContent = 'Falta la descripción del procedimiento.';
+      return;
+    }
+    if (proformaState.missing && proformaState.missing.length) {
+      msg.style.color = 'var(--red)';
+      msg.textContent = 'Completá: ' + proformaState.missing.join(', ');
+      return;
+    }
 
     if (canvasEmpty()) {
       msg.style.color = 'var(--red)';
@@ -263,6 +320,10 @@
         op_indicada: val('qx-op-ind'),
         op_practicada: val('qx-op-prac'),
         riesgo: val('qx-riesgo'),
+        cie_pre: val('qx-cie-pre'),
+        cie_post: val('qx-cie-post'),
+        cie_pre_manual: !!($('qx-cie-pre-man') && $('qx-cie-pre-man').checked),
+        cie_post_manual: !!($('qx-cie-post-man') && $('qx-cie-post-man').checked),
       },
       clinicos: {
         consentimiento: cons === 'si',
@@ -270,7 +331,10 @@
         atb: atb === 'si',
         atb_detalle: val('qx-atb-det'),
       },
-      texto: val('qx-texto'),
+      texto: textoFinal,
+      proforma_id: proformaState.proforma_id || null,
+      modo_armado: proformaState.modo_armado || null,
+      slots: proformaState.slots || {},
       grado_dificultad: val('qx-grado'),
       firma: {
         png: canvas.toDataURL('image/png'),
@@ -319,31 +383,53 @@
     .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
     .then(function (res) {
       if (!res.ok || !res.j.ok) {
-        throw new Error((res.j && res.j.error) || 'No se pudo leer el enlace');
+        throw new Error((res.j && res.j.error) || 'Enlace no válido');
       }
-      var j = res.j;
+      peekData = res.j;
       $('qx-pub-err').style.display = 'none';
       $('qx-pub-ok').style.display = 'block';
-      setTxt('qx-pub-san', j.sanatorio);
-      setTxt('qx-pub-serv', j.especialidad);
-      setTxt('qx-pub-pac', j.paciente);
-      setTxt('qx-pub-dni', j.dni);
-      setTxt('qx-pub-fecha', j.fecha);
-      setTxt('qx-pub-hora-ini', j.hora_ini);
-      setTxt('qx-pub-hora-fin', j.hora_fin);
+      setTxt('qx-pub-san', peekData.sanatorio);
+      setTxt('qx-pub-serv', peekData.especialidad);
+      setTxt('qx-pub-pac', peekData.paciente);
+      setTxt('qx-pub-dni', peekData.dni);
+      setTxt('qx-pub-fecha', peekData.fecha);
+      setTxt('qx-pub-hora-ini', peekData.hora_ini);
+      setTxt('qx-pub-hora-fin', peekData.hora_fin);
+      if (peekData.cirujano) $('qx-cirujano').value = peekData.cirujano;
+      if (peekData.especialidad) $('qx-firma-esp').value = peekData.especialidad;
+      if (peekData.dx_preop) $('qx-dx-pre').value = peekData.dx_preop;
+      else if (peekData.diag) $('qx-dx-pre').value = peekData.diag;
+      if (peekData.dx_postop) $('qx-dx-post').value = peekData.dx_postop;
+      if (peekData.op_indicada) $('qx-op-ind').value = peekData.op_indicada;
+      if (peekData.op_practicada) $('qx-op-prac').value = peekData.op_practicada;
+      if (peekData.riesgo) $('qx-riesgo').value = peekData.riesgo;
+      if (peekData.cie_pre) $('qx-cie-pre').value = peekData.cie_pre;
+      if (peekData.cie_post) $('qx-cie-post').value = peekData.cie_post;
+      if (peekData.cie_pre_manual && $('qx-cie-pre-man')) $('qx-cie-pre-man').checked = true;
+      if (peekData.cie_post_manual && $('qx-cie-post-man')) $('qx-cie-post-man').checked = true;
 
-      $('qx-cirujano').value = j.cirujano || '';
-      $('qx-dx-pre').value = j.diag || '';
-      $('qx-firma-esp').value = j.especialidad || '';
-      if (j.cirujano) $('qx-firma-nom').value = j.cirujano;
-
+      wireCie('qx-cie-pre');
+      wireCie('qx-cie-post');
       initCanvas();
-      window.addEventListener('resize', function () {
-        if (!hasStroke) initCanvas();
-      });
+
+      if (typeof afProformaMountUI === 'function') {
+        proformaUi = afProformaMountUI($('qx-proforma-host'), {
+          especialidad: peekData.especialidad || '',
+          operacion: peekData.diag || peekData.op_practicada || '',
+          proformaId: peekData.proforma_id || null,
+          modo: peekData.modo_armado || (peekData.texto && !peekData.proforma_id ? 'cero' : 'usar'),
+          values: peekData.slots || {},
+          texto: peekData.texto || '',
+          onChange: function (st) { proformaState = st; },
+        });
+      } else {
+        $('qx-texto').style.display = '';
+        $('qx-texto').required = true;
+        if (peekData.texto) $('qx-texto').value = peekData.texto;
+      }
     })
     .catch(function (err) {
-      showErr('No se pudo abrir', err.message || 'Error de red');
+      showErr('Enlace no válido', err.message || 'No se pudo abrir');
     });
 })();
 </script>

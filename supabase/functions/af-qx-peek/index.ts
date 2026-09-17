@@ -60,5 +60,19 @@ Deno.serve(async (req) => {
     diag: String(ctx.diag || '').trim(),
     inter_id: String(ctx.inter_id || '').trim(),
     expires_at: qr.expires_at,
+    // Snapshot liviano desde create (Huerta → cirujano)
+    texto: String(ctx.texto || ''),
+    proforma_id: ctx.proforma_id != null ? ctx.proforma_id : null,
+    slots: ctx.slots && typeof ctx.slots === 'object' ? ctx.slots : {},
+    modo_armado: ctx.modo_armado != null ? String(ctx.modo_armado) : null,
+    cie_pre: String(ctx.cie_pre || '').trim(),
+    cie_post: String(ctx.cie_post || '').trim(),
+    cie_pre_manual: !!ctx.cie_pre_manual,
+    cie_post_manual: !!ctx.cie_post_manual,
+    dx_preop: String(ctx.dx_preop || '').trim(),
+    dx_postop: String(ctx.dx_postop || '').trim(),
+    op_indicada: String(ctx.op_indicada || '').trim(),
+    op_practicada: String(ctx.op_practicada || '').trim(),
+    riesgo: String(ctx.riesgo || '').trim(),
   });
 });

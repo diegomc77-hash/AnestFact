@@ -1,8 +1,8 @@
 # P2 — QR cirujano / `fojaQx` (diseño confirmado)
 
-**Estado (2026-09-16):** Paso 1–**2.2 CERRADOS en prod** (Pages 12.69 +
-Edge create/peek/submit; TTL foja_qx 7 d; pull + skip Mayo). Smokes Diego OK.
-Siguiente: proformas / print / CIE (entregas posteriores).
+**Estado (2026-09-16):** Paso 1–2.2 CERRADOS en prod. **Paso 2.3 listo local**
+(12.70: proformas×32 + CIE + print A4; UI dual; firma solo QR). Pendiente
+deploy Pages + Edge peek/submit.
 
 Índice: `docs/ESTADO_PROYECTO.md` · Marco: `docs/ROADMAP_ESCALAMIENTO.md`.
 
@@ -94,6 +94,17 @@ iniciando foja quirúrgica sin intervención previa de anestesia — ver
 nota en `docs/ROADMAP_ESCALAMIENTO.md` § P2. Hoy fojaQx sigue atada a
 intervención nacida del flujo anestesia.
 
+## Paso 2.3 (listo local — 2026-09-16)
+
+Decisiones: UI proformas en **app + QR** (firma solo QR); CIE subconjunto
+quirúrgico + otro a mano; **32 proformas** (13 CyC + resto especialidades).
+
+- Shape `fojaQx` v2: `proforma_id`, `modo_armado`, `slots`, `dx.cie_*`.
+- Sync: texto/slots viajan; PNG no. Puente QR = snapshot en token create.
+- Datos: `data/proformas-bundle.js` (~470 KB) + `data/cie-quirurgico.js`.
+- Motor: `js/44-foja-qx-proformas.js` (puro) + UI `js/44b-foja-qx-proformas-ui.js`. Print: `js/45-imprimir-foja-qx.js`.
+- Edge: peek ampliado + submit slots/CIE (redeploy al publicar).
+
 ## Paso 2.2 (cerrado en prod — 2026-09-16)
 
 A–E confirmados. SQL `022` + Edge submit/peek/create (7 d) + form/firma +
@@ -111,7 +122,7 @@ form+firma+pull+cruce; Mayo skip por code review. `17-sync-export.js` intacto.
 
 ## No hacer aún
 
-- No motor de proformas / slots / CIE (después de 2.2).
+- No Mayo foja_qx on / GECLISA fill / Traditum.
 - No inicio independiente de fojaQx sin intervención de anestesia
   (pendiente suite completa; ver ROADMAP).
 - No cambiar el flujo de valoración preop más allá del filtro de modo.

@@ -2,7 +2,7 @@
 // STATIC_CORE: shell + SCRIPTS (js/load-scripts.js) + vistas (js/load-views.js).
 // Si agregás un script o vista nueva, actualizá AMBOS lados (lista acá + SCRIPTS/VIEWS/FOJA_PARTS).
 // No incluir scripts propios de valoracion.html ni CDNs (QR paciente = online).
-var CACHE_NAME = 'anesfact-v12.69';
+var CACHE_NAME = 'anesfact-v12.70';
 var STATIC_CORE = [
   'index.html',
   'valoracion.html',
@@ -65,6 +65,12 @@ var STATIC_CORE = [
   'js/38-sesiones.js',
   'js/42-foja-qx.js',
   'js/43-foja-qx-sync.js',
+  'data/proformas-bundle.js',
+  'data/cie-quirurgico.js',
+  'js/44-foja-qx-proformas.js',
+  'js/44b-foja-qx-proformas-ui.js',
+  'js/45-imprimir-foja-qx.js',
+  'js/46-foja-qx-cie-ui.js',
   'js/load-views.js',
   'js/24-sw-register.js',
   'js/load-scripts.js',

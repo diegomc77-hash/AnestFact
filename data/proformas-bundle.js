@@ -1,0 +1,17158 @@
+/* auto-generated bundle — tools/bundle-proformas (inline) */
+/* auto-generated index — tools/md-proforma-to-js.mjs */
+(function (g) {
+  g.AF_PROFORMAS_INDEX = [
+  {
+    "id": "cyc-tiroides-paratiroides-v1",
+    "folder": "cyc",
+    "file": "cyc/cyc-tiroides-paratiroides-v1.js",
+    "especialidad": "Cirugía de Cabeza y Cuello",
+    "titulo": "Cirugía de patología tiroidea, paratiroidea y mínimamente invasiva",
+    "operaciones": [
+      "Tiroidectomía total",
+      "Hemitiroidectomía",
+      "Istmectomía",
+      "Nodulectomía por ablación",
+      "TOETVA",
+      "Ablación térmica percutánea",
+      "Resección de quiste tirogloso (Sistrunk)",
+      "Paratiroidectomía"
+    ]
+  },
+  {
+    "id": "cyc-vaciamiento-cervical-v1",
+    "folder": "cyc",
+    "file": "cyc/cyc-vaciamiento-cervical-v1.js",
+    "especialidad": "Cirugía de Cabeza y Cuello",
+    "titulo": "Vaciamientos ganglionares cervicales (linfadenectomías)",
+    "operaciones": [
+      "Vaciamiento ganglionar cervical",
+      "Linfadenectomía cervical",
+      "Vaciamiento radical de cuello",
+      "Vaciamiento radical modificado",
+      "Vaciamiento selectivo de cuello",
+      "Vaciamiento central"
+    ]
+  },
+  {
+    "id": "cyc-salivales-v1",
+    "folder": "cyc",
+    "file": "cyc/cyc-salivales-v1.js",
+    "especialidad": "Cirugía de Cabeza y Cuello",
+    "titulo": "Glándulas salivales (parótida y submaxilar)",
+    "operaciones": [
+      "Parotidectomía superficial",
+      "Parotidectomía total",
+      "Parotidectomía parcial / lobectomía",
+      "Enucleación extracapsular de parótida",
+      "Submaxilectomía"
+    ]
+  },
+  {
+    "id": "cyc-oncologia-reconstruccion-v1",
+    "folder": "cyc",
+    "file": "cyc/cyc-oncologia-reconstruccion-v1.js",
+    "especialidad": "Cirugía de Cabeza y Cuello",
+    "titulo": "Oncología cervicofacial compleja (resección + reconstrucción)",
+    "operaciones": [
+      "Glosectomía",
+      "Mandibulectomía",
+      "Maxilectomía",
+      "Laringectomía",
+      "Resección oncológica cervicofacial con reconstrucción"
+    ]
+  },
+  {
+    "id": "cyc-rifo-v1",
+    "folder": "cyc",
+    "file": "cyc/cyc-rifo-v1.js",
+    "especialidad": "Cirugía de Cabeza y Cuello",
+    "titulo": "Traumatología maxilofacial (RIFO)",
+    "operaciones": [
+      "Reducción e inmovilización de fracturas óseas (RIFO)",
+      "Osteosíntesis maxilofacial",
+      "Tratamiento quirúrgico de fractura mandibular",
+      "Tratamiento quirúrgico de fractura orbitomalar / CNEO",
+      "Tratamiento quirúrgico de fractura maxilar"
+    ]
+  },
+  {
+    "id": "cyc-piel-faneras-v1",
+    "folder": "cyc",
+    "file": "cyc/cyc-piel-faneras-v1.js",
+    "especialidad": "Cirugía de Cabeza y Cuello",
+    "titulo": "Patología quirúrgica de piel y faneras (Mohs / convencional + reconstrucción)",
+    "operaciones": [
+      "Cirugía micrográfica de Mohs",
+      "Resección cutánea oncológica facial",
+      "Resección cutánea de piel y faneras",
+      "Reconstrucción facial post-Mohs",
+      "Exéresis de lesión cutánea de cabeza y cuello"
+    ]
+  },
+  {
+    "id": "cyc-nariz-senos-v1",
+    "folder": "cyc",
+    "file": "cyc/cyc-nariz-senos-v1.js",
+    "especialidad": "Cirugía de Cabeza y Cuello",
+    "titulo": "Nariz y senos paranasales",
+    "operaciones": [
+      "Cirugía endoscópica nasal (CEN / FESS)",
+      "Polipectomía nasal",
+      "Septoplastia",
+      "Cirugía de senos paranasales",
+      "Cierre / reconstrucción de base de cráneo (vía nasal)"
+    ]
+  },
+  {
+    "id": "cyc-benigna-cuello-v1",
+    "folder": "cyc",
+    "file": "cyc/cyc-benigna-cuello-v1.js",
+    "especialidad": "Cirugía de Cabeza y Cuello",
+    "titulo": "Patología benigna y congénita del cuello (quistes, schwannomas, glomus)",
+    "operaciones": [
+      "Resección de quiste tirogloso (Sistrunk)",
+      "Resección de quiste branquial",
+      "Resección de schwannoma cervical",
+      "Resección de tumor glómico",
+      "Cirugía de patología benigna / congénita de cuello"
+    ]
+  },
+  {
+    "id": "cyc-ortognatica-v1",
+    "folder": "cyc",
+    "file": "cyc/cyc-ortognatica-v1.js",
+    "especialidad": "Cirugía de Cabeza y Cuello",
+    "titulo": "Cirugía ortognática (Le Fort I, OSRM, mentoplastia)",
+    "operaciones": [
+      "Cirugía ortognática",
+      "Osteotomía Le Fort I",
+      "Osteotomía sagital de rama mandibular (OSRM)",
+      "Mentoplastia"
+    ]
+  },
+  {
+    "id": "cyc-biopsia-cavidad-v1",
+    "folder": "cyc",
+    "file": "cyc/cyc-biopsia-cavidad-v1.js",
+    "especialidad": "Cirugía de Cabeza y Cuello",
+    "titulo": "Biopsias / exéresis en cavidad oral, orofaringe y rinofaringe",
+    "operaciones": [
+      "Biopsia de cavidad oral",
+      "Biopsia de orofaringe",
+      "Biopsia de rinofaringe",
+      "Exéresis de lesión de cavidad oral",
+      "Exéresis de lesión de orofaringe",
+      "Exéresis de lesión de rinofaringe"
+    ]
+  },
+  {
+    "id": "cyc-laringe-mls-v1",
+    "folder": "cyc",
+    "file": "cyc/cyc-laringe-mls-v1.js",
+    "especialidad": "Cirugía de Cabeza y Cuello",
+    "titulo": "Laringe y microcirugía laríngea (MLS)",
+    "operaciones": [
+      "Microcirugía laríngea (MLS)",
+      "Biopsia laríngea",
+      "Exéresis de lesión laríngea benigna",
+      "Laringectomía parcial simple",
+      "Cordectomía",
+      "Laringectomía total simple (sin reconstrucción compleja)"
+    ]
+  },
+  {
+    "id": "cyc-biopsia-salivales-acc-v1",
+    "folder": "cyc",
+    "file": "cyc/cyc-biopsia-salivales-acc-v1.js",
+    "especialidad": "Cirugía de Cabeza y Cuello",
+    "titulo": "Biopsia de glándulas salivales accesorias",
+    "operaciones": [
+      "Biopsia de glándulas salivales accesorias"
+    ]
+  },
+  {
+    "id": "cyc-biopsia-adenopatias-v1",
+    "folder": "cyc",
+    "file": "cyc/cyc-biopsia-adenopatias-v1.js",
+    "especialidad": "Cirugía de Cabeza y Cuello",
+    "titulo": "Biopsias de adenopatías cervicales",
+    "operaciones": [
+      "Biopsia de adenopatía cervical",
+      "Exéresis de adenopatía cervical"
+    ]
+  },
+  {
+    "id": "cg-pared-abdominal-v1",
+    "folder": "cg",
+    "file": "cg/cg-pared-abdominal-v1.js",
+    "especialidad": "Cirugía General",
+    "titulo": "Cirugía de pared abdominal",
+    "operaciones": [
+      "Hernioplastia inguinal",
+      "Hernioplastia femoral / crural",
+      "Eventroplastia / hernioplastia ventral",
+      "Reparación de diástasis de rectos",
+      "Reconstrucción de pared abdominal / hernias complejas",
+      "Eventración estrangulada / urgencia de pared"
+    ]
+  },
+  {
+    "id": "cg-gastrointestinal-v1",
+    "folder": "cg",
+    "file": "cg/cg-gastrointestinal-v1.js",
+    "especialidad": "Cirugía General",
+    "titulo": "Cirugía gastrointestinal (tubo digestivo)",
+    "operaciones": [
+      "Colectomía / resección colorrectal",
+      "Gastrectomía / procedimiento gástrico",
+      "Resección de intestino delgado / enterectomía",
+      "Laparotomía / laparoscopía exploradora",
+      "Ostomía (confección / cierre)",
+      "Apendicectomía"
+    ]
+  },
+  {
+    "id": "cg-pancreato-biliar-v1",
+    "folder": "cg",
+    "file": "cg/cg-pancreato-biliar-v1.js",
+    "especialidad": "Cirugía General",
+    "titulo": "Cirugía pancreática y biliar",
+    "operaciones": [
+      "Duodenopancreatectomía / Whipple",
+      "Pancreatectomía distal / central / total / enucleación",
+      "Exploración / derivación de vía biliar",
+      "Reconstrucción de lesión de vía biliar",
+      "Colecistectomía"
+    ]
+  },
+  {
+    "id": "cg-proctologia-v1",
+    "folder": "cg",
+    "file": "cg/cg-proctologia-v1.js",
+    "especialidad": "Cirugía General",
+    "titulo": "Proctología — patología anal y periorificial",
+    "operaciones": [
+      "Hemorroidectomía / hemorroidopexia",
+      "Drenaje de absceso perianal",
+      "Cirugía de fístula anal",
+      "Esfinterotomía / fisura anal",
+      "Cirugía de quiste / sinus pilonidal",
+      "Biopsia / escisión de lesión perianal",
+      "Esfinteroplastia anal"
+    ]
+  },
+  {
+    "id": "cg-retroperitoneo-v1",
+    "folder": "cg",
+    "file": "cg/cg-retroperitoneo-v1.js",
+    "especialidad": "Cirugía General",
+    "titulo": "Cirugía del retroperitoneo",
+    "operaciones": [
+      "Resección de masa / tumor retroperitoneal",
+      "Linfadenectomía retroperitoneal",
+      "Adrenalectomía",
+      "Reconstrucción vascular / urológica asociada"
+    ]
+  },
+  {
+    "id": "cg-esofagogastrico-v1",
+    "folder": "cg",
+    "file": "cg/cg-esofagogastrico-v1.js",
+    "especialidad": "Cirugía General",
+    "titulo": "Esofagogástrico, bariátrica y hernias internas",
+    "operaciones": [
+      "Funduplicatura / hiatoplastia / hernia hiatal",
+      "Cirugía bariátrica (RYGB / OAGB / Sleeve / revisional)",
+      "Esofaguectomía / resección esofágica",
+      "Hernia interna / defecto mesentérico"
+    ]
+  },
+  {
+    "id": "ct-torax-v1",
+    "folder": "torax",
+    "file": "torax/ct-torax-v1.js",
+    "especialidad": "Cirugía Torácica",
+    "titulo": "Cirugía torácica",
+    "operaciones": [
+      "Neumonectomía / lobectomía / segmentectomía / wedge",
+      "Decorticación / pleurodesis",
+      "Cirugía de mediastino / timectomía",
+      "Fístula broncopleural / reintervención"
+    ]
+  },
+  {
+    "id": "cu-urologia-v1",
+    "folder": "uro",
+    "file": "uro/cu-urologia-v1.js",
+    "especialidad": "Cirugía Urológica",
+    "titulo": "Cirugía urológica",
+    "operaciones": [
+      "Nefrectomía / pieloplastia",
+      "Cirugía ureteral / reconstructiva",
+      "Endourología / litiasis",
+      "Cistectomía / próstata / RTU-V",
+      "Cirugía escrotal / peniana / uretral"
+    ]
+  },
+  {
+    "id": "cgine-pelviana-v1",
+    "folder": "gine",
+    "file": "gine/cgine-pelviana-v1.js",
+    "especialidad": "Cirugía Ginecológica",
+    "titulo": "Cirugía ginecológica y pelviana",
+    "operaciones": [
+      "Histerectomía / miomectomía",
+      "Cirugía anexial / endometriosis",
+      "Estadificación / citorreducción oncológica",
+      "Piso pélvico / uroginecología",
+      "Histeroscopía / conización / LUI"
+    ]
+  },
+  {
+    "id": "cto-traumatologia-v1",
+    "folder": "trauma",
+    "file": "trauma/cto-traumatologia-v1.js",
+    "especialidad": "Traumatología y Ortopedia",
+    "titulo": "Traumatología y ortopedia",
+    "operaciones": [
+      "Osteosíntesis / artroscopía / artroplastia de miembro superior",
+      "Cirugía de pelvis / cadera",
+      "Cirugía de rodilla / pierna",
+      "Cirugía de tobillo / pie",
+      "Cirugía de columna"
+    ]
+  },
+  {
+    "id": "cvasc-vascular-v1",
+    "folder": "vascular",
+    "file": "vascular/cvasc-vascular-v1.js",
+    "especialidad": "Cirugía Vascular y Endovascular",
+    "titulo": "Cirugía vascular y endovascular",
+    "operaciones": [
+      "Cirugía aórtica / abdominal (abierta o endovascular)",
+      "Cirugía carotídea / troncos supraaórticos",
+      "Revascularización arterial periférica",
+      "Accesos vasculares para hemodiálisis",
+      "Cirugía venosa",
+      "Amputaciones / salvataje de miembro"
+    ]
+  },
+  {
+    "id": "cpl-plastica-v1",
+    "folder": "plastica",
+    "file": "plastica/cpl-plastica-v1.js",
+    "especialidad": "Cirugía Plástica, Reconstructiva y Estética",
+    "titulo": "Cirugía plástica, reconstructiva y estética",
+    "operaciones": [
+      "Cobertura cutánea — injertos y colgajos",
+      "Cirugía mamaria reconstructiva y estética",
+      "Contorno corporal / posbariátrica",
+      "Cirugía estética y reconstructiva facial",
+      "Manejo del paciente quemado y secuelas",
+      "Drenajes, cierre y manejo de heridas"
+    ]
+  },
+  {
+    "id": "cneuro-neurocirugia-v1",
+    "folder": "neuro",
+    "file": "neuro/cneuro-neurocirugia-v1.js",
+    "especialidad": "Neurocirugía",
+    "titulo": "Neurocirugía",
+    "operaciones": [
+      "Patología tumoral e infecciosa craneal",
+      "Neurocirugía vascular craneal",
+      "Neurotraumatología / neurointensivismo",
+      "Hidrocefalia y neurocirugía funcional",
+      "Cirugía raquimedular",
+      "Drenajes, materiales y cierre neuroquirúrgico"
+    ]
+  },
+  {
+    "id": "ccv-cardiovascular-v1",
+    "folder": "cv",
+    "file": "cv/ccv-cardiovascular-v1.js",
+    "especialidad": "Cirugía Cardiovascular",
+    "titulo": "Cirugía cardiovascular",
+    "operaciones": [
+      "Abordaje, canulación y circulación extracorpórea",
+      "Revascularización miocárdica (CRM)",
+      "Cirugía valvular",
+      "Aorta torácica y congénitas del adulto",
+      "Soporte circulatorio, marcapasos y cierre"
+    ]
+  },
+  {
+    "id": "cmano-mano-v1",
+    "folder": "mano",
+    "file": "mano/cmano-mano-v1.js",
+    "especialidad": "Cirugía de Mano y Miembro Superior",
+    "titulo": "Cirugía de mano y miembro superior",
+    "operaciones": [
+      "Patología osteoarticular y traumatológica de mano",
+      "Tendones y partes blandas",
+      "Nervio periférico y microcirugía",
+      "Artroscopia de muñeca",
+      "Infecciones y cobertura cutánea",
+      "Isquemia, torniquete y cierre"
+    ]
+  },
+  {
+    "id": "corl-orl-general-v1",
+    "folder": "orl",
+    "file": "orl/corl-orl-general-v1.js",
+    "especialidad": "Otorrinolaringología",
+    "titulo": "Otorrinolaringología general",
+    "operaciones": [
+      "Otología y cirugía del oído",
+      "Cirugía faringoamigdalina y cavidad oral general",
+      "Cirugía del sueño / SAHOS"
+    ]
+  },
+  {
+    "id": "coft-oftalmologia-v1",
+    "folder": "oftalmo",
+    "file": "oftalmo/coft-oftalmologia-v1.js",
+    "especialidad": "Oftalmología",
+    "titulo": "Oftalmología y cirugía ocular",
+    "operaciones": [
+      "Cirugía de segmento anterior / cristalino / córnea",
+      "Cirugía vitreorretiniana",
+      "Cirugía de glaucoma",
+      "Oculoplastia / vía lagrimal / órbita",
+      "Estrabismo y traumatología ocular"
+    ]
+  },
+  {
+    "id": "chem-hemodinamia-v1",
+    "folder": "hemo",
+    "file": "hemo/chem-hemodinamia-v1.js",
+    "especialidad": "Hemodinamia / Cardiología Intervencionista",
+    "titulo": "Hemodinamia y cardiología intervencionista",
+    "operaciones": [
+      "Accesos vasculares para hemodinamia",
+      "Intervencionismo coronario (diagnóstico / terapéutico)",
+      "Cardiopatía estructural / valvuloplastias percutáneas",
+      "Electrofisiología / dispositivos cardíacos"
+    ]
+  },
+  {
+    "id": "cge-endoscopia-v1",
+    "folder": "gastro",
+    "file": "gastro/cge-endoscopia-v1.js",
+    "especialidad": "Gastroenterología",
+    "titulo": "Gastroenterología y endoscopia digestiva",
+    "operaciones": [
+      "Endoscopia digestiva alta (VEDA)",
+      "Colonoscopia / rectosigmoidoscopia",
+      "Endoscopia de urgencia / hemorragia digestiva",
+      "Endoscopia terapéutica avanzada / CPRE",
+      "Complicaciones e incidencias post-endoscopia"
+    ]
+  }
+];
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cg-esofagogastrico-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Funduplicatura / hiato / reflujo",
+        "Cirugía bariátrica (RYGB / OAGB / Sleeve / revisional)",
+        "Esofaguectomía / resección esofágica",
+        "Hernia interna / defecto mesentérico"
+      ]
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": true,
+      "label": "Abordaje",
+      "options": [
+        "Laparoscópico",
+        "Robótico",
+        "Abierto / laparotómico",
+        "Convertido a abierto"
+      ]
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_hiato",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Funduplicatura / hiato / reflujo"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Enfermedad por reflujo gastroesofágico (ERGE)",
+        "Hernia hiatal por deslizamiento (Tipo I)",
+        "Hernia paraesofágica / mixta (Tipo II, III, IV)",
+        "Acalasia / cardioplastia"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_paraesofagica",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_hiato": [
+        "Hernia paraesofágica / mixta (Tipo II",
+        "III",
+        "IV)"
+      ],
+      "label": "Tipo de hernia paraesofágica",
+      "options": [
+        "Tipo II",
+        "Tipo III",
+        "Tipo IV"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "contenido_hernia_hiatal",
+      "type": "multi",
+      "required": false,
+      "required_if_indicacion_hiato": [
+        "Hernia paraesofágica / mixta (Tipo II",
+        "III",
+        "IV)"
+      ],
+      "label": "Contenido herniado",
+      "options": [
+        "Estómago",
+        "Colon",
+        "Omento",
+        "Otro"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "contenido_hernia_hiatal_otro",
+      "type": "free",
+      "required": false,
+      "required_if_contenido_hernia_hiatal": [
+        "Otro"
+      ],
+      "label": "Contenido herniado (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "reduccion_contenido_hiatal",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_hiato": [
+        "Hernia paraesofágica / mixta (Tipo II",
+        "III",
+        "IV)"
+      ],
+      "label": "Reducción del contenido",
+      "options": [
+        "Reducción completa",
+        "Reducción parcial",
+        "Irreductible"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "reseccion_saco_hiatal",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_hiato": [
+        "Hernia paraesofágica / mixta (Tipo II",
+        "III",
+        "IV)"
+      ],
+      "label": "Manejo del saco herniario",
+      "options": [
+        "Resección / excisión de saco",
+        "Reducción de saco sin resección",
+        "No abordado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "gastropexia",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_hiato": [
+        "Hernia paraesofágica / mixta (Tipo II",
+        "III",
+        "IV)"
+      ],
+      "label": "Gastropexia",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "liberacion_pilares_saco",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Funduplicatura / hiato / reflujo"
+      ],
+      "label": "Liberación de pilares hiatales y disección de saco",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "esofago_intraabdominal_cm",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Funduplicatura / hiato / reflujo"
+      ],
+      "label": "Longitud de esófago intraabdominal logrado (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "collis",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_hiato": [
+        "Hernia paraesofágica / mixta (Tipo II",
+        "III",
+        "IV)"
+      ],
+      "label": "Gastroplastia de Collis (esófago corto)",
+      "options": [
+        "Sí",
+        "No",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "vasos_cortos",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Funduplicatura / hiato / reflujo"
+      ],
+      "label": "Sección de vasos cortos",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hiatoplastia",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Funduplicatura / hiato / reflujo"
+      ],
+      "label": "Cierre de pilares (hiatoplastia)",
+      "options": [
+        "Puntos separados monofilamento / irreabsorbible",
+        "Con refuerzo protésico / malla",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hiatoplastia_malla_tipo",
+      "type": "free",
+      "required": false,
+      "required_if_hiatoplastia": [
+        "Con refuerzo protésico / malla"
+      ],
+      "label": "Tipo de malla / prótesis (hiatoplastia)",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_funduplicatura",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Funduplicatura / hiato / reflujo"
+      ],
+      "label": "Confección de la funduplicatura",
+      "options": [
+        "Nissen (total 360°)",
+        "Toupet (parcial posterior 270°)",
+        "Dor (parcial anterior 180°)",
+        "No realizada (solo hiatoplastia / gastropexia / Collis)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "calibracion_valvula",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_funduplicatura": [
+        "Nissen (total 360°)",
+        "Toupet (parcial posterior 270°)",
+        "Dor (parcial anterior 180°)"
+      ],
+      "label": "Calibración de la válvula con sonda (Bougie / Faucher)",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "calibracion_valvula_fr",
+      "type": "free",
+      "required": false,
+      "required_if_calibracion_valvula": [
+        "Sí"
+      ],
+      "label": "Calibración — calibre (Fr)",
+      "empty_text": ""
+    },
+    {
+      "id": "vago_anterior",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Funduplicatura / hiato / reflujo",
+        "Esofaguectomía / resección esofágica"
+      ],
+      "required_if_tipo_bariatrica": [
+        "Sleeve gástrico"
+      ],
+      "label": "Nervio vago anterior",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "vago_posterior",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Funduplicatura / hiato / reflujo",
+        "Esofaguectomía / resección esofágica"
+      ],
+      "required_if_tipo_bariatrica": [
+        "Sleeve gástrico"
+      ],
+      "label": "Nervio vago posterior",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hermeticidad_funduplicatura",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_funduplicatura": [
+        "Nissen (total 360°)",
+        "Toupet (parcial posterior 270°)",
+        "Dor (parcial anterior 180°)"
+      ],
+      "label": "Prueba de hermeticidad (funduplicatura)",
+      "options": [
+        "Fuga demostrada",
+        "Sin fuga demostrada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_bariatrica",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía bariátrica (RYGB / OAGB / Sleeve / revisional)"
+      ],
+      "label": "Procedimiento bariátrico",
+      "options": [
+        "Bypass gástrico en Y de Roux (RYGB)",
+        "Bypass de anastomosis única (OAGB / BAGUA / mini-bypass)",
+        "Sleeve gástrico",
+        "Cirugía revisional bariátrica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "revisional_subtipo",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_bariatrica": [
+        "Cirugía revisional bariátrica"
+      ],
+      "label": "Tipo de revisión bariátrica",
+      "options": [
+        "Banda → bypass",
+        "Sleeve → bypass",
+        "Revisión de asa (longitud / anastomosis)",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "revisional_subtipo_otro",
+      "type": "free",
+      "required": false,
+      "required_if_revisional_subtipo": [
+        "Otro"
+      ],
+      "label": "Revisión bariátrica (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "pouch_volumen_cc",
+      "type": "free",
+      "required": false,
+      "label": "Reservorio / pouch — volumen estimado (cc)",
+      "empty_text": ""
+    },
+    {
+      "id": "calibracion_pouch",
+      "type": "single",
+      "required": false,
+      "label": "Calibración con sonda",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "calibracion_pouch_fr",
+      "type": "free",
+      "required": false,
+      "required_if_calibracion_pouch": [
+        "Sí"
+      ],
+      "label": "Calibración — calibre (Fr)",
+      "empty_text": ""
+    },
+    {
+      "id": "refuerzo_linea_grapado",
+      "type": "single",
+      "required": false,
+      "label": "Refuerzo de línea de engrapado / sutura continua",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "asa_biliopancreatica_cm",
+      "type": "free",
+      "required": false,
+      "label": "Asa biliopancreática — longitud (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "asa_alimentaria_cm",
+      "type": "free",
+      "required": false,
+      "label": "Asa alimentaria — longitud (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_gy",
+      "type": "single",
+      "required": false,
+      "label": "Anastomosis gastroyeyunal",
+      "options": [
+        "Mecánica circular",
+        "Mecánica lineal",
+        "Manual"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_gy_circular_mm",
+      "type": "free",
+      "required": false,
+      "required_if_anastomosis_gy": [
+        "Mecánica circular"
+      ],
+      "label": "Anastomosis GY circular — diámetro (mm)",
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_yy",
+      "type": "single",
+      "required": false,
+      "label": "Anastomosis yeyunoyeyunal (Y de Roux)",
+      "options": [
+        "Mecánica lineal",
+        "Manual",
+        "No realizada / no aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "brecha_petersen",
+      "type": "single",
+      "required": false,
+      "label": "Brecha intermesentérica (Petersen)",
+      "options": [
+        "Cerrada",
+        "No cerrada",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "brecha_mesenterio_yeyunal",
+      "type": "single",
+      "required": false,
+      "label": "Brecha del mesenterio yeyunal",
+      "options": [
+        "Cerrada",
+        "No cerrada",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hermeticidad_bariatrica",
+      "type": "single",
+      "required": false,
+      "label": "Prueba de hermeticidad (azul de metileno / neumática)",
+      "options": [
+        "Fuga demostrada",
+        "Sin fuga demostrada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_esofaguectomia",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Esofaguectomía / resección esofágica"
+      ],
+      "label": "Técnica / campos",
+      "options": [
+        "Transhiatal (Orringer — laparotomía + cervicotomía)",
+        "Transtorácica subtotal (Ivor Lewis — laparotomía + toracotomía derecha)",
+        "Tres campos (McKeown — cervicotomía + toracotomía + laparotomía)",
+        "Mínimamente invasivo / híbrido (MIE — laparoscopía / toracoscopía)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "organo_sustitucion",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Esofaguectomía / resección esofágica"
+      ],
+      "label": "Órgano de sustitución (ascenso / tubulización)",
+      "options": [
+        "Estómago (túbulo / plastia gástrica)",
+        "Colon (plastia colónica)",
+        "Yeyuno (asa libre / yeyunoplastia)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "plastia_colon_sentido",
+      "type": "single",
+      "required": false,
+      "required_if_organo_sustitucion": [
+        "Colon (plastia colónica)"
+      ],
+      "label": "Plastia colónica — sentido",
+      "options": [
+        "Isoperistáltica",
+        "Anteroperistáltica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "via_ascenso",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Esofaguectomía / resección esofágica"
+      ],
+      "label": "Vía de ascenso del plastrón",
+      "options": [
+        "Mediastino posterior (lecho esofágico)",
+        "Retroesternal",
+        "Subcutáneo"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "linfadenectomia_esofago",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Esofaguectomía / resección esofágica"
+      ],
+      "label": "Linfadenectomía",
+      "options": [
+        "2 campos (abdominal + torácico)",
+        "3 campos (abdominal + torácico + cervical)",
+        "No realizada / no oncológica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_esofagica_ubicacion",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Esofaguectomía / resección esofágica"
+      ],
+      "label": "Anastomosis esofágica — ubicación",
+      "options": [
+        "Cervical",
+        "Torácica alta"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_esofagica_tecnica",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Esofaguectomía / resección esofágica"
+      ],
+      "label": "Anastomosis esofágica — técnica",
+      "options": [
+        "Mecánica circular",
+        "Mecánica lineal",
+        "Manual (1 plano)",
+        "Manual (2 planos)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_proximal_esofago",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Esofaguectomía / resección esofágica"
+      ],
+      "label": "Margen proximal",
+      "options": [
+        "Libre",
+        "Comprometido",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_proximal_esofago_distancia",
+      "type": "free",
+      "required": false,
+      "required_if_margen_proximal_esofago": [
+        "Libre",
+        "Comprometido"
+      ],
+      "label": "Margen proximal — distancia (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "margen_distal_tubo",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Esofaguectomía / resección esofágica"
+      ],
+      "label": "Margen distal del tubo / plastia",
+      "options": [
+        "Libre",
+        "Comprometido",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_distal_tubo_distancia",
+      "type": "free",
+      "required": false,
+      "required_if_margen_distal_tubo": [
+        "Libre",
+        "Comprometido"
+      ],
+      "label": "Margen distal — distancia (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_recurrente",
+      "type": "single",
+      "required": false,
+      "required_if_anastomosis_esofagica_ubicacion": [
+        "Cervical"
+      ],
+      "label": "Nervio laríngeo recurrente",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "yeyunostomia_alimentacion",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Esofaguectomía / resección esofágica"
+      ],
+      "label": "Yeyunostomía de alimentación complementaria",
+      "options": [
+        "Realizada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hermeticidad_esofagica",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Esofaguectomía / resección esofágica"
+      ],
+      "label": "Prueba de hermeticidad (anastomosis esofágica)",
+      "options": [
+        "Fuga demostrada",
+        "Sin fuga demostrada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_esofaguectomia",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Esofaguectomía / resección esofágica"
+      ],
+      "label": "Drenaje(s)",
+      "options": [
+        "Sí",
+        "Sin drenaje"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_esofaguectomia_detalle",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_esofaguectomia": [
+        "Sí"
+      ],
+      "label": "Drenaje — tipo / ubicación",
+      "empty_text": ""
+    },
+    {
+      "id": "etiologia_hernia_interna",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernia interna / defecto mesentérico"
+      ],
+      "label": "Origen / etiología",
+      "options": [
+        "Post-quirúrgica (posbypass / defecto mesentérico creado)",
+        "Congénita / primaria"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "sitio_hernia_interna",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernia interna / defecto mesentérico"
+      ],
+      "label": "Sitio del defecto",
+      "options": [
+        "Brecha de Petersen",
+        "Brecha yeyunoyeyunal / mesenterio yeyunal",
+        "Hernia paraduodenal (Treitz)",
+        "Foramen de Winslow",
+        "Transmesentérica",
+        "Transomesentérica",
+        "Intersigmoidea",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "sitio_hernia_interna_otro",
+      "type": "free",
+      "required": false,
+      "required_if_sitio_hernia_interna": [
+        "Otro"
+      ],
+      "label": "Sitio del defecto (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "manejo_contenido_hernia_interna",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernia interna / defecto mesentérico"
+      ],
+      "label": "Manejo del contenido herniado",
+      "options": [
+        "Reducción manual — víscera indemne",
+        "Isquemia / necrosis — resección intestinal — completar en M2 Gastrointestinal (cg-gastrointestinal-v1)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "handoff_gi",
+      "type": "single",
+      "required": false,
+      "label": "Handoff",
+      "options": [
+        "Sí — completar en M2 Gastrointestinal (cg-gastrointestinal-v1)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "campo_hernia_interna",
+      "type": "single",
+      "required": false,
+      "label": "Clasificación del campo",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tratamiento_defecto_hernia_interna",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernia interna / defecto mesentérico"
+      ],
+      "label": "Tratamiento del defecto",
+      "options": [
+        "Cierre de brecha / espacio anatómico (sutura monofilamento irreabsorbible)",
+        "Sección / apertura del anillo constrictor"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_modulo",
+      "type": "single",
+      "required": false,
+      "label": "Drenaje",
+      "options": [
+        "Sí",
+        "Sin drenaje"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_modulo_detalle",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_modulo": [
+        "Sí"
+      ],
+      "label": "Drenaje — tipo / ubicación",
+      "empty_text": ""
+    }
+  ],
+  "id": "cg-esofagogastrico-v1",
+  "especialidad": "Cirugía General",
+  "operaciones": [
+    "Funduplicatura / hiatoplastia / hernia hiatal",
+    "Cirugía bariátrica (RYGB / OAGB / Sleeve / revisional)",
+    "Esofaguectomía / resección esofágica",
+    "Hernia interna / defecto mesentérico"
+  ],
+  "titulo": "Esofagogástrico, bariátrica y hernias internas",
+  "plantilla_texto": "Esofagogástrico — {{procedimiento_grupo}}. Abordaje: {{abordaje}}{{conversion_causa}}.\nHiato: {{indicacion_hiato}} {{tipo_paraesofagica}}; contenido {{contenido_hernia_hiatal}}{{contenido_hernia_hiatal_otro}}; reducción {{reduccion_contenido_hiatal}}; saco {{reseccion_saco_hiatal}}; gastropexia {{gastropexia}}; pilares/saco {{liberacion_pilares_saco}}; esófago IA {{esofago_intraabdominal_cm}} cm; Collis {{collis}}; vasos cortos {{vasos_cortos}}; hiatoplastia {{hiatoplastia}}{{hiatoplastia_malla_tipo}}; válvula {{tipo_funduplicatura}} cal.{{calibracion_valvula}}{{calibracion_valvula_fr}}; vagos ant. {{vago_anterior}} post. {{vago_posterior}}; hermeticidad {{hermeticidad_funduplicatura}}.\nBariátrica: {{tipo_bariatrica}} {{revisional_subtipo}}{{revisional_subtipo_otro}}; pouch {{pouch_volumen_cc}} cc; cal.{{calibracion_pouch}}{{calibracion_pouch_fr}}; refuerzo {{refuerzo_linea_grapado}}; BP {{asa_biliopancreatica_cm}} cm / alim. {{asa_alimentaria_cm}} cm; GY {{anastomosis_gy}}{{anastomosis_gy_circular_mm}}; YY {{anastomosis_yy}}; Petersen {{brecha_petersen}}; mes. yeyunal {{brecha_mesenterio_yeyunal}}; hermeticidad {{hermeticidad_bariatrica}}.\nEsofaguectomía: {{tipo_esofaguectomia}}; sustitución {{organo_sustitucion}}{{plastia_colon_sentido}}; vía {{via_ascenso}}; linfadenectomía {{linfadenectomia_esofago}}; anastomosis {{anastomosis_esofagica_ubicacion}} {{anastomosis_esofagica_tecnica}}; márgenes prox. {{margen_proximal_esofago}}{{margen_proximal_esofago_distancia}} / dist. {{margen_distal_tubo}}{{margen_distal_tubo_distancia}}; recurrente {{nervio_recurrente}}; yeyunostomía {{yeyunostomia_alimentacion}}; hermeticidad {{hermeticidad_esofagica}}; drenaje {{drenaje_esofaguectomia}}{{drenaje_esofaguectomia_detalle}}.\nHernia interna: {{etiologia_hernia_interna}}; sitio {{sitio_hernia_interna}}{{sitio_hernia_interna_otro}}; contenido {{manejo_contenido_hernia_interna}}; handoff {{handoff_gi}}; campo {{campo_hernia_interna}}; defecto {{tratamiento_defecto_hernia_interna}}.\nDrenaje (otros focos): {{drenaje_modulo}}{{drenaje_modulo_detalle}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cg-gastrointestinal-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Colectomía / resección colorrectal",
+        "Gastrectomía / procedimiento gástrico",
+        "Resección de intestino delgado / enterectomía",
+        "Laparotomía / laparoscopía exploradora",
+        "Ostomía (confección / cierre)",
+        "Apendicectomía"
+      ]
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": true,
+      "label": "Abordaje",
+      "options": [
+        "Abierto",
+        "Laparoscópico",
+        "Robótico",
+        "Convertido a abierto"
+      ]
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_colorrecto",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Colectomía / resección colorrectal"
+      ],
+      "label": "Procedimiento colorrectal",
+      "options": [
+        "Hemicolectomía derecha",
+        "Colectomía transversa",
+        "Hemicolectomía izquierda",
+        "Sigmoidectomía",
+        "Colectomía subtotal / total",
+        "Resección anterior de recto (baja / ultrabaja)",
+        "Operación de Miles (resección abdominoperineal)",
+        "Operación de Hartmann (resección + colostomía terminal)",
+        "Procedimiento de Garengeot / Mikulicz"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hemiderecha_extendida",
+      "type": "single",
+      "required": false,
+      "required_if_proc_colorrecto": [
+        "Hemicolectomía derecha"
+      ],
+      "label": "Hemicolectomía derecha extendida",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_colorrecto",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Colectomía / resección colorrectal"
+      ],
+      "label": "Indicación / patología",
+      "options": [
+        "Neoplasia maligna",
+        "Enfermedad diverticular",
+        "Isquemia intestinal",
+        "Vólvulo",
+        "EII (Crohn / CUCI)",
+        "Urgencia / perforación"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "linfadenectomia_colorrecto",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Colectomía / resección colorrectal"
+      ],
+      "label": "Linfadenectomía / ligadura vascular",
+      "options": [
+        "D2",
+        "D3 / ligadura central"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "vasos_ligadura_central",
+      "type": "multi",
+      "required": false,
+      "required_if_linfadenectomia_colorrecto": [
+        "D3 / ligadura central"
+      ],
+      "label": "Vasos (ligadura central)",
+      "options": [
+        "Ileocólica",
+        "Cólica derecha",
+        "Cólica media",
+        "Mesentérica inferior"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "conservacion_colica_izq",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Colectomía / resección colorrectal"
+      ],
+      "label": "Conservación de la arteria cólica izquierda",
+      "options": [
+        "Sí",
+        "No",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "escision_mesorrectal",
+      "type": "single",
+      "required": false,
+      "label": "Escisión mesorrectal",
+      "options": [
+        "Total (TME)",
+        "Parcial (PME)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ureter_derecho",
+      "type": "single",
+      "required": false,
+      "label": "Uréter derecho",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ureter_izquierdo",
+      "type": "single",
+      "required": false,
+      "label": "Uréter izquierdo",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ureter_lesion_detalle",
+      "type": "free",
+      "required": false,
+      "label": "Detalle de lesión ureteral (si aplica)",
+      "empty_text": ""
+    },
+    {
+      "id": "campo_colorrecto",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_colorrecto": [
+        "Urgencia / perforación"
+      ],
+      "label": "Clasificación del campo",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "decision_restitucion",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_colorrecto": [
+        "Urgencia / perforación"
+      ],
+      "label": "Decisión de restitución",
+      "options": [
+        "Anastomosis primaria",
+        "Hartmann",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "decision_restitucion_otra",
+      "type": "free",
+      "required": false,
+      "required_if_decision_restitucion": [
+        "Otro"
+      ],
+      "label": "Decisión de restitución (otra)",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_anastomosis_cr",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Colectomía / resección colorrectal"
+      ],
+      "label": "Tipo de anastomosis",
+      "options": [
+        "Íleo-cólica",
+        "Colo-cólica",
+        "Colo-rectal",
+        "Íleo-rectal",
+        "Ninguna (estoma terminal)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "config_anastomosis_cr",
+      "type": "single",
+      "required": false,
+      "label": "Configuración de anastomosis",
+      "options": [
+        "Término-terminal",
+        "Término-lateral",
+        "Látero-lateral",
+        "Látero-terminal"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_anastomosis_cr",
+      "type": "single",
+      "required": false,
+      "label": "Técnica de confección",
+      "options": [
+        "Mecánica / engrapadora",
+        "Manual"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "engrapadora_circular_mm",
+      "type": "free",
+      "required": false,
+      "required_if_tecnica_anastomosis_cr": [
+        "Mecánica / engrapadora"
+      ],
+      "label": "Circular (mm)",
+      "empty_text": ""
+    },
+    {
+      "id": "engrapadora_lineal_mm",
+      "type": "free",
+      "required": false,
+      "required_if_tecnica_anastomosis_cr": [
+        "Mecánica / engrapadora"
+      ],
+      "label": "Lineal cortante (mm)",
+      "empty_text": ""
+    },
+    {
+      "id": "sutura_manual_cr",
+      "type": "single",
+      "required": false,
+      "required_if_tecnica_anastomosis_cr": [
+        "Manual"
+      ],
+      "label": "Sutura manual",
+      "options": [
+        "Monofilamento",
+        "Trenzado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "planos_manual_cr",
+      "type": "single",
+      "required": false,
+      "required_if_tecnica_anastomosis_cr": [
+        "Manual"
+      ],
+      "label": "Planos (manual)",
+      "options": [
+        "1 plano",
+        "2 planos"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hermeticidad_cr",
+      "type": "single",
+      "required": false,
+      "label": "Prueba de hermeticidad",
+      "options": [
+        "Fuga demostrada",
+        "Sin fuga demostrada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ostomia_proteccion",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Colectomía / resección colorrectal"
+      ],
+      "label": "Ostomía de protección",
+      "options": [
+        "No realizada",
+        "Ileostomía en asa",
+        "Colostomía en asa"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_reseccion_gastrica",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Gastrectomía / procedimiento gástrico"
+      ],
+      "label": "Tipo de resección / procedimiento gástrico",
+      "options": [
+        "Gastrectomía total",
+        "Gastrectomía subtotal / parcial (distal)",
+        "Gastrectomía subtotal / parcial (proximal)",
+        "Sleeve gástrico — ver M6 Esofagogástrico (cg-esofagogastrico-v1)",
+        "Gastrostomía (alimentación / descompresión)",
+        "Cierre de úlcera perforada + parche de omento (Graham)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "sleeve_xref_nota",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_reseccion_gastrica": [
+        "Sleeve gástrico — ver M6 Esofagogástrico (cg-esofagogastrico-v1)"
+      ],
+      "label": "Sleeve (referencia / handoff)",
+      "options": [
+        "Definición completa en M6 Esofagogástrico (cg-esofagogastrico-v1) — no completar slots acá"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "linfadenectomia_gastrica",
+      "type": "single",
+      "required": false,
+      "label": "Linfadenectomía (neoplasia)",
+      "options": [
+        "D1",
+        "D1+",
+        "D2",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_proximal",
+      "type": "single",
+      "required": false,
+      "label": "Margen proximal",
+      "options": [
+        "Libre",
+        "Comprometido",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_proximal_distancia",
+      "type": "free",
+      "required": false,
+      "required_if_margen_proximal": [
+        "Libre",
+        "Comprometido"
+      ],
+      "label": "Margen proximal — distancia (mm/cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "margen_distal",
+      "type": "single",
+      "required": false,
+      "label": "Margen distal",
+      "options": [
+        "Libre",
+        "Comprometido",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_distal_distancia",
+      "type": "free",
+      "required": false,
+      "required_if_margen_distal": [
+        "Libre",
+        "Comprometido"
+      ],
+      "label": "Margen distal — distancia (mm/cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "reconstruccion_gastrica",
+      "type": "single",
+      "required": false,
+      "label": "Reconstrucción del tránsito",
+      "options": [
+        "Y de Roux (yeyunal)",
+        "Billroth I (gastroduodenoanastomosis)",
+        "Billroth II (gastroenteroanastomosis)",
+        "Asa al brown / interposición yeyunal",
+        "Sin reconstrucción en este tiempo"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_anastomosis_gastrica",
+      "type": "single",
+      "required": false,
+      "label": "Confección de anastomosis",
+      "options": [
+        "Mecánica",
+        "Manual"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "refuerzo_linea_sutura",
+      "type": "single",
+      "required": false,
+      "label": "Refuerzo de línea de sutura",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hermeticidad_gastrica",
+      "type": "single",
+      "required": false,
+      "label": "Prueba de hermeticidad",
+      "options": [
+        "Fuga demostrada",
+        "Sin fuga demostrada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "campo_gastrico_urgencia",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_reseccion_gastrica": [
+        "Cierre de úlcera perforada + parche de omento (Graham)"
+      ],
+      "label": "Clasificación del campo",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_delgado",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de intestino delgado / enterectomía"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Isquemia / necrosis",
+        "Obstrucción / bridas",
+        "Neoplasia / tumor neuroendocrino",
+        "Perforación / trauma",
+        "Divertículo de Meckel"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "longitud_resecada_cm",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de intestino delgado / enterectomía"
+      ],
+      "label": "Longitud resecada (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "intestino_remanente_cm",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de intestino delgado / enterectomía"
+      ],
+      "label": "Intestino remanente estimado (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "ubicacion_reseccion_delgado",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de intestino delgado / enterectomía"
+      ],
+      "label": "Ubicación de la resección",
+      "options": [
+        "Yeyuno",
+        "Íleon proximal",
+        "Íleon distal / válvula ileocecal"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "reconstruccion_delgado",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de intestino delgado / enterectomía"
+      ],
+      "label": "Reconstrucción",
+      "options": [
+        "Anastomosis entero-entérica",
+        "Enterostomía temporaria (ileostomía / yeyunostomía)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "config_anastomosis_delgado",
+      "type": "single",
+      "required": false,
+      "required_if_reconstruccion_delgado": [
+        "Anastomosis entero-entérica"
+      ],
+      "label": "Configuración (entero-entérica)",
+      "options": [
+        "Látero-lateral",
+        "Término-terminal"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_anastomosis_delgado",
+      "type": "single",
+      "required": false,
+      "required_if_reconstruccion_delgado": [
+        "Anastomosis entero-entérica"
+      ],
+      "label": "Técnica (entero-entérica)",
+      "options": [
+        "Manual",
+        "Mecánica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hermeticidad_delgado",
+      "type": "single",
+      "required": false,
+      "required_if_reconstruccion_delgado": [
+        "Anastomosis entero-entérica"
+      ],
+      "label": "Prueba de hermeticidad",
+      "options": [
+        "Fuga demostrada",
+        "Sin fuga demostrada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "campo_delgado",
+      "type": "single",
+      "required": false,
+      "label": "Clasificación del campo",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "objetivo_exploradora",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Laparotomía / laparoscopía exploradora"
+      ],
+      "label": "Objetivo",
+      "options": [
+        "Estadificación (staging de neoplasia)",
+        "Síndrome abdomen agudo indeterminado",
+        "Trauma abdominal",
+        "Evaluación de peritonitis"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "liquido_libre",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Laparotomía / laparoscopía exploradora"
+      ],
+      "label": "Líquido libre en cavidad",
+      "options": [
+        "No",
+        "Seroso",
+        "Hemático",
+        "Purulento / fecaloide"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "liquido_hematico_cc",
+      "type": "free",
+      "required": false,
+      "required_if_liquido_libre": [
+        "Hemático"
+      ],
+      "label": "Volumen hemático (cc)",
+      "empty_text": ""
+    },
+    {
+      "id": "pci",
+      "type": "free",
+      "required": false,
+      "required_if_objetivo_exploradora": [
+        "Estadificación (staging de neoplasia)"
+      ],
+      "label": "PCI (índice de cáncer peritoneal) /39",
+      "empty_text": ""
+    },
+    {
+      "id": "compromiso_organos",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Laparotomía / laparoscopía exploradora"
+      ],
+      "label": "Compromiso de órganos (describir)",
+      "empty_text": ""
+    },
+    {
+      "id": "biopsia_peritoneal",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Laparotomía / laparoscopía exploradora"
+      ],
+      "label": "Biopsia peritoneal / omental",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "biopsia_peritoneal_sitios",
+      "type": "free",
+      "required": false,
+      "required_if_biopsia_peritoneal": [
+        "Sí"
+      ],
+      "label": "Sitios de biopsia peritoneal / omental",
+      "empty_text": ""
+    },
+    {
+      "id": "biopsia_hepatica_ganglionar",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Laparotomía / laparoscopía exploradora"
+      ],
+      "label": "Biopsia hepática / ganglionar",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "lavado_citologia",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Laparotomía / laparoscopía exploradora"
+      ],
+      "label": "Lavado peritoneal para citología",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "gesto_exploradora",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Laparotomía / laparoscopía exploradora"
+      ],
+      "label": "Gesto quirúrgico realizado",
+      "options": [
+        "Solamente biopsias y desbridamiento / lavado",
+        "Adhesiólisis / liberación de bridas",
+        "Colocación de drenaje y cierre",
+        "Abdomen abierto / VAC / laparostomía contenida"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "campo_exploradora",
+      "type": "single",
+      "required": false,
+      "label": "Clasificación del campo",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ostomia_acto",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Ostomía (confección / cierre)"
+      ],
+      "label": "Acto sobre ostomía",
+      "options": [
+        "Confección de estoma",
+        "Cierre / restitución de tránsito (incl. reconstrucción de Hartmann)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ostomia_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_ostomia_acto": [
+        "Confección de estoma"
+      ],
+      "label": "Tipo de estoma",
+      "options": [
+        "Ileostomía",
+        "Colostomía sigmoidea",
+        "Colostomía transversa"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ostomia_config",
+      "type": "single",
+      "required": false,
+      "required_if_ostomia_acto": [
+        "Confección de estoma"
+      ],
+      "label": "Configuración del estoma",
+      "options": [
+        "Terminal",
+        "En asa (sobre varilla / puente)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "trayecto_muscular",
+      "type": "single",
+      "required": false,
+      "required_if_ostomia_acto": [
+        "Confección de estoma"
+      ],
+      "label": "Trayecto a través de la pared",
+      "options": [
+        "Trans-recto abdominal (a través del músculo recto del abdomen)",
+        "Extramuscular",
+        "Lateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "fijacion_estoma",
+      "type": "single",
+      "required": false,
+      "required_if_ostomia_acto": [
+        "Confección de estoma"
+      ],
+      "label": "Fijación del estoma",
+      "options": [
+        "Fijación mucocutánea con puntos reabsorbibles",
+        "Eversión del cabo (técnica de Brooke)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "cierre_ostomia_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_ostomia_acto": [
+        "Cierre / restitución de tránsito (incl. reconstrucción de Hartmann)"
+      ],
+      "label": "Tipo de cierre / restitución",
+      "options": [
+        "Cierre de ileostomía en asa",
+        "Cierre de colostomía en asa",
+        "Reconstrucción de Hartmann (anastomosis colorrectal)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "control_cabo_distal",
+      "type": "single",
+      "required": false,
+      "required_if_cierre_ostomia_tipo": [
+        "Reconstrucción de Hartmann (anastomosis colorrectal)"
+      ],
+      "label": "Control del cabo distal antes de anastomosis",
+      "options": [
+        "Manometría / endoscopía previa adecuada",
+        "No realizado / no consignado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hermeticidad_cierre_ostomia",
+      "type": "single",
+      "required": false,
+      "required_if_cierre_ostomia_tipo": [
+        "Reconstrucción de Hartmann (anastomosis colorrectal)"
+      ],
+      "label": "Prueba de hermeticidad (restitución)",
+      "options": [
+        "Fuga demostrada",
+        "Sin fuga demostrada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "apendicectomia_via",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Apendicectomía"
+      ],
+      "label": "Vía",
+      "options": [
+        "Abierta",
+        "Laparoscópica",
+        "Convertida a abierta"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "apendicectomia_conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_apendicectomia_via": [
+        "Convertida a abierta"
+      ],
+      "label": "Causa de conversión (apendicectomía)",
+      "empty_text": ""
+    },
+    {
+      "id": "apendicectomia_hallazgo",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Apendicectomía"
+      ],
+      "label": "Hallazgo del apéndice",
+      "options": [
+        "Normal",
+        "Flemonosa",
+        "Gangrenosa",
+        "Perforada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "apendicectomia_munon",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Apendicectomía"
+      ],
+      "label": "Manejo del muñón",
+      "options": [
+        "Ligadura / transfixación",
+        "Endoloop",
+        "Engrapadora lineal",
+        "Invaginación del muñón",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "apendicectomia_munon_otro",
+      "type": "free",
+      "required": false,
+      "required_if_apendicectomia_munon": [
+        "Otro"
+      ],
+      "label": "Manejo del muñón (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "campo_apendicectomia",
+      "type": "single",
+      "required": false,
+      "required_if_apendicectomia_hallazgo": [
+        "Gangrenosa",
+        "Perforada"
+      ],
+      "label": "Clasificación del campo",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_gi",
+      "type": "single",
+      "required": false,
+      "label": "Drenaje",
+      "options": [
+        "Sí",
+        "Sin drenaje"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_gi_detalle",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_gi": [
+        "Sí"
+      ],
+      "label": "Drenaje — tipo / cantidad / ubicación",
+      "empty_text": ""
+    }
+  ],
+  "id": "cg-gastrointestinal-v1",
+  "especialidad": "Cirugía General",
+  "operaciones": [
+    "Colectomía / resección colorrectal",
+    "Gastrectomía / procedimiento gástrico",
+    "Resección de intestino delgado / enterectomía",
+    "Laparotomía / laparoscopía exploradora",
+    "Ostomía (confección / cierre)",
+    "Apendicectomía"
+  ],
+  "titulo": "Cirugía gastrointestinal (tubo digestivo)",
+  "plantilla_texto": "Gastrointestinal — {{procedimiento_grupo}}. Abordaje: {{abordaje}}{{conversion_causa}}.\nColorrecto: {{proc_colorrecto}}{{hemiderecha_extendida}}; indicación {{indicacion_colorrecto}}; linfadenectomía {{linfadenectomia_colorrecto}} {{vasos_ligadura_central}}; cólica izq. {{conservacion_colica_izq}}; mesorrecto {{escision_mesorrectal}}.\nUréteres: der. {{ureter_derecho}}; izq. {{ureter_izquierdo}}{{ureter_lesion_detalle}}.\nCampo {{campo_colorrecto}}; restitución {{decision_restitucion}}{{decision_restitucion_otra}}.\nAnastomosis {{tipo_anastomosis_cr}} {{config_anastomosis_cr}} {{tecnica_anastomosis_cr}} circ.{{engrapadora_circular_mm}} lin.{{engrapadora_lineal_mm}} {{sutura_manual_cr}} {{planos_manual_cr}}; hermeticidad {{hermeticidad_cr}}; ostomía protección {{ostomia_proteccion}}.\nGástrico: {{tipo_reseccion_gastrica}}{{sleeve_xref_nota}}; linfadenectomía {{linfadenectomia_gastrica}}; márgenes prox. {{margen_proximal}} {{margen_proximal_distancia}} / dist. {{margen_distal}} {{margen_distal_distancia}}; reconstrucción {{reconstruccion_gastrica}} {{tecnica_anastomosis_gastrica}} refuerzo {{refuerzo_linea_sutura}}; hermeticidad {{hermeticidad_gastrica}}; campo {{campo_gastrico_urgencia}}.\nDelgado: {{indicacion_delgado}}; resecado {{longitud_resecada_cm}} cm / remanente {{intestino_remanente_cm}} cm; {{ubicacion_reseccion_delgado}}; {{reconstruccion_delgado}} {{config_anastomosis_delgado}} {{tecnica_anastomosis_delgado}}; hermeticidad {{hermeticidad_delgado}}; campo {{campo_delgado}}.\nExploradora: {{objetivo_exploradora}}; líquido {{liquido_libre}} {{liquido_hematico_cc}}; PCI {{pci}}; órganos {{compromiso_organos}}; biopsias peri. {{biopsia_peritoneal}} {{biopsia_peritoneal_sitios}} hep/gang. {{biopsia_hepatica_ganglionar}}; citología {{lavado_citologia}}; gesto {{gesto_exploradora}}; campo {{campo_exploradora}}.\nOstomía: {{ostomia_acto}} {{ostomia_tipo}} {{ostomia_config}}; trayecto {{trayecto_muscular}}; fijación {{fijacion_estoma}}; cierre {{cierre_ostomia_tipo}} cabo distal {{control_cabo_distal}}; hermeticidad {{hermeticidad_cierre_ostomia}}.\nApendicectomía: vía {{apendicectomia_via}}{{apendicectomia_conversion_causa}}; hallazgo {{apendicectomia_hallazgo}}; muñón {{apendicectomia_munon}}{{apendicectomia_munon_otro}}; campo {{campo_apendicectomia}}.\nDrenaje: {{drenaje_gi}} {{drenaje_gi_detalle}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cg-pancreato-biliar-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Pancreatectomía / resección pancreática",
+        "Vía biliar / derivaciones / reconstrucción",
+        "Colecistectomía / procedimientos vesiculares"
+      ]
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": true,
+      "label": "Abordaje",
+      "options": [
+        "Abierto / laparotómico",
+        "Laparoscópico",
+        "Robótico",
+        "Convertido a abierto"
+      ]
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_reseccion_pancreas",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Pancreatectomía / resección pancreática"
+      ],
+      "label": "Tipo de resección",
+      "options": [
+        "Duodenopancreatectomía cefálica (DPC / Whipple)",
+        "DPC con preservación pilórica (Traverso-Longmire)",
+        "Pancreatectomía corporocaudal (distal)",
+        "Pancreatectomía central / resección segmentaria",
+        "Pancreatectomía total",
+        "Enucleación de neoplasia / tumor neuroendocrino"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "piloro_final",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_reseccion_pancreas": [
+        "DPC con preservación pilórica (Traverso-Longmire)"
+      ],
+      "label": "Estado final del píloro",
+      "options": [
+        "Píloro preservado",
+        "Conversión a antrectomía durante el acto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "esplenectomia_asociada",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_reseccion_pancreas": [
+        "Pancreatectomía corporocaudal (distal)"
+      ],
+      "label": "Esplenectomía asociada",
+      "options": [
+        "Sí (distal con esplenectomía)",
+        "No — técnica de Warshaw",
+        "No — preservación de vasos esplénicos"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "linfadenectomia_pancreas",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Pancreatectomía / resección pancreática"
+      ],
+      "label": "Linfadenectomía",
+      "options": [
+        "Estándar",
+        "Extendida",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "reseccion_vascular_electiva",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Pancreatectomía / resección pancreática"
+      ],
+      "label": "Compromiso / resección vascular (electiva oncológica)",
+      "options": [
+        "Venosa (VMS / porta)",
+        "Arterial (hepática / tronco celíaco)"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "reconstruccion_vascular",
+      "type": "single",
+      "required": false,
+      "label": "Reconstrucción vascular",
+      "options": [
+        "Anastomosis primaria",
+        "Injerto autólogo / sintético"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "evento_vascular_no_planificado",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Pancreatectomía / resección pancreática"
+      ],
+      "label": "Evento vascular no planificado",
+      "options": [
+        "Sin eventos",
+        "Lesión vascular no planificada — controlada",
+        "Lesión vascular no planificada — requirió reconstrucción de urgencia"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "pancreas_textura",
+      "type": "single",
+      "required": false,
+      "label": "Textura del páncreas remanente",
+      "options": [
+        "Blando",
+        "Fibroso-duro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "wirsung_mm",
+      "type": "free",
+      "required": false,
+      "label": "Diámetro Wirsung (mm)",
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_pancreatica_tipo",
+      "type": "single",
+      "required": false,
+      "label": "Anastomosis pancreática — tipo",
+      "options": [
+        "Pancreatoyeyunoanastomosis",
+        "Pancreatogastroanastomosis"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_pancreatica_tecnica",
+      "type": "multi",
+      "required": false,
+      "label": "Anastomosis pancreática — técnica",
+      "options": [
+        "Invaginante",
+        "Ducto-mucosa (duct-to-mucosa)",
+        "Sutura con tutor intraductal / stent"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_biliar_dpc",
+      "type": "single",
+      "required": false,
+      "label": "Anastomosis biliar (DPC)",
+      "options": [
+        "Hepaticoyeyunoanastomosis (término-lateral en Y de Roux)",
+        "Coledocoyeyunoanastomosis"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hermeticidad_biliar_dpc",
+      "type": "single",
+      "required": false,
+      "label": "Prueba de hermeticidad (anastomosis biliar)",
+      "options": [
+        "Fuga demostrada",
+        "Sin fuga demostrada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_digestiva_dpc",
+      "type": "single",
+      "required": false,
+      "label": "Anastomosis digestiva (DPC)",
+      "options": [
+        "Gastroyeyunoanastomosis",
+        "Duodenoyeyunoanastomosis"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_digestiva_ruta",
+      "type": "single",
+      "required": false,
+      "label": "Ruta de la anastomosis digestiva",
+      "options": [
+        "Antecólica",
+        "Retrócolica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hermeticidad_digestiva_dpc",
+      "type": "single",
+      "required": false,
+      "label": "Prueba de hermeticidad (anastomosis digestiva)",
+      "options": [
+        "Fuga demostrada",
+        "Sin fuga demostrada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_via_biliar",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Vía biliar / derivaciones / reconstrucción"
+      ],
+      "label": "Procedimiento de vía biliar",
+      "options": [
+        "Exploración / coledocotomía + extracción de litiasis",
+        "Exploración transcística de vía biliar",
+        "Derivación biliodigestiva",
+        "Reconstrucción por lesión iatrogénica de vía biliar"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_derivacion_biliodigestiva",
+      "type": "single",
+      "required": false,
+      "required_if_proc_via_biliar": [
+        "Derivación biliodigestiva"
+      ],
+      "label": "Tipo de derivación biliodigestiva",
+      "options": [
+        "Coledocoduodenoanastomosis",
+        "Hepaticoyeyunoanastomosis en Y de Roux"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hermeticidad_derivacion",
+      "type": "single",
+      "required": false,
+      "required_if_proc_via_biliar": [
+        "Derivación biliodigestiva"
+      ],
+      "label": "Prueba de hermeticidad (derivación)",
+      "options": [
+        "Fuga demostrada",
+        "Sin fuga demostrada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_lesion_vbp",
+      "type": "single",
+      "required": false,
+      "required_if_proc_via_biliar": [
+        "Reconstrucción por lesión iatrogénica de vía biliar"
+      ],
+      "label": "Clasificación Strasberg (lesión)",
+      "options": [
+        "Tipo A",
+        "Tipo B",
+        "Tipo C",
+        "Tipo D",
+        "Tipo E1",
+        "Tipo E2",
+        "Tipo E3",
+        "Tipo E4",
+        "Tipo E5"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "vbp_integridad_via",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Vía biliar / derivaciones / reconstrucción"
+      ],
+      "label": "Integridad de vía biliar principal",
+      "options": [
+        "Identificada y preservada",
+        "Lesión identificada intraoperatoriamente",
+        "No disecada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "instrumentacion_biliar",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Vía biliar / derivaciones / reconstrucción"
+      ],
+      "label": "Instrumentación",
+      "options": [
+        "Coledocoscopía directa / fibroendoscopía",
+        "Colangiografía intraoperatoria (CIO)",
+        "Extracción con cesta de Dormia / catéter Fogarty"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "cio_hallazgos",
+      "type": "multi",
+      "required": false,
+      "required_if_instrumentacion_biliar": [
+        "Colangiografía intraoperatoria (CIO)"
+      ],
+      "label": "Hallazgos CIO",
+      "options": [
+        "Vía biliar expedita",
+        "Litiasis de VBP",
+        "Fuga / variaciones anatómicas"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_biliar_colocado",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Vía biliar / derivaciones / reconstrucción"
+      ],
+      "label": "Drenaje biliar colocado",
+      "options": [
+        "Tubo de Kehr (T-tube / tubo en T)",
+        "Stent / tutor biliar transanastomótico",
+        "Drenaje transcístico"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "hallazgos_vesicula",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Colecistectomía / procedimientos vesiculares"
+      ],
+      "label": "Hallazgos intraoperatorios",
+      "options": [
+        "Colecistitis aguda",
+        "Colecistitis aguda enfisematosa",
+        "Colecistitis aguda gangrenosa",
+        "Piocolecisto",
+        "Colecistitis crónica litiásica / escleroatrófica",
+        "Plastrón",
+        "Síndrome de Mirizzi"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "mirizzi_grado",
+      "type": "single",
+      "required": false,
+      "required_if_hallazgos_vesicula": [
+        "Síndrome de Mirizzi"
+      ],
+      "label": "Mirizzi — grado",
+      "options": [
+        "I",
+        "II",
+        "III",
+        "IV"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "cvs_strasberg",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Colecistectomía / procedimientos vesiculares"
+      ],
+      "label": "Visión de seguridad de Strasberg (CVS)",
+      "options": [
+        "Lograda",
+        "No lograda"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "vbp_integridad_cole",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Colecistectomía / procedimientos vesiculares"
+      ],
+      "label": "Integridad de vía biliar principal",
+      "options": [
+        "Identificada y preservada",
+        "Lesión identificada intraoperatoriamente",
+        "No disecada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "vbp_lesion_detalle",
+      "type": "free",
+      "required": false,
+      "label": "Detalle de lesión VBP / Strasberg-Bismuth (si aplica)",
+      "empty_text": ""
+    },
+    {
+      "id": "handoff_reconstruccion_vbp",
+      "type": "single",
+      "required": false,
+      "required_if_vbp_integridad_cole": [
+        "Lesión identificada intraoperatoriamente"
+      ],
+      "label": "Handoff",
+      "options": [
+        "Sí — completar en foco «Vía biliar / derivaciones / reconstrucción» (misma foja)",
+        "No — diferida / otro equipo"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_colecistectomia",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Colecistectomía / procedimientos vesiculares"
+      ],
+      "label": "Técnica / resección",
+      "options": [
+        "Colecistectomía total retrógrada",
+        "Colecistectomía total anterógrada",
+        "Colecistectomía subtotal / de rescate — fenestrada",
+        "Colecistectomía subtotal / de rescate — reconstitutiva"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "cio_cole",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Colecistectomía / procedimientos vesiculares"
+      ],
+      "label": "Colangiografía intraoperatoria (CIO)",
+      "options": [
+        "No realizada",
+        "Realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "cio_cole_hallazgos",
+      "type": "multi",
+      "required": false,
+      "required_if_cio_cole": [
+        "Realizada"
+      ],
+      "label": "Hallazgos CIO (colecistectomía)",
+      "options": [
+        "Vía biliar expedita",
+        "Litiasis de VBP",
+        "Fuga / variaciones anatómicas"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "clipado_cistico",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Colecistectomía / procedimientos vesiculares"
+      ],
+      "label": "Ligadura / clipado (cístico / arteria cística)",
+      "options": [
+        "Clips titanio",
+        "Clips polímero (Hem-o-lok)",
+        "Sutura monofilamento / ligadura manual"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "campo_cole",
+      "type": "single",
+      "required": false,
+      "label": "Clasificación del campo",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_celda_hepatica",
+      "type": "single",
+      "required": false,
+      "label": "Drenaje en celda hepática / lecho vesicular",
+      "options": [
+        "Sí",
+        "Sin drenaje"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_celda_detalle",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_celda_hepatica": [
+        "Sí"
+      ],
+      "label": "Celda hepática — cantidad / tipo",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_pancreatoyeyuno",
+      "type": "single",
+      "required": false,
+      "label": "Drenaje en pancreatoyeyuno / hepaticoyeyuno",
+      "options": [
+        "Sí",
+        "Sin drenaje"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_pancreatoyeyuno_detalle",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_pancreatoyeyuno": [
+        "Sí"
+      ],
+      "label": "Pancreatoyeyuno / hepaticoyeyuno — cantidad / tipo",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_trascavidad",
+      "type": "single",
+      "required": false,
+      "label": "Drenaje en trascavidad de los epiplones / trasfondo",
+      "options": [
+        "Sí",
+        "Sin drenaje"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_trascavidad_detalle",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_trascavidad": [
+        "Sí"
+      ],
+      "label": "Trascavidad — cantidad / tipo",
+      "empty_text": ""
+    },
+    {
+      "id": "amilasa_drenaje",
+      "type": "single",
+      "required": false,
+      "label": "Medición de amilasa en drenaje (POD)",
+      "options": [
+        "Programado",
+        "No",
+        "No aplica"
+      ],
+      "empty_text": ""
+    }
+  ],
+  "id": "cg-pancreato-biliar-v1",
+  "especialidad": "Cirugía General",
+  "operaciones": [
+    "Duodenopancreatectomía / Whipple",
+    "Pancreatectomía distal / central / total / enucleación",
+    "Exploración / derivación de vía biliar",
+    "Reconstrucción de lesión de vía biliar",
+    "Colecistectomía"
+  ],
+  "titulo": "Cirugía pancreática y biliar",
+  "plantilla_texto": "Pancreato-biliar — {{procedimiento_grupo}}. Abordaje: {{abordaje}}{{conversion_causa}}.\nPáncreas: {{tipo_reseccion_pancreas}}; píloro {{piloro_final}}; bazo {{esplenectomia_asociada}}; linfadenectomía {{linfadenectomia_pancreas}}.\nVascular electivo {{reseccion_vascular_electiva}} {{reconstruccion_vascular}}; no planificado {{evento_vascular_no_planificado}}.\nRemanente: textura {{pancreas_textura}}; Wirsung {{wirsung_mm}} mm.\nAnastomosis: pancreática {{anastomosis_pancreatica_tipo}} {{anastomosis_pancreatica_tecnica}}; biliar {{anastomosis_biliar_dpc}} herm. {{hermeticidad_biliar_dpc}}; digestiva {{anastomosis_digestiva_dpc}} {{anastomosis_digestiva_ruta}} herm. {{hermeticidad_digestiva_dpc}}.\nVía biliar: {{proc_via_biliar}} {{tipo_derivacion_biliodigestiva}}; lesión {{clasificacion_lesion_vbp}}; integridad {{vbp_integridad_via}}; instr. {{instrumentacion_biliar}} CIO {{cio_hallazgos}}; drenaje biliar {{drenaje_biliar_colocado}}; herm. derivación {{hermeticidad_derivacion}}.\nColecistectomía: hallazgos {{hallazgos_vesicula}} Mirizzi {{mirizzi_grado}}; CVS {{cvs_strasberg}}; VBP {{vbp_integridad_cole}}{{vbp_lesion_detalle}}; handoff {{handoff_reconstruccion_vbp}}; técnica {{tecnica_colecistectomia}}; CIO {{cio_cole}} {{cio_cole_hallazgos}}; clipado {{clipado_cistico}}; campo {{campo_cole}}.\nDrenajes: celda {{drenaje_celda_hepatica}} {{drenaje_celda_detalle}}; PY/HY {{drenaje_pancreatoyeyuno}} {{drenaje_pancreatoyeyuno_detalle}}; trascavidad {{drenaje_trascavidad}} {{drenaje_trascavidad_detalle}}; amilasa {{amilasa_drenaje}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cg-pared-abdominal-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Hernioplastia inguinal / femoral",
+        "Eventroplastia / hernia ventral",
+        "Diástasis de rectos / línea alba",
+        "Hernias complejas / reconstrucción",
+        "Urgencia de pared / eventración estrangulada"
+      ]
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": true,
+      "label": "Abordaje",
+      "options": [
+        "Abierto",
+        "Laparoscópico / endoscópico",
+        "Robótico",
+        "Convertido a abierto"
+      ]
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "lateralidad",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernioplastia inguinal / femoral"
+      ],
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_hernia_inguinal",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernioplastia inguinal / femoral"
+      ],
+      "label": "Tipo de hernia",
+      "options": [
+        "Inguinal directa",
+        "Inguinal indirecta",
+        "Mixta (pantalón)",
+        "Femoral / crural",
+        "Encarcelada / estrangulada"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_lap_inguinal",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernioplastia inguinal / femoral"
+      ],
+      "required_if_abordaje": [
+        "Laparoscópico / endoscópico",
+        "Robótico"
+      ],
+      "label": "Técnica laparoscópica / endoscópica",
+      "options": [
+        "TAPP",
+        "TEP",
+        "eTEP"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "enfoque_reparacion",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernioplastia inguinal / femoral"
+      ],
+      "label": "Enfoque de reparación",
+      "options": [
+        "Con malla",
+        "Tisular (sin malla)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_con_malla",
+      "type": "single",
+      "required": false,
+      "required_if_enfoque_reparacion": [
+        "Con malla"
+      ],
+      "required_if_abordaje": [
+        "Abierto",
+        "Convertido a abierto"
+      ],
+      "label": "Técnica con malla (abierta)",
+      "options": [
+        "Lichtenstein",
+        "Plug & Patch",
+        "Gilbert",
+        "Otra"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_con_malla_otra",
+      "type": "free",
+      "required": false,
+      "required_if_tecnica_con_malla": [
+        "Otra"
+      ],
+      "label": "Técnica con malla (otra)",
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_tisular",
+      "type": "single",
+      "required": false,
+      "required_if_enfoque_reparacion": [
+        "Tisular (sin malla)"
+      ],
+      "label": "Técnica tisular",
+      "options": [
+        "Bassini",
+        "Shouldice",
+        "McVay"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tratamiento_saco",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernioplastia inguinal / femoral"
+      ],
+      "label": "Tratamiento del saco",
+      "options": [
+        "Reintroducción indemne",
+        "Resección y ligadura proximal",
+        "Apertura y exploración del contenido"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "contenido_saco",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernioplastia inguinal / femoral"
+      ],
+      "label": "Contenido del saco",
+      "options": [
+        "Asa delgada",
+        "Epíplon",
+        "Colon",
+        "Sin contenido vital comprometido",
+        "Sufrimiento vascular"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "sufrimiento_detalle",
+      "type": "free",
+      "required": false,
+      "required_if_contenido_saco": [
+        "Sufrimiento vascular"
+      ],
+      "label": "Sufrimiento vascular (detalle)",
+      "empty_text": ""
+    },
+    {
+      "id": "malla_tipo_inguinal",
+      "type": "single",
+      "required": false,
+      "required_if_enfoque_reparacion": [
+        "Con malla"
+      ],
+      "label": "Tipo de malla",
+      "options": [
+        "Polipropileno alta densidad",
+        "Polipropileno baja densidad / liviana",
+        "3D / preformada",
+        "Biológica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "malla_medidas_inguinal",
+      "type": "free",
+      "required": false,
+      "required_if_enfoque_reparacion": [
+        "Con malla"
+      ],
+      "label": "Medidas de la malla (cm × cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "fijacion_metodo",
+      "type": "multi",
+      "required": false,
+      "required_if_enfoque_reparacion": [
+        "Con malla"
+      ],
+      "label": "Método de fijación",
+      "options": [
+        "Sutura monofilamento",
+        "Tacas / tackers",
+        "Sellante de fibrina / pegamento",
+        "Sin fijación adicional"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "fijacion_sutura_material",
+      "type": "single",
+      "required": false,
+      "required_if_fijacion_metodo": [
+        "Sutura monofilamento"
+      ],
+      "label": "Sutura (material)",
+      "options": [
+        "Absorbible",
+        "No absorbible"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "fijacion_tacas_material",
+      "type": "single",
+      "required": false,
+      "required_if_fijacion_metodo": [
+        "Tacas / tackers"
+      ],
+      "label": "Tacas / tackers (material)",
+      "options": [
+        "Absorbibles",
+        "Metálicos"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_ilioinguinal",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernioplastia inguinal / femoral"
+      ],
+      "label": "Nervio ilioinguinal",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_iliohipogastrico",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernioplastia inguinal / femoral"
+      ],
+      "label": "Nervio iliohipogástrico",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_genitofemoral",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernioplastia inguinal / femoral"
+      ],
+      "label": "Nervio genitofemoral",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "deferente_o_ligamento",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernioplastia inguinal / femoral"
+      ],
+      "label": "Conducto deferente / ligamento redondo",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "vasos_testiculares_cordon",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernioplastia inguinal / femoral"
+      ],
+      "label": "Vasos testiculares / cordón espermático",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "estructura_lesion_detalle",
+      "type": "free",
+      "required": false,
+      "label": "Detalle de lesión de estructura crítica (si aplica)",
+      "empty_text": ""
+    },
+    {
+      "id": "topografia_ventral",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Eventroplastia / hernia ventral"
+      ],
+      "label": "Topografía",
+      "options": [
+        "Umbilical",
+        "Epigástrica",
+        "Incisional / eventración — línea media",
+        "Incisional / eventración — subcostal",
+        "Incisional / eventración — laparotomía anterior",
+        "Lumbar / otras"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "defecto_ancho_cm",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Eventroplastia / hernia ventral"
+      ],
+      "label": "Defecto — ancho (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "defecto_largo_cm",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Eventroplastia / hernia ventral"
+      ],
+      "label": "Defecto — largo (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_ventral_especifica",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Eventroplastia / hernia ventral"
+      ],
+      "required_if_abordaje": [
+        "Laparoscópico / endoscópico",
+        "Robótico"
+      ],
+      "label": "Técnica mínimamente invasiva (ventral)",
+      "options": [
+        "IPOM",
+        "IPOM-Plus",
+        "eTEP",
+        "MILOS",
+        "Otra"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "separacion_componentes",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Eventroplastia / hernia ventral",
+        "Hernias complejas / reconstrucción"
+      ],
+      "label": "Separación de componentes",
+      "options": [
+        "No requerida",
+        "Anterior (Ramirez)",
+        "Posterior (TAR)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "plano_malla",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Eventroplastia / hernia ventral"
+      ],
+      "label": "Plano de colocación de la malla",
+      "options": [
+        "Onlay (supraaponeurótica)",
+        "Inlay (bridging)",
+        "Sublay / retromuscular (Rives-Stoppa)",
+        "Preperitoneal",
+        "Intraabdominal / IPOM",
+        "No se colocó malla"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "malla_tipo_ventral",
+      "type": "single",
+      "required": false,
+      "label": "Tipo de malla (ventral)",
+      "options": [
+        "Polipropileno",
+        "Dual / barrera antiadherente",
+        "Biológica / sintética absorbible"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "malla_medidas_ventral",
+      "type": "free",
+      "required": false,
+      "label": "Medidas de la malla (cm × cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "malla_overlap_cm",
+      "type": "free",
+      "required": false,
+      "label": "Overlap / traslape mínimo (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "fijacion_ventral",
+      "type": "multi",
+      "required": false,
+      "label": "Fijación (ventral)",
+      "options": [
+        "Puntos transfasciales",
+        "Tacas absorbibles",
+        "Tacas helicoidales / metálicas",
+        "Sutura continua monofilamento"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "reduccion_adhesiolisis",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Eventroplastia / hernia ventral"
+      ],
+      "label": "Reducción del contenido y adhesiólisis",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "reseccion_saco_dermolipectomia",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Eventroplastia / hernia ventral"
+      ],
+      "label": "Resección de saco / dermolipectomía de complemento",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "diastasis_asociada",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Eventroplastia / hernia ventral"
+      ],
+      "label": "Diástasis de rectos asociada",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "diastasis_estado",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Diástasis de rectos / línea alba"
+      ],
+      "label": "Diástasis",
+      "options": [
+        "Presente",
+        "Ausente"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "diastasis_cm",
+      "type": "free",
+      "required": false,
+      "required_if_diastasis_estado": [
+        "Presente"
+      ],
+      "label": "Distancia interrectos (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "diastasis_abordaje",
+      "type": "single",
+      "required": false,
+      "required_if_diastasis_estado": [
+        "Presente"
+      ],
+      "label": "Abordaje de la diástasis",
+      "options": [
+        "Abierto",
+        "REPA endoscópico",
+        "SCOPA",
+        "eTEP"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "diastasis_plicatura",
+      "type": "single",
+      "required": false,
+      "required_if_diastasis_estado": [
+        "Presente"
+      ],
+      "label": "Técnica de plicatura",
+      "options": [
+        "Plicatura de aponeurosis anterior",
+        "Plicatura de aponeurosis posterior",
+        "Plicatura anterior y posterior"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "diastasis_malla_refuerzo",
+      "type": "single",
+      "required": false,
+      "required_if_diastasis_estado": [
+        "Presente"
+      ],
+      "label": "Malla de refuerzo asociada",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "diastasis_malla_plano",
+      "type": "single",
+      "required": false,
+      "required_if_diastasis_malla_refuerzo": [
+        "Sí"
+      ],
+      "label": "Plano de malla (refuerzo diástasis)",
+      "options": [
+        "Onlay",
+        "Sublay / retromuscular"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "campo_complejas",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernias complejas / reconstrucción"
+      ],
+      "label": "Clasificación del campo",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_reconstruccion",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hernias complejas / reconstrucción"
+      ],
+      "label": "Técnica de reconstrucción",
+      "options": [
+        "Cierre progresivo / neoperitoneo neumático (Goni Moreno)",
+        "Toxina botulínica A preoperatoria",
+        "Colgajos musculoaponeuróticos"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "botox_preop",
+      "type": "single",
+      "required": false,
+      "required_if_tecnica_reconstruccion": [
+        "Toxina botulínica A preoperatoria"
+      ],
+      "label": "Toxina botulínica A preoperatoria",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje",
+      "type": "single",
+      "required": false,
+      "label": "Drenaje",
+      "options": [
+        "Sí",
+        "Sin drenaje"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_drenaje": [
+        "Sí"
+      ],
+      "label": "Tipo de drenaje",
+      "options": [
+        "Aspirativo / Jackson-Pratt",
+        "Redon",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_cantidad",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje": [
+        "Sí"
+      ],
+      "label": "Cantidad de drenajes",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_ubicacion",
+      "type": "multi",
+      "required": false,
+      "required_if_drenaje": [
+        "Sí"
+      ],
+      "label": "Ubicación del drenaje",
+      "options": [
+        "Subcutáneo",
+        "Retromuscular",
+        "Cavidad"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "campo_urgencia",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Urgencia de pared / eventración estrangulada"
+      ],
+      "label": "Clasificación del campo (urgencia)",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "contenido_urgencia",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Urgencia de pared / eventración estrangulada"
+      ],
+      "label": "Hallazgo del contenido",
+      "options": [
+        "Viable tras restitución / reducción",
+        "Necrosis intestinal / omental"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "procedimiento_asociado_urgencia",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Urgencia de pared / eventración estrangulada"
+      ],
+      "label": "Procedimiento asociado",
+      "options": [
+        "Resección intestinal (± anastomosis) — completar en M2 Gastrointestinal (cg-gastrointestinal-v1)",
+        "Omentectomía parcial",
+        "Ninguno adicional"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "handoff_gi",
+      "type": "single",
+      "required": false,
+      "label": "Handoff",
+      "options": [
+        "Sí — completar en M2 Gastrointestinal (cg-gastrointestinal-v1)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "malla_contaminado",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Urgencia de pared / eventración estrangulada"
+      ],
+      "label": "Malla en contexto contaminado",
+      "options": [
+        "Biológica",
+        "Sintética absorbible",
+        "Sintética no absorbible",
+        "No se colocó malla (cierre tisular primario)",
+        "No se colocó malla (abdomen abierto)"
+      ],
+      "empty_text": ""
+    }
+  ],
+  "id": "cg-pared-abdominal-v1",
+  "especialidad": "Cirugía General",
+  "operaciones": [
+    "Hernioplastia inguinal",
+    "Hernioplastia femoral / crural",
+    "Eventroplastia / hernioplastia ventral",
+    "Reparación de diástasis de rectos",
+    "Reconstrucción de pared abdominal / hernias complejas",
+    "Eventración estrangulada / urgencia de pared"
+  ],
+  "titulo": "Cirugía de pared abdominal",
+  "plantilla_texto": "Pared abdominal — {{procedimiento_grupo}}. Abordaje: {{abordaje}}{{conversion_causa}}.\n{{lateralidad}} {{tipo_hernia_inguinal}}. {{enfoque_reparacion}} {{tecnica_con_malla}}{{tecnica_tisular}} {{tecnica_lap_inguinal}}.\nSaco: {{tratamiento_saco}}; contenido: {{contenido_saco}}{{sufrimiento_detalle}}.\nEstructuras: ilioinguinal {{nervio_ilioinguinal}}; iliohipogástrico {{nervio_iliohipogastrico}}; genitofemoral {{nervio_genitofemoral}}; deferente/lig. redondo {{deferente_o_ligamento}}; vasos testiculares/cordón {{vasos_testiculares_cordon}}{{estructura_lesion_detalle}}.\nMalla inguinal: {{malla_tipo_inguinal}} {{malla_medidas_inguinal}}; fijación {{fijacion_metodo}} {{fijacion_sutura_material}} {{fijacion_tacas_material}}.\nVentral: {{topografia_ventral}}; defecto {{defecto_ancho_cm}} × {{defecto_largo_cm}} cm; {{tecnica_ventral_especifica}}; componentes {{separacion_componentes}}; plano {{plano_malla}}; malla {{malla_tipo_ventral}} {{malla_medidas_ventral}} overlap {{malla_overlap_cm}}; fijación {{fijacion_ventral}}.\nReducción/adhesiólisis {{reduccion_adhesiolisis}}; saco/dermolipectomía {{reseccion_saco_dermolipectomia}}.\nDiástasis: {{diastasis_estado}} {{diastasis_cm}} cm; abordaje {{diastasis_abordaje}}; plicatura {{diastasis_plicatura}}; refuerzo malla {{diastasis_malla_refuerzo}} {{diastasis_malla_plano}}.\nComplejas: campo {{campo_complejas}}; {{tecnica_reconstruccion}} {{botox_preop}}.\nUrgencia: campo {{campo_urgencia}}; contenido {{contenido_urgencia}}; {{procedimiento_asociado_urgencia}}; handoff {{handoff_gi}}; malla {{malla_contaminado}}.\nDrenaje: {{drenaje}} {{drenaje_tipo}} n={{drenaje_cantidad}} {{drenaje_ubicacion}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cg-proctologia-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Patología hemorroidal",
+        "Absceso / fístula perianal",
+        "Fisura anal",
+        "Quiste sacrococcígeo / pilonidal",
+        "Otras lesiones / neoplasia / esfinteroplastia"
+      ]
+    },
+    {
+      "id": "grado_hemorroides",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Patología hemorroidal"
+      ],
+      "label": "Clasificación / grado",
+      "options": [
+        "Grado I",
+        "Grado II",
+        "Grado III",
+        "Grado IV",
+        "Trombosis hemorroidal aguda"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "paquetes_hemorroides",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Patología hemorroidal"
+      ],
+      "label": "Topografía / paquetes afectados",
+      "options": [
+        "3 (izquierdo)",
+        "7 (anteroderecho)",
+        "11 (posteroderecho)",
+        "Circunferencial"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "enfoque_hemorroides",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Patología hemorroidal"
+      ],
+      "label": "Enfoque de reparación",
+      "options": [
+        "Resectiva (abierta / cerrada)",
+        "No resectiva / instrumental"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_hemorroides_resectiva",
+      "type": "single",
+      "required": false,
+      "required_if_enfoque_hemorroides": [
+        "Resectiva (abierta / cerrada)"
+      ],
+      "label": "Técnica resectiva",
+      "options": [
+        "Hemorroidectomía abierta (Milligan-Morgan)",
+        "Hemorroidectomía cerrada (Ferguson)",
+        "Hemorroidectomía semi-cerrada (Parks)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_hemorroides_no_resectiva",
+      "type": "single",
+      "required": false,
+      "required_if_enfoque_hemorroides": [
+        "No resectiva / instrumental"
+      ],
+      "label": "Técnica no resectiva / instrumental",
+      "options": [
+        "Hemorroidopexia mecánica (PPH / Longo)",
+        "Desarterialización hemorroidal transanal (THD / RAR)",
+        "Ligadura con banda elástica (LBL)",
+        "Fotocoagulación láser / escleroterapia"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "instrumento_corte_hemorroides",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Patología hemorroidal"
+      ],
+      "label": "Instrumento de corte / sellado",
+      "options": [
+        "Bisturí frío",
+        "Electrocauterio",
+        "Bisturí armónico / ultrasónico",
+        "Ligasure / radiofrecuencia",
+        "Láser",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "foco_absceso_fistula",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Absceso / fístula perianal"
+      ],
+      "label": "Fase / foco",
+      "options": [
+        "Absceso perianal (fase aguda)",
+        "Fístula anal (fase crónica)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "topografia_absceso",
+      "type": "single",
+      "required": false,
+      "required_if_foco_absceso_fistula": [
+        "Absceso perianal (fase aguda)"
+      ],
+      "label": "Topografía del absceso",
+      "options": [
+        "Perianal superficial",
+        "Isquiorrectal",
+        "Interesfinteriano",
+        "Supraelevador"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "gesto_absceso",
+      "type": "multi",
+      "required": false,
+      "required_if_foco_absceso_fistula": [
+        "Absceso perianal (fase aguda)"
+      ],
+      "label": "Gesto sobre el absceso",
+      "options": [
+        "Incisión, drenaje, lavado y debridamiento",
+        "Embalaje / mecha",
+        "Drenaje en asa (loop)"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "campo_absceso",
+      "type": "single",
+      "required": false,
+      "required_if_foco_absceso_fistula": [
+        "Absceso perianal (fase aguda)"
+      ],
+      "label": "Clasificación del campo",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "parks_fistula",
+      "type": "single",
+      "required": false,
+      "required_if_foco_absceso_fistula": [
+        "Fístula anal (fase crónica)"
+      ],
+      "label": "Clasificación de Parks",
+      "options": [
+        "Interesfinteriana",
+        "Transesfinteriana baja",
+        "Transesfinteriana alta",
+        "Supraesfinteriana",
+        "Extraesfinteriana"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_fistula",
+      "type": "single",
+      "required": false,
+      "required_if_foco_absceso_fistula": [
+        "Fístula anal (fase crónica)"
+      ],
+      "label": "Técnica quirúrgica (fístula)",
+      "options": [
+        "Fistulotomía (puesta a plano)",
+        "Fistulectomía",
+        "Setón cortante (terapéutico)",
+        "Setón laxo / de drenaje",
+        "LIFT",
+        "Avance de colgajo endorrectal (flap)",
+        "VAAFT",
+        "Tapón / plug de colágeno",
+        "Sellado con láser (FiLaC)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "continencia_pre",
+      "type": "single",
+      "required": false,
+      "label": "Continencia previa (antes del gesto sobre el esfínter)",
+      "options": [
+        "Continente",
+        "Incontinencia ocasional / leve",
+        "Incontinencia significativa",
+        "No evaluada / no consignada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "factores_riesgo_continencia",
+      "type": "multi",
+      "required": false,
+      "label": "Factores de riesgo de continencia",
+      "options": [
+        "Partos / traumatismo obstétrico",
+        "Cirugía anal previa",
+        "Enfermedad neurológica / otra"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "campo_fistula",
+      "type": "single",
+      "required": false,
+      "required_if_foco_absceso_fistula": [
+        "Fístula anal (fase crónica)"
+      ],
+      "label": "Clasificación del campo (si sepsis local / contaminación)",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ubicacion_fisura",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Fisura anal"
+      ],
+      "label": "Ubicación de la fisura",
+      "options": [
+        "Línea media posterior",
+        "Línea media anterior",
+        "Atípica / lateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_fisura",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Fisura anal"
+      ],
+      "label": "Tipo de fisura",
+      "options": [
+        "Aguda",
+        "Crónica (tríada de Brodie)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "procedimiento_fisura",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Fisura anal"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Esfinterotomía lateral interna (ELI) abierta",
+        "Esfinterotomía lateral interna (ELI) percutánea / cerrada",
+        "Fisurectomía simple",
+        "Fisurectomía + anoplastia (colgajo de avance)",
+        "Inyección de toxina botulínica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "continencia_pre_eli",
+      "type": "single",
+      "required": false,
+      "label": "Continencia previa (antes de ELI)",
+      "options": [
+        "Continente",
+        "Incontinencia ocasional / leve",
+        "Incontinencia significativa",
+        "No evaluada / no consignada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "factores_riesgo_continencia_eli",
+      "type": "multi",
+      "required": false,
+      "label": "Factores de riesgo de continencia (ELI)",
+      "options": [
+        "Partos / traumatismo obstétrico",
+        "Cirugía anal previa",
+        "Enfermedad neurológica / otra"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "botox_ui",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_fisura": [
+        "Inyección de toxina botulínica"
+      ],
+      "label": "Toxina botulínica — dosis (UI)",
+      "empty_text": ""
+    },
+    {
+      "id": "fase_pilonidal",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Quiste sacrococcígeo / pilonidal"
+      ],
+      "label": "Fase",
+      "options": [
+        "Absceso agudo (drenaje)",
+        "Sinus pilonidal crónico"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "infeccion_activa_pilonidal",
+      "type": "single",
+      "required": false,
+      "required_if_fase_pilonidal": [
+        "Sinus pilonidal crónico"
+      ],
+      "label": "Infección activa al momento (electivo)",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_pilonidal",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Quiste sacrococcígeo / pilonidal"
+      ],
+      "label": "Técnica quirúrgica",
+      "options": [
+        "Resección y cierre primario por la línea media",
+        "Resección y cicatrización por segunda intención (abierta)",
+        "Colgajo Karydakis",
+        "Colgajo Bascom",
+        "Colgajo Limberg (plastia en Z / romboide)",
+        "EPSiT (videoasistida)",
+        "Ablación láser (SiLaC)",
+        "Drenaje de absceso (solo)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "campo_pilonidal",
+      "type": "single",
+      "required": false,
+      "required_if_fase_pilonidal": [
+        "Absceso agudo (drenaje)"
+      ],
+      "label": "Clasificación del campo",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "campo_pilonidal_electivo",
+      "type": "single",
+      "required": false,
+      "required_if_infeccion_activa_pilonidal": [
+        "Sí"
+      ],
+      "label": "Clasificación del campo (pilonidal infectado)",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "foco_otras",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Otras lesiones / neoplasia / esfinteroplastia"
+      ],
+      "label": "Foco",
+      "options": [
+        "Lesiones condilomatosas / HPV",
+        "Neoplasia de canal anal / tumores perianales",
+        "Esfinteroplastia anal (incontinencia / defecto)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_condilomas",
+      "type": "single",
+      "required": false,
+      "required_if_foco_otras": [
+        "Lesiones condilomatosas / HPV"
+      ],
+      "label": "Técnica (condilomas / HPV)",
+      "options": [
+        "Electrofulguración / cauterización",
+        "Escisión quirúrgica simple"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "dx_presuntivo_neoplasia_anal",
+      "type": "single",
+      "required": false,
+      "required_if_foco_otras": [
+        "Neoplasia de canal anal / tumores perianales"
+      ],
+      "label": "Diagnóstico presuntivo",
+      "options": [
+        "Epidermoide / escamoso",
+        "Basocelular",
+        "Melanoma anal",
+        "Adenocarcinoma",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "dx_presuntivo_neoplasia_otro",
+      "type": "free",
+      "required": false,
+      "required_if_dx_presuntivo_neoplasia_anal": [
+        "Otro"
+      ],
+      "label": "Diagnóstico presuntivo (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "localizacion_neoplasia_anal",
+      "type": "single",
+      "required": false,
+      "required_if_foco_otras": [
+        "Neoplasia de canal anal / tumores perianales"
+      ],
+      "label": "Localización",
+      "options": [
+        "Canal anal",
+        "Margen anal / perianal",
+        "Ambos / extensión"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tamanio_neoplasia_anal",
+      "type": "free",
+      "required": false,
+      "required_if_foco_otras": [
+        "Neoplasia de canal anal / tumores perianales"
+      ],
+      "label": "Tamaño de la lesión (mm/cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_biopsia_neoplasia",
+      "type": "single",
+      "required": false,
+      "required_if_foco_otras": [
+        "Neoplasia de canal anal / tumores perianales"
+      ],
+      "label": "Tipo de biopsia / resección",
+      "options": [
+        "Biopsia escisional",
+        "Biopsia incisional"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_marcado",
+      "type": "single",
+      "required": false,
+      "required_if_foco_otras": [
+        "Neoplasia de canal anal / tumores perianales"
+      ],
+      "label": "Margen marcado",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_esfinteroplastia",
+      "type": "single",
+      "required": false,
+      "required_if_foco_otras": [
+        "Esfinteroplastia anal (incontinencia / defecto)"
+      ],
+      "label": "Técnica de esfinteroplastia",
+      "options": [
+        "Traslape / overlapping",
+        "Otra"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "esfinter_estado_post",
+      "type": "single",
+      "required": false,
+      "label": "Estado del esfínter al cierre",
+      "options": [
+        "Íntegro (preservado)",
+        "Sección parcial controlada",
+        "Sección reconstruida"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "esfinter_estado_post_eli",
+      "type": "single",
+      "required": false,
+      "label": "Estado del esfínter al cierre (ELI)",
+      "options": [
+        "Íntegro (preservado)",
+        "Sección parcial controlada",
+        "Sección reconstruida"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hemostasia_metodo",
+      "type": "multi",
+      "required": false,
+      "label": "Hemostasia",
+      "options": [
+        "Electrocauterio",
+        "Bisturí armónico / ultrasónico",
+        "Ligasure / radiofrecuencia",
+        "Sutura hemostática",
+        "Agente tópico",
+        "Cauterización / puntos hemostáticos absorbibles"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "taponamiento_anal",
+      "type": "single",
+      "required": false,
+      "label": "Taponamiento anal",
+      "options": [
+        "Sí (gasa / esponja / tubo de descompresión)",
+        "Sin taponamiento"
+      ],
+      "empty_text": ""
+    }
+  ],
+  "id": "cg-proctologia-v1",
+  "especialidad": "Cirugía General",
+  "operaciones": [
+    "Hemorroidectomía / hemorroidopexia",
+    "Drenaje de absceso perianal",
+    "Cirugía de fístula anal",
+    "Esfinterotomía / fisura anal",
+    "Cirugía de quiste / sinus pilonidal",
+    "Biopsia / escisión de lesión perianal",
+    "Esfinteroplastia anal"
+  ],
+  "titulo": "Proctología — patología anal y periorificial",
+  "plantilla_texto": "Proctología — {{procedimiento_grupo}}.\nHemorroides: grado {{grado_hemorroides}}; paquetes {{paquetes_hemorroides}}; enfoque {{enfoque_hemorroides}} {{tecnica_hemorroides_resectiva}}{{tecnica_hemorroides_no_resectiva}}; instrumento {{instrumento_corte_hemorroides}}.\nAbsceso/fístula: {{foco_absceso_fistula}}; topografía {{topografia_absceso}} {{gesto_absceso}}; Parks {{parks_fistula}}; técnica {{tecnica_fistula}}; continencia pre {{continencia_pre}} {{factores_riesgo_continencia}}; campo {{campo_absceso}}{{campo_fistula}}.\nFisura: {{ubicacion_fisura}} {{tipo_fisura}}; {{procedimiento_fisura}}; continencia pre ELI {{continencia_pre_eli}} {{factores_riesgo_continencia_eli}}; Botox {{botox_ui}} UI.\nPilonidal: {{fase_pilonidal}}; infección activa {{infeccion_activa_pilonidal}}; {{tecnica_pilonidal}}; campo {{campo_pilonidal}}{{campo_pilonidal_electivo}}.\nOtras: {{foco_otras}} {{tecnica_condilomas}}; neoplasia {{dx_presuntivo_neoplasia_anal}}{{dx_presuntivo_neoplasia_otro}} {{localizacion_neoplasia_anal}} {{tamanio_neoplasia_anal}} {{tipo_biopsia_neoplasia}} margen marcado {{margen_marcado}}; esfinteroplastia {{tecnica_esfinteroplastia}}.\nEsfínter post: {{esfinter_estado_post}}{{esfinter_estado_post_eli}}; hemostasia {{hemostasia_metodo}}; taponamiento {{taponamiento_anal}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cg-retroperitoneo-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Resección de masa / tumor retroperitoneal",
+        "Linfadenectomía retroperitoneal",
+        "Adrenalectomía / cirugía suprarrenal",
+        "Gestos vasculares / urológicos asociados"
+      ]
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": true,
+      "label": "Abordaje",
+      "options": [
+        "Laparotomía mediana",
+        "Laparotomía subcostal ampliada",
+        "Toracoabdominal",
+        "Laparoscópico",
+        "Robótico",
+        "Retroperitoneoscópico (RLA)",
+        "Convertido a abierto"
+      ]
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "dx_presuntivo_masa",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de masa / tumor retroperitoneal"
+      ],
+      "label": "Diagnóstico presuntivo de la masa",
+      "options": [
+        "Liposarcoma",
+        "Leiomiosarcoma",
+        "GIST",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "dx_presuntivo_masa_otro",
+      "type": "free",
+      "required": false,
+      "required_if_dx_presuntivo_masa": [
+        "Otro"
+      ],
+      "label": "Diagnóstico presuntivo (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "localizacion_masa",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de masa / tumor retroperitoneal"
+      ],
+      "label": "Localización",
+      "options": [
+        "Retroperitoneo alto / ilio-lumbar",
+        "Fosa ilíaca",
+        "Pelviano / suprapúbico"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "compromiso_linea_media_vasos",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de masa / tumor retroperitoneal"
+      ],
+      "label": "Compromiso de línea media / grandes vasos",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "intencion_reseccion",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de masa / tumor retroperitoneal"
+      ],
+      "label": "Intención de la resección",
+      "options": [
+        "R0 (resección microscópica completa)",
+        "R1 (margen microscópico positivo)",
+        "R2 (incompleta / debulking)",
+        "Biopsia de masa inoperable"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "resecciones_multiviscerales",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de masa / tumor retroperitoneal"
+      ],
+      "label": "Resecciones multiviscerales asociadas",
+      "options": [
+        "Nefrectomía derecha",
+        "Nefrectomía izquierda",
+        "Hemicolectomía derecha",
+        "Hemicolectomía izquierda",
+        "Sigmoidectomía",
+        "Pancreatectomía corporocaudal (distal)",
+        "Esplenectomía (asociada)",
+        "Resección vascular (cava / aorta / ilíacos) — electiva",
+        "Resección muscular (psoas / pared posterior)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "campo_multivisceral",
+      "type": "single",
+      "required": false,
+      "label": "Clasificación del campo (víscera hueca / contaminación)",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "handoff_gi",
+      "type": "single",
+      "required": false,
+      "label": "Handoff",
+      "options": [
+        "Sí — completar en M2 Gastrointestinal (cg-gastrointestinal-v1)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "handoff_pancreato",
+      "type": "single",
+      "required": false,
+      "label": "Handoff",
+      "options": [
+        "Sí — completar en M3 Pancreato-biliar (cg-pancreato-biliar-v1)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ureter_derecho_masa",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de masa / tumor retroperitoneal"
+      ],
+      "label": "Uréter derecho",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ureter_izquierdo_masa",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de masa / tumor retroperitoneal"
+      ],
+      "label": "Uréter izquierdo",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "vci_integridad_diseccion",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de masa / tumor retroperitoneal"
+      ],
+      "label": "Vena cava inferior (disección)",
+      "options": [
+        "Identificada y preservada",
+        "Lesión identificada intraoperatoriamente",
+        "No disecada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "aorta_integridad_diseccion",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de masa / tumor retroperitoneal"
+      ],
+      "label": "Aorta (disección)",
+      "options": [
+        "Identificada y preservada",
+        "Lesión identificada intraoperatoriamente",
+        "No disecada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "iliaco_integridad_diseccion",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de masa / tumor retroperitoneal"
+      ],
+      "label": "Vasos ilíacos (disección)",
+      "options": [
+        "Identificados y preservados",
+        "Lesión identificada intraoperatoriamente",
+        "No disecados"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "trombo_vci",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de masa / tumor retroperitoneal",
+        "Adrenalectomía / cirugía suprarrenal"
+      ],
+      "label": "Trombo en VCI",
+      "options": [
+        "No",
+        "Sí — trombectomía"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "trombo_vci_detalle",
+      "type": "free",
+      "required": false,
+      "required_if_trombo_vci": [
+        "Sí — trombectomía"
+      ],
+      "label": "Trombo VCI — detalle (tumoral / no tumoral / extensión)",
+      "empty_text": ""
+    },
+    {
+      "id": "reseccion_vascular_electiva",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección de masa / tumor retroperitoneal"
+      ],
+      "label": "Resección vascular electiva oncológica",
+      "options": [
+        "Vena cava",
+        "Aorta",
+        "Vasos ilíacos"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "reconstruccion_vascular_electiva",
+      "type": "single",
+      "required": false,
+      "required_if_reseccion_vascular_electiva": [
+        "Vena cava",
+        "Aorta",
+        "Vasos ilíacos"
+      ],
+      "label": "Reconstrucción vascular (electiva)",
+      "options": [
+        "Anastomosis / venorrafia",
+        "Injerto / prótesis",
+        "Ligadura"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "evento_vascular_no_planificado",
+      "type": "single",
+      "required": false,
+      "label": "Evento vascular no planificado",
+      "options": [
+        "Sin eventos",
+        "Lesión vascular no planificada — controlada",
+        "Lesión vascular no planificada — requirió reconstrucción de urgencia"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_linfadenectomia",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Linfadenectomía retroperitoneal"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Tumor germinal de testículo",
+        "Tumor ginecológico / oncológico",
+        "Estadificación / debulking"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "plantilla_linfadenectomia",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Linfadenectomía retroperitoneal"
+      ],
+      "label": "Extensión / plantilla",
+      "options": [
+        "Paraaórtica",
+        "Interaortocava",
+        "Paracava",
+        "Ilíaca común",
+        "Ilíaca externa",
+        "Ilíaca interna",
+        "Obturatriz"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "plexo_simpatico",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Linfadenectomía retroperitoneal"
+      ],
+      "label": "Plexo simpático lumbar",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "lateralidad_adrenal",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Adrenalectomía / cirugía suprarrenal"
+      ],
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "abordaje_adrenal",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Adrenalectomía / cirugía suprarrenal"
+      ],
+      "label": "Abordaje (adrenal)",
+      "options": [
+        "Laparoscópico (transperitoneal)",
+        "Retroperitoneoscópico (posterior — RLA)",
+        "Abierto / laparotómico"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_adrenal",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Adrenalectomía / cirugía suprarrenal"
+      ],
+      "label": "Indicación / patología",
+      "options": [
+        "Feocromocitoma",
+        "Incidentaloma / adenoma",
+        "Síndrome de Cushing / Conn",
+        "Carcinoma suprarrenal (ACC)",
+        "Metástasis"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "vena_suprarrenal_ligada_antes",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Adrenalectomía / cirugía suprarrenal"
+      ],
+      "label": "Vena suprarrenal principal aislada y ligada antes de manipular",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "manejo_lecho_adrenal",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Adrenalectomía / cirugía suprarrenal"
+      ],
+      "label": "Manejo del lecho",
+      "options": [
+        "Clipado",
+        "Sellado energético",
+        "Sutura manual"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "gesto_vci",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Gestos vasculares / urológicos asociados"
+      ],
+      "label": "Vena cava inferior — gesto",
+      "options": [
+        "Control venoso lateral / venorrafia",
+        "Resección + injerto / prótesis",
+        "Ligadura",
+        "No abordada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "gesto_iliacos",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Gestos vasculares / urológicos asociados"
+      ],
+      "label": "Vasos ilíacos — gesto",
+      "options": [
+        "Resección y sustitución protésica",
+        "Anastomosis directa",
+        "No abordados"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "gesto_renales",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Gestos vasculares / urológicos asociados"
+      ],
+      "label": "Vasos renales",
+      "options": [
+        "Preservados",
+        "Reconstruidos",
+        "No abordados"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ureter_gesto",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Gestos vasculares / urológicos asociados"
+      ],
+      "label": "Manejo del uréter",
+      "options": [
+        "Aislado y preservado",
+        "Resección ureteral",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ureter_reconstruccion",
+      "type": "multi",
+      "required": false,
+      "required_if_ureter_gesto": [
+        "Resección ureteral"
+      ],
+      "label": "Reconstrucción ureteral",
+      "options": [
+        "Reimplante ureterovesical",
+        "Anastomosis término-terminal",
+        "Catéter Doble J intraoperatorio"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "hemostasia_lecho",
+      "type": "multi",
+      "required": false,
+      "label": "Hemostasia del lecho",
+      "options": [
+        "Coagulación monopolar / bipolar / sellado energético",
+        "Agentes hemostáticos tópicos (gelatina / fibrina / celulosa)"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_lecho",
+      "type": "single",
+      "required": false,
+      "label": "Drenaje aspirativo en lecho retroperitoneal",
+      "options": [
+        "Sí",
+        "Sin drenaje"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_lecho_detalle",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_lecho": [
+        "Sí"
+      ],
+      "label": "Drenaje — cantidad / ubicación",
+      "empty_text": ""
+    },
+    {
+      "id": "cierre_pared",
+      "type": "multi",
+      "required": false,
+      "label": "Cierre",
+      "options": [
+        "Cierre aponeurótico por planos",
+        "Malla de refuerzo en pared posterior"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    }
+  ],
+  "id": "cg-retroperitoneo-v1",
+  "especialidad": "Cirugía General",
+  "operaciones": [
+    "Resección de masa / tumor retroperitoneal",
+    "Linfadenectomía retroperitoneal",
+    "Adrenalectomía",
+    "Reconstrucción vascular / urológica asociada"
+  ],
+  "titulo": "Cirugía del retroperitoneo",
+  "plantilla_texto": "Retroperitoneo — {{procedimiento_grupo}}. Abordaje: {{abordaje}}{{conversion_causa}}.\nMasa: {{dx_presuntivo_masa}}{{dx_presuntivo_masa_otro}}; {{localizacion_masa}}; línea media/vasos {{compromiso_linea_media_vasos}}; intención {{intencion_reseccion}}; multivisceral {{resecciones_multiviscerales}}; campo {{campo_multivisceral}}; handoff GI {{handoff_gi}} / pancreato {{handoff_pancreato}}.\nIntegridad: uréter der. {{ureter_derecho_masa}} izq. {{ureter_izquierdo_masa}}; VCI {{vci_integridad_diseccion}}; aorta {{aorta_integridad_diseccion}}; ilíacos {{iliaco_integridad_diseccion}}.\nTrombo VCI {{trombo_vci}} {{trombo_vci_detalle}}; vascular electivo {{reseccion_vascular_electiva}} {{reconstruccion_vascular_electiva}}; no planificado {{evento_vascular_no_planificado}}.\nLinfadenectomía: {{indicacion_linfadenectomia}}; plantilla {{plantilla_linfadenectomia}}; plexo {{plexo_simpatico}}.\nAdrenal: Lateralidad {{lateralidad_adrenal}}; {{abordaje_adrenal}}; {{indicacion_adrenal}}; vena ligada antes {{vena_suprarrenal_ligada_antes}}; lecho {{manejo_lecho_adrenal}}.\nGestos: VCI {{gesto_vci}}; ilíacos {{gesto_iliacos}}; renales {{gesto_renales}}; uréter {{ureter_gesto}} {{ureter_reconstruccion}}.\nHemostasia {{hemostasia_lecho}}; drenaje {{drenaje_lecho}} {{drenaje_lecho_detalle}}; cierre {{cierre_pared}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["ccv-cardiovascular-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Abordaje / canulación / CEC",
+        "Revascularización miocárdica (CRM)",
+        "Cirugía valvular",
+        "Aorta torácica / congénitas del adulto",
+        "Soporte circulatorio / marcapasos / cierre"
+      ]
+    },
+    {
+      "id": "caracter_cirugia",
+      "type": "single",
+      "required": false,
+      "label": "Carácter de la cirugía",
+      "options": [
+        "Electiva / programada",
+        "Urgente",
+        "Emergencia"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "reexploracion_sangrado",
+      "type": "single",
+      "required": false,
+      "label": "Reexploración por sangrado postoperatorio",
+      "options": [
+        "No requerida",
+        "Requerida — hemostasia quirúrgica",
+        "Requerida — coagulopatía"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": false,
+      "label": "Abordaje (si aplica)",
+      "options": [
+        "Abierto",
+        "Mínimamente invasivo",
+        "Convertido a abierto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "via_abordaje_cv",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Abordaje / canulación / CEC"
+      ],
+      "label": "Abordaje quirúrgico",
+      "options": [
+        "Esternotomía media",
+        "Miniesternotomía",
+        "Toracotomía lateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "esternotomia_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_via_abordaje_cv": [
+        "Esternotomía media"
+      ],
+      "label": "Esternotomía — tipo",
+      "options": [
+        "Primaria",
+        "Reoperación"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "riesgo_reesternotomia",
+      "type": "single",
+      "required": false,
+      "required_if_esternotomia_tipo": [
+        "Reoperación"
+      ],
+      "label": "Riesgo de reesternotomía",
+      "options": [
+        "Sin incidentes",
+        "Lesión de estructura cardíaca — controlada",
+        "Lesión de injerto previo"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "lateralidad_toracotomia",
+      "type": "single",
+      "required": false,
+      "required_if_via_abordaje_cv": [
+        "Toracotomía lateral"
+      ],
+      "label": "Lateralidad (toracotomía)",
+      "options": [
+        "Derecha",
+        "Izquierda"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "canulacion_arterial",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Abordaje / canulación / CEC"
+      ],
+      "label": "Canulación arterial",
+      "options": [
+        "Aorta ascendente",
+        "Femoral",
+        "Subclavia / axilar"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "canulacion_venosa",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Abordaje / canulación / CEC"
+      ],
+      "label": "Canulación venosa",
+      "options": [
+        "Aurícula derecha (cánula única / bivalva)",
+        "Cavas separadas (bicava)",
+        "Femoral"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "cardioplejia_via",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Abordaje / canulación / CEC"
+      ],
+      "label": "Protección miocárdica / cardioplejía — vía",
+      "options": [
+        "Anterógrada (seno de Valsalva / coronarias)",
+        "Retrógrada (seno coronario)",
+        "Combinada"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "cardioplejia_solucion",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Abordaje / canulación / CEC"
+      ],
+      "label": "Cardioplejía — solución",
+      "options": [
+        "Cristaloide (Custodiol / Del Nido)",
+        "Sanguínea — fría",
+        "Sanguínea — caliente"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tiempo_cec_min",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Abordaje / canulación / CEC"
+      ],
+      "label": "Tiempo de CEC (min)",
+      "empty_text": ""
+    },
+    {
+      "id": "tiempo_clampeo_aortico_cv_min",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Abordaje / canulación / CEC"
+      ],
+      "label": "Tiempo de clampeo aórtico (min)",
+      "empty_text": ""
+    },
+    {
+      "id": "paro_circulatorio_hipotermico",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Abordaje / canulación / CEC"
+      ],
+      "label": "Paro circulatorio hipotérmico",
+      "options": [
+        "Realizado",
+        "No realizado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "temperatura_central_paro_c",
+      "type": "free",
+      "required": false,
+      "required_if_paro_circulatorio_hipotermico": [
+        "Realizado"
+      ],
+      "label": "Temperatura central (°C)",
+      "empty_text": ""
+    },
+    {
+      "id": "tiempo_paro_circulatorio_min",
+      "type": "free",
+      "required": false,
+      "required_if_paro_circulatorio_hipotermico": [
+        "Realizado"
+      ],
+      "label": "Tiempo de paro circulatorio (min)",
+      "empty_text": ""
+    },
+    {
+      "id": "destete_cec",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Abordaje / canulación / CEC"
+      ],
+      "label": "Resultado del destete de CEC",
+      "options": [
+        "Sin inconvenientes",
+        "Requirió inotrópicos",
+        "Requirió soporte circulatorio mecánico (ver Sección 5)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_crm",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Revascularización miocárdica (CRM)"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Enfermedad coronaria multivaso",
+        "Lesión de tronco de coronaria izquierda (TCI)",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_crm_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_crm": [
+        "Otro"
+      ],
+      "label": "Indicación CRM (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_crm",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Revascularización miocárdica (CRM)"
+      ],
+      "label": "Técnica",
+      "options": [
+        "Con CEC (on-pump)",
+        "Sin CEC (off-pump / corazón batiente)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "estabilizador_offpump",
+      "type": "free",
+      "required": false,
+      "required_if_tecnica_crm": [
+        "Sin CEC (off-pump / corazón batiente)"
+      ],
+      "label": "Estabilizador (off-pump)",
+      "empty_text": ""
+    },
+    {
+      "id": "injertos_arteriales",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Revascularización miocárdica (CRM)"
+      ],
+      "label": "Injertos arteriales",
+      "options": [
+        "Arteria mamaria interna izquierda (AMII / LIMA)",
+        "Arteria mamaria interna derecha (AMID / RIMA)",
+        "Arteria radial"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_lima",
+      "type": "single",
+      "required": false,
+      "required_if_injertos_arteriales": [
+        "Arteria mamaria interna izquierda (AMII / LIMA)"
+      ],
+      "label": "LIMA — anastomosis a",
+      "options": [
+        "DA",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_lima_otro",
+      "type": "free",
+      "required": false,
+      "required_if_anastomosis_lima": [
+        "Otro"
+      ],
+      "label": "LIMA — anastomosis (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_rima",
+      "type": "free",
+      "required": false,
+      "required_if_injertos_arteriales": [
+        "Arteria mamaria interna derecha (AMID / RIMA)"
+      ],
+      "label": "RIMA — anastomosis a",
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_radial",
+      "type": "free",
+      "required": false,
+      "required_if_injertos_arteriales": [
+        "Arteria radial"
+      ],
+      "label": "Radial — anastomosis a",
+      "empty_text": ""
+    },
+    {
+      "id": "injerto_safena",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Revascularización miocárdica (CRM)"
+      ],
+      "label": "Injerto de vena safena magna",
+      "options": [
+        "Puentes individuales",
+        "Puente secuencial",
+        "No utilizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "vasos_receptores_safena",
+      "type": "multi",
+      "required": false,
+      "required_if_injerto_safena": [
+        "Puentes individuales",
+        "Puente secuencial"
+      ],
+      "label": "Vasos receptores (safena)",
+      "options": [
+        "Cx",
+        "CD",
+        "Dx",
+        "Otro"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "vasos_receptores_safena_otro",
+      "type": "free",
+      "required": false,
+      "required_if_vasos_receptores_safena": [
+        "Otro"
+      ],
+      "label": "Vasos receptores (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "numero_puentes_proximales",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Revascularización miocárdica (CRM)"
+      ],
+      "label": "Número de anastomosis proximales a aorta",
+      "empty_text": ""
+    },
+    {
+      "id": "clampeo_parcial_aorta",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Revascularización miocárdica (CRM)"
+      ],
+      "label": "Clampeo parcial / Heartstring",
+      "options": [
+        "Sí — clampeo parcial",
+        "No / Heartstring"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "flujometria_ttfm",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Revascularización miocárdica (CRM)"
+      ],
+      "label": "Verificación de flujo del injerto (flujometría / TTFM)",
+      "options": [
+        "Realizada — flujo adecuado",
+        "Realizada — flujo subóptimo",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "valvula_abordada",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía valvular"
+      ],
+      "label": "Válvula(s) abordada(s)",
+      "options": [
+        "Aórtica",
+        "Mitral",
+        "Tricúspide"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_aortica_valvular",
+      "type": "multi",
+      "required": false,
+      "required_if_valvula_abordada": [
+        "Aórtica"
+      ],
+      "label": "Indicación — válvula aórtica",
+      "options": [
+        "Estenosis",
+        "Insuficiencia",
+        "Endocarditis",
+        "Mixta"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_aortica_valvular",
+      "type": "single",
+      "required": false,
+      "required_if_valvula_abordada": [
+        "Aórtica"
+      ],
+      "label": "Procedimiento — válvula aórtica",
+      "options": [
+        "Reemplazo valvular aórtico (RVA)",
+        "Plástica / reparación valvular"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "protesis_aortica_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_proc_aortica_valvular": [
+        "Reemplazo valvular aórtico (RVA)"
+      ],
+      "label": "Prótesis aórtica — tipo",
+      "options": [
+        "Mecánica",
+        "Biológica (bovina / porcina)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "protesis_aortica_marca",
+      "type": "free",
+      "required": false,
+      "required_if_proc_aortica_valvular": [
+        "Reemplazo valvular aórtico (RVA)"
+      ],
+      "label": "Prótesis aórtica — marca y N°",
+      "empty_text": ""
+    },
+    {
+      "id": "ete_post_aortica",
+      "type": "single",
+      "required": false,
+      "required_if_valvula_abordada": [
+        "Aórtica"
+      ],
+      "label": "ETE post-implante — aórtica",
+      "options": [
+        "Adecuada — sin fuga significativa",
+        "Fuga paravalvular — aceptada",
+        "Requirió revisión en el mismo acto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_mitral",
+      "type": "multi",
+      "required": false,
+      "required_if_valvula_abordada": [
+        "Mitral"
+      ],
+      "label": "Indicación — válvula mitral",
+      "options": [
+        "Estenosis",
+        "Insuficiencia",
+        "Endocarditis",
+        "Mixta"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_mitral",
+      "type": "single",
+      "required": false,
+      "required_if_valvula_abordada": [
+        "Mitral"
+      ],
+      "label": "Procedimiento — válvula mitral",
+      "options": [
+        "Reemplazo valvular mitral (RVM)",
+        "Plástica / reparación"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "plastica_mitral_detalle",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_mitral": [
+        "Plástica / reparación"
+      ],
+      "label": "Plástica mitral — detalle",
+      "options": [
+        "Anuloplastia con anillo",
+        "Resección cuadrangular / triangular",
+        "Neocuerdas"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "protesis_mitral_marca",
+      "type": "free",
+      "required": false,
+      "required_if_proc_mitral": [
+        "Reemplazo valvular mitral (RVM)",
+        "Plástica / reparación"
+      ],
+      "label": "Prótesis / anillo mitral — marca y N°",
+      "empty_text": ""
+    },
+    {
+      "id": "ete_post_mitral",
+      "type": "single",
+      "required": false,
+      "required_if_valvula_abordada": [
+        "Mitral"
+      ],
+      "label": "ETE post-implante — mitral",
+      "options": [
+        "Adecuada — sin fuga significativa",
+        "Fuga paravalvular — aceptada",
+        "Requirió revisión en el mismo acto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_tricuspide",
+      "type": "multi",
+      "required": false,
+      "required_if_valvula_abordada": [
+        "Tricúspide"
+      ],
+      "label": "Indicación — válvula tricúspide",
+      "options": [
+        "Estenosis",
+        "Insuficiencia",
+        "Endocarditis",
+        "Mixta"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_tricuspide",
+      "type": "single",
+      "required": false,
+      "required_if_valvula_abordada": [
+        "Tricúspide"
+      ],
+      "label": "Procedimiento — válvula tricúspide",
+      "options": [
+        "Anuloplastia tricuspídea (anillo / De Vega)",
+        "Reemplazo valvular"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ete_post_tricuspide",
+      "type": "single",
+      "required": false,
+      "required_if_valvula_abordada": [
+        "Tricúspide"
+      ],
+      "label": "ETE post-implante — tricúspide",
+      "options": [
+        "Adecuada — sin fuga significativa",
+        "Fuga paravalvular — aceptada",
+        "Requirió revisión en el mismo acto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "resultado_revision_valvular",
+      "type": "single",
+      "required": false,
+      "required_if_ete_post_aortica": [
+        "Requirió revisión en el mismo acto"
+      ],
+      "required_if_ete_post_mitral": [
+        "Requirió revisión en el mismo acto"
+      ],
+      "required_if_ete_post_tricuspide": [
+        "Requirió revisión en el mismo acto"
+      ],
+      "label": "Resultado de la revisión valvular (mismo acto)",
+      "options": [
+        "Nueva reparación exitosa",
+        "Conversión a reemplazo valvular"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "patologia_aorta_toracica",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Aorta torácica / congénitas del adulto"
+      ],
+      "label": "Patología aórtica",
+      "options": [
+        "Aneurisma de aorta ascendente",
+        "Disección aórtica tipo A",
+        "Aneurisma de arco aórtico / toracoabdominal"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_aorta_toracica",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Aorta torácica / congénitas del adulto"
+      ],
+      "label": "Procedimiento específico — aorta",
+      "options": [
+        "Reemplazo de aorta ascendente con tubo recto (Dacrón)",
+        "Procedimiento de Bentall-De Bono",
+        "Preservación valvular aórtica (David / Yacoub)",
+        "Cirugía de arco aórtico — trompa de elefante / elephant trunk",
+        "Cirugía de arco aórtico — reimplante de troncos supraaórticos"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "troncos_supraaorticos_reimplantados",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_aorta_toracica": [
+        "Cirugía de arco aórtico — reimplante de troncos supraaórticos"
+      ],
+      "label": "Troncos supraaórticos reimplantados",
+      "options": [
+        "Tronco braquiocefálico",
+        "Carótida común izquierda",
+        "Subclavia izquierda"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_congenitas_adulto",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Aorta torácica / congénitas del adulto"
+      ],
+      "label": "Congénitas adulto / corrección",
+      "options": [
+        "Cierre de CIA / CIV",
+        "Coartación aórtica",
+        "Miectomía septal (Morrow / Symmetry en MCH)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "gradiente_septal_post_mmhg",
+      "type": "free",
+      "required": false,
+      "required_if_proc_congenitas_adulto": [
+        "Miectomía septal (Morrow / Symmetry en MCH)"
+      ],
+      "label": "Gradiente de salida del VI post-resección (mmHg)",
+      "empty_text": ""
+    },
+    {
+      "id": "soporte_circulatorio",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Soporte circulatorio / marcapasos / cierre"
+      ],
+      "label": "Asistencia circulatoria / soporte",
+      "options": [
+        "Balón de contrapulsación intraaórtico (BCIAo)",
+        "ECMO veno-arterial (VA)",
+        "Impella"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "via_bciao",
+      "type": "single",
+      "required": false,
+      "required_if_soporte_circulatorio": [
+        "Balón de contrapulsación intraaórtico (BCIAo)"
+      ],
+      "label": "Vía BCIAo",
+      "options": [
+        "Femoral",
+        "Central"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_soporte_circulatorio",
+      "type": "single",
+      "required": false,
+      "label": "Indicación del soporte circulatorio",
+      "options": [
+        "Profiláctico (preoperatorio)",
+        "Rescate — falla de destete de CEC",
+        "Rescate — shock postoperatorio"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "marcapasos_epicardico",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Soporte circulatorio / marcapasos / cierre"
+      ],
+      "label": "Cables de marcapasos epicárdico",
+      "options": [
+        "Ventricular",
+        "Auricular"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "salida_marcapasos",
+      "type": "single",
+      "required": false,
+      "required_if_marcapasos_epicardico": [
+        "Ventricular",
+        "Auricular"
+      ],
+      "label": "Salida de cables de marcapasos",
+      "options": [
+        "Pared abdominal",
+        "Pared torácica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "protamina",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Soporte circulatorio / marcapasos / cierre"
+      ],
+      "label": "Neutralización de heparina con protamina",
+      "options": [
+        "Completa",
+        "Parcial"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenajes_toracicos_cv",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Soporte circulatorio / marcapasos / cierre"
+      ],
+      "label": "Drenajes torácicos",
+      "options": [
+        "Pericárdico",
+        "Mediastínico anterior",
+        "Pleural derecho",
+        "Pleural izquierdo"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "osteosintesis_esternal",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Soporte circulatorio / marcapasos / cierre"
+      ],
+      "label": "Osteosíntesis esternal",
+      "options": [
+        "Alambres de acero quirúrgico",
+        "Placas rígidas de titanio"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "alambres_esternales_numero",
+      "type": "free",
+      "required": false,
+      "required_if_osteosintesis_esternal": [
+        "Alambres de acero quirúrgico"
+      ],
+      "label": "Número de alambres esternales",
+      "empty_text": ""
+    },
+    {
+      "id": "alambres_esternales_patron",
+      "type": "single",
+      "required": false,
+      "required_if_osteosintesis_esternal": [
+        "Alambres de acero quirúrgico"
+      ],
+      "label": "Patrón de alambres",
+      "options": [
+        "Simple",
+        "En 8"
+      ],
+      "empty_text": ""
+    }
+  ],
+  "id": "ccv-cardiovascular-v1",
+  "especialidad": "Cirugía Cardiovascular",
+  "operaciones": [
+    "Abordaje, canulación y circulación extracorpórea",
+    "Revascularización miocárdica (CRM)",
+    "Cirugía valvular",
+    "Aorta torácica y congénitas del adulto",
+    "Soporte circulatorio, marcapasos y cierre"
+  ],
+  "titulo": "Cirugía cardiovascular",
+  "plantilla_texto": "Cardiovascular — {{procedimiento_grupo}}. Carácter {{caracter_cirugia}}. Abordaje {{abordaje}}{{conversion_causa}}. Reexploración sangrado {{reexploracion_sangrado}}.\nCEC: vía {{via_abordaje_cv}} {{esternotomia_tipo}} reesternotomía {{riesgo_reesternotomia}}; toracotomía {{lateralidad_toracotomia}}; canulación art. {{canulacion_arterial}} ven. {{canulacion_venosa}}; cardioplejía {{cardioplejia_via}} {{cardioplejia_solucion}}; CEC {{tiempo_cec_min}} min; clampeo {{tiempo_clampeo_aortico_cv_min}} min; paro hipotérmico {{paro_circulatorio_hipotermico}} {{temperatura_central_paro_c}} °C {{tiempo_paro_circulatorio_min}} min; destete {{destete_cec}}.\nCRM: {{indicacion_crm}}{{indicacion_crm_otro}}; {{tecnica_crm}} estabilizador {{estabilizador_offpump}}; art. {{injertos_arteriales}} LIMA→{{anastomosis_lima}}{{anastomosis_lima_otro}} RIMA→{{anastomosis_rima}} Radial→{{anastomosis_radial}}; safena {{injerto_safena}} receptores {{vasos_receptores_safena}}{{vasos_receptores_safena_otro}}; proximales n={{numero_puentes_proximales}} clampeo parcial {{clampeo_parcial_aorta}}; TTFM {{flujometria_ttfm}}.\nValvular: {{valvula_abordada}}; Ao {{indicacion_aortica_valvular}} {{proc_aortica_valvular}} {{protesis_aortica_tipo}} {{protesis_aortica_marca}} ETE {{ete_post_aortica}}; Mi {{indicacion_mitral}} {{proc_mitral}} {{plastica_mitral_detalle}} {{protesis_mitral_marca}} ETE {{ete_post_mitral}}; Tri {{indicacion_tricuspide}} {{proc_tricuspide}} ETE {{ete_post_tricuspide}}; revisión {{resultado_revision_valvular}}.\nAorta/cong: {{patologia_aorta_toracica}}; {{proc_aorta_toracica}} troncos {{troncos_supraaorticos_reimplantados}}; {{proc_congenitas_adulto}} gradiente septal {{gradiente_septal_post_mmhg}} mmHg.\nSoporte/cierre: {{soporte_circulatorio}} vía BCIAo {{via_bciao}} indicación {{indicacion_soporte_circulatorio}}; MP {{marcapasos_epicardico}} salida {{salida_marcapasos}}; protamina {{protamina}}; drenajes {{drenajes_toracicos_cv}}; esternón {{osteosintesis_esternal}} n={{alambres_esternales_numero}} {{alambres_esternales_patron}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cyc-benigna-cuello-v1"] = {
+  "slots": [
+    {
+      "id": "entidad",
+      "type": "single",
+      "required": true,
+      "label": "Entidad",
+      "options": [
+        "Quiste tirogloso",
+        "Quiste branquial",
+        "Schwannoma",
+        "Tumor glómico (glomus)",
+        "Otra patología benigna / congénita (detallar)"
+      ]
+    },
+    {
+      "id": "procedimiento",
+      "type": "free",
+      "required": false,
+      "label": "Procedimiento concreto (ej. Sistrunk)",
+      "empty_text": "exéresis según técnica habitual de la entidad"
+    },
+    {
+      "id": "lateralidad",
+      "type": "single",
+      "required": false,
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Medial / línea media",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "glomus_ubicacion",
+      "type": "single",
+      "required": false,
+      "required_if_entidad": [
+        "Tumor glómico (glomus)"
+      ],
+      "label": "Ubicación (glomus)",
+      "options": [
+        "Carotídeo",
+        "Yugular",
+        "Vagal"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "glomus_embolizacion",
+      "type": "single",
+      "required": false,
+      "required_if_entidad": [
+        "Tumor glómico (glomus)"
+      ],
+      "label": "Embolización previa (glomus)",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "schwannoma_nervio",
+      "type": "single",
+      "required": false,
+      "required_if_entidad": [
+        "Schwannoma"
+      ],
+      "label": "Nervio de origen (schwannoma)",
+      "options": [
+        "Vago",
+        "Simpático",
+        "Hipogloso",
+        "Espinal"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "schwannoma_preservacion",
+      "type": "single",
+      "required": false,
+      "required_if_entidad": [
+        "Schwannoma"
+      ],
+      "label": "Preservación nerviosa (schwannoma)",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "branquial_arco",
+      "type": "single",
+      "required": false,
+      "required_if_entidad": [
+        "Quiste branquial"
+      ],
+      "label": "Arco branquial",
+      "options": [
+        "1°",
+        "2°",
+        "3°",
+        "4°"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hallazgos_semiologia",
+      "type": "free",
+      "required": false,
+      "label": "Hallazgos (tamaño visto, relación con vecinos, aspecto — no conteo AP)",
+      "empty_text": "[hallazgos a completar]"
+    },
+    {
+      "id": "estructuras_riesgo",
+      "type": "free",
+      "required": false,
+      "label": "Estructuras de riesgo identificadas / preservadas",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje",
+      "type": "single",
+      "required": false,
+      "label": "Drenaje",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    }
+  ],
+  "id": "cyc-benigna-cuello-v1",
+  "especialidad": "Cirugía de Cabeza y Cuello",
+  "operaciones": [
+    "Resección de quiste tirogloso (Sistrunk)",
+    "Resección de quiste branquial",
+    "Resección de schwannoma cervical",
+    "Resección de tumor glómico",
+    "Cirugía de patología benigna / congénita de cuello"
+  ],
+  "titulo": "Patología benigna y congénita del cuello (quistes, schwannomas, glomus)",
+  "plantilla_texto": "Entidad: {{entidad}}. Procedimiento: {{procedimiento}}. Lateralidad: {{lateralidad}}.\nGlomus — ubicación: {{glomus_ubicacion}}; embolización previa: {{glomus_embolizacion}}.\nSchwannoma — nervio de origen: {{schwannoma_nervio}}; preservación nerviosa: {{schwannoma_preservacion}}.\nQuiste branquial — arco: {{branquial_arco}}.\nHallazgos: {{hallazgos_semiologia}}.\nEstructuras de riesgo: {{estructuras_riesgo}}.\nCierre: drenaje {{drenaje}}. Cierre por planos."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cyc-biopsia-adenopatias-v1"] = {
+  "slots": [
+    {
+      "id": "lateralidad",
+      "type": "single",
+      "required": true,
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral"
+      ]
+    },
+    {
+      "id": "nivel",
+      "type": "multi",
+      "required": false,
+      "label": "Nivel(es) (si se consigna)",
+      "options": [
+        "IA",
+        "IB",
+        "IIA",
+        "IIB",
+        "III",
+        "IV",
+        "VA",
+        "VB",
+        "VI",
+        "VII"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_acto",
+      "type": "single",
+      "required": true,
+      "label": "Tipo de acto",
+      "options": [
+        "Biopsia escisional",
+        "Biopsia incisional",
+        "BAAF/BAG guiada"
+      ]
+    },
+    {
+      "id": "semiologia",
+      "type": "free",
+      "required": false,
+      "label": "Semiología (tamaño visto/palpado, fijación, aspecto — no conteo AP)",
+      "empty_text": "[semiología a completar]"
+    },
+    {
+      "id": "destino_muestra",
+      "type": "multi",
+      "required": true,
+      "label": "Destino de la muestra",
+      "options": [
+        "Anatomía patológica (rutina)",
+        "Citología",
+        "Cultivo",
+        "Citometría en fresco"
+      ],
+      "join": "; "
+    }
+  ],
+  "id": "cyc-biopsia-adenopatias-v1",
+  "especialidad": "Cirugía de Cabeza y Cuello",
+  "operaciones": [
+    "Biopsia de adenopatía cervical",
+    "Exéresis de adenopatía cervical"
+  ],
+  "titulo": "Biopsias de adenopatías cervicales",
+  "plantilla_texto": "Se realiza {{tipo_acto}} de adenopatía cervical, lado {{lateralidad}},\nnivel(es) {{nivel}}.\nHallazgos semiológicos: {{semiologia}}.\n(Sin conteo ganglionar de anatomía patológica.)\nDestino de la muestra: {{destino_muestra}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cyc-biopsia-cavidad-v1"] = {
+  "slots": [
+    {
+      "id": "sitio",
+      "type": "single",
+      "required": true,
+      "label": "Sitio",
+      "options": [
+        "Cavidad oral",
+        "Orofaringe",
+        "Rinofaringe"
+      ]
+    },
+    {
+      "id": "sitio_oral",
+      "type": "single",
+      "required": false,
+      "required_if_sitio": [
+        "Cavidad oral"
+      ],
+      "label": "Sub-localización — cavidad oral",
+      "options": [
+        "Lengua",
+        "Piso de boca",
+        "Mucosa yugular",
+        "Encía",
+        "Paladar duro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "sitio_oro",
+      "type": "single",
+      "required": false,
+      "required_if_sitio": [
+        "Orofaringe"
+      ],
+      "label": "Sub-localización — orofaringe",
+      "options": [
+        "Amígdala",
+        "Base de lengua",
+        "Paladar blando",
+        "Pared posterior"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_acto",
+      "type": "single",
+      "required": true,
+      "label": "Tipo de acto",
+      "options": [
+        "Biopsia incisional",
+        "Biopsia escisional",
+        "Resección local amplia"
+      ]
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": true,
+      "label": "Abordaje",
+      "options": [
+        "Transoral directo",
+        "Transoral guiado por endoscopía/microscopio",
+        "TORS (robótico)"
+      ]
+    },
+    {
+      "id": "margen_marcado",
+      "type": "single",
+      "required": true,
+      "label": "Margen marcado",
+      "options": [
+        "Sí — suturas de orientación",
+        "No"
+      ]
+    },
+    {
+      "id": "cierre_defecto",
+      "type": "single",
+      "required": true,
+      "label": "Cierre del defecto",
+      "options": [
+        "Cierre primario",
+        "Hemostasia y cicatrización por 2da intención",
+        "Colgajo local"
+      ]
+    },
+    {
+      "id": "hallazgos",
+      "type": "free",
+      "required": false,
+      "label": "Hallazgos",
+      "empty_text": "[hallazgos a completar]"
+    }
+  ],
+  "id": "cyc-biopsia-cavidad-v1",
+  "especialidad": "Cirugía de Cabeza y Cuello",
+  "operaciones": [
+    "Biopsia de cavidad oral",
+    "Biopsia de orofaringe",
+    "Biopsia de rinofaringe",
+    "Exéresis de lesión de cavidad oral",
+    "Exéresis de lesión de orofaringe",
+    "Exéresis de lesión de rinofaringe"
+  ],
+  "titulo": "Biopsias / exéresis en cavidad oral, orofaringe y rinofaringe",
+  "plantilla_texto": "Se realiza {{tipo_acto}} en {{sitio}}\n(cavidad oral: {{sitio_oral}}; orofaringe: {{sitio_oro}}).\nAbordaje: {{abordaje}}.\nMargen marcado: {{margen_marcado}}. Cierre del defecto: {{cierre_defecto}}.\nHallazgos: {{hallazgos}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cyc-biopsia-salivales-acc-v1"] = {
+  "slots": [
+    {
+      "id": "sitio",
+      "type": "single",
+      "required": true,
+      "label": "Sitio de toma",
+      "options": [
+        "Mucosa labial inferior",
+        "Paladar"
+      ]
+    },
+    {
+      "id": "cantidad_lobulillos_estado",
+      "type": "single",
+      "required": true,
+      "label": "Cantidad de lobulillos — estado",
+      "options": [
+        "Cuantificado",
+        "No cuantificable en el acto"
+      ]
+    },
+    {
+      "id": "cantidad_lobulillos",
+      "type": "free",
+      "required": false,
+      "required_if_cantidad_lobulillos_estado": [
+        "Cuantificado"
+      ],
+      "label": "Cantidad de lobulillos (número)"
+    },
+    {
+      "id": "objetivo_diagnostico",
+      "type": "single",
+      "required": true,
+      "label": "Objetivo diagnóstico",
+      "options": [
+        "Descarte de Síndrome de Sjögren / Amiloidosis / enfermedad autoinmune",
+        "Lesión tumoral"
+      ]
+    },
+    {
+      "id": "hallazgos",
+      "type": "free",
+      "required": false,
+      "label": "Hallazgos",
+      "empty_text": ""
+    },
+    {
+      "id": "hemostasia",
+      "type": "free",
+      "required": false,
+      "label": "Hemostasia / cierre"
+    }
+  ],
+  "id": "cyc-biopsia-salivales-acc-v1",
+  "especialidad": "Cirugía de Cabeza y Cuello",
+  "operaciones": [
+    "Biopsia de glándulas salivales accesorias"
+  ],
+  "titulo": "Biopsia de glándulas salivales accesorias",
+  "plantilla_texto": "Se realiza biopsia de glándulas salivales accesorias en {{sitio}}.\nLobulillos: {{cantidad_lobulillos_estado}}{{cantidad_frase}}.\nObjetivo diagnóstico: {{objetivo_diagnostico}}.\nHallazgos: {{hallazgos}}.\n{{hemostasia}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cyc-laringe-mls-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento",
+      "options": [
+        "Microcirugía laríngea (MLS)",
+        "Biopsia laríngea",
+        "Exéresis de lesión benigna",
+        "Laringectomía parcial simple",
+        "Laringectomía total simple (sin reconstrucción compleja)"
+      ]
+    },
+    {
+      "id": "lesion_benigna_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento": [
+        "Exéresis de lesión benigna"
+      ],
+      "label": "Tipo de lesión benigna",
+      "options": [
+        "Pólipo",
+        "Nódulo",
+        "Quiste epidermoide",
+        "Edema de Reinke",
+        "Papilomatosis"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "parcial_simple_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento": [
+        "Laringectomía parcial simple"
+      ],
+      "label": "Tipo de laringectomía parcial simple",
+      "options": [
+        "Cordectomía",
+        "Otra parcial (detallar en texto)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "instrumentacion",
+      "type": "single",
+      "required": true,
+      "label": "Instrumentación",
+      "options": [
+        "Instrumental frío de microcirugía",
+        "Láser CO2",
+        "Radiofrecuencia"
+      ]
+    },
+    {
+      "id": "cuerda_vocal_eval",
+      "type": "single",
+      "required": false,
+      "label": "Cuerda vocal / región evaluada o tratada",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Comisura anterior"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "laringoscopio",
+      "type": "free",
+      "required": true,
+      "label": "Laringoscopio de suspensión (tipo / modelo)"
+    },
+    {
+      "id": "ventilacion",
+      "type": "single",
+      "required": true,
+      "label": "Manejo de vía aérea / ventilación",
+      "options": [
+        "Tubo estándar",
+        "Ventilación jet",
+        "Otro (detallar en texto)"
+      ]
+    },
+    {
+      "id": "ventilacion_detalle",
+      "type": "free",
+      "required": false,
+      "label": "Detalle de vía aérea (si Otro u observación)",
+      "empty_text": ""
+    },
+    {
+      "id": "hallazgos",
+      "type": "free",
+      "required": false,
+      "label": "Hallazgos / lesión",
+      "empty_text": "[hallazgos a completar]"
+    },
+    {
+      "id": "hemostasia_cierre",
+      "type": "free",
+      "required": false,
+      "label": "Hemostasia / cierre"
+    }
+  ],
+  "id": "cyc-laringe-mls-v1",
+  "especialidad": "Cirugía de Cabeza y Cuello",
+  "operaciones": [
+    "Microcirugía laríngea (MLS)",
+    "Biopsia laríngea",
+    "Exéresis de lesión laríngea benigna",
+    "Laringectomía parcial simple",
+    "Cordectomía",
+    "Laringectomía total simple (sin reconstrucción compleja)"
+  ],
+  "titulo": "Laringe y microcirugía laríngea (MLS)",
+  "plantilla_texto": "Se realiza {{procedimiento}}\n(lesión benigna: {{lesion_benigna_tipo}}; parcial simple: {{parcial_simple_tipo}}).\nInstrumentación: {{instrumentacion}}.\nCuerda vocal / región: {{cuerda_vocal_eval}}.\nManejo de vía aérea (coordinado con anestesia): laringoscopio de\nsuspensión {{laringoscopio}}; ventilación {{ventilacion}}.\n{{ventilacion_detalle}}.\n\nHallazgos: {{hallazgos}}.\n{{hemostasia_cierre}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cyc-nariz-senos-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento",
+      "type": "multi",
+      "required": true,
+      "label": "Procedimiento(s)",
+      "options": [
+        "CEN / FESS",
+        "Polipectomía",
+        "Septoplastia",
+        "Cierre / reconstrucción de base de cráneo (vía nasal)",
+        "Otro (detallar en texto)"
+      ],
+      "join": "; "
+    },
+    {
+      "id": "lateralidad",
+      "type": "single",
+      "required": false,
+      "label": "Lateralidad (si aplica)",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "senos",
+      "type": "multi",
+      "required": false,
+      "label": "Senos abordados (si FESS / CEN)",
+      "options": [
+        "Maxilar",
+        "Etmoidal",
+        "Frontal",
+        "Esfenoidal"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "angulo_endoscopio",
+      "type": "single",
+      "required": false,
+      "label": "Ángulo de visualización endoscópica",
+      "options": [
+        "0°",
+        "30°",
+        "45°",
+        "70°"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "navegacion",
+      "type": "single",
+      "required": false,
+      "label": "Navegación intraoperatoria",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "cebc_reseccion_xref_nota",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento": [
+        "Cierre / reconstrucción de base de cráneo (vía nasal)"
+      ],
+      "label": "Resección / corredor CEBC (referencia)",
+      "options": [
+        "Definición en Neurocirugía M14 §1 (cneuro-neurocirugia-v1) — foja neuro aparte si equipo; no completar lesión/corredor acá"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_cierre_base_craneo",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento": [
+        "Cierre / reconstrucción de base de cráneo (vía nasal)"
+      ],
+      "label": "Técnica de cierre / reconstrucción",
+      "options": [
+        "Colgajo nasoseptal pediculado (Hadad-Bassagasteguy)",
+        "Injerto libre",
+        "Sellante de fibrina / sustituto dural",
+        "Taponamiento nasal",
+        "Catéter lumbar de drenaje"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "lateralidad_colgajo_nasoseptal",
+      "type": "single",
+      "required": false,
+      "required_if_proc_cierre_base_craneo": [
+        "Colgajo nasoseptal pediculado (Hadad-Bassagasteguy)"
+      ],
+      "label": "Lateralidad del colgajo nasoseptal",
+      "options": [
+        "Derecha",
+        "Izquierda"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_injerto_libre_base_craneo",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_cierre_base_craneo": [
+        "Injerto libre"
+      ],
+      "label": "Injerto libre — material",
+      "options": [
+        "Grasa",
+        "Fascia lata",
+        "Mucosa"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_sellante_base_craneo",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_cierre_base_craneo": [
+        "Sellante de fibrina / sustituto dural"
+      ],
+      "label": "Sellante / sustituto dural",
+      "options": [
+        "Sellante de fibrina",
+        "Sustituto dural"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "empaquetamiento",
+      "type": "single",
+      "required": false,
+      "label": "Manejo de empaquetamiento",
+      "options": [
+        "Merocel",
+        "Nasopore",
+        "Sin taponamiento"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hallazgos",
+      "type": "free",
+      "required": false,
+      "label": "Hallazgos intraoperatorios",
+      "empty_text": "[hallazgos a completar]"
+    },
+    {
+      "id": "hemostasia_cierre",
+      "type": "free",
+      "required": false,
+      "label": "Hemostasia / cierre (detalle adicional)",
+      "empty_text": ""
+    }
+  ],
+  "id": "cyc-nariz-senos-v1",
+  "especialidad": "Cirugía de Cabeza y Cuello",
+  "operaciones": [
+    "Cirugía endoscópica nasal (CEN / FESS)",
+    "Polipectomía nasal",
+    "Septoplastia",
+    "Cirugía de senos paranasales",
+    "Cierre / reconstrucción de base de cráneo (vía nasal)"
+  ],
+  "titulo": "Nariz y senos paranasales",
+  "plantilla_texto": "Se realiza {{procedimiento}} ({{lateralidad}}). Senos abordados: {{senos}}.\nEndoscopio: {{angulo_endoscopio}}. Navegación intraoperatoria: {{navegacion}}.\nBase de cráneo (vía nasal): {{cebc_reseccion_xref_nota}}; cierre {{proc_cierre_base_craneo}}; Hadad {{lateralidad_colgajo_nasoseptal}}; injerto {{tipo_injerto_libre_base_craneo}}; sellante {{tipo_sellante_base_craneo}}.\nHallazgos: {{hallazgos}}.\nEmpaquetamiento: {{empaquetamiento}}. {{hemostasia_cierre}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cyc-oncologia-reconstruccion-v1"] = {
+  "slots": [
+    {
+      "id": "reseccion",
+      "type": "multi",
+      "required": true,
+      "label": "Resección(es) realizada(s)",
+      "options": [
+        "Glosectomía",
+        "Mandibulectomía",
+        "Maxilectomía",
+        "Laringectomía"
+      ],
+      "join": "; "
+    },
+    {
+      "id": "glosectomia_ext",
+      "type": "single",
+      "required": false,
+      "required_if_reseccion_includes": [
+        "Glosectomía"
+      ],
+      "label": "Extensión — glosectomía",
+      "options": [
+        "Parcial",
+        "Hemi",
+        "Subtotal",
+        "Total"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "mandibulectomia_ext",
+      "type": "single",
+      "required": false,
+      "required_if_reseccion_includes": [
+        "Mandibulectomía"
+      ],
+      "label": "Extensión — mandibulectomía",
+      "options": [
+        "Marginal",
+        "Segmentaria",
+        "Hemi",
+        "Total"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "mandib_desart",
+      "type": "single",
+      "required": false,
+      "label": "Desarticulación (mandíbula)",
+      "options": [
+        "Sin desarticulación",
+        "Con desarticulación"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "maxilectomia_ext",
+      "type": "single",
+      "required": false,
+      "required_if_reseccion_includes": [
+        "Maxilectomía"
+      ],
+      "label": "Extensión — maxilectomía",
+      "options": [
+        "Medial",
+        "Inferior",
+        "Subtotal",
+        "Total"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "maxil_exent",
+      "type": "single",
+      "required": false,
+      "label": "Exenteración orbitaria",
+      "options": [
+        "Sin exenteración",
+        "Con exenteración"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "laringectomia_ext",
+      "type": "single",
+      "required": false,
+      "required_if_reseccion_includes": [
+        "Laringectomía"
+      ],
+      "label": "Extensión — laringectomía",
+      "options": [
+        "Total",
+        "Supraglótica",
+        "Supracricoidea",
+        "Parcial"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "recon_modo",
+      "type": "single",
+      "required": true,
+      "label": "Modo de reconstrucción",
+      "options": [
+        "Cierre primario",
+        "Colgajo local",
+        "Colgajo regional",
+        "Colgajo libre microvascularizado",
+        "Material protésico"
+      ]
+    },
+    {
+      "id": "colgajo_local",
+      "type": "single",
+      "required": false,
+      "label": "Colgajo local",
+      "options": [
+        "Nasogeniano",
+        "Lengua",
+        "FAMM"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "colgajo_regional",
+      "type": "single",
+      "required": false,
+      "label": "Colgajo regional",
+      "options": [
+        "Pectoral",
+        "Trapecio",
+        "Dorsal ancho",
+        "Temporal"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "colgajo_libre",
+      "type": "single",
+      "required": false,
+      "label": "Colgajo libre",
+      "options": [
+        "Peroné",
+        "Radial",
+        "ALT",
+        "Cresta ilíaca"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "protesis",
+      "type": "multi",
+      "required": false,
+      "label": "Material protésico",
+      "options": [
+        "Placas de titanio",
+        "Prótesis condilar",
+        "Malla orbitaria"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis",
+      "type": "free",
+      "required": false,
+      "label": "Anastomosis arterial / venosa (detalle)",
+      "empty_text": ""
+    },
+    {
+      "id": "isquemia_min",
+      "type": "free",
+      "required": false,
+      "label": "Tiempo de isquemia (min)",
+      "suffix": " min",
+      "empty_text": ""
+    },
+    {
+      "id": "doppler",
+      "type": "single",
+      "required": false,
+      "label": "Patencia por Doppler (colgajo libre)",
+      "options": [
+        "Permeable",
+        "No permeable",
+        "No aplica"
+      ],
+      "empty_text": "no consignado"
+    },
+    {
+      "id": "pieza_macro",
+      "type": "free",
+      "required": false,
+      "label": "Descripción macroscópica de la pieza",
+      "empty_text": "[descripción macroscópica a completar]"
+    },
+    {
+      "id": "margen_cong",
+      "type": "single",
+      "required": false,
+      "label": "Biopsia de márgenes por congelación",
+      "options": [
+        "Libre",
+        "Comprometido"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_mm",
+      "type": "free",
+      "required": false,
+      "label": "Margen (mm)",
+      "suffix": " mm",
+      "empty_text": ""
+    },
+    {
+      "id": "sng",
+      "type": "single",
+      "required": false,
+      "label": "Sonda nasogástrica",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenajes",
+      "type": "free",
+      "required": false,
+      "label": "Drenajes (detalle)",
+      "empty_text": ""
+    }
+  ],
+  "id": "cyc-oncologia-reconstruccion-v1",
+  "especialidad": "Cirugía de Cabeza y Cuello",
+  "operaciones": [
+    "Glosectomía",
+    "Mandibulectomía",
+    "Maxilectomía",
+    "Laringectomía",
+    "Resección oncológica cervicofacial con reconstrucción"
+  ],
+  "titulo": "Oncología cervicofacial compleja (resección + reconstrucción)",
+  "plantilla_texto": "Tiempo oncológico: se realiza {{reseccion}}\n(glosectomía {{glosectomia_ext}}; mandibulectomía {{mandibulectomia_ext}}\n{{mandib_desart}}; maxilectomía {{maxilectomia_ext}} {{maxil_exent}};\nlaringectomía {{laringectomia_ext}} — completar solo lo aplicable).\n\nHallazgos: {{pieza_macro}}.\nMárgenes por congelación: {{margen_cong}} ({{margen_mm}}).\n\nTiempo reconstructivo: {{recon_modo}}\n(local {{colgajo_local}}; regional {{colgajo_regional}}; libre {{colgajo_libre}};\nprotésico {{protesis}}).\nAnastomosis: {{anastomosis}}. Isquemia: {{isquemia_min}}. Doppler: {{doppler}}.\n\nCierre con SNG: {{sng}}. Drenajes: {{drenajes}}. Cierre por planos."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cyc-ortognatica-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento",
+      "type": "multi",
+      "required": true,
+      "label": "Procedimiento(s)",
+      "options": [
+        "Le Fort I",
+        "OSRM (osteotomía sagital de rama mandibular)",
+        "Mentoplastia",
+        "Otro (detallar en texto)"
+      ],
+      "join": "; "
+    },
+    {
+      "id": "lateralidad_osrm",
+      "type": "single",
+      "required": false,
+      "label": "Lateralidad OSRM (si aplica)",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "fijacion",
+      "type": "free",
+      "required": false,
+      "label": "Fijación / osteosíntesis (detalle)",
+      "empty_text": "[fijación a completar]"
+    },
+    {
+      "id": "oclusion",
+      "type": "free",
+      "required": true,
+      "label": "Comprobación de oclusión final",
+      "empty_text": "oclusión comprobada al cierre"
+    }
+  ],
+  "id": "cyc-ortognatica-v1",
+  "especialidad": "Cirugía de Cabeza y Cuello",
+  "operaciones": [
+    "Cirugía ortognática",
+    "Osteotomía Le Fort I",
+    "Osteotomía sagital de rama mandibular (OSRM)",
+    "Mentoplastia"
+  ],
+  "titulo": "Cirugía ortognática (Le Fort I, OSRM, mentoplastia)",
+  "plantilla_texto": "Se realiza cirugía ortognática: {{procedimiento}} ({{lateralidad_osrm}}).\nOsteotomías y fijación: {{fijacion}}.\nComprobación de oclusión final: {{oclusion}}.\nCierre por planos."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cyc-piel-faneras-v1"] = {
+  "slots": [
+    {
+      "id": "diag_presuntivo",
+      "type": "single",
+      "required": true,
+      "label": "Diagnóstico presuntivo",
+      "options": [
+        "Carcinoma basocelular",
+        "Carcinoma espinocelular",
+        "Melanoma",
+        "Lesión benigna"
+      ]
+    },
+    {
+      "id": "localizacion",
+      "type": "single",
+      "required": true,
+      "label": "Localización",
+      "options": [
+        "Pirámide nasal",
+        "Geniana",
+        "Párpado / cantal",
+        "Periocular",
+        "Auricular",
+        "Labio",
+        "Cuero cabelludo",
+        "Frente",
+        "Manto parotídeo",
+        "Cervical"
+      ]
+    },
+    {
+      "id": "tecnica",
+      "type": "single",
+      "required": true,
+      "label": "Técnica de resección",
+      "options": [
+        "Cirugía micrográfica de Mohs (evaluación 100% márgenes)",
+        "Resección convencional"
+      ]
+    },
+    {
+      "id": "margen_mm",
+      "type": "free",
+      "required": false,
+      "label": "Margen de resección convencional (mm)",
+      "suffix": " mm",
+      "empty_text": ""
+    },
+    {
+      "id": "mohs_capas",
+      "type": "free",
+      "required": false,
+      "label": "Resultado por capa / cuadrantes horarios (comprometido o libre)",
+      "empty_text": "detalle de capas Mohs a completar si aplica"
+    },
+    {
+      "id": "defecto_tamano",
+      "type": "free",
+      "required": false,
+      "label": "Defecto — tamaño",
+      "empty_text": ""
+    },
+    {
+      "id": "defecto_prof",
+      "type": "free",
+      "required": false,
+      "label": "Defecto — profundidad",
+      "empty_text": ""
+    },
+    {
+      "id": "reconstruccion",
+      "type": "single",
+      "required": true,
+      "label": "Reconstrucción",
+      "options": [
+        "Cierre directo",
+        "Colgajo de avance",
+        "Colgajo de rotación",
+        "Colgajo de transposición (rómbico)",
+        "Colgajo de transposición (bilobulado)",
+        "Colgajo paramediano nasal",
+        "Injerto de piel total"
+      ]
+    }
+  ],
+  "id": "cyc-piel-faneras-v1",
+  "reemplaza": "cyc-mohs-cutaneo-v1",
+  "especialidad": "Cirugía de Cabeza y Cuello",
+  "operaciones": [
+    "Cirugía micrográfica de Mohs",
+    "Resección cutánea oncológica facial",
+    "Resección cutánea de piel y faneras",
+    "Reconstrucción facial post-Mohs",
+    "Exéresis de lesión cutánea de cabeza y cuello"
+  ],
+  "titulo": "Patología quirúrgica de piel y faneras (Mohs / convencional + reconstrucción)",
+  "plantilla_texto": "Diagnóstico presuntivo: {{diag_presuntivo}}. Lesión en {{localizacion}}.\nTécnica: {{tecnica}}{{margen_frase}}.\n\nMarcación por cuadrantes horarios. Resultado de capas / márgenes:\n{{mohs_capas}}.\n\nEvaluación del defecto: tamaño {{defecto_tamano}}; profundidad {{defecto_prof}}.\nReconstrucción: {{reconstruccion}}.\n\nCierre con sutura por planos."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cyc-rifo-v1"] = {
+  "slots": [
+    {
+      "id": "fractura_grupo",
+      "type": "multi",
+      "required": true,
+      "label": "Grupo(s) de fractura",
+      "options": [
+        "Mandibular",
+        "CNEO / Orbitomalar",
+        "Maxilar"
+      ],
+      "join": "; "
+    },
+    {
+      "id": "mandib_sitio",
+      "type": "multi",
+      "required": false,
+      "label": "Sitio mandibular",
+      "options": [
+        "Sínfisis",
+        "Cuerpo",
+        "Ángulo",
+        "Rama",
+        "Cóndilo"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "mandib_lado",
+      "type": "single",
+      "required": false,
+      "label": "Lado mandibular",
+      "options": [
+        "Derecho",
+        "Izquierdo",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "cneo_sitio",
+      "type": "multi",
+      "required": false,
+      "label": "Sitio CNEO / orbitomalar",
+      "options": [
+        "Reborde",
+        "Pared orbitaria",
+        "Arbotante"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "cneo_lado",
+      "type": "single",
+      "required": false,
+      "label": "Lado CNEO / orbitomalar",
+      "options": [
+        "Derecho",
+        "Izquierdo",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "maxilar_tipo",
+      "type": "single",
+      "required": false,
+      "label": "Fractura maxilar",
+      "options": [
+        "LeFort I",
+        "LeFort II",
+        "LeFort III",
+        "Palatina"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "intubacion",
+      "type": "single",
+      "required": true,
+      "label": "Intubación",
+      "options": [
+        "Nasotraqueal",
+        "Orotraqueal",
+        "Submentoniana",
+        "Traqueostomía"
+      ]
+    },
+    {
+      "id": "fim",
+      "type": "single",
+      "required": false,
+      "label": "Fijación intermaxilar transitoria",
+      "options": [
+        "Tornillos IMF",
+        "Arcos de Erich",
+        "Splint oclusal",
+        "No utilizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "abordajes",
+      "type": "multi",
+      "required": false,
+      "label": "Abordajes",
+      "options": [
+        "Intraoral vestibular",
+        "Transparotídeo",
+        "Preauricular",
+        "Submandibular",
+        "Subciliar",
+        "Transconjuntival"
+      ],
+      "join": ", ",
+      "empty_text": "abordajes según focos"
+    },
+    {
+      "id": "osteosintesis",
+      "type": "free",
+      "required": false,
+      "label": "Osteosíntesis (sistema, orificios, tornillos por foco)",
+      "empty_text": "[detalle de placas/tornillos por foco]"
+    },
+    {
+      "id": "oclusion",
+      "type": "free",
+      "required": true,
+      "label": "Comprobación de oclusión final"
+    }
+  ],
+  "id": "cyc-rifo-v1",
+  "especialidad": "Cirugía de Cabeza y Cuello",
+  "operaciones": [
+    "Reducción e inmovilización de fracturas óseas (RIFO)",
+    "Osteosíntesis maxilofacial",
+    "Tratamiento quirúrgico de fractura mandibular",
+    "Tratamiento quirúrgico de fractura orbitomalar / CNEO",
+    "Tratamiento quirúrgico de fractura maxilar"
+  ],
+  "titulo": "Traumatología maxilofacial (RIFO)",
+  "plantilla_texto": "Fractura(s): {{fractura_grupo}}.\nMandíbula: {{mandib_sitio}} ({{mandib_lado}}). CNEO/orbitomalar: {{cneo_sitio}}\n({{cneo_lado}}). Maxilar: {{maxilar_tipo}}.\n\nIntubación: {{intubacion}}. Fijación intermaxilar transitoria: {{fim}}.\nBloqueo intermaxilar según técnica elegida. Abordajes: {{abordajes}}.\n\nReducción y osteosíntesis con placas de titanio: {{osteosintesis}}.\nComprobación de oclusión final: {{oclusion}}.\n\nCierre por planos."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cyc-salivales-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento",
+      "options": [
+        "Parotidectomía superficial",
+        "Parotidectomía total",
+        "Parotidectomía parcial / lobectomía",
+        "Enucleación extracapsular",
+        "Submaxilectomía"
+      ]
+    },
+    {
+      "id": "lateralidad",
+      "type": "single",
+      "required": true,
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda"
+      ]
+    },
+    {
+      "id": "mon_facial",
+      "type": "multi",
+      "required": false,
+      "label": "Canales de neuromonitoreo del nervio facial",
+      "options": [
+        "Frontal",
+        "Orbicular",
+        "Bucal",
+        "Marginal"
+      ],
+      "join": ", ",
+      "empty_text": "neuromonitoreo facial no detallado por canales"
+    },
+    {
+      "id": "hallazgo_lesion",
+      "type": "free",
+      "required": false,
+      "label": "Lesión — tamaño / consistencia / localización",
+      "empty_text": "[hallazgos de la lesión a completar]"
+    },
+    {
+      "id": "facial_estado",
+      "type": "single",
+      "required": true,
+      "label": "Integridad del nervio facial",
+      "options": [
+        "Íntegro y funcional",
+        "Rama sacrificada (detallar)"
+      ]
+    },
+    {
+      "id": "facial_detalle",
+      "type": "free",
+      "required": false,
+      "label": "Detalle de rama sacrificada / observación",
+      "empty_text": ""
+    },
+    {
+      "id": "lingual_estado",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento": [
+        "Submaxilectomía"
+      ],
+      "label": "Nervio lingual (vía submaxilar)",
+      "options": [
+        "Identificado y preservado",
+        "Lesionado/sacrificado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hipogloso_estado",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento": [
+        "Submaxilectomía"
+      ],
+      "label": "Nervio hipogloso (vía submaxilar)",
+      "options": [
+        "Identificado y preservado",
+        "Lesionado/sacrificado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje",
+      "type": "single",
+      "required": false,
+      "label": "Drenaje",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    }
+  ],
+  "id": "cyc-salivales-v1",
+  "especialidad": "Cirugía de Cabeza y Cuello",
+  "operaciones": [
+    "Parotidectomía superficial",
+    "Parotidectomía total",
+    "Parotidectomía parcial / lobectomía",
+    "Enucleación extracapsular de parótida",
+    "Submaxilectomía"
+  ],
+  "titulo": "Glándulas salivales (parótida y submaxilar)",
+  "plantilla_texto": "Se realiza {{procedimiento}}, lado {{lateralidad}}.\nNeuromonitoreo continuo del nervio facial (canales {{mon_facial}}).\n\nIdentificación del tronco del facial con referentes anatómicos\n(tragus, vientre posterior del digástrico, sutura timpanomastoidea,\napófisis estiloides) cuando el procedimiento es parotídeo; disección\nanterógrada por ramas. En abordaje submandibular: identificación de\nnervio lingual, hipogloso y conducto de Wharton.\n\nHallazgos: {{hallazgo_lesion}}.\nNervio facial: {{facial_estado}}. {{facial_detalle}}.\nNervio lingual: {{lingual_estado}}. Nervio hipogloso: {{hipogloso_estado}}.\n\nHemostasia. Cierre con drenaje: {{drenaje}}. Cierre por planos."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cyc-tiroides-paratiroides-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento",
+      "options": [
+        "Cirugía de tiroides (vía + extensión)",
+        "Resección de quiste tirogloso (Sistrunk)",
+        "Paratiroidectomía"
+      ]
+    },
+    {
+      "id": "via",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía de tiroides (vía + extensión)"
+      ],
+      "label": "Vía / abordaje",
+      "options": [
+        "Convencional (abierta)",
+        "TOETVA",
+        "Ablativa (percutánea)"
+      ]
+    },
+    {
+      "id": "extension",
+      "type": "single",
+      "required": false,
+      "required_if_via": [
+        "Convencional (abierta)",
+        "TOETVA"
+      ],
+      "label": "Extensión",
+      "options": [
+        "Tiroidectomía total",
+        "Hemitiroidectomía",
+        "Istmectomía"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "extension_ablativa",
+      "type": "single",
+      "required": false,
+      "required_if_via": [
+        "Ablativa (percutánea)"
+      ],
+      "label": "Extensión (ablativa)",
+      "options": [
+        "Nodulectomía por ablación"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "lado",
+      "type": "single",
+      "required": false,
+      "required_if_extension": [
+        "Hemitiroidectomía"
+      ],
+      "label": "Lateralidad (si hemitiroidectomía)",
+      "options": [
+        "Derecho",
+        "Izquierdo"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "para_tecnica",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Paratiroidectomía"
+      ],
+      "label": "Enfoque quirúrgico (paratiroidectomía)",
+      "options": [
+        "Targeted",
+        "Selectiva",
+        "Exploración de 4 glándulas"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "para_patologia",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Paratiroidectomía"
+      ],
+      "label": "Patología de base (paratiroidectomía)",
+      "options": [
+        "Adenoma",
+        "Hiperplasia (insuficiencia renal)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "para_lado",
+      "type": "single",
+      "required": false,
+      "required_if_para_patologia": [
+        "Adenoma"
+      ],
+      "label": "Lado (adenoma)",
+      "options": [
+        "Derecho",
+        "Izquierdo"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "para_cantidad",
+      "type": "single",
+      "required": false,
+      "required_if_para_patologia": [
+        "Adenoma"
+      ],
+      "label": "Cantidad (adenoma)",
+      "options": [
+        "Única",
+        "Múltiple"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "para_ubicacion",
+      "type": "multi",
+      "required": false,
+      "required_if_para_patologia": [
+        "Adenoma"
+      ],
+      "label": "Ubicación (adenoma; multi si múltiple)",
+      "options": [
+        "Superior",
+        "Inferior",
+        "Ectópica"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "para_subtotal_lado",
+      "type": "single",
+      "required": false,
+      "required_if_para_patologia": [
+        "Hiperplasia (insuficiencia renal)"
+      ],
+      "label": "Lado del remanente (paratiroidectomía subtotal)",
+      "options": [
+        "Derecho",
+        "Izquierdo"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "para_subtotal_ubicacion",
+      "type": "single",
+      "required": false,
+      "required_if_para_patologia": [
+        "Hiperplasia (insuficiencia renal)"
+      ],
+      "label": "Glándula remanente (subtotal)",
+      "options": [
+        "Superior",
+        "Inferior"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "intubacion",
+      "type": "single",
+      "required": true,
+      "label": "Intubación",
+      "options": [
+        "Orotraqueal estándar",
+        "Orotraqueal con tubo electrodado (neuromonitoreo)",
+        "Nasotraqueal",
+        "Vía aérea difícil"
+      ]
+    },
+    {
+      "id": "aparatologia",
+      "type": "multi",
+      "required": false,
+      "label": "Neuromonitoreo / aparatología",
+      "options": [
+        "NIM intraoperatorio",
+        "Bisturí ultrasónico",
+        "Ecógrafo intraoperatorio",
+        "Insuflador CO2"
+      ],
+      "join": ", ",
+      "empty_text": "sin aparatología adicional consignada"
+    },
+    {
+      "id": "co2_param",
+      "type": "free",
+      "required": false,
+      "label": "CO2 — presión / flujo (si insuflador)",
+      "empty_text": ""
+    },
+    {
+      "id": "nim_senales",
+      "type": "free",
+      "required": false,
+      "label": "Señales NIM (V1 / R1 / R2 / V2 y mA)",
+      "empty_text": "señales de neuromonitoreo no consignadas en detalle"
+    },
+    {
+      "id": "nlr",
+      "type": "single",
+      "required": true,
+      "label": "Nervio laríngeo recurrente",
+      "options": [
+        "Identificado y preservado",
+        "Lesionado/sacrificado"
+      ]
+    },
+    {
+      "id": "vaciamiento_asoc",
+      "type": "multi",
+      "required": false,
+      "label": "Vaciamiento ganglionar asociado",
+      "options": [
+        "Ninguno",
+        "Central",
+        "Laterocervical unilateral",
+        "Laterocervical bilateral"
+      ],
+      "join": "; ",
+      "empty_text": "sin vaciamiento ganglionar asociado"
+    },
+    {
+      "id": "hallazgo_tamano",
+      "type": "free",
+      "required": false,
+      "label": "Tamaño de la lesión (cm)",
+      "suffix": " cm",
+      "empty_text": "[tamaño no consignado]"
+    },
+    {
+      "id": "hallazgo_caract",
+      "type": "single",
+      "required": false,
+      "label": "Características",
+      "options": [
+        "Sólido",
+        "Quístico",
+        "Mixto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "pth_basal",
+      "type": "free",
+      "required": false,
+      "label": "PTH basal",
+      "empty_text": ""
+    },
+    {
+      "id": "pth_post",
+      "type": "free",
+      "required": false,
+      "label": "PTH post-exéresis",
+      "empty_text": ""
+    },
+    {
+      "id": "pth_pct",
+      "type": "free",
+      "required": false,
+      "label": "Variación PTH (%)",
+      "suffix": " %",
+      "empty_text": ""
+    },
+    {
+      "id": "biopsia_cong",
+      "type": "free",
+      "required": false,
+      "label": "Biopsia por congelación (resultado)",
+      "empty_text": "sin biopsia por congelación consignada"
+    },
+    {
+      "id": "drenaje",
+      "type": "single",
+      "required": false,
+      "label": "Drenaje",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_detalle",
+      "type": "free",
+      "required": false,
+      "label": "Detalle de drenaje (si Sí)",
+      "empty_text": ""
+    }
+  ],
+  "id": "cyc-tiroides-paratiroides-v1",
+  "especialidad": "Cirugía de Cabeza y Cuello",
+  "operaciones": [
+    "Tiroidectomía total",
+    "Hemitiroidectomía",
+    "Istmectomía",
+    "Nodulectomía por ablación",
+    "TOETVA",
+    "Ablación térmica percutánea",
+    "Resección de quiste tirogloso (Sistrunk)",
+    "Paratiroidectomía"
+  ],
+  "titulo": "Cirugía de patología tiroidea, paratiroidea y mínimamente invasiva",
+  "plantilla_texto": "Procedimiento: {{procedimiento_grupo}}.\nVía / abordaje: {{via}}. Extensión: {{extension}}{{extension_ablativa}}{{lado_frase}}.\n\nSi Sistrunk: resección de quiste tirogloso según técnica de Sistrunk.\n\nSi paratiroidectomía: enfoque {{para_tecnica}}; patología {{para_patologia}}.\nAdenoma — lado {{para_lado}}, cantidad {{para_cantidad}}, ubicación {{para_ubicacion}}.\nHiperplasia (paratiroidectomía subtotal, remanente mitad de una glándula) —\nlado del remanente {{para_subtotal_lado}}, glándula {{para_subtotal_ubicacion}}.\n\nIntubación: {{intubacion}}. Aparatología: {{aparatologia}}{{co2_frase}}.\n\nSe desarrolla la técnica según la vía elegida (convencional abierta /\nTOETVA / ablación percutánea) o el procedimiento separado consignado arriba.\nExéresis o ablación con identificación de paratiroides cuando corresponde.\nNervio laríngeo recurrente: {{nlr}}.\nNeuromonitoreo (si aplica): {{nim_senales}}.\n\nVaciamiento ganglionar asociado: {{vaciamiento_asoc}}.\n\nHallazgos: lesión de {{hallazgo_tamano}}, características {{hallazgo_caract}}.\nPTH basal {{pth_basal}}; PTH post-exéresis {{pth_post}} (variación {{pth_pct}}).\nBiopsia por congelación: {{biopsia_cong}}.\n\nCierre: drenaje {{drenaje}}{{drenaje_detalle_frase}}. Hemostasia y cierre por planos."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cyc-vaciamiento-cervical-v1"] = {
+  "slots": [
+    {
+      "id": "tipo",
+      "type": "single",
+      "required": true,
+      "label": "Tipo de vaciamiento",
+      "options": [
+        "Radical clásico",
+        "Radical modificado tipo I (funcional)",
+        "Radical modificado tipo II (funcional)",
+        "Radical modificado tipo III (funcional)",
+        "Selectivo (por niveles)",
+        "Central (VI/VII)"
+      ]
+    },
+    {
+      "id": "lateralidad",
+      "type": "single",
+      "required": true,
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral simultánea",
+        "Bilateral secuencial"
+      ]
+    },
+    {
+      "id": "niveles",
+      "type": "multi",
+      "required": true,
+      "label": "Niveles disecados",
+      "options": [
+        "IA",
+        "IB",
+        "IIA",
+        "IIB",
+        "III",
+        "IV",
+        "VA",
+        "VB",
+        "VI",
+        "VII"
+      ],
+      "join": ", "
+    },
+    {
+      "id": "n_espinal",
+      "type": "single",
+      "required": true,
+      "label": "Nervio espinal accesorio",
+      "options": [
+        "Preservado",
+        "Seccionado"
+      ]
+    },
+    {
+      "id": "vyi",
+      "type": "single",
+      "required": true,
+      "label": "Vena yugular interna",
+      "options": [
+        "Preservada",
+        "Ligada"
+      ]
+    },
+    {
+      "id": "vyi_lado",
+      "type": "free",
+      "required": false,
+      "label": "Lado VYI (si ligada / bilateral)",
+      "empty_text": ""
+    },
+    {
+      "id": "ecm",
+      "type": "single",
+      "required": true,
+      "label": "Músculo esternocleidomastoideo",
+      "options": [
+        "Preservado",
+        "Resecado"
+      ]
+    },
+    {
+      "id": "nervios_id",
+      "type": "multi",
+      "required": false,
+      "label": "Nervios identificados y preservados",
+      "options": [
+        "Frénico",
+        "Simpático cervical",
+        "Hipogloso",
+        "Lingual"
+      ],
+      "join": ", ",
+      "empty_text": "otros nervios según disección habitual del tipo elegido"
+    },
+    {
+      "id": "incision",
+      "type": "single",
+      "required": true,
+      "label": "Incisión",
+      "options": [
+        "MacFee",
+        "Crile",
+        "En Y",
+        "Utility",
+        "Otra (detallar en texto)"
+      ]
+    },
+    {
+      "id": "adenopatias",
+      "type": "single",
+      "required": true,
+      "label": "Adenopatías sospechosas (semiología)",
+      "options": [
+        "Ausentes",
+        "Presentes"
+      ]
+    },
+    {
+      "id": "adenopatias_semiologia",
+      "type": "free",
+      "required": false,
+      "label": "Detalle semiológico (nivel, tamaño visto/palpado, ruptura capsular, fijación a vecinos — NO conteo AP)",
+      "empty_text": "sin adenopatías sospechosas al examen intraoperatorio"
+    },
+    {
+      "id": "pieza_rotulada",
+      "type": "single",
+      "required": true,
+      "label": "Pieza rotulada por niveles",
+      "options": [
+        "Sí",
+        "No"
+      ]
+    },
+    {
+      "id": "drenajes_n",
+      "type": "free",
+      "required": false,
+      "label": "Cantidad de drenajes (1–2)",
+      "empty_text": ""
+    },
+    {
+      "id": "drenajes_tipo",
+      "type": "single",
+      "required": false,
+      "label": "Tipo de drenaje",
+      "options": [
+        "Hemosuctor",
+        "Jackson-Pratt",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "valsalva_quilo",
+      "type": "single",
+      "required": false,
+      "label": "Chequeo de Valsalva (quilo; nivel IV/V izquierdo)",
+      "options": [
+        "Realizado — sin fuga",
+        "Realizado — con fuga",
+        "No aplica"
+      ],
+      "empty_text": "no consignado"
+    }
+  ],
+  "id": "cyc-vaciamiento-cervical-v1",
+  "especialidad": "Cirugía de Cabeza y Cuello",
+  "operaciones": [
+    "Vaciamiento ganglionar cervical",
+    "Linfadenectomía cervical",
+    "Vaciamiento radical de cuello",
+    "Vaciamiento radical modificado",
+    "Vaciamiento selectivo de cuello",
+    "Vaciamiento central"
+  ],
+  "titulo": "Vaciamientos ganglionares cervicales (linfadenectomías)",
+  "plantilla_texto": "Se realiza vaciamiento ganglionar cervical tipo {{tipo}}, lado {{lateralidad}}.\nNiveles disecados: {{niveles}}. Incisión: {{incision}}.\n\nDisección sistemática por niveles (cadena yugulocarotídea, triángulo\nposterior y/o compartimento central según el tipo). Estructuras:\nnervio espinal accesorio {{n_espinal}}; vena yugular interna {{vyi}}\n{{vyi_lado}}; ECM {{ecm}}. Nervios identificados y preservados: {{nervios_id}}.\n\nHallazgos semiológicos: adenopatías sospechosas {{adenopatias}}.\n{{adenopatias_semiologia}}.\n(No se consigna conteo ganglionar de anatomía patológica; solo lo\nobservado/palpado en el acto.)\n\nPieza quirúrgica rotulada por niveles: {{pieza_rotulada}}.\nCierre con {{drenajes_n}} drenaje(s) tipo {{drenajes_tipo}}.\nValsalva / control de quilo: {{valsalva_quilo}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cge-endoscopia-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Endoscopia digestiva alta (VEDA)",
+        "Endoscopia digestiva baja (colonoscopia / rectosigmoidoscopia)",
+        "Endoscopia de emergencia / hemorragia",
+        "Endoscopia terapéutica / avanzada / CPRE",
+        "Complicaciones / incidencias post-procedimiento"
+      ]
+    },
+    {
+      "id": "sedacion_endoscopia",
+      "type": "single",
+      "required": false,
+      "label": "Sedación / anestesia",
+      "options": [
+        "Tópica (lidocaína spray)",
+        "Sedación consciente (midazolam / fentanilo)",
+        "Sedación profunda / asistida por anestesiología (propofol)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": false,
+      "label": "Abordaje (si aplica)",
+      "options": [
+        "Endoscópico",
+        "Convertido a quirúrgico / abierto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a quirúrgico / abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_veda",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva alta (VEDA)"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Dispepsia / dolor epigástrico",
+        "Tamizaje / vigilancia",
+        "Disfagia / odinofagia",
+        "Síndrome anémico",
+        "Sospecha de hemorragia digestiva"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "hallazgo_esofago",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva alta (VEDA)"
+      ],
+      "label": "Hallazgos — esófago",
+      "options": [
+        "Normal",
+        "Esofagitis",
+        "Esófago de Barrett",
+        "Várices esofágicas"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "grado_los_angeles",
+      "type": "single",
+      "required": false,
+      "required_if_hallazgo_esofago": [
+        "Esofagitis"
+      ],
+      "label": "Esofagitis — Los Ángeles",
+      "options": [
+        "Grado A",
+        "Grado B",
+        "Grado C",
+        "Grado D"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "barrett_praga_c",
+      "type": "free",
+      "required": false,
+      "required_if_hallazgo_esofago": [
+        "Esófago de Barrett"
+      ],
+      "label": "Barrett — Praga C (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "barrett_praga_m",
+      "type": "free",
+      "required": false,
+      "required_if_hallazgo_esofago": [
+        "Esófago de Barrett"
+      ],
+      "label": "Barrett — Praga M (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "grado_varices_esofagicas",
+      "type": "single",
+      "required": false,
+      "required_if_hallazgo_esofago": [
+        "Várices esofágicas"
+      ],
+      "label": "Grado de várices esofágicas",
+      "options": [
+        "Grado I",
+        "Grado II",
+        "Grado III",
+        "Grado IV"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "signos_rojos_varices",
+      "type": "single",
+      "required": false,
+      "required_if_hallazgo_esofago": [
+        "Várices esofágicas"
+      ],
+      "label": "Signos rojos (várices)",
+      "options": [
+        "Con signos rojos",
+        "Sin signos rojos"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hallazgo_estomago",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva alta (VEDA)"
+      ],
+      "label": "Hallazgos — estómago",
+      "options": [
+        "Normal",
+        "Gastritis",
+        "Úlcera gástrica",
+        "Lesión elevada / polipoidea"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_gastritis",
+      "type": "multi",
+      "required": false,
+      "required_if_hallazgo_estomago": [
+        "Gastritis"
+      ],
+      "label": "Tipo de gastritis",
+      "options": [
+        "Eritematosa",
+        "Erosiva",
+        "Atrófica"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "forrest_ulcera_gastrica",
+      "type": "single",
+      "required": false,
+      "required_if_hallazgo_estomago": [
+        "Úlcera gástrica"
+      ],
+      "label": "Forrest (úlcera gástrica)",
+      "options": [
+        "Ia",
+        "Ib",
+        "IIa",
+        "IIb",
+        "IIc",
+        "III"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hallazgo_duodeno",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva alta (VEDA)"
+      ],
+      "label": "Hallazgos — duodeno",
+      "options": [
+        "Normal",
+        "Duodenitis",
+        "Úlcera duodenal",
+        "Patrón atrófico (atrofia vellositaria / sospecha de celiaquía)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "bbps_colon_derecho",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva baja (colonoscopia / rectosigmoidoscopia)"
+      ],
+      "label": "BBPS — colon derecho",
+      "options": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "bbps_colon_transverso",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva baja (colonoscopia / rectosigmoidoscopia)"
+      ],
+      "label": "BBPS — colon transverso",
+      "options": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "bbps_colon_izquierdo",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva baja (colonoscopia / rectosigmoidoscopia)"
+      ],
+      "label": "BBPS — colon izquierdo",
+      "options": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "calidad_preparacion_bbps",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva baja (colonoscopia / rectosigmoidoscopia)"
+      ],
+      "label": "Calidad global de la preparación (BBPS)",
+      "options": [
+        "Inadecuada (0–5)",
+        "Adecuada (6–9)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "extension_colonoscopia",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva baja (colonoscopia / rectosigmoidoscopia)"
+      ],
+      "label": "Extensión del estudio",
+      "options": [
+        "Recto",
+        "Sigmoides",
+        "Colon izquierdo",
+        "Colon transverso",
+        "Ciego",
+        "Íleon terminal (ileocolonoscopia)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "hallazgo_colon",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia digestiva baja (colonoscopia / rectosigmoidoscopia)"
+      ],
+      "label": "Hallazgos anatómicos",
+      "options": [
+        "Normal",
+        "Enfermedad diverticular",
+        "Pólipos",
+        "Proctitis / colitis",
+        "Estenosis / lesión ocupante de espacio"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "ubicacion_diverticulos",
+      "type": "multi",
+      "required": false,
+      "required_if_hallazgo_colon": [
+        "Enfermedad diverticular"
+      ],
+      "label": "Divertículos — ubicación",
+      "options": [
+        "Sigmoides",
+        "Pancolónica"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "polipos_ubicacion_tamano",
+      "type": "free",
+      "required": false,
+      "required_if_hallazgo_colon": [
+        "Pólipos"
+      ],
+      "label": "Pólipos — ubicación y tamaño (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_paris_polipo",
+      "type": "single",
+      "required": false,
+      "required_if_hallazgo_colon": [
+        "Pólipos"
+      ],
+      "label": "Clasificación de París (pólipo)",
+      "options": [
+        "Is",
+        "Isp",
+        "Ip",
+        "IIa",
+        "IIb",
+        "IIc"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_colitis",
+      "type": "multi",
+      "required": false,
+      "required_if_hallazgo_colon": [
+        "Proctitis / colitis"
+      ],
+      "label": "Tipo de proctitis / colitis",
+      "options": [
+        "Infecciosa",
+        "Ulcerosa",
+        "Crohn",
+        "Isquémica"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "mayo_grade_cu",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_colitis": [
+        "Ulcerosa"
+      ],
+      "label": "Mayo endoscopic subscore (colitis ulcerosa)",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "sitio_biopsia",
+      "type": "multi",
+      "required": false,
+      "label": "Sitio de toma de biopsia",
+      "options": [
+        "Esófago",
+        "Estómago (cuerpo / antro — protocolo de Sydney)",
+        "Duodeno (2.ª porción)",
+        "Íleon",
+        "Colon derecho",
+        "Colon transverso",
+        "Colon izquierdo",
+        "Sigmoides",
+        "Recto"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_biopsia",
+      "type": "multi",
+      "required": false,
+      "label": "Técnica / dispositivo de biopsia",
+      "options": [
+        "Pinza de biopsia estándar",
+        "Pinza jumbo",
+        "Cepillado citológico"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "objetivo_biopsia",
+      "type": "multi",
+      "required": false,
+      "label": "Objetivo diagnóstico de la biopsia",
+      "options": [
+        "Detección de Helicobacter pylori",
+        "Evaluación de atrofia / metaplasia intestinal (OLGA / OLGIM)",
+        "Confirmación de enfermedad celíaca",
+        "Descarte de displasia / malignidad",
+        "Mapeo de enfermedad inflamatoria intestinal (EII)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "metodo_h_pylori",
+      "type": "multi",
+      "required": false,
+      "required_if_objetivo_biopsia": [
+        "Detección de Helicobacter pylori"
+      ],
+      "label": "Helicobacter pylori — método",
+      "options": [
+        "Test rápido de ureasa",
+        "Histología"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "marsh_celiaquia",
+      "type": "free",
+      "required": false,
+      "required_if_objetivo_biopsia": [
+        "Confirmación de enfermedad celíaca"
+      ],
+      "label": "Clasificación de Marsh",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_urgencia_endoscopia",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia de emergencia / hemorragia"
+      ],
+      "label": "Indicación de urgencia",
+      "options": [
+        "Hemorragia digestiva alta (HDA)",
+        "Hemorragia digestiva baja (HDB)",
+        "Cuerpo extraño / impactación alimentaria",
+        "Ingesta de cáusticos"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "manejo_hemorragia_no_variceal",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia de emergencia / hemorragia"
+      ],
+      "label": "Manejo de hemorragia no variceal",
+      "options": [
+        "Inyectoterapia (adrenalina 1:10.000)",
+        "Hemostasia mecánica (clips / hemoclips)",
+        "Térmica / coagulación (argón plasma / Gold Probe)",
+        "Polvos hemostáticos (Hemospray / EndoClot)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "cantidad_hemoclips",
+      "type": "free",
+      "required": false,
+      "required_if_manejo_hemorragia_no_variceal": [
+        "Hemostasia mecánica (clips / hemoclips)"
+      ],
+      "label": "Cantidad de hemoclips",
+      "empty_text": ""
+    },
+    {
+      "id": "manejo_hemorragia_variceal",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia de emergencia / hemorragia"
+      ],
+      "label": "Manejo de hemorragia variceal / HDA portal",
+      "options": [
+        "Ligadura elástica de várices esofágicas (LEVE)",
+        "Inyección de cianoacrilato (várices gástricas / fúndicas)",
+        "Sonda de Sengstaken-Blakemore / Linton"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "caracter_hemorragia_variceal",
+      "type": "single",
+      "required": false,
+      "label": "Carácter de la hemorragia variceal",
+      "options": [
+        "Profilaxis primaria (sin sangrado activo)",
+        "Profilaxis secundaria (resangrado)",
+        "Control de sangrado activo"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "numero_bandas_leve",
+      "type": "free",
+      "required": false,
+      "required_if_manejo_hemorragia_variceal": [
+        "Ligadura elástica de várices esofágicas (LEVE)"
+      ],
+      "label": "Número de bandas (LEVE)",
+      "empty_text": ""
+    },
+    {
+      "id": "extraccion_cuerpo_extrano",
+      "type": "multi",
+      "required": false,
+      "required_if_indicacion_urgencia_endoscopia": [
+        "Cuerpo extraño / impactación alimentaria"
+      ],
+      "label": "Extracción de cuerpo extraño / impactación",
+      "options": [
+        "Asa de polipectomía",
+        "Cesta de Dormia",
+        "Pinza de cocodrilo",
+        "Capuchón protector"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_terapeutica",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endoscopia terapéutica / avanzada / CPRE"
+      ],
+      "label": "Procedimiento terapéutico",
+      "options": [
+        "Polipectomía simple",
+        "Resección mucosal endoscópica (RME / mucosectomía)",
+        "Disección submucosa endoscópica (DSE)",
+        "Dilatación neumática / hidrostática / mecánica con bujías",
+        "Colocación de prótesis / stent",
+        "Gastrostomía endoscópica percutánea (PEG)",
+        "CPRE — papilotomía / esfinterotomía",
+        "CPRE — extracción de coledocolitiasis",
+        "CPRE — colocación de stent biliar"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_polipectomia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_terapeutica": [
+        "Polipectomía simple"
+      ],
+      "label": "Técnica de polipectomía",
+      "options": [
+        "Asa en frío",
+        "Asa con diatermia"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ubicacion_stent_digestivo",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_terapeutica": [
+        "Colocación de prótesis / stent"
+      ],
+      "label": "Ubicación del stent digestivo",
+      "options": [
+        "Esofágico",
+        "Duodenal",
+        "Colónico"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_stent_digestivo",
+      "type": "single",
+      "required": false,
+      "required_if_proc_terapeutica": [
+        "Colocación de prótesis / stent"
+      ],
+      "label": "Tipo de stent digestivo",
+      "options": [
+        "Autoexpandible metálico",
+        "Plástico"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_peg",
+      "type": "single",
+      "required": false,
+      "required_if_proc_terapeutica": [
+        "Gastrostomía endoscópica percutánea (PEG)"
+      ],
+      "label": "Indicación de PEG",
+      "options": [
+        "Disfagia neurológica (ACV, ELA, etc.)",
+        "Cáncer de cabeza y cuello",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_peg_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_peg": [
+        "Otro"
+      ],
+      "label": "Indicación PEG (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "calibre_peg_fr",
+      "type": "free",
+      "required": false,
+      "required_if_proc_terapeutica": [
+        "Gastrostomía endoscópica percutánea (PEG)"
+      ],
+      "label": "Calibre PEG (Fr)",
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_peg",
+      "type": "single",
+      "required": false,
+      "required_if_proc_terapeutica": [
+        "Gastrostomía endoscópica percutánea (PEG)"
+      ],
+      "label": "Técnica PEG",
+      "options": [
+        "Pull",
+        "Push"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "profilaxis_pancreatitis_cpre",
+      "type": "single",
+      "required": false,
+      "required_if_proc_terapeutica": [
+        "CPRE — papilotomía / esfinterotomía"
+      ],
+      "label": "Profilaxis de pancreatitis post-CPRE",
+      "options": [
+        "AINE rectal administrado (indometacina / diclofenac)",
+        "No administrado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_extraccion_coledocolitiasis",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_terapeutica": [
+        "CPRE — extracción de coledocolitiasis"
+      ],
+      "label": "Extracción de coledocolitiasis",
+      "options": [
+        "Cesta de Dormia",
+        "Balón extractor",
+        "Litotricia"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_stent_biliar",
+      "type": "single",
+      "required": false,
+      "required_if_proc_terapeutica": [
+        "CPRE — colocación de stent biliar"
+      ],
+      "label": "Tipo de stent biliar",
+      "options": [
+        "Plástico",
+        "Metálico SEEMS"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "complicacion_endoscopia",
+      "type": "multi",
+      "required": false,
+      "label": "Complicaciones intraprocedimiento",
+      "options": [
+        "Sangrado controlado",
+        "Perforación",
+        "Hipoxemia transitoria / laringoespasmo",
+        "Aspiración"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "medidas_correccion_complicacion",
+      "type": "free",
+      "required": false,
+      "label": "Medidas de corrección aplicadas",
+      "empty_text": ""
+    },
+    {
+      "id": "estado_retiro_servicio",
+      "type": "multi",
+      "required": false,
+      "label": "Estado al retiro del servicio",
+      "options": [
+        "Recuperación anestésica satisfactoria",
+        "Alta ambulatoria",
+        "Hospitalización / observación"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "aldrete_score",
+      "type": "free",
+      "required": false,
+      "required_if_estado_retiro_servicio": [
+        "Recuperación anestésica satisfactoria"
+      ],
+      "label": "Aldrete (/10)",
+      "empty_text": ""
+    }
+  ],
+  "id": "cge-endoscopia-v1",
+  "especialidad": "Gastroenterología",
+  "operaciones": [
+    "Endoscopia digestiva alta (VEDA)",
+    "Colonoscopia / rectosigmoidoscopia",
+    "Endoscopia de urgencia / hemorragia digestiva",
+    "Endoscopia terapéutica avanzada / CPRE",
+    "Complicaciones e incidencias post-endoscopia"
+  ],
+  "titulo": "Gastroenterología y endoscopia digestiva",
+  "plantilla_texto": "Endoscopia — {{procedimiento_grupo}}. Sedación {{sedacion_endoscopia}}. Abordaje {{abordaje}}{{conversion_causa}}.\nVEDA: {{indicacion_veda}}; esófago {{hallazgo_esofago}} LA {{grado_los_angeles}} Barrett C{{barrett_praga_c}} M{{barrett_praga_m}} várices {{grado_varices_esofagicas}} {{signos_rojos_varices}}; estómago {{hallazgo_estomago}} {{tipo_gastritis}} Forrest {{forrest_ulcera_gastrica}}; duodeno {{hallazgo_duodeno}}.\nColon: BBPS D{{bbps_colon_derecho}} T{{bbps_colon_transverso}} I{{bbps_colon_izquierdo}} {{calidad_preparacion_bbps}}; extensión {{extension_colonoscopia}}; {{hallazgo_colon}} divert. {{ubicacion_diverticulos}}; pólipos {{polipos_ubicacion_tamano}} París {{clasificacion_paris_polipo}}; colitis {{tipo_colitis}} Mayo {{mayo_grade_cu}}.\nBiopsia: {{sitio_biopsia}}; {{tecnica_biopsia}}; {{objetivo_biopsia}} Hp {{metodo_h_pylori}} Marsh {{marsh_celiaquia}}.\nUrgencia: {{indicacion_urgencia_endoscopia}}; no variceal {{manejo_hemorragia_no_variceal}} clips {{cantidad_hemoclips}}; variceal {{manejo_hemorragia_variceal}} carácter {{caracter_hemorragia_variceal}} bandas {{numero_bandas_leve}}; CE {{extraccion_cuerpo_extrano}}.\nTerapéutica: {{proc_terapeutica}} polipect. {{tecnica_polipectomia}}; stent {{ubicacion_stent_digestivo}} {{tipo_stent_digestivo}}; PEG {{indicacion_peg}}{{indicacion_peg_otro}} {{calibre_peg_fr}} Fr {{tecnica_peg}}; CPRE profilaxis {{profilaxis_pancreatitis_cpre}} extracción {{tecnica_extraccion_coledocolitiasis}} stent biliar {{tipo_stent_biliar}}.\nComplicaciones: {{complicacion_endoscopia}} {{medidas_correccion_complicacion}}; retiro {{estado_retiro_servicio}} Aldrete {{aldrete_score}}/10."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cgine-pelviana-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Patología uterina (histerectomía / miomectomía)",
+        "Patología anexial / conservadora",
+        "Cirugía oncológica / estadificación pelviana",
+        "Piso pélvico / uroginecología / vaginal",
+        "Histeroscopía / procedimientos intrauterinos / menores"
+      ]
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": true,
+      "label": "Abordaje",
+      "options": [
+        "Abierto / laparotómico (Pfannenstiel / mediana)",
+        "Laparoscópico (TLH)",
+        "Robótico",
+        "Vaginal (VH / VAVH)",
+        "vNOTES",
+        "Histeroscópico",
+        "Convertido a abierto"
+      ]
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_uterino",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Patología uterina (histerectomía / miomectomía)"
+      ],
+      "label": "Procedimiento uterino",
+      "options": [
+        "Histerectomía total",
+        "Histerectomía subtotal / supracervical",
+        "Histerectomía radical (parametrectomía / Wertheim-Meigs)",
+        "Miomectomía"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_uterina",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Patología uterina (histerectomía / miomectomía)"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Miomatosis sintomática",
+        "Adenomiosis",
+        "Sangrado uterino anormal",
+        "Prolapso uterino",
+        "Neoplasia de endometrio",
+        "Neoplasia de cérvix",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_uterina_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_uterina": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "miomectomia_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_proc_uterino": [
+        "Miomectomía"
+      ],
+      "label": "Miomectomía — número",
+      "options": [
+        "Única",
+        "Múltiple"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "mioma_ubicacion",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_uterino": [
+        "Miomectomía"
+      ],
+      "label": "Ubicación del/los mioma(s)",
+      "options": [
+        "Subserosa",
+        "Intramural",
+        "Submucosa"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "anexectomia_asociada",
+      "type": "single",
+      "required": false,
+      "label": "Anexectomía asociada",
+      "options": [
+        "Salpingooforectomía bilateral (SOB)",
+        "Salpingooforectomía unilateral",
+        "Conservación de anexos / salpingectomía profiláctica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "anexectomia_unilateral_lado",
+      "type": "single",
+      "required": false,
+      "required_if_anexectomia_asociada": [
+        "Salpingooforectomía unilateral"
+      ],
+      "label": "Lateralidad (anexectomía unilateral)",
+      "options": [
+        "Derecha",
+        "Izquierda"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "control_vasos_uterinos",
+      "type": "single",
+      "required": false,
+      "label": "Sellado / ligadura de vasos uterino-ováricos y arterias uterinas",
+      "options": [
+        "Sutura manual",
+        "Sellado energético / clips"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ureter_derecho_histerectomia",
+      "type": "single",
+      "required": false,
+      "label": "Uréter derecho",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ureter_izquierdo_histerectomia",
+      "type": "single",
+      "required": false,
+      "label": "Uréter izquierdo",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "vejiga_histerectomia",
+      "type": "single",
+      "required": false,
+      "label": "Vejiga (espacio vesicouterino)",
+      "options": [
+        "Identificada y preservada",
+        "Lesión identificada intraoperatoriamente",
+        "No disecada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_parametrio",
+      "type": "single",
+      "required": false,
+      "required_if_proc_uterino": [
+        "Histerectomía radical (parametrectomía / Wertheim-Meigs)"
+      ],
+      "label": "Margen de parametrio",
+      "options": [
+        "Libre",
+        "Comprometido",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_parametrio_distancia",
+      "type": "free",
+      "required": false,
+      "required_if_margen_parametrio": [
+        "Libre",
+        "Comprometido"
+      ],
+      "label": "Margen parametrio — distancia",
+      "empty_text": ""
+    },
+    {
+      "id": "margen_vaginal_radical",
+      "type": "single",
+      "required": false,
+      "required_if_proc_uterino": [
+        "Histerectomía radical (parametrectomía / Wertheim-Meigs)"
+      ],
+      "label": "Margen vaginal",
+      "options": [
+        "Libre",
+        "Comprometido",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_vaginal_radical_distancia",
+      "type": "free",
+      "required": false,
+      "required_if_margen_vaginal_radical": [
+        "Libre",
+        "Comprometido"
+      ],
+      "label": "Margen vaginal — distancia",
+      "empty_text": ""
+    },
+    {
+      "id": "preservacion_nerviosa_radical",
+      "type": "single",
+      "required": false,
+      "required_if_proc_uterino": [
+        "Histerectomía radical (parametrectomía / Wertheim-Meigs)"
+      ],
+      "label": "Preservación nerviosa (nervios autonómicos pélvicos)",
+      "options": [
+        "Preservación nerviosa lograda",
+        "Preservación nerviosa parcial",
+        "No intentada — técnica convencional"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_anexial",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Patología anexial / conservadora"
+      ],
+      "label": "Procedimiento anexial",
+      "options": [
+        "Salpingectomía (ectópico / hidrosálpinx / profilaxis)",
+        "Quistectomía ovárica / cistectomía",
+        "Ooforectomía parcial / monolateral",
+        "Liberación de adherencias pelvianas / adhesiólisis",
+        "Resección / ablación de endometriosis pelviana"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "lateralidad_anexial",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Patología anexial / conservadora"
+      ],
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "contenido_lesion_anexial",
+      "type": "single",
+      "required": false,
+      "label": "Contenido de la lesión",
+      "options": [
+        "Seroso",
+        "Hemático / endometrioma",
+        "Sebáceo / dermoide",
+        "Purulento / absceso tubo-ovárico (ATO)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "rotura_quiste_intraoperatoria",
+      "type": "single",
+      "required": false,
+      "required_if_proc_anexial": [
+        "Quistectomía ovárica / cistectomía"
+      ],
+      "label": "Rotura intraoperatoria del quiste",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "grado_endometriosis",
+      "type": "single",
+      "required": false,
+      "required_if_proc_anexial": [
+        "Resección / ablación de endometriosis pelviana"
+      ],
+      "label": "Grado de endometriosis",
+      "options": [
+        "I",
+        "II",
+        "III",
+        "IV"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "campo_anexial",
+      "type": "single",
+      "required": false,
+      "required_if_contenido_lesion_anexial": [
+        "Purulento / absceso tubo-ovárico (ATO)"
+      ],
+      "label": "Clasificación del campo",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_onco_gine",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía oncológica / estadificación pelviana"
+      ],
+      "label": "Indicación oncológica",
+      "options": [
+        "Cáncer de endometrio",
+        "Cáncer de ovario",
+        "Cáncer de cérvix"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "gesto_estadificacion",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía oncológica / estadificación pelviana"
+      ],
+      "label": "Gestos de estadificación / debulking",
+      "options": [
+        "Linfadenectomía pelviana",
+        "Linfadenectomía paraaórtica",
+        "Detección y biopsia de ganglio centinela",
+        "Omentectomía",
+        "Biopsias peritoneales múltiples / lavado peritoneal citológico",
+        "Citorreducción completa (R0)",
+        "Citorreducción incompleta"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "plantilla_linfadenectomia_pelviana",
+      "type": "multi",
+      "required": false,
+      "required_if_gesto_estadificacion": [
+        "Linfadenectomía pelviana"
+      ],
+      "label": "Extensión / plantilla — linfadenectomía pelviana",
+      "options": [
+        "Ilíaca externa",
+        "Ilíaca interna",
+        "Ilíaca común",
+        "Obturatriz"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "omentectomia_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_gesto_estadificacion": [
+        "Omentectomía"
+      ],
+      "label": "Omentectomía",
+      "options": [
+        "Infracólica",
+        "Total"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ganglio_centinela_trazador",
+      "type": "multi",
+      "required": false,
+      "required_if_gesto_estadificacion": [
+        "Detección y biopsia de ganglio centinela"
+      ],
+      "label": "Trazador / técnica de ganglio centinela",
+      "options": [
+        "Verde de indocianina (ICG)",
+        "Trazador radioisotópico / colorante"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "resultado_ganglio_centinela",
+      "type": "single",
+      "required": false,
+      "required_if_gesto_estadificacion": [
+        "Detección y biopsia de ganglio centinela"
+      ],
+      "label": "Resultado de ganglio centinela",
+      "options": [
+        "Negativo",
+        "Positivo (macrometástasis)",
+        "Positivo (micrometástasis)",
+        "Células tumorales aisladas",
+        "No evaluable"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "rotura_capsular_oncologica",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_onco_gine": [
+        "Cáncer de ovario"
+      ],
+      "label": "Rotura capsular ovárica (oncológica)",
+      "options": [
+        "Sin rotura",
+        "Rotura intraoperatoria",
+        "Rotura preoperatoria"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "invasion_miometrial",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_onco_gine": [
+        "Cáncer de endometrio"
+      ],
+      "label": "Invasión miometrial",
+      "options": [
+        "<50% del miometrio",
+        "≥50% del miometrio",
+        "No evaluada intraoperatoriamente"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_piso_pelvico",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Piso pélvico / uroginecología / vaginal"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Colpoplastia anterior (cistocele)",
+        "Colpoplastia posterior (rectocele / enterocele)",
+        "Sacrocolpopexia / sacrohisteropexia (malla sintética)",
+        "Fijación al ligamento sacroespinoso (Richter)",
+        "Cinta suburetral — TVT (vía retropúbica)",
+        "Cinta suburetral — TOT (vía transobturadora)",
+        "Colpocleisis (Le Fort)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_piso_pelvico",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Piso pélvico / uroginecología / vaginal"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Cistocele",
+        "Rectocele",
+        "Enterocele",
+        "Prolapso apical (uterino o de cúpula)",
+        "Incontinencia urinaria de esfuerzo"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "grado_popq",
+      "type": "single",
+      "required": false,
+      "label": "Grado POP-Q",
+      "options": [
+        "I",
+        "II",
+        "III",
+        "IV"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "cistoscopia_control_tvt",
+      "type": "single",
+      "required": false,
+      "required_if_proc_piso_pelvico": [
+        "Cinta suburetral — TVT (vía retropúbica)"
+      ],
+      "label": "Cistoscopía de control (TVT)",
+      "options": [
+        "Realizada — sin lesión",
+        "Realizada — lesión identificada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_histeroscopia",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Histeroscopía / procedimientos intrauterinos / menores"
+      ],
+      "label": "Tipo",
+      "options": [
+        "Histeroscopía diagnóstica",
+        "Histeroscopía quirúrgica / resectoscopía",
+        "Legrado uterino instrumental (LUI) / AMEU",
+        "Biopsia de cérvix / conización (Leep / cono frío)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "gesto_histeroscopico",
+      "type": "multi",
+      "required": false,
+      "required_if_tipo_histeroscopia": [
+        "Histeroscopía quirúrgica / resectoscopía"
+      ],
+      "label": "Gesto histeroscópico",
+      "options": [
+        "Polipectomía endometrial / cervical",
+        "Miomectomía histeroscópica",
+        "Ablación / resección endometrial",
+        "Metroplastia / sección de septo uterino"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "complicacion_histeroscopia",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_histeroscopia": [
+        "Histeroscopía quirúrgica / resectoscopía"
+      ],
+      "label": "Complicación de histeroscopía",
+      "options": [
+        "Sin complicaciones",
+        "Perforación uterina",
+        "Otra"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "complicacion_histeroscopia_otra",
+      "type": "free",
+      "required": false,
+      "required_if_complicacion_histeroscopia": [
+        "Otra"
+      ],
+      "label": "Complicación histeroscopía (otra)",
+      "empty_text": ""
+    },
+    {
+      "id": "margen_conizacion",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_histeroscopia": [
+        "Biopsia de cérvix / conización (Leep / cono frío)"
+      ],
+      "label": "Margen quirúrgico (conización)",
+      "options": [
+        "Libre",
+        "Comprometido",
+        "No evaluable"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_conizacion_distancia",
+      "type": "free",
+      "required": false,
+      "required_if_margen_conizacion": [
+        "Libre",
+        "Comprometido"
+      ],
+      "label": "Margen conización — distancia",
+      "empty_text": ""
+    },
+    {
+      "id": "cierre_cupula_vaginal",
+      "type": "single",
+      "required": false,
+      "label": "Cierre de cúpula vaginal",
+      "options": [
+        "Vía vaginal",
+        "Vía laparoscópica / abierta"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "sutura_cupula",
+      "type": "single",
+      "required": false,
+      "required_if_cierre_cupula_vaginal": [
+        "Vía vaginal",
+        "Vía laparoscópica / abierta"
+      ],
+      "label": "Sutura de cúpula",
+      "options": [
+        "Continua absorbible",
+        "Puntos separados"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "anclaje_uterosacros",
+      "type": "single",
+      "required": false,
+      "required_if_cierre_cupula_vaginal": [
+        "Vía vaginal",
+        "Vía laparoscópica / abierta"
+      ],
+      "label": "Anclaje de ligamentos uterosacros",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_pelviano",
+      "type": "single",
+      "required": false,
+      "label": "Drenaje en fondo de saco de Douglas / pelvis",
+      "options": [
+        "Sí",
+        "Sin drenaje"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_pelviano_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_drenaje_pelviano": [
+        "Sí"
+      ],
+      "label": "Tipo de drenaje pelviano",
+      "options": [
+        "Aspirativo",
+        "Jackson-Pratt",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_pelviano_tipo_otro",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_pelviano_tipo": [
+        "Otro"
+      ],
+      "label": "Tipo de drenaje (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_pelviano_cantidad",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_pelviano": [
+        "Sí"
+      ],
+      "label": "Cantidad de drenajes",
+      "empty_text": ""
+    }
+  ],
+  "id": "cgine-pelviana-v1",
+  "especialidad": "Cirugía Ginecológica",
+  "operaciones": [
+    "Histerectomía / miomectomía",
+    "Cirugía anexial / endometriosis",
+    "Estadificación / citorreducción oncológica",
+    "Piso pélvico / uroginecología",
+    "Histeroscopía / conización / LUI"
+  ],
+  "titulo": "Cirugía ginecológica y pelviana",
+  "plantilla_texto": "Ginecológica — {{procedimiento_grupo}}. Abordaje: {{abordaje}}{{conversion_causa}}.\nUterina: {{proc_uterino}}; indicación {{indicacion_uterina}}{{indicacion_uterina_otro}}; mioma {{miomectomia_tipo}} {{mioma_ubicacion}}; anexos {{anexectomia_asociada}}{{anexectomia_unilateral_lado}}; vasos {{control_vasos_uterinos}}; uréter der. {{ureter_derecho_histerectomia}} izq. {{ureter_izquierdo_histerectomia}}; vejiga {{vejiga_histerectomia}}; margen parametrio {{margen_parametrio}}{{margen_parametrio_distancia}} / vaginal {{margen_vaginal_radical}}{{margen_vaginal_radical_distancia}}; preservación nerviosa {{preservacion_nerviosa_radical}}.\nAnexial: {{proc_anexial}}; Lateralidad {{lateralidad_anexial}}; contenido {{contenido_lesion_anexial}}; rotura quiste {{rotura_quiste_intraoperatoria}} (si Sí + sospecha malignidad → cambia estadificación); endometriosis grado {{grado_endometriosis}}; campo {{campo_anexial}}.\nOnco: {{indicacion_onco_gine}}; gestos {{gesto_estadificacion}}; plantilla pelviana {{plantilla_linfadenectomia_pelviana}}; omentectomía {{omentectomia_tipo}}; centinela {{ganglio_centinela_trazador}} resultado {{resultado_ganglio_centinela}}; rotura capsular ovárica {{rotura_capsular_oncologica}}; invasión miometrial {{invasion_miometrial}}.\nPiso: {{proc_piso_pelvico}}; indicación {{indicacion_piso_pelvico}}; POP-Q {{grado_popq}}; cistoscopía TVT {{cistoscopia_control_tvt}}.\nHisteroscopía/menores: {{tipo_histeroscopia}} {{gesto_histeroscopico}}; complicación {{complicacion_histeroscopia}}{{complicacion_histeroscopia_otra}}; margen cono {{margen_conizacion}}{{margen_conizacion_distancia}}.\nCúpula {{cierre_cupula_vaginal}} {{sutura_cupula}} uterosacros {{anclaje_uterosacros}}; drenaje {{drenaje_pelviano}} {{drenaje_pelviano_tipo}}{{drenaje_pelviano_tipo_otro}} n={{drenaje_pelviano_cantidad}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["chem-hemodinamia-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Accesos vasculares / hemostasia",
+        "Intervencionismo coronario",
+        "Cardiopatía estructural",
+        "Electrofisiología / dispositivos"
+      ]
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": false,
+      "label": "Abordaje (si aplica)",
+      "options": [
+        "Percutáneo",
+        "Convertido a quirúrgico / abierto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a quirúrgico / abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "via_acceso",
+      "type": "multi",
+      "required": false,
+      "label": "Vía de acceso",
+      "options": [
+        "Radial derecho",
+        "Radial izquierdo",
+        "Radial distal / tabaquera anatómica",
+        "Femoral derecho",
+        "Femoral izquierdo",
+        "Humeral / braquial"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "calibre_introductor",
+      "type": "single",
+      "required": false,
+      "label": "Calibre del introductor",
+      "options": [
+        "4 Fr",
+        "5 Fr",
+        "6 Fr",
+        "7 Fr",
+        "8 Fr",
+        "Gran calibre (12–16 Fr — TAVI / EVAR)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "cierre_vascular",
+      "type": "multi",
+      "required": false,
+      "label": "Dispositivo / técnica de cierre vascular",
+      "options": [
+        "Compresión neumática / banda radial (TR Band)",
+        "Cierre percutáneo con sutura / ancla (Angio-Seal / Perclose ProGlide / MANTA)",
+        "Compresión manual / quirúrgica"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_coronario",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Intervencionismo coronario"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Cinecoronariografía diagnóstica (CCG)",
+        "Angioplastia coronaria transluminal percutánea (ACTP)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "caracter_actp",
+      "type": "single",
+      "required": false,
+      "required_if_proc_coronario": [
+        "Angioplastia coronaria transluminal percutánea (ACTP)"
+      ],
+      "label": "Carácter del procedimiento (ACTP)",
+      "options": [
+        "Electivo",
+        "Urgente (SCA sin elevación ST)",
+        "Emergencia (IAM con elevación ST — angioplastia primaria)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "dominancia_coronaria",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Intervencionismo coronario"
+      ],
+      "label": "Dominancia",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Codominancia"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "arteria_intervenida",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_coronario": [
+        "Angioplastia coronaria transluminal percutánea (ACTP)"
+      ],
+      "label": "Arteria intervenida",
+      "options": [
+        "TCI (tronco)",
+        "DA (descendente anterior)",
+        "Cx (circunfleja)",
+        "CD (coronaria derecha)",
+        "Injerto venoso / mamario"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "diagnostico_intracoronario",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Intervencionismo coronario"
+      ],
+      "label": "Diagnóstico intracoronario / fisiología",
+      "options": [
+        "IVUS",
+        "OCT",
+        "FFR / iFR"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "modificacion_placa",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_coronario": [
+        "Angioplastia coronaria transluminal percutánea (ACTP)"
+      ],
+      "label": "Modificación de placa / preparación",
+      "options": [
+        "Balón de alta presión / cutters",
+        "Aterectomía rotacional (Rotablator)",
+        "Litotricia intracoronaria (IVL / Shockwave)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "implante_stent_balon",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_coronario": [
+        "Angioplastia coronaria transluminal percutánea (ACTP)"
+      ],
+      "label": "Implante de stent / balón",
+      "options": [
+        "Stent liberador de fármaco (DES)",
+        "Stent convencional (BMS)",
+        "Balón liberador de fármaco (DEB)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "numero_stents",
+      "type": "free",
+      "required": false,
+      "label": "Número de stents (si multivaso, especificar por vaso — ej. DA: 2; Cx: 1)",
+      "empty_text": ""
+    },
+    {
+      "id": "marca_medidas_stent",
+      "type": "free",
+      "required": false,
+      "label": "Marca / medidas (si multivaso, por vaso — ej. DA: 2 stents 3.0×18 mm; Cx: 1 stent 2.5×15 mm)",
+      "empty_text": ""
+    },
+    {
+      "id": "flujo_timi_post",
+      "type": "single",
+      "required": false,
+      "required_if_proc_coronario": [
+        "Angioplastia coronaria transluminal percutánea (ACTP)"
+      ],
+      "label": "Flujo TIMI post-procedimiento",
+      "options": [
+        "TIMI 0",
+        "TIMI 1",
+        "TIMI 2",
+        "TIMI 3"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "complicacion_intraprocedimiento",
+      "type": "multi",
+      "required": false,
+      "label": "Complicaciones intraprocedimiento",
+      "options": [
+        "Espasmo arterial",
+        "Disección",
+        "Perforación",
+        "Taponamiento",
+        "Arritmia severa"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_ellis",
+      "type": "single",
+      "required": false,
+      "required_if_complicacion_intraprocedimiento": [
+        "Perforación"
+      ],
+      "label": "Clasificación de Ellis (perforación)",
+      "options": [
+        "Tipo I",
+        "Tipo II",
+        "Tipo III"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_estructural",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cardiopatía estructural"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "TAVI / TAVR",
+        "Reparación valvular mitral borde a borde (MitraClip / TriClip)",
+        "Valvuloplastia percutánea con balón",
+        "Cierre de orejuela de aurícula izquierda (LAAO)",
+        "Cierre de defecto septal",
+        "Cierre de leaks / fugas paravalvulares"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_valvula_tavi",
+      "type": "single",
+      "required": false,
+      "required_if_proc_estructural": [
+        "TAVI / TAVR"
+      ],
+      "label": "Tipo de válvula TAVI",
+      "options": [
+        "Autoexpandible",
+        "Expandible por balón"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "medida_valvula_tavi_mm",
+      "type": "free",
+      "required": false,
+      "required_if_proc_estructural": [
+        "TAVI / TAVR"
+      ],
+      "label": "Medida de la válvula TAVI (mm)",
+      "empty_text": ""
+    },
+    {
+      "id": "marcapasos_post_tavi",
+      "type": "single",
+      "required": false,
+      "required_if_proc_estructural": [
+        "TAVI / TAVR"
+      ],
+      "label": "Necesidad de marcapasos post-TAVI",
+      "options": [
+        "No requerido",
+        "Requerido — implantado en el mismo acto",
+        "Requerido — diferido"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ipv_residual_tavi",
+      "type": "single",
+      "required": false,
+      "required_if_proc_estructural": [
+        "TAVI / TAVR"
+      ],
+      "label": "Insuficiencia paravalvular residual post-TAVI",
+      "options": [
+        "Ausente",
+        "Trivial",
+        "Leve",
+        "Moderada",
+        "Severa"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_valvuloplastia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_estructural": [
+        "Valvuloplastia percutánea con balón"
+      ],
+      "label": "Valvuloplastia — válvula",
+      "options": [
+        "Aórtica",
+        "Mitral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "dispositivo_laao",
+      "type": "single",
+      "required": false,
+      "required_if_proc_estructural": [
+        "Cierre de orejuela de aurícula izquierda (LAAO)"
+      ],
+      "label": "Dispositivo LAAO",
+      "options": [
+        "Watchman",
+        "Amulet"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "leak_residual_laao",
+      "type": "single",
+      "required": false,
+      "required_if_proc_estructural": [
+        "Cierre de orejuela de aurícula izquierda (LAAO)"
+      ],
+      "label": "Leak residual post-LAAO",
+      "options": [
+        "Sin leak",
+        "Leak <5 mm",
+        "Leak ≥5 mm",
+        "No evaluado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_defecto_septal",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_estructural": [
+        "Cierre de defecto septal"
+      ],
+      "label": "Defecto septal",
+      "options": [
+        "FOP",
+        "CIA",
+        "CIV"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "dispositivo_cierre_septal",
+      "type": "free",
+      "required": false,
+      "required_if_proc_estructural": [
+        "Cierre de defecto septal"
+      ],
+      "label": "Dispositivo de cierre septal",
+      "empty_text": ""
+    },
+    {
+      "id": "resultado_cierre_septal",
+      "type": "single",
+      "required": false,
+      "required_if_proc_estructural": [
+        "Cierre de defecto septal"
+      ],
+      "label": "Resultado de cierre de defecto septal",
+      "options": [
+        "Cierre completo",
+        "Shunt residual"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "valvula_leak_paravalvular",
+      "type": "single",
+      "required": false,
+      "required_if_proc_estructural": [
+        "Cierre de leaks / fugas paravalvulares"
+      ],
+      "label": "Válvula del leak / fuga paravalvular",
+      "options": [
+        "Aórtica",
+        "Mitral",
+        "Otra"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "valvula_leak_paravalvular_otra",
+      "type": "free",
+      "required": false,
+      "required_if_valvula_leak_paravalvular": [
+        "Otra"
+      ],
+      "label": "Válvula leak (otra)",
+      "empty_text": ""
+    },
+    {
+      "id": "resultado_leak_paravalvular",
+      "type": "single",
+      "required": false,
+      "required_if_proc_estructural": [
+        "Cierre de leaks / fugas paravalvulares"
+      ],
+      "label": "Resultado del cierre de leak paravalvular",
+      "options": [
+        "Leak resuelto",
+        "Leak residual persistente"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_electrofisiologia",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Electrofisiología / dispositivos"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Mapeo electroanatómico 3D (CARTO / EnSite)",
+        "Ablación de arritmia",
+        "Implante de marcapasos definitivo",
+        "Implante de cardiodesfibrilador (CDI)",
+        "Terapia de resincronización cardíaca (TRC-P / TRC-D)",
+        "Estimulación del sistema de conducción (His / rama izquierda)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "energia_ablacion",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_electrofisiologia": [
+        "Ablación de arritmia"
+      ],
+      "label": "Energía de ablación",
+      "options": [
+        "Radiofrecuencia",
+        "Crioablación",
+        "Campo pulsado / PFA"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "sustrato_ablacion",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_electrofisiologia": [
+        "Ablación de arritmia"
+      ],
+      "label": "Sustrato",
+      "options": [
+        "Fibrilación auricular (aislamiento de venas pulmonares)",
+        "Flutter auricular",
+        "Reentrada nodal / taquicardia ventricular"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "aislamiento_venas_pulmonares",
+      "type": "single",
+      "required": false,
+      "required_if_sustrato_ablacion": [
+        "Fibrilación auricular (aislamiento de venas pulmonares)"
+      ],
+      "label": "Confirmación de aislamiento de venas pulmonares",
+      "options": [
+        "Bloqueo de entrada y salida confirmado",
+        "Aislamiento parcial",
+        "No confirmado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_marcapasos",
+      "type": "single",
+      "required": false,
+      "required_if_proc_electrofisiologia": [
+        "Implante de marcapasos definitivo"
+      ],
+      "label": "Tipo de marcapasos",
+      "options": [
+        "Monocameral",
+        "Bicameral",
+        "Sin cables / Micra"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_cdi",
+      "type": "single",
+      "required": false,
+      "required_if_proc_electrofisiologia": [
+        "Implante de cardiodesfibrilador (CDI)"
+      ],
+      "label": "Tipo de CDI",
+      "options": [
+        "Transvenoso",
+        "Subcutáneo / S-ICD"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "umbrales_estimulacion_sensado",
+      "type": "free",
+      "required": false,
+      "label": "Umbrales de estimulación y sensado",
+      "empty_text": ""
+    },
+    {
+      "id": "volumen_contraste_cc",
+      "type": "free",
+      "required": false,
+      "label": "Volumen de contraste (cc)",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_contraste",
+      "type": "free",
+      "required": false,
+      "label": "Tipo de contraste",
+      "empty_text": ""
+    },
+    {
+      "id": "dap_mgy_cm2",
+      "type": "free",
+      "required": false,
+      "label": "Producto dosis-área — DAP (mGy·cm²)",
+      "empty_text": ""
+    },
+    {
+      "id": "tiempo_fluoroscopia_min",
+      "type": "free",
+      "required": false,
+      "label": "Tiempo de fluoroscopia (min)",
+      "empty_text": ""
+    },
+    {
+      "id": "presion_aortica_mmhg",
+      "type": "free",
+      "required": false,
+      "label": "Presión aórtica (mmHg)",
+      "empty_text": ""
+    },
+    {
+      "id": "presion_vi_mmhg",
+      "type": "free",
+      "required": false,
+      "label": "Presión ventricular izquierda (mmHg)",
+      "empty_text": ""
+    },
+    {
+      "id": "gradiente_transvalvular_pre_mmhg",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cardiopatía estructural"
+      ],
+      "label": "Gradiente transvalvular pre (mmHg)",
+      "empty_text": ""
+    },
+    {
+      "id": "gradiente_transvalvular_post_mmhg",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cardiopatía estructural"
+      ],
+      "label": "Gradiente transvalvular post (mmHg)",
+      "empty_text": ""
+    }
+  ],
+  "id": "chem-hemodinamia-v1",
+  "especialidad": "Hemodinamia / Cardiología Intervencionista",
+  "operaciones": [
+    "Accesos vasculares para hemodinamia",
+    "Intervencionismo coronario (diagnóstico / terapéutico)",
+    "Cardiopatía estructural / valvuloplastias percutáneas",
+    "Electrofisiología / dispositivos cardíacos"
+  ],
+  "titulo": "Hemodinamia y cardiología intervencionista",
+  "plantilla_texto": "Hemodinamia — {{procedimiento_grupo}}. Abordaje {{abordaje}}{{conversion_causa}}.\nAcceso: {{via_acceso}}; introductor {{calibre_introductor}}; cierre {{cierre_vascular}}.\nCoronario: {{proc_coronario}} carácter {{caracter_actp}}; dominancia {{dominancia_coronaria}}; arteria {{arteria_intervenida}}; {{diagnostico_intracoronario}}; placa {{modificacion_placa}}; stent/balón {{implante_stent_balon}} n={{numero_stents}} {{marca_medidas_stent}}; TIMI {{flujo_timi_post}}.\nEstructural: {{proc_estructural}}; TAVI {{tipo_valvula_tavi}} {{medida_valvula_tavi_mm}} mm; MP {{marcapasos_post_tavi}}; IPV {{ipv_residual_tavi}}; valvuloplastia {{tipo_valvuloplastia}}; LAAO {{dispositivo_laao}} leak {{leak_residual_laao}}; septal {{tipo_defecto_septal}} {{dispositivo_cierre_septal}} resultado {{resultado_cierre_septal}}; leak PV {{valvula_leak_paravalvular}}{{valvula_leak_paravalvular_otra}} resultado {{resultado_leak_paravalvular}}.\nEF: {{proc_electrofisiologia}}; energía {{energia_ablacion}}; sustrato {{sustrato_ablacion}}; PV {{aislamiento_venas_pulmonares}}; MP {{tipo_marcapasos}}; CDI {{tipo_cdi}}; umbrales {{umbrales_estimulacion_sensado}}.\nContraste/DAP: {{volumen_contraste_cc}} cc {{tipo_contraste}}; DAP {{dap_mgy_cm2}} mGy·cm²; fluoro {{tiempo_fluoroscopia_min}} min; Ao {{presion_aortica_mmhg}} mmHg; VI {{presion_vi_mmhg}} mmHg; gradiente pre {{gradiente_transvalvular_pre_mmhg}} / post {{gradiente_transvalvular_post_mmhg}} mmHg.\nComplicaciones: {{complicacion_intraprocedimiento}}; Ellis {{clasificacion_ellis}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cmano-mano-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Osteoarticular / traumatológica",
+        "Tendones / partes blandas",
+        "Nervio periférico / microcirugía",
+        "Artroscopia de muñeca",
+        "Infecciones / cobertura",
+        "Isquemia / torniquete / cierre"
+      ]
+    },
+    {
+      "id": "lateralidad",
+      "type": "single",
+      "required": false,
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": false,
+      "label": "Abordaje (si aplica)",
+      "options": [
+        "Abierto",
+        "Percutáneo / mínimamente invasivo",
+        "Artroscópico",
+        "Endoscópico",
+        "Convertido a abierto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "pieza_osea",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Osteoarticular / traumatológica"
+      ],
+      "label": "Ubicación / pieza ósea",
+      "options": [
+        "Radio distal",
+        "Cúbito",
+        "Escafoides",
+        "Carpo (otros)",
+        "Metacarpianos",
+        "Falanges"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "carpo_otros_detalle",
+      "type": "free",
+      "required": false,
+      "required_if_pieza_osea": [
+        "Carpo (otros)"
+      ],
+      "label": "Carpo — detalle",
+      "empty_text": ""
+    },
+    {
+      "id": "metacarpiano_numero",
+      "type": "multi",
+      "required": false,
+      "required_if_pieza_osea": [
+        "Metacarpianos"
+      ],
+      "label": "Metacarpiano(s)",
+      "options": [
+        "1.º",
+        "2.º",
+        "3.º",
+        "4.º",
+        "5.º"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "falange_nivel",
+      "type": "multi",
+      "required": false,
+      "required_if_pieza_osea": [
+        "Falanges"
+      ],
+      "label": "Falange",
+      "options": [
+        "Proximal",
+        "Media",
+        "Distal"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_lesion_osea",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Osteoarticular / traumatológica"
+      ],
+      "label": "Tipo de lesión",
+      "options": [
+        "Fractura cerrada",
+        "Fractura expuesta",
+        "Luxación / luxofractura",
+        "Seudoartrosis / artrosis"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "gustilo_anderson_mano",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_lesion_osea": [
+        "Fractura expuesta"
+      ],
+      "label": "Clasificación de Gustilo-Anderson",
+      "options": [
+        "I",
+        "II",
+        "IIIA",
+        "IIIB",
+        "IIIC"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "localizacion_escafoides",
+      "type": "single",
+      "required": false,
+      "required_if_pieza_osea": [
+        "Escafoides"
+      ],
+      "label": "Localización de fractura de escafoides",
+      "options": [
+        "Polo proximal",
+        "Cintura",
+        "Polo distal"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_osteosintesis_mano",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Osteoarticular / traumatológica"
+      ],
+      "label": "Osteosíntesis / fijación",
+      "options": [
+        "RAFI con placa bloqueada / volar de radio",
+        "Enclavijado percutáneo (K-wires)",
+        "Tornillo canulado de compresión (Herbert)",
+        "Fijación externa"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "resultado_reduccion_mano",
+      "type": "single",
+      "required": false,
+      "label": "Resultado de la reducción",
+      "options": [
+        "Anatómica",
+        "Aceptable",
+        "Insatisfactoria"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_articular_mano",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Osteoarticular / traumatológica"
+      ],
+      "label": "Cirugía articular / reconstructiva",
+      "options": [
+        "Trapecectomía aislada",
+        "Trapecectomía con plastia de suspensión / ligamentoplastia",
+        "Artrodesis parcial del carpo",
+        "Artrodesis total de muñeca",
+        "Artrodesis interfalángica / MTC-F",
+        "Artroplastia trapecio-metacarpiana",
+        "Artroplastia interfalángica",
+        "Carpectomía de la primera fila"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "patologia_tendinosa",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Tendones / partes blandas"
+      ],
+      "label": "Patología / lesión",
+      "options": [
+        "Sección / laceración tendinosa",
+        "Tenosinovitis / dedo en gatillo",
+        "Enfermedad de De Quervain",
+        "Dupuytren"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "zona_flexores",
+      "type": "single",
+      "required": false,
+      "required_if_patologia_tendinosa": [
+        "Sección / laceración tendinosa"
+      ],
+      "label": "Zona flexores (si aplica)",
+      "options": [
+        "Zona I",
+        "Zona II (No Man's Land)",
+        "Zona III",
+        "Zona IV",
+        "Zona V",
+        "No aplica (extensores / otra)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tenorrafia_flexores",
+      "type": "single",
+      "required": false,
+      "required_if_zona_flexores": [
+        "Zona I",
+        "Zona II (No Mans Land), Zona III, Zona IV, Zona V"
+      ],
+      "label": "Tenorrafia de flexores",
+      "options": [
+        "Realizada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_tenorrafia_flexores",
+      "type": "multi",
+      "required": false,
+      "required_if_tenorrafia_flexores": [
+        "Realizada"
+      ],
+      "label": "Técnica tenorrafia flexores",
+      "options": [
+        "Kessler",
+        "Tajima",
+        "Strickland",
+        "Sutura epitenon"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "zona_extensores",
+      "type": "single",
+      "required": false,
+      "required_if_patologia_tendinosa": [
+        "Sección / laceración tendinosa"
+      ],
+      "label": "Zona extensores (si aplica)",
+      "options": [
+        "Zona I (mallet)",
+        "Zona II",
+        "Zona III (boutonnière)",
+        "Zona IV–VIII",
+        "No aplica (flexores / otra)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "manejo_extensores",
+      "type": "multi",
+      "required": false,
+      "required_if_zona_extensores": [
+        "Zona I (mallet)",
+        "Zona II",
+        "Zona III (boutonnière)",
+        "Zona IV–VIII"
+      ],
+      "label": "Manejo de extensores",
+      "options": [
+        "Tenorrafia directa",
+        "Fijación del mallet con clavija K"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "injerto_tendinoso",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Tendones / partes blandas"
+      ],
+      "label": "Injerto tendinoso",
+      "options": [
+        "Realizado",
+        "No realizado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "donante_injerto_tendinoso",
+      "type": "single",
+      "required": false,
+      "required_if_injerto_tendinoso": [
+        "Realizado"
+      ],
+      "label": "Donante del injerto tendinoso",
+      "options": [
+        "Palmar mayor / longus",
+        "Plantar delgado",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "transferencia_tendinosa",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Tendones / partes blandas"
+      ],
+      "label": "Transferencia tendinosa (detalle, ej. EIP → EPL)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_dupuytren",
+      "type": "multi",
+      "required": false,
+      "required_if_patologia_tendinosa": [
+        "Dupuytren"
+      ],
+      "label": "Procedimiento Dupuytren",
+      "options": [
+        "Fasciotomía percutánea",
+        "Fasciectomía selectiva / subtotal",
+        "Dermofasciectomía + injerto"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "dedos_dupuytren",
+      "type": "multi",
+      "required": false,
+      "required_if_patologia_tendinosa": [
+        "Dupuytren"
+      ],
+      "label": "Dedos afectados (Dupuytren)",
+      "options": [
+        "Pulgar",
+        "Índice",
+        "Medio",
+        "Anular",
+        "Meñique"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "grado_contractura_dupuytren",
+      "type": "single",
+      "required": false,
+      "required_if_patologia_tendinosa": [
+        "Dupuytren"
+      ],
+      "label": "Grado de contractura preoperatoria (Dupuytren)",
+      "options": [
+        "Leve (<30°)",
+        "Moderada (30–60°)",
+        "Severa (>60°)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_gatillo_dequervain",
+      "type": "multi",
+      "required": false,
+      "label": "Procedimiento (gatillo / De Quervain)",
+      "options": [
+        "Liberación de polea / tenosinovectomía",
+        "Liberación del primer compartimento dorsal"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "patologia_nerviosa",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Nervio periférico / microcirugía"
+      ],
+      "label": "Patología",
+      "options": [
+        "Síndrome del túnel carpiano (STC)",
+        "Síndrome del canal de Guyón",
+        "Compresión del nervio cubital en codo",
+        "Sección nerviosa accidental",
+        "Amputación / reimplante"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_seddon",
+      "type": "single",
+      "required": false,
+      "required_if_patologia_nerviosa": [
+        "Sección nerviosa accidental"
+      ],
+      "label": "Clasificación de lesión nerviosa (Seddon)",
+      "options": [
+        "Neurapraxia",
+        "Axonotmesis",
+        "Neurotmesis"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_liberacion_nerviosa",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Nervio periférico / microcirugía"
+      ],
+      "label": "Liberación / descompresión",
+      "options": [
+        "Liberación del nervio mediano (túnel carpiano) — abierta",
+        "Liberación del nervio mediano (túnel carpiano) — endoscópica",
+        "Liberación / transposición del nervio cubital — subcutánea",
+        "Liberación / transposición del nervio cubital — submuscular",
+        "Liberación canal de Guyón"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_reparacion_nerviosa",
+      "type": "multi",
+      "required": false,
+      "required_if_patologia_nerviosa": [
+        "Sección nerviosa accidental",
+        "Amputación / reimplante"
+      ],
+      "label": "Reparación nerviosa (microcirugía)",
+      "options": [
+        "Neurorrafia directa epineural / perineural",
+        "Injerto nervioso autólogo",
+        "Conduit / tubulización sintética"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "sutura_neurorrafia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_reparacion_nerviosa": [
+        "Neurorrafia directa epineural / perineural"
+      ],
+      "label": "Sutura de neurorrafia",
+      "options": [
+        "Monofilamento 8-0",
+        "Monofilamento 9-0",
+        "Monofilamento 10-0"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_donante",
+      "type": "single",
+      "required": false,
+      "required_if_proc_reparacion_nerviosa": [
+        "Injerto nervioso autólogo"
+      ],
+      "label": "Nervio donante (injerto)",
+      "options": [
+        "Sural",
+        "Cutáneo antebraquial",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "reimplante",
+      "type": "single",
+      "required": false,
+      "required_if_patologia_nerviosa": [
+        "Amputación / reimplante"
+      ],
+      "label": "Reimplante de dedo / mano",
+      "options": [
+        "Realizado",
+        "No realizado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nivel_amputacion_reimplante",
+      "type": "single",
+      "required": false,
+      "required_if_reimplante": [
+        "Realizado"
+      ],
+      "label": "Nivel anatómico de la amputación",
+      "options": [
+        "Distal a IFD",
+        "IFD / falange media",
+        "IFP",
+        "MTC-F / metacarpiano",
+        "Muñeca / carpo",
+        "Más proximal (antebrazo / brazo)",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nivel_amputacion_reimplante_otro",
+      "type": "free",
+      "required": false,
+      "required_if_nivel_amputacion_reimplante": [
+        "Otro"
+      ],
+      "label": "Nivel de amputación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "viabilidad_final_reimplante",
+      "type": "single",
+      "required": false,
+      "required_if_reimplante": [
+        "Realizado"
+      ],
+      "label": "Viabilidad final al cierre (reimplante)",
+      "options": [
+        "Viable — sin compromiso",
+        "Viable — compromiso venoso resuelto",
+        "Comprometido — requirió reexploración"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_artroscopia_muneca",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Artroscopia de muñeca"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Lesión del complejo del fibrocartílago triangular (CFCT)",
+        "Inestabilidad escafolunar / lunopiramidal",
+        "Cuerpos libres articulares",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_artroscopia_muneca_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_artroscopia_muneca": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "palmer_cfct",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_artroscopia_muneca": [
+        "Lesión del complejo del fibrocartílago triangular (CFCT)"
+      ],
+      "label": "Clasificación de Palmer (CFCT)",
+      "options": [
+        "Clase 1 — traumática",
+        "Clase 2 — degenerativa"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_artroscopia_muneca",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Artroscopia de muñeca"
+      ],
+      "label": "Técnica",
+      "options": [
+        "Artroscopia diagnóstica / debridamiento",
+        "Reparación / sutura de fibrocartílago triangular",
+        "Reconstrucción ligamentaria (escafolunar / arpones)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_infeccion_mano",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Infecciones / cobertura"
+      ],
+      "label": "Infecciones complejas de la mano",
+      "options": [
+        "Drenaje de panadizo / paroniquia",
+        "Lavado y drenaje de tenosinovitis infecciosa de flexores (Kanavel)",
+        "Drenaje de absceso de espacios cóncavos (thenar / hipotenar / midpalmar)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "hallazgo_io_infeccion",
+      "type": "single",
+      "required": false,
+      "label": "Hallazgo intraoperatorio",
+      "options": [
+        "Purulento",
+        "Necrótico",
+        "Seroso",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hallazgo_io_infeccion_otro",
+      "type": "free",
+      "required": false,
+      "required_if_hallazgo_io_infeccion": [
+        "Otro"
+      ],
+      "label": "Hallazgo (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "second_look",
+      "type": "single",
+      "required": false,
+      "required_if_proc_infeccion_mano": [
+        "Lavado y drenaje de tenosinovitis infecciosa de flexores (Kanavel)"
+      ],
+      "label": "Planificación de reintervención / second-look",
+      "options": [
+        "No planificada",
+        "Planificada — próximo lavado programado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_cobertura_mano",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Infecciones / cobertura"
+      ],
+      "label": "Cobertura cutánea y colgajos focales",
+      "options": [
+        "Colgajo Atasoy / Kutler (avance V-Y pulpejo)",
+        "Colgajo de Brunelli",
+        "Colgajo heterodigital (cross-finger)",
+        "Colgajo chino / radial de antebrazo"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "torniquete_ubicacion",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Isquemia / torniquete / cierre"
+      ],
+      "label": "Isquemia neumática — ubicación del manguito",
+      "options": [
+        "Brazo",
+        "Antebrazo"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "torniquete_presion_mmhg",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Isquemia / torniquete / cierre"
+      ],
+      "label": "Presión del manguito (mmHg)",
+      "empty_text": ""
+    },
+    {
+      "id": "torniquete_tiempo_min",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Isquemia / torniquete / cierre"
+      ],
+      "label": "Tiempo total de isquemia (min)",
+      "empty_text": ""
+    },
+    {
+      "id": "exanguinacion_previa",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Isquemia / torniquete / cierre"
+      ],
+      "label": "Exanguinación previa al inflado",
+      "options": [
+        "Realizada (venda de Esmarch u otro método)",
+        "No realizada (elevación simple)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_mano",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Isquemia / torniquete / cierre"
+      ],
+      "label": "Drenaje",
+      "options": [
+        "Sin drenaje",
+        "Penrose pequeño",
+        "Drenaje aspirativo micro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "inmovilizacion_postop",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Isquemia / torniquete / cierre"
+      ],
+      "label": "Inmovilización postoperatoria",
+      "options": [
+        "Férula — posición neutra",
+        "Férula — posición funcional / anti-garra",
+        "Inmovilización de pulgar / spica",
+        "No aplicada"
+      ],
+      "empty_text": ""
+    }
+  ],
+  "id": "cmano-mano-v1",
+  "especialidad": "Cirugía de Mano y Miembro Superior",
+  "operaciones": [
+    "Patología osteoarticular y traumatológica de mano",
+    "Tendones y partes blandas",
+    "Nervio periférico y microcirugía",
+    "Artroscopia de muñeca",
+    "Infecciones y cobertura cutánea",
+    "Isquemia, torniquete y cierre"
+  ],
+  "titulo": "Cirugía de mano y miembro superior",
+  "plantilla_texto": "Mano — {{procedimiento_grupo}}. Lateralidad {{lateralidad}}. Abordaje {{abordaje}}{{conversion_causa}}.\nOsteo: {{pieza_osea}} {{carpo_otros_detalle}} MTC {{metacarpiano_numero}} falange {{falange_nivel}}; lesión {{tipo_lesion_osea}} Gustilo {{gustilo_anderson_mano}}; escafoides {{localizacion_escafoides}}; osteosíntesis {{proc_osteosintesis_mano}} reducción {{resultado_reduccion_mano}}; articular {{proc_articular_mano}}.\nTendones: {{patologia_tendinosa}}; flexores Z{{zona_flexores}} {{tenorrafia_flexores}} {{tecnica_tenorrafia_flexores}}; extensores Z{{zona_extensores}} {{manejo_extensores}}; injerto {{injerto_tendinoso}} {{donante_injerto_tendinoso}}; transferencia {{transferencia_tendinosa}}; Dupuytren {{proc_dupuytren}} dedos {{dedos_dupuytren}} grado {{grado_contractura_dupuytren}}; gatillo/DQ {{proc_gatillo_dequervain}}.\nNervio: {{patologia_nerviosa}}; Seddon {{clasificacion_seddon}}; liberación {{proc_liberacion_nerviosa}}; reparación {{proc_reparacion_nerviosa}} sutura {{sutura_neurorrafia}} donante {{nervio_donante}}; reimplante {{reimplante}} nivel {{nivel_amputacion_reimplante}}{{nivel_amputacion_reimplante_otro}} viabilidad {{viabilidad_final_reimplante}}.\nArtroscopia: {{indicacion_artroscopia_muneca}}{{indicacion_artroscopia_muneca_otro}}; Palmer {{palmer_cfct}}; {{proc_artroscopia_muneca}}.\nInfección/cobertura: {{proc_infeccion_mano}}; hallazgo {{hallazgo_io_infeccion}}{{hallazgo_io_infeccion_otro}}; second-look {{second_look}}; cobertura {{proc_cobertura_mano}}.\nTorniquete/cierre: manguito {{torniquete_ubicacion}} {{torniquete_presion_mmhg}} mmHg {{torniquete_tiempo_min}} min; exanguinación {{exanguinacion_previa}}; drenaje {{drenaje_mano}}; inmovilización {{inmovilizacion_postop}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cneuro-neurocirugia-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Tumoral / infecciosa craneal",
+        "Vascular craneal",
+        "Neurotraumatología / neurointensivismo",
+        "Hidrocefalia / funcional / pediátrica",
+        "Raquimedular",
+        "Drenajes / materiales / cierre"
+      ]
+    },
+    {
+      "id": "posicion_quirurgica",
+      "type": "single",
+      "required": false,
+      "required_if_ubicacion_craneal": [
+        "Infratentorial / fosa posterior"
+      ],
+      "required_if_ubicacion_circulacion": [
+        "Circulación posterior"
+      ],
+      "required_if_procedimiento_grupo": [
+        "Hidrocefalia / funcional / pediátrica"
+      ],
+      "label": "Posición quirúrgica",
+      "options": [
+        "Decúbito supino",
+        "Decúbito prono",
+        "Sentado",
+        "Decúbito lateral (park bench)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": false,
+      "label": "Abordaje (si aplica)",
+      "options": [
+        "Abierto",
+        "Endoscópico / endonasal",
+        "Endovascular",
+        "Estereotáxico / neuronavegación",
+        "Convertido a abierto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_craneal_tumoral",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Tumoral / infecciosa craneal"
+      ],
+      "label": "Indicación / diagnóstico",
+      "options": [
+        "Tumoral primario",
+        "Metastásico",
+        "Infeccioso (absceso / empiema)",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_craneal_tumoral_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_craneal_tumoral": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "ubicacion_craneal",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Tumoral / infecciosa craneal"
+      ],
+      "label": "Ubicación de la lesión",
+      "options": [
+        "Supratentorial",
+        "Infratentorial / fosa posterior",
+        "Base de cráneo / silla turca"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "ubicacion_supratentorial",
+      "type": "multi",
+      "required": false,
+      "required_if_ubicacion_craneal": [
+        "Supratentorial"
+      ],
+      "label": "Ubicación — supratentorial",
+      "options": [
+        "Frontal",
+        "Parietal",
+        "Temporal",
+        "Occipital",
+        "Intraventricular"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "ubicacion_fosa_posterior",
+      "type": "multi",
+      "required": false,
+      "required_if_ubicacion_craneal": [
+        "Infratentorial / fosa posterior"
+      ],
+      "label": "Ubicación — fosa posterior",
+      "options": [
+        "Cerebelo",
+        "Ángulo pontocerebeloso",
+        "Tronco encefálico"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "abordaje_craneal",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Tumoral / infecciosa craneal"
+      ],
+      "label": "Abordaje quirúrgico",
+      "options": [
+        "Craneotomía / cranectomía",
+        "Abordaje endoscópico endonasal transesfenoidal (EET)",
+        "Biopsia estereotáxica / guiada por neuronavegación"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_craneotomia",
+      "type": "single",
+      "required": false,
+      "required_if_abordaje_craneal": [
+        "Craneotomía / cranectomía"
+      ],
+      "label": "Tipo de craneotomía / cranectomía",
+      "options": [
+        "Osteoplásica",
+        "Osteoflácida"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "lesion_cebc",
+      "type": "single",
+      "required": false,
+      "required_if_abordaje_craneal": [
+        "Abordaje endoscópico endonasal transesfenoidal (EET)"
+      ],
+      "label": "Lesión / indicación (CEBC / EET)",
+      "options": [
+        "Adenoma hipofisario",
+        "Craneofaringioma",
+        "Cordoma",
+        "Meningioma",
+        "Fístula de LCR aislada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "corredor_cebc",
+      "type": "single",
+      "required": false,
+      "required_if_abordaje_craneal": [
+        "Abordaje endoscópico endonasal transesfenoidal (EET)"
+      ],
+      "label": "Corredor de abordaje (CEBC / EET)",
+      "options": [
+        "Transesfenoidal — sellar",
+        "Transesfenoidal — presellar",
+        "Transesfenoidal — parasellar",
+        "Transesfenoidal — clival",
+        "Transcribiforme",
+        "Transpterigoideo"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "cebc_cierre_xref_nota",
+      "type": "single",
+      "required": false,
+      "required_if_abordaje_craneal": [
+        "Abordaje endoscópico endonasal transesfenoidal (EET)"
+      ],
+      "label": "Cierre / reconstrucción de base de cráneo (referencia)",
+      "options": [
+        "Definición en CyC Proforma 7 Nariz/Senos (cyc-nariz-senos-v1) — foja ORL aparte si equipo; no completar cierre nasal acá"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "reseccion_tumoral",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Tumoral / infecciosa craneal"
+      ],
+      "label": "Resección",
+      "options": [
+        "Total (GTR)",
+        "Subtotal (STR)",
+        "Biopsia"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "neuromonitoreo_craneal",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Tumoral / infecciosa craneal"
+      ],
+      "label": "Monitoreo neurofisiológico intraoperatorio",
+      "options": [
+        "Potenciales evocados",
+        "Mapeo cortical motor / despierto (awake craniotomy)"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "fluorescencia",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Tumoral / infecciosa craneal"
+      ],
+      "label": "Marcadores / fluorescencia",
+      "options": [
+        "5-ALA",
+        "Fluoresceína sódica"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "duramadre_craneotomia",
+      "type": "single",
+      "required": false,
+      "required_if_abordaje_craneal": [
+        "Craneotomía / cranectomía"
+      ],
+      "label": "Integridad / apertura dural",
+      "options": [
+        "Íntegra",
+        "Durotomía incidental — reparada",
+        "Durotomía incidental — fuga persistente"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_trigemino_v",
+      "type": "single",
+      "required": false,
+      "required_if_ubicacion_craneal": [
+        "Infratentorial / fosa posterior"
+      ],
+      "label": "Nervio trigémino (V)",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_facial_vii",
+      "type": "single",
+      "required": false,
+      "required_if_ubicacion_craneal": [
+        "Infratentorial / fosa posterior"
+      ],
+      "label": "Nervio facial (VII)",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_vestibulococlear_viii",
+      "type": "single",
+      "required": false,
+      "required_if_ubicacion_craneal": [
+        "Infratentorial / fosa posterior"
+      ],
+      "label": "Nervio vestibulococlear (VIII)",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "carotida_interna",
+      "type": "single",
+      "required": false,
+      "required_if_ubicacion_craneal": [
+        "Base de cráneo / silla turca"
+      ],
+      "label": "Carótida interna",
+      "options": [
+        "Identificada y preservada",
+        "Lesión identificada intraoperatoriamente",
+        "No disecada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "quiasma_optico",
+      "type": "single",
+      "required": false,
+      "required_if_ubicacion_craneal": [
+        "Base de cráneo / silla turca"
+      ],
+      "label": "Quiasma óptico",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "patologia_vascular_craneal",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Vascular craneal"
+      ],
+      "label": "Patología",
+      "options": [
+        "Aneurisma cerebral",
+        "Malformación arteriovenosa (MAV)",
+        "Cavernoma",
+        "Hematoma intraparenquimatoso"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "ubicacion_circulacion",
+      "type": "single",
+      "required": false,
+      "label": "Ubicación — circulación",
+      "options": [
+        "Circulación anterior",
+        "Circulación posterior"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "volumen_hematoma_vascular_cc",
+      "type": "free",
+      "required": false,
+      "required_if_patologia_vascular_craneal": [
+        "Hematoma intraparenquimatoso"
+      ],
+      "label": "Volumen del hematoma intraparenquimatoso (cc)",
+      "empty_text": ""
+    },
+    {
+      "id": "hsa",
+      "type": "single",
+      "required": false,
+      "required_if_patologia_vascular_craneal": [
+        "Aneurisma cerebral"
+      ],
+      "label": "Hemorragia subaracnoidea (HSA)",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hunt_hess",
+      "type": "single",
+      "required": false,
+      "required_if_hsa": [
+        "Sí"
+      ],
+      "label": "Escala de Hunt-Hess",
+      "options": [
+        "I",
+        "II",
+        "III",
+        "IV",
+        "V"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "fisher",
+      "type": "single",
+      "required": false,
+      "required_if_hsa": [
+        "Sí"
+      ],
+      "label": "Escala de Fisher",
+      "options": [
+        "I",
+        "II",
+        "III",
+        "IV"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_vascular_craneal",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Vascular craneal"
+      ],
+      "label": "Abordaje / técnica",
+      "options": [
+        "Clipado de aneurisma",
+        "Exéresis / resección de MAV o cavernoma",
+        "Evacuación quirúrgica de hematoma",
+        "Embolización endovascular (coils / stent diversor / Onyx)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "vasos_clipado",
+      "type": "multi",
+      "required": false,
+      "required_if_tecnica_vascular_craneal": [
+        "Clipado de aneurisma"
+      ],
+      "label": "Vasos involucrados (clipado)",
+      "options": [
+        "ACA",
+        "ACM",
+        "ACI",
+        "Comunicante posterior",
+        "Basilar",
+        "Otro"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "vasos_clipado_otro",
+      "type": "free",
+      "required": false,
+      "required_if_vasos_clipado": [
+        "Otro"
+      ],
+      "label": "Vasos involucrados (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "ruptura_aneurisma_io",
+      "type": "single",
+      "required": false,
+      "required_if_tecnica_vascular_craneal": [
+        "Clipado de aneurisma"
+      ],
+      "label": "Ruptura intraoperatoria del aneurisma",
+      "options": [
+        "Sin ruptura",
+        "Ruptura controlada",
+        "Ruptura con conversión de estrategia"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "resultado_angiografico_clipado",
+      "type": "single",
+      "required": false,
+      "required_if_tecnica_vascular_craneal": [
+        "Clipado de aneurisma"
+      ],
+      "label": "Resultado angiográfico final del clipado",
+      "options": [
+        "Oclusión completa",
+        "Remanente residual",
+        "No evaluado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "estudio_vascular_io",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Vascular craneal"
+      ],
+      "label": "Estudio vascular intraoperatorio",
+      "options": [
+        "Videoangiografía con indocianina (ICG)",
+        "Doppler microvascular"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_neurotrauma",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Neurotraumatología / neurointensivismo"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Hematoma epidural (HED)",
+        "Hematoma subdural agudo (HSDA)",
+        "Hematoma subdural crónico (HSDC)",
+        "Fractura de cráneo con hundimiento",
+        "Hipertensión endocraneana refractaria"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "glasgow_preop",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Neurotraumatología / neurointensivismo"
+      ],
+      "label": "Escala de Glasgow preoperatorio (3–15)",
+      "empty_text": ""
+    },
+    {
+      "id": "volumen_hematoma_cc",
+      "type": "free",
+      "required": false,
+      "label": "Volumen del hematoma evacuado (cc)",
+      "empty_text": ""
+    },
+    {
+      "id": "midline_shift_mm",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Neurotraumatología / neurointensivismo"
+      ],
+      "label": "Desplazamiento de línea media / midline shift (mm)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_neurotrauma",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Neurotraumatología / neurointensivismo"
+      ],
+      "label": "Procedimiento específico",
+      "options": [
+        "Cranectomía descompresiva",
+        "Evacuación de hematoma + hemostasia de duramadre / lecho",
+        "Drenaje de HSDC (trepanación + lavado + drenaje subdural)",
+        "Craneoplastia / reconstrucción ósea",
+        "Colocación de monitoreo de PIC"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_descompresiva",
+      "type": "single",
+      "required": false,
+      "required_if_proc_neurotrauma": [
+        "Cranectomía descompresiva"
+      ],
+      "label": "Tipo de cranectomía descompresiva",
+      "options": [
+        "Unilateral / frontoparietotemporal",
+        "Bifrontal"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "material_craneoplastia",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_neurotrauma": [
+        "Craneoplastia / reconstrucción ósea"
+      ],
+      "label": "Material de craneoplastia",
+      "options": [
+        "Hueso autólogo",
+        "PEEK",
+        "Malla de titanio",
+        "Metilmetacrilato"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_monitoreo_pic",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_neurotrauma": [
+        "Colocación de monitoreo de PIC"
+      ],
+      "label": "Monitoreo de PIC",
+      "options": [
+        "Sensor intraparenquimatoso",
+        "Drenaje ventricular externo (DVE)"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_hidrocefalia",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hidrocefalia / funcional / pediátrica"
+      ],
+      "label": "Manejo de LCR / hidrocefalia",
+      "options": [
+        "Derivación ventriculoperitoneal (DVP)",
+        "Derivación ventriculoatrial (DVA) / lumboperitoneal",
+        "Tercerventriculostomía endoscópica (TVE)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_hidrocefalia",
+      "type": "single",
+      "required": false,
+      "label": "Indicación de hidrocefalia",
+      "options": [
+        "Comunicante",
+        "No comunicante (obstructiva)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "valvula_dvp",
+      "type": "single",
+      "required": false,
+      "required_if_proc_hidrocefalia": [
+        "Derivación ventriculoperitoneal (DVP)"
+      ],
+      "label": "Válvula (DVP)",
+      "options": [
+        "Presión fija",
+        "Programable"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_funcional",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Hidrocefalia / funcional / pediátrica"
+      ],
+      "label": "Neurocirugía funcional / dolor / epilepsia",
+      "options": [
+        "Estimulación cerebral profunda (DBS)",
+        "Estimulador del nervio vago (VNS)",
+        "Descompresión microvascular (DVM) de nervio trigémino / facial (Jannetta)",
+        "Resección de foco epileptógeno / lobectomía temporal / callosotomía"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "blanco_dbs",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_funcional": [
+        "Estimulación cerebral profunda (DBS)"
+      ],
+      "label": "Blanco DBS",
+      "options": [
+        "STN",
+        "GPi",
+        "VIM"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "testing_dbs",
+      "type": "single",
+      "required": false,
+      "required_if_proc_funcional": [
+        "Estimulación cerebral profunda (DBS)"
+      ],
+      "label": "Testing intraoperatorio del electrodo (DBS)",
+      "options": [
+        "Realizado — respuesta adecuada",
+        "Realizado — requirió reposicionamiento",
+        "No realizado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_raquimedular",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Raquimedular"
+      ],
+      "label": "Indicación / diagnóstico",
+      "options": [
+        "Hernia discal",
+        "Estenosis de canal",
+        "Tumor",
+        "Malformación vascular",
+        "Trauma",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_raquimedular_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_raquimedular": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "region_raquimedular",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Raquimedular"
+      ],
+      "label": "Región anatómica",
+      "options": [
+        "Cervical",
+        "Torácica / dorsal",
+        "Lumbar",
+        "Sacro"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "niveles_cervicales",
+      "type": "multi",
+      "required": false,
+      "required_if_region_raquimedular": [
+        "Cervical"
+      ],
+      "label": "Niveles cervicales",
+      "options": [
+        "C1-C2",
+        "C2-C3",
+        "C3-C4",
+        "C4-C5",
+        "C5-C6",
+        "C6-C7",
+        "C7-T1"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "niveles_toracicos",
+      "type": "multi",
+      "required": false,
+      "required_if_region_raquimedular": [
+        "Torácica / dorsal"
+      ],
+      "label": "Niveles torácicos / dorsales",
+      "options": [
+        "T1-T2",
+        "T2-T3",
+        "T3-T4",
+        "T4-T5",
+        "T5-T6",
+        "T6-T7",
+        "T7-T8",
+        "T8-T9",
+        "T9-T10",
+        "T10-T11",
+        "T11-T12",
+        "T12-L1"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "niveles_lumbares",
+      "type": "multi",
+      "required": false,
+      "required_if_region_raquimedular": [
+        "Lumbar"
+      ],
+      "label": "Niveles lumbares",
+      "options": [
+        "L1-L2",
+        "L2-L3",
+        "L3-L4",
+        "L4-L5",
+        "L5-S1"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "niveles_atipicos_libre",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Raquimedular"
+      ],
+      "label": "Niveles múltiples / atípicos (detalle libre)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_raquimedular",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Raquimedular"
+      ],
+      "label": "Abordaje y procedimiento",
+      "options": [
+        "Discectomía / microdiscectomía",
+        "Laminectomía / hemilaminectomía descompresiva",
+        "Resección de tumor intradural / extramedular",
+        "Resección de tumor intramedular",
+        "Resección de malformación vascular espinal"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "via_discectomia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_raquimedular": [
+        "Discectomía / microdiscectomía"
+      ],
+      "label": "Vía de discectomía",
+      "options": [
+        "Anterior (Cloward / ACDF — cervical)",
+        "Posterior (lumbar / torácica)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "neuromonitoreo_raquimedular",
+      "type": "single",
+      "required": false,
+      "required_if_proc_raquimedular": [
+        "Resección de tumor intramedular"
+      ],
+      "label": "Neuromonitoreo intraoperatorio",
+      "options": [
+        "Potenciales evocados motores y sensitivos — sin cambios",
+        "Con alerta intraoperatoria",
+        "No utilizado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "raiz_nerviosa_schwannoma",
+      "type": "single",
+      "required": false,
+      "required_if_proc_raquimedular": [
+        "Resección de tumor intradural / extramedular"
+      ],
+      "label": "Integridad de raíz nerviosa",
+      "options": [
+        "Preservada",
+        "Sacrificada — sección necesaria"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nivel_raiz_afectada",
+      "type": "free",
+      "required": false,
+      "required_if_proc_raquimedular": [
+        "Resección de tumor intradural / extramedular"
+      ],
+      "label": "Nivel de raíz afectada",
+      "empty_text": ""
+    },
+    {
+      "id": "duroplastia",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Raquimedular"
+      ],
+      "label": "Duroplastia / cierre dural",
+      "options": [
+        "Cierre dural hermético primario",
+        "Plastia dural con injerto + sellante de fibrina",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "injerto_dural",
+      "type": "multi",
+      "required": false,
+      "required_if_duroplastia": [
+        "Plastia dural con injerto + sellante de fibrina"
+      ],
+      "label": "Material de plastia dural",
+      "options": [
+        "Sustituto dural sintético",
+        "Pericardio",
+        "Fascia lata",
+        "Sellante de fibrina (TachoSil / DuraSeal)"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "hemostasia_lecho",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Drenajes / materiales / cierre"
+      ],
+      "label": "Hemostasia de lecho quirúrgico",
+      "options": [
+        "Cera para hueso (bone wax)",
+        "Esponja de gelatina (Gelfoam)",
+        "Celulosa oxidada (Surgicel)",
+        "Algodonitos contados"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "dve",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Drenajes / materiales / cierre"
+      ],
+      "label": "Drenaje ventricular externo (DVE)",
+      "options": [
+        "Colocado",
+        "No colocado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "dve_calibracion_cmh2o",
+      "type": "free",
+      "required": false,
+      "required_if_dve": [
+        "Colocado"
+      ],
+      "label": "Calibración DVE (cmH₂O)",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_craneal",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Drenajes / materiales / cierre"
+      ],
+      "label": "Drenaje craneal (no DVE)",
+      "options": [
+        "Sí",
+        "Sin drenaje"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_craneal_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_drenaje_craneal": [
+        "Sí"
+      ],
+      "label": "Tipo de drenaje craneal",
+      "options": [
+        "Subdural",
+        "Subgaleal",
+        "Epidural",
+        "Aspirativo / al vacío"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_craneal_cantidad",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_craneal": [
+        "Sí"
+      ],
+      "label": "Cantidad de drenajes",
+      "empty_text": ""
+    },
+    {
+      "id": "reposicion_colgajo_oseo",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Drenajes / materiales / cierre"
+      ],
+      "label": "Reposición del colgajo óseo",
+      "options": [
+        "Sí — fijado con plaquitas / tornillos (titanio / PEEK)",
+        "No — guardado en banco / abdomen",
+        "No — descartado"
+      ],
+      "empty_text": ""
+    }
+  ],
+  "id": "cneuro-neurocirugia-v1",
+  "especialidad": "Neurocirugía",
+  "operaciones": [
+    "Patología tumoral e infecciosa craneal",
+    "Neurocirugía vascular craneal",
+    "Neurotraumatología / neurointensivismo",
+    "Hidrocefalia y neurocirugía funcional",
+    "Cirugía raquimedular",
+    "Drenajes, materiales y cierre neuroquirúrgico"
+  ],
+  "titulo": "Neurocirugía",
+  "plantilla_texto": "Neurocirugía — {{procedimiento_grupo}}. Posición {{posicion_quirurgica}}. Abordaje {{abordaje}}{{conversion_causa}}.\nCraneal tumoral: {{indicacion_craneal_tumoral}}{{indicacion_craneal_tumoral_otro}}; ubic. {{ubicacion_craneal}} {{ubicacion_supratentorial}} {{ubicacion_fosa_posterior}}; {{abordaje_craneal}} {{tipo_craneotomia}}; CEBC {{lesion_cebc}} corredor {{corredor_cebc}}{{cebc_cierre_xref_nota}}; resección {{reseccion_tumoral}}; neuromonitoreo {{neuromonitoreo_craneal}}; fluorescencia {{fluorescencia}}; duramadre {{duramadre_craneotomia}}; V {{nervio_trigemino_v}} VII {{nervio_facial_vii}} VIII {{nervio_vestibulococlear_viii}}; ACI {{carotida_interna}}; quiasma {{quiasma_optico}}.\nVascular: {{patologia_vascular_craneal}}; circulación {{ubicacion_circulacion}}; vol. hematoma {{volumen_hematoma_vascular_cc}} cc; HSA {{hsa}} Hunt-Hess {{hunt_hess}} Fisher {{fisher}}; {{tecnica_vascular_craneal}}; vasos {{vasos_clipado}}{{vasos_clipado_otro}}; ruptura {{ruptura_aneurisma_io}}; angio {{resultado_angiografico_clipado}}; estudio {{estudio_vascular_io}}.\nTrauma: {{indicacion_neurotrauma}}; GCS {{glasgow_preop}}; vol. {{volumen_hematoma_cc}} cc; midline {{midline_shift_mm}} mm; {{proc_neurotrauma}} {{tipo_descompresiva}}; craneoplastia {{material_craneoplastia}}; PIC {{tipo_monitoreo_pic}}.\nHidro/funcional: {{proc_hidrocefalia}} tipo {{indicacion_hidrocefalia}} válvula {{valvula_dvp}}; {{proc_funcional}} DBS {{blanco_dbs}} testing {{testing_dbs}}.\nRaquimedular: {{indicacion_raquimedular}}{{indicacion_raquimedular_otro}}; región {{region_raquimedular}}; niveles C {{niveles_cervicales}} T {{niveles_toracicos}} L {{niveles_lumbares}} {{niveles_atipicos_libre}}; {{proc_raquimedular}} vía {{via_discectomia}}; neuromonitoreo {{neuromonitoreo_raquimedular}}; raíz {{raiz_nerviosa_schwannoma}} nivel {{nivel_raiz_afectada}}; duroplastia {{duroplastia}} {{injerto_dural}}.\nDrenajes/cierre: hemostasia {{hemostasia_lecho}}; DVE {{dve}} {{dve_calibracion_cmh2o}} cmH2O; drenaje {{drenaje_craneal}} {{drenaje_craneal_tipo}} n={{drenaje_craneal_cantidad}}; colgajo {{reposicion_colgajo_oseo}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["coft-oftalmologia-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Segmento anterior / cristalino / córnea",
+        "Segmento posterior / vitreorretiniana",
+        "Glaucoma / drenaje",
+        "Oculoplastia / vía lagrimal / órbita",
+        "Estrabismo / traumatología ocular"
+      ]
+    },
+    {
+      "id": "ojo_afectado",
+      "type": "single",
+      "required": false,
+      "label": "Ojo / anexo afectado",
+      "options": [
+        "Derecho (OD)",
+        "Izquierdo (OI)",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": false,
+      "label": "Abordaje (si aplica)",
+      "options": [
+        "Abierto",
+        "Microincisional / mínimamente invasivo",
+        "Endoscópico",
+        "Convertido a abierto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_segmento_anterior",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Segmento anterior / cristalino / córnea"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Facoemulsificación + implante de LIO",
+        "Extracción extracapsular de catarata (EECC)",
+        "Femto-catarata (FLACS)",
+        "Queratoplastia penetrante (PKP)",
+        "Queratoplastia lamelar anterior (DALK)",
+        "Queratoplastia endotelial (DSAEK / DMEK)",
+        "Resección de pterigión + autoinjerto de conjuntiva",
+        "Crosslinking corneal",
+        "Anillos intraestromales"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "modelo_lio",
+      "type": "free",
+      "required": false,
+      "label": "LIO — modelo / dioptrías",
+      "empty_text": ""
+    },
+    {
+      "id": "ubicacion_lio",
+      "type": "single",
+      "required": false,
+      "label": "Ubicación del LIO",
+      "options": [
+        "Saco capsular",
+        "Sulcus",
+        "Cámara anterior / fijación escleral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "complicacion_faco",
+      "type": "single",
+      "required": false,
+      "label": "Complicación intraoperatoria (catarata)",
+      "options": [
+        "Sin complicaciones",
+        "Ruptura de cápsula posterior — sin pérdida vítrea",
+        "Ruptura de cápsula posterior — con pérdida vítrea (requirió vitrectomía anterior)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_trasplante_corneal",
+      "type": "single",
+      "required": false,
+      "label": "Indicación de trasplante corneal",
+      "options": [
+        "Queratocono",
+        "Distrofia de Fuchs",
+        "Edema corneal",
+        "Cicatriz corneal",
+        "Rechazo de injerto previo",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_trasplante_corneal_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_trasplante_corneal": [
+        "Otro"
+      ],
+      "label": "Indicación trasplante (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "mitomicina_pterigion",
+      "type": "single",
+      "required": false,
+      "required_if_proc_segmento_anterior": [
+        "Resección de pterigión + autoinjerto de conjuntiva"
+      ],
+      "label": "Mitomicina C (pterigión)",
+      "options": [
+        "Con Mitomicina C",
+        "Sin Mitomicina C"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_vitreorretiniana",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Segmento posterior / vitreorretiniana"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Desprendimiento de retina",
+        "Hemorragia vítrea",
+        "Retinopatía diabética proliferativa",
+        "Agujero macular / membrana epirretiniana"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "cuadrantes_desprendimiento",
+      "type": "multi",
+      "required": false,
+      "required_if_indicacion_vitreorretiniana": [
+        "Desprendimiento de retina"
+      ],
+      "label": "Cuadrantes afectados (desprendimiento)",
+      "options": [
+        "Superior nasal",
+        "Superior temporal",
+        "Inferior nasal",
+        "Inferior temporal"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "estado_macula",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_vitreorretiniana": [
+        "Desprendimiento de retina"
+      ],
+      "label": "Estado macular",
+      "options": [
+        "Mácula ON (aplicada)",
+        "Mácula OFF (desprendida)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_vitreorretiniana",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Segmento posterior / vitreorretiniana"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Vitrectomía vía pars plana (VVPP)",
+        "Pelado de membrana limitante interna (MLI) / membrana epirretiniana",
+        "Retinopexia / endo-láser / crioaplicación",
+        "Indentación escleral / cerclaje escleral (scleral buckle)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "calibre_vvpp",
+      "type": "single",
+      "required": false,
+      "required_if_proc_vitreorretiniana": [
+        "Vitrectomía vía pars plana (VVPP)"
+      ],
+      "label": "Calibre VVPP",
+      "options": [
+        "23G",
+        "25G",
+        "27G"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "taponamiento_intraocular",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Segmento posterior / vitreorretiniana"
+      ],
+      "label": "Taponamiento intraocular",
+      "options": [
+        "Aire",
+        "Gas expandible — SF6",
+        "Gas expandible — C3F8",
+        "Aceite de silicona"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "viscosidad_silicona_cst",
+      "type": "free",
+      "required": false,
+      "required_if_taponamiento_intraocular": [
+        "Aceite de silicona"
+      ],
+      "label": "Viscosidad del aceite de silicona (cSt)",
+      "empty_text": ""
+    },
+    {
+      "id": "hallazgos_io_vitreorretiniana",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Segmento posterior / vitreorretiniana"
+      ],
+      "label": "Hallazgos intraoperatorios adicionales",
+      "options": [
+        "Sin hallazgos adicionales",
+        "Desgarro(s) adicional(es) identificado(s) y tratado(s)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "estado_final_retina",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Segmento posterior / vitreorretiniana"
+      ],
+      "label": "Estado final de la retina",
+      "options": [
+        "Aplicada",
+        "No aplicada (requiere reintervención)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "pio_preop_mmhg",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Glaucoma / drenaje"
+      ],
+      "label": "PIO preoperatoria (mmHg)",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_glaucoma",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Glaucoma / drenaje"
+      ],
+      "label": "Indicación específica",
+      "options": [
+        "Ángulo abierto",
+        "Ángulo cerrado",
+        "Glaucoma refractario",
+        "Glaucoma congénito",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_glaucoma_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_glaucoma": [
+        "Otro"
+      ],
+      "label": "Indicación glaucoma (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_glaucoma",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Glaucoma / drenaje"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Trabeculectomía",
+        "Dispositivo de drenaje / válvula de glaucoma",
+        "Cirugía de glaucoma mínimamente invasiva (MIGS — iStent / Kahook)",
+        "Ciclofotocoagulación con láser diodo"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "antimetabolito_trabeculectomia",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_glaucoma": [
+        "Trabeculectomía"
+      ],
+      "label": "Antimetabolitos (trabeculectomía)",
+      "options": [
+        "Mitomicina C",
+        "5-FU"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_valvula_glaucoma",
+      "type": "single",
+      "required": false,
+      "required_if_proc_glaucoma": [
+        "Dispositivo de drenaje / válvula de glaucoma"
+      ],
+      "label": "Tipo de válvula / dispositivo",
+      "options": [
+        "Ahmed",
+        "Baerveldt"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_oculoplastia",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Oculoplastia / vía lagrimal / órbita"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Blefaroplastia funcional / corrección de ptosis palpebral",
+        "Corrección de entropión / ectropión",
+        "Resección de tumor palpebral + reconstrucción",
+        "Dacriocistorrinostomía (DCR)",
+        "Sondaje / intubación de vía lagrimal con tubo de silicona",
+        "Enucleación / evisceración ocular + implante orbitario",
+        "Descompresión orbitaria (oftalmopatía tiroidea)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "dx_tumor_palpebral",
+      "type": "single",
+      "required": false,
+      "required_if_proc_oculoplastia": [
+        "Resección de tumor palpebral + reconstrucción"
+      ],
+      "label": "Diagnóstico presuntivo (tumor palpebral)",
+      "options": [
+        "Basocelular",
+        "Espinocelular",
+        "Melanoma",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "dx_tumor_palpebral_otro",
+      "type": "free",
+      "required": false,
+      "required_if_dx_tumor_palpebral": [
+        "Otro"
+      ],
+      "label": "Diagnóstico tumor (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "margen_tumor_palpebral",
+      "type": "single",
+      "required": false,
+      "required_if_proc_oculoplastia": [
+        "Resección de tumor palpebral + reconstrucción"
+      ],
+      "label": "Margen quirúrgico",
+      "options": [
+        "Libre",
+        "Comprometido"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "distancia_margen_tumor_mm",
+      "type": "free",
+      "required": false,
+      "required_if_margen_tumor_palpebral": [
+        "Libre",
+        "Comprometido"
+      ],
+      "label": "Distancia de margen (mm)",
+      "empty_text": ""
+    },
+    {
+      "id": "via_dcr",
+      "type": "single",
+      "required": false,
+      "required_if_proc_oculoplastia": [
+        "Dacriocistorrinostomía (DCR)"
+      ],
+      "label": "Vía de DCR",
+      "options": [
+        "Vía externa",
+        "Vía endonasal endoscópica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "permeabilidad_via_lagrimal",
+      "type": "single",
+      "required": false,
+      "required_if_proc_oculoplastia": [
+        "Dacriocistorrinostomía (DCR)"
+      ],
+      "label": "Permeabilidad final de vía lagrimal",
+      "options": [
+        "Confirmada por irrigación",
+        "No confirmada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "material_implante_orbitario",
+      "type": "single",
+      "required": false,
+      "required_if_proc_oculoplastia": [
+        "Enucleación / evisceración ocular + implante orbitario"
+      ],
+      "label": "Material del implante orbitario",
+      "options": [
+        "Hidroxiapatita",
+        "PMMA",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "material_implante_orbitario_otro",
+      "type": "free",
+      "required": false,
+      "required_if_material_implante_orbitario": [
+        "Otro"
+      ],
+      "label": "Implante orbitario (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_estrabismo_trauma",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Estrabismo / traumatología ocular"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Cirugía de estrabismo (músculos extraoculares)",
+        "Cierre / sutura de herida corneo-escleral",
+        "Extracción de cuerpo extraño intraocular (CEIO)",
+        "Reconstrucción de cámara anterior / iridoplastia"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "musculos_extraoculares",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_estrabismo_trauma": [
+        "Cirugía de estrabismo (músculos extraoculares)"
+      ],
+      "label": "Músculos extraoculares intervenidos",
+      "options": [
+        "Recto medio",
+        "Recto lateral",
+        "Recto superior",
+        "Recto inferior",
+        "Oblicuos"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "accion_estrabismo",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_estrabismo_trauma": [
+        "Cirugía de estrabismo (músculos extraoculares)"
+      ],
+      "label": "Acción sobre el músculo",
+      "options": [
+        "Retroceso (recess)",
+        "Resección (resect)",
+        "Suturas ajustables"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "mm_retroceso",
+      "type": "free",
+      "required": false,
+      "required_if_accion_estrabismo": [
+        "Retroceso (recess)"
+      ],
+      "label": "Retroceso (mm)",
+      "empty_text": ""
+    },
+    {
+      "id": "mm_reseccion_estrabismo",
+      "type": "free",
+      "required": false,
+      "required_if_accion_estrabismo": [
+        "Resección (resect)"
+      ],
+      "label": "Resección (mm)",
+      "empty_text": ""
+    },
+    {
+      "id": "angulo_desviacion_preop_dp",
+      "type": "free",
+      "required": false,
+      "required_if_proc_estrabismo_trauma": [
+        "Cirugía de estrabismo (músculos extraoculares)"
+      ],
+      "label": "Ángulo de desviación preoperatorio (dioptrías prismáticas)",
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_zona_trauma",
+      "type": "single",
+      "required": false,
+      "label": "Clasificación de zona (trauma ocular abierto)",
+      "options": [
+        "Zona I",
+        "Zona II",
+        "Zona III"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "agudeza_visual_preop_trauma",
+      "type": "free",
+      "required": false,
+      "label": "Agudeza visual preoperatoria (trauma)",
+      "empty_text": ""
+    },
+    {
+      "id": "sutura_corneoescleral",
+      "type": "single",
+      "required": false,
+      "required_if_proc_estrabismo_trauma": [
+        "Cierre / sutura de herida corneo-escleral"
+      ],
+      "label": "Sutura corneo-escleral",
+      "options": [
+        "Nylon 10-0",
+        "Nylon 9-0"
+      ],
+      "empty_text": ""
+    }
+  ],
+  "id": "coft-oftalmologia-v1",
+  "especialidad": "Oftalmología",
+  "operaciones": [
+    "Cirugía de segmento anterior / cristalino / córnea",
+    "Cirugía vitreorretiniana",
+    "Cirugía de glaucoma",
+    "Oculoplastia / vía lagrimal / órbita",
+    "Estrabismo y traumatología ocular"
+  ],
+  "titulo": "Oftalmología y cirugía ocular",
+  "plantilla_texto": "Oftalmología — {{procedimiento_grupo}}. Ojo {{ojo_afectado}}. Abordaje {{abordaje}}{{conversion_causa}}.\nSegmento ant.: {{proc_segmento_anterior}}; LIO {{modelo_lio}} ubic. {{ubicacion_lio}}; complicación {{complicacion_faco}}; trasplante {{indicacion_trasplante_corneal}}{{indicacion_trasplante_corneal_otro}}; MMC pterigión {{mitomicina_pterigion}}.\nVitreo: {{indicacion_vitreorretiniana}}; cuadrantes {{cuadrantes_desprendimiento}} mácula {{estado_macula}}; {{proc_vitreorretiniana}} calibre {{calibre_vvpp}}; taponamiento {{taponamiento_intraocular}} {{viscosidad_silicona_cst}} cSt; hallazgos {{hallazgos_io_vitreorretiniana}}; retina final {{estado_final_retina}}.\nGlaucoma: PIO {{pio_preop_mmhg}} mmHg; {{indicacion_glaucoma}}{{indicacion_glaucoma_otro}}; {{proc_glaucoma}} antimet. {{antimetabolito_trabeculectomia}} válvula {{tipo_valvula_glaucoma}}.\nOculoplastia: {{proc_oculoplastia}}; tumor {{dx_tumor_palpebral}}{{dx_tumor_palpebral_otro}} margen {{margen_tumor_palpebral}} {{distancia_margen_tumor_mm}} mm; DCR {{via_dcr}} permeabilidad {{permeabilidad_via_lagrimal}}; implante {{material_implante_orbitario}}{{material_implante_orbitario_otro}}.\nEstrabismo/trauma: {{proc_estrabismo_trauma}}; músculos {{musculos_extraoculares}} acción {{accion_estrabismo}} recess {{mm_retroceso}} mm resect {{mm_reseccion_estrabismo}} mm; ángulo {{angulo_desviacion_preop_dp}} DP; zona {{clasificacion_zona_trauma}}; AV {{agudeza_visual_preop_trauma}}; sutura {{sutura_corneoescleral}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["corl-orl-general-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Otología / cirugía del oído",
+        "Faringoamigdalina / cavidad oral general",
+        "Ronquido / cirugía del sueño (SAHOS)"
+      ]
+    },
+    {
+      "id": "lateralidad",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Otología / cirugía del oído"
+      ],
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": false,
+      "label": "Abordaje (si aplica)",
+      "options": [
+        "Abierto",
+        "Endoscópico",
+        "Convertido a abierto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_otologia",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Otología / cirugía del oído"
+      ],
+      "label": "Indicación / diagnóstico",
+      "options": [
+        "Otitis media crónica",
+        "Colesteatoma",
+        "Otosclerosis",
+        "Hipoacusia neurosensorial (implante)",
+        "Trauma",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_otologia_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_otologia": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "abordaje_otologico",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Otología / cirugía del oído"
+      ],
+      "label": "Abordaje otológico",
+      "options": [
+        "Endaural",
+        "Retroauricular",
+        "Transcanal"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_otologia",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Otología / cirugía del oído"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Miringotomía + tubos de ventilación (diábolos)",
+        "Timpanoplastia",
+        "Mastoidectomía",
+        "Estapedectomía / estapedotomía",
+        "Implante coclear",
+        "Dispositivo de conducción ósea (BAHA)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_timpanoplastia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_otologia": [
+        "Timpanoplastia"
+      ],
+      "label": "Tipo de timpanoplastia",
+      "options": [
+        "Tipo I / miringoplastia",
+        "Tipo II",
+        "Tipo III"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "material_injerto_timpanoplastia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_otologia": [
+        "Timpanoplastia"
+      ],
+      "label": "Material del injerto (timpanoplastia)",
+      "options": [
+        "Fascia temporal",
+        "Cartílago / pericondrio tragal"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "colesteatoma",
+      "type": "single",
+      "required": false,
+      "required_if_proc_otologia": [
+        "Timpanoplastia",
+        "Mastoidectomía"
+      ],
+      "label": "Colesteatoma",
+      "options": [
+        "Ausente",
+        "Presente — resección completa",
+        "Presente — resección incompleta (planificar second-look)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_mastoidectomia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_otologia": [
+        "Mastoidectomía"
+      ],
+      "label": "Tipo de mastoidectomía",
+      "options": [
+        "Canal Wall Up / conservadora",
+        "Canal Wall Down / radical"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_facial_vii_otologia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_otologia": [
+        "Mastoidectomía"
+      ],
+      "required_if_tipo_timpanoplastia": [
+        "Tipo II",
+        "Tipo III"
+      ],
+      "label": "Nervio facial (VII)",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "estado_cadena_osicular",
+      "type": "single",
+      "required": false,
+      "required_if_proc_otologia": [
+        "Timpanoplastia"
+      ],
+      "label": "Estado de la cadena osicular",
+      "options": [
+        "Íntegra",
+        "Erosionada — requiere reconstrucción"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "material_osiculoplastia",
+      "type": "single",
+      "required": false,
+      "required_if_estado_cadena_osicular": [
+        "Erosionada — requiere reconstrucción"
+      ],
+      "label": "Material de osiculoplastia",
+      "options": [
+        "Prótesis parcial (PORP)",
+        "Prótesis total (TORP)",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "material_osiculoplastia_otro",
+      "type": "free",
+      "required": false,
+      "required_if_material_osiculoplastia": [
+        "Otro"
+      ],
+      "label": "Osiculoplastia (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "gusher_platina",
+      "type": "single",
+      "required": false,
+      "required_if_proc_otologia": [
+        "Estapedectomía / estapedotomía"
+      ],
+      "label": "Platina / gusher perilinfático",
+      "options": [
+        "Platina móvil — sin incidentes",
+        "Platina fija — requirió fenestración",
+        "Gusher perilinfático identificado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "verificacion_implante_coclear",
+      "type": "single",
+      "required": false,
+      "required_if_proc_otologia": [
+        "Implante coclear"
+      ],
+      "label": "Verificación de implante coclear",
+      "options": [
+        "Inserción completa del electrodo — telemetría normal",
+        "Inserción parcial",
+        "Telemetría alterada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_faringoamigdalina",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Faringoamigdalina / cavidad oral general"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Amigdalitis recurrente",
+        "Hipertrofia obstructiva",
+        "Sospecha oncológica",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_faringoamigdalina_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_faringoamigdalina": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_faringoamigdalina",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Faringoamigdalina / cavidad oral general"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Amigdalectomía parcial / total",
+        "Adenoidectomía",
+        "Frenectomía / frenuloplastia",
+        "Drenaje de absceso periamigdalino / parafaríngeo"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_amigdalectomia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_faringoamigdalina": [
+        "Amigdalectomía parcial / total"
+      ],
+      "label": "Técnica de amigdalectomía",
+      "options": [
+        "Disección fría",
+        "Electrocauterio",
+        "Coblation (radiofrecuencia)",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_amigdalectomia_otro",
+      "type": "free",
+      "required": false,
+      "required_if_tecnica_amigdalectomia": [
+        "Otro"
+      ],
+      "label": "Técnica amigdalectomía (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_adenoidectomia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_faringoamigdalina": [
+        "Adenoidectomía"
+      ],
+      "label": "Técnica de adenoidectomía",
+      "options": [
+        "Legrado",
+        "Microdebridador",
+        "Radiofrecuencia / Coblation"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_frenectomia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_faringoamigdalina": [
+        "Frenectomía / frenuloplastia"
+      ],
+      "label": "Tipo de frenectomía / frenuloplastia",
+      "options": [
+        "Lingual",
+        "Labial"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_frenectomia",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_faringoamigdalina": [
+        "Frenectomía / frenuloplastia"
+      ],
+      "label": "Indicación de frenectomía / frenuloplastia",
+      "options": [
+        "Anquiloglosia",
+        "Diastema",
+        "Recesión gingival",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_frenectomia_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_frenectomia": [
+        "Otro"
+      ],
+      "label": "Indicación frenectomía (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "via_absceso_faringeo",
+      "type": "single",
+      "required": false,
+      "required_if_proc_faringoamigdalina": [
+        "Drenaje de absceso periamigdalino / parafaríngeo"
+      ],
+      "label": "Vía de abordaje del absceso",
+      "options": [
+        "Intraoral",
+        "Cervical externa (parafaríngeo)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hallazgo_absceso_faringeo",
+      "type": "single",
+      "required": false,
+      "required_if_proc_faringoamigdalina": [
+        "Drenaje de absceso periamigdalino / parafaríngeo"
+      ],
+      "label": "Hallazgo",
+      "options": [
+        "Purulento confirmado",
+        "Celulitis sin colección"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hemostasia_faringoamigdalina",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Faringoamigdalina / cavidad oral general"
+      ],
+      "label": "Hemostasia",
+      "options": [
+        "Bipolar",
+        "Sutura / ligadura",
+        "Agentes hemostáticos"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_sahos",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Ronquido / cirugía del sueño (SAHOS)"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Síndrome de apnea-hipopnea obstructiva del sueño (SAHOS)",
+        "Roncopatía primaria"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "gravedad_iah",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Ronquido / cirugía del sueño (SAHOS)"
+      ],
+      "label": "Gravedad preoperatoria (IAH)",
+      "options": [
+        "IAH leve (5–15)",
+        "IAH moderado (15–30)",
+        "IAH severo (>30)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nivel_obstruccion_dise",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Ronquido / cirugía del sueño (SAHOS)"
+      ],
+      "label": "Nivel de obstrucción por DISE",
+      "options": [
+        "Palatal",
+        "Base de lengua",
+        "Multinivel",
+        "No realizada endoscopia de sueño"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_sahos",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Ronquido / cirugía del sueño (SAHOS)"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Uvulopalatofaringoplastia (UPFP) / técnica de Fujita",
+        "Expansión de esfínter faríngeo / faringoplastia lateral",
+        "Ablación por radiofrecuencia del paladar blando / base de lengua",
+        "Avance geniogloso / miotomía hioidea"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    }
+  ],
+  "id": "corl-orl-general-v1",
+  "especialidad": "Otorrinolaringología",
+  "operaciones": [
+    "Otología y cirugía del oído",
+    "Cirugía faringoamigdalina y cavidad oral general",
+    "Cirugía del sueño / SAHOS"
+  ],
+  "titulo": "Otorrinolaringología general",
+  "plantilla_texto": "ORL general — {{procedimiento_grupo}}. Lateralidad {{lateralidad}}. Abordaje {{abordaje}}{{conversion_causa}}.\nOtología: {{indicacion_otologia}}{{indicacion_otologia_otro}}; vía {{abordaje_otologico}}; {{proc_otologia}}; timpanoplastia {{tipo_timpanoplastia}} injerto {{material_injerto_timpanoplastia}}; colesteatoma {{colesteatoma}}; mastoidectomía {{tipo_mastoidectomia}}; VII {{nervio_facial_vii_otologia}}; cadena {{estado_cadena_osicular}} {{material_osiculoplastia}}{{material_osiculoplastia_otro}}; platina/gusher {{gusher_platina}}; implante {{verificacion_implante_coclear}}.\nFaringe: {{indicacion_faringoamigdalina}}{{indicacion_faringoamigdalina_otro}}; {{proc_faringoamigdalina}}; amigd. {{tecnica_amigdalectomia}}{{tecnica_amigdalectomia_otro}}; adenoid. {{tecnica_adenoidectomia}}; frenillo {{tipo_frenectomia}} {{indicacion_frenectomia}}{{indicacion_frenectomia_otro}}; absceso vía {{via_absceso_faringeo}} hallazgo {{hallazgo_absceso_faringeo}}; hemostasia {{hemostasia_faringoamigdalina}}.\nSAHOS: {{indicacion_sahos}}; IAH {{gravedad_iah}}; DISE {{nivel_obstruccion_dise}}; {{proc_sahos}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cpl-plastica-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Cobertura cutánea — injertos y colgajos",
+        "Cirugía mamaria",
+        "Contorno corporal / posbariátrica",
+        "Facial — estética / reconstructiva",
+        "Quemados / secuelas",
+        "Drenajes / cierre / heridas"
+      ]
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": false,
+      "label": "Abordaje (si aplica)",
+      "options": [
+        "Abierto",
+        "Endoscópico / mínimamente invasivo",
+        "Convertido a abierto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_cobertura",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cobertura cutánea — injertos y colgajos"
+      ],
+      "label": "Indicación / diagnóstico",
+      "options": [
+        "Defecto traumático",
+        "Defecto oncológico post-resección",
+        "Quemadura",
+        "Úlcera crónica",
+        "Reconstrucción congénita",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_cobertura_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_cobertura": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_injerto_piel",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cobertura cutánea — injertos y colgajos"
+      ],
+      "label": "Injerto de piel — tipo",
+      "options": [
+        "Espesor parcial (STSG)",
+        "Espesor total (FTSG)"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_injerto",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_injerto_piel": [
+        "Espesor parcial (STSG)",
+        "Espesor total (FTSG)"
+      ],
+      "label": "Técnica del injerto",
+      "options": [
+        "En malla (meshed)",
+        "Lámina entera (unmeshed)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "razon_malla",
+      "type": "single",
+      "required": false,
+      "required_if_tecnica_injerto": [
+        "En malla (meshed)"
+      ],
+      "label": "Razón de malla",
+      "options": [
+        "1.5:1",
+        "3:1"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "zona_donante",
+      "type": "multi",
+      "required": false,
+      "required_if_tipo_injerto_piel": [
+        "Espesor parcial (STSG)",
+        "Espesor total (FTSG)"
+      ],
+      "label": "Zona donante",
+      "options": [
+        "Muslo",
+        "Región retroauricular",
+        "Región inguinal",
+        "Abdomen",
+        "Otra"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "zona_donante_otra",
+      "type": "free",
+      "required": false,
+      "required_if_zona_donante": [
+        "Otra"
+      ],
+      "label": "Zona donante (otra)",
+      "empty_text": ""
+    },
+    {
+      "id": "fijacion_injerto",
+      "type": "multi",
+      "required": false,
+      "required_if_tipo_injerto_piel": [
+        "Espesor parcial (STSG)",
+        "Espesor total (FTSG)"
+      ],
+      "label": "Fijación del injerto",
+      "options": [
+        "Sutura / agrafes",
+        "Cura acompasada / cura de balsa (tie-over)",
+        "Terapia de presión negativa (VAC)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "colgajo_diseno",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cobertura cutánea — injertos y colgajos"
+      ],
+      "label": "Colgajo — tipo por diseño",
+      "options": [
+        "De avance",
+        "De rotación",
+        "De transposición",
+        "En Z (Z-plastia) / V-Y"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "colgajo_irrigacion",
+      "type": "single",
+      "required": false,
+      "label": "Colgajo — tipo por irrigación",
+      "options": [
+        "Aleatorio",
+        "Axial / pediculado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "colgajo_denominacion",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cobertura cutánea — injertos y colgajos"
+      ],
+      "label": "Colgajo — denominación específica",
+      "options": [
+        "Inguinal",
+        "Surcolateral",
+        "Anterolateral de muslo (ALT)",
+        "TRAM",
+        "DIEP",
+        "Dorsal ancho",
+        "Otro"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "colgajo_denominacion_otro",
+      "type": "free",
+      "required": false,
+      "required_if_colgajo_denominacion": [
+        "Otro"
+      ],
+      "label": "Denominación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "tram_modalidad",
+      "type": "single",
+      "required": false,
+      "required_if_colgajo_denominacion": [
+        "TRAM"
+      ],
+      "label": "TRAM — modalidad",
+      "options": [
+        "Pediculado",
+        "Libre"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "colgajo_libre",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cobertura cutánea — injertos y colgajos"
+      ],
+      "label": "Colgajo microvascularizado / libre",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_tecnica",
+      "type": "single",
+      "required": false,
+      "required_if_colgajo_libre": [
+        "Sí"
+      ],
+      "label": "Anastomosis arterial / venosa — técnica",
+      "options": [
+        "Término-terminal",
+        "Término-lateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "anastomosis_sutura",
+      "type": "single",
+      "required": false,
+      "required_if_colgajo_libre": [
+        "Sí"
+      ],
+      "label": "Anastomosis — sutura / coupler",
+      "options": [
+        "Monofilamento 8-0",
+        "Monofilamento 9-0",
+        "Monofilamento 10-0",
+        "Coupler"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tiempo_isquemia_colgajo_min",
+      "type": "free",
+      "required": false,
+      "required_if_colgajo_libre": [
+        "Sí"
+      ],
+      "label": "Tiempo de isquemia del colgajo libre (min)",
+      "empty_text": ""
+    },
+    {
+      "id": "monitoreo_viabilidad",
+      "type": "multi",
+      "required": false,
+      "required_if_colgajo_libre": [
+        "Sí"
+      ],
+      "label": "Monitoreo de viabilidad",
+      "options": [
+        "Doppler acústico",
+        "Llenado capilar",
+        "Temperatura"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "viabilidad_final_colgajo",
+      "type": "single",
+      "required": false,
+      "required_if_colgajo_libre": [
+        "Sí"
+      ],
+      "label": "Viabilidad final del colgajo al cierre",
+      "options": [
+        "Viable — sin compromiso",
+        "Viable — compromiso venoso parcial resuelto",
+        "Comprometido — requirió reexploración"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "lateralidad_mamaria",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía mamaria"
+      ],
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_mamaria",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía mamaria"
+      ],
+      "label": "Indicación / diagnóstico",
+      "options": [
+        "Estética primaria",
+        "Macromastia sintomática",
+        "Asimetría mamaria",
+        "Ptosis mamaria",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_mamaria_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_mamaria": [
+        "Otro"
+      ],
+      "label": "Indicación mamaria (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_mamario",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía mamaria"
+      ],
+      "label": "Procedimiento específico",
+      "options": [
+        "Mamoplastia de aumento (implantes)",
+        "Mamoplastia reductiva / mastopexia",
+        "Reconstrucción mamaria post-mastectomía",
+        "Corrección de ginecomastia"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "ginecomastia_tecnica",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_mamario": [
+        "Corrección de ginecomastia"
+      ],
+      "label": "Técnica (ginecomastia)",
+      "options": [
+        "Liposucción",
+        "Exéresis glandular directa"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_reconstruccion_mama",
+      "type": "single",
+      "required": false,
+      "required_if_proc_mamario": [
+        "Reconstrucción mamaria post-mastectomía"
+      ],
+      "label": "Tipo de reconstrucción post-mastectomía",
+      "options": [
+        "Basada en implante",
+        "Autóloga (colgajo)",
+        "Combinada (implante + colgajo)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "momento_reconstruccion_mama",
+      "type": "single",
+      "required": false,
+      "required_if_proc_mamario": [
+        "Reconstrucción mamaria post-mastectomía"
+      ],
+      "label": "Momento de la reconstrucción",
+      "options": [
+        "Inmediata",
+        "Diferida"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "plano_implante",
+      "type": "single",
+      "required": false,
+      "required_if_proc_mamario": [
+        "Mamoplastia de aumento (implantes)"
+      ],
+      "label": "Plano de colocación del implante / expansor",
+      "options": [
+        "Subglandular",
+        "Subfascial",
+        "Subpectoral / plano dual (dual plane)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "via_abordaje_mama",
+      "type": "single",
+      "required": false,
+      "label": "Vía de abordaje",
+      "options": [
+        "Periareolar",
+        "Inframamaria",
+        "Axilar"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "pediculo_reductiva",
+      "type": "single",
+      "required": false,
+      "required_if_proc_mamario": [
+        "Mamoplastia reductiva / mastopexia"
+      ],
+      "label": "Técnica pediculada (reductiva / mastopexia)",
+      "options": [
+        "Pedículo superior",
+        "Pedículo inferior",
+        "Pedículo superomedial"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_perfil_implante",
+      "type": "single",
+      "required": false,
+      "required_if_proc_mamario": [
+        "Mamoplastia de aumento (implantes)"
+      ],
+      "label": "Tipo / perfil de implante",
+      "options": [
+        "Liso — redondo",
+        "Liso — anatómico",
+        "Texturizado — redondo",
+        "Texturizado — anatómico"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "marca_volumen_protesis",
+      "type": "free",
+      "required": false,
+      "required_if_proc_mamario": [
+        "Mamoplastia de aumento (implantes)"
+      ],
+      "label": "Marca y volumen de prótesis / expansor (cc)",
+      "empty_text": ""
+    },
+    {
+      "id": "peso_resecado_der_g",
+      "type": "free",
+      "required": false,
+      "required_if_proc_mamario": [
+        "Mamoplastia reductiva / mastopexia"
+      ],
+      "label": "Peso de tejido resecado — derecha (g)",
+      "empty_text": ""
+    },
+    {
+      "id": "peso_resecado_izq_g",
+      "type": "free",
+      "required": false,
+      "required_if_proc_mamario": [
+        "Mamoplastia reductiva / mastopexia"
+      ],
+      "label": "Peso de tejido resecado — izquierda (g)",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_contorno",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Contorno corporal / posbariátrica"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Posbariátrica (pérdida masiva de peso)",
+        "Estética primaria"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "profilaxis_tev",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Contorno corporal / posbariátrica"
+      ],
+      "label": "Profilaxis de tromboembolismo venoso",
+      "options": [
+        "Mecánica (compresión neumática)",
+        "Farmacológica",
+        "Ambas",
+        "No indicada (evaluar y documentar motivo)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "profilaxis_tev_motivo",
+      "type": "free",
+      "required": false,
+      "required_if_profilaxis_tev": [
+        "No indicada (evaluar y documentar motivo)"
+      ],
+      "label": "Motivo de no indicar profilaxis TEV",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_contorno",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Contorno corporal / posbariátrica"
+      ],
+      "label": "Procedimiento específico",
+      "options": [
+        "Dermolipectomía abdominal / abdominoplastia",
+        "Liposucción / lipoescultura",
+        "Cruroplastia (lifting de muslos)",
+        "Braquioplastia (lifting de brazos)",
+        "Lipectomía en cinturón / dermolipectomía circunferencial"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_abdominoplastia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_contorno": [
+        "Dermolipectomía abdominal / abdominoplastia"
+      ],
+      "label": "Tipo de abdominoplastia",
+      "options": [
+        "Convencional",
+        "En ancla / flor de lis",
+        "Mini-abdominoplastia"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "zonas_liposuccion",
+      "type": "free",
+      "required": false,
+      "required_if_proc_contorno": [
+        "Liposucción / lipoescultura"
+      ],
+      "label": "Zonas de liposucción",
+      "empty_text": ""
+    },
+    {
+      "id": "volumen_aspirado_cc",
+      "type": "free",
+      "required": false,
+      "required_if_proc_contorno": [
+        "Liposucción / lipoescultura"
+      ],
+      "label": "Volumen aspirado total (cc)",
+      "empty_text": ""
+    },
+    {
+      "id": "plicatura_rectos",
+      "type": "single",
+      "required": false,
+      "required_if_proc_contorno": [
+        "Dermolipectomía abdominal / abdominoplastia"
+      ],
+      "label": "Plicatura de la vaina de los rectos (diástasis)",
+      "options": [
+        "Realizada",
+        "No requerida"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "plicatura_sutura",
+      "type": "free",
+      "required": false,
+      "required_if_plicatura_rectos": [
+        "Realizada"
+      ],
+      "label": "Sutura de plicatura",
+      "empty_text": ""
+    },
+    {
+      "id": "umbilicoplastia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_contorno": [
+        "Dermolipectomía abdominal / abdominoplastia"
+      ],
+      "label": "Reimplantación / neoombligo",
+      "options": [
+        "Umbilicoplastia con fijación a la aponeurosis",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_facial",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Facial — estética / reconstructiva"
+      ],
+      "label": "Indicación / diagnóstico",
+      "options": [
+        "Estética primaria",
+        "Funcional (ej. obstrucción nasal en rinoplastia)",
+        "Reconstructiva (defecto congénito o adquirido)",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_facial_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_facial": [
+        "Otro"
+      ],
+      "label": "Indicación facial (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_facial",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Facial — estética / reconstructiva"
+      ],
+      "label": "Procedimiento específico",
+      "options": [
+        "Ritidoplastia / lifting facial",
+        "Blefaroplastia",
+        "Rinoplastia / rinoseptoplastia",
+        "Otoplastia",
+        "Reconstrucción de defectos auriculares / nasales / labiales complejos"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "ritidoplastia_detalle",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_facial": [
+        "Ritidoplastia / lifting facial"
+      ],
+      "label": "Ritidoplastia — detalle",
+      "options": [
+        "Cervicofacial",
+        "SMAS plicatura / SMASectomía"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_facial",
+      "type": "single",
+      "required": false,
+      "required_if_proc_facial": [
+        "Ritidoplastia / lifting facial"
+      ],
+      "label": "Nervio facial",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "blefaroplastia_lado",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_facial": [
+        "Blefaroplastia"
+      ],
+      "label": "Blefaroplastia — párpado",
+      "options": [
+        "Superior",
+        "Inferior"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "via_blefaroplastia_inferior",
+      "type": "single",
+      "required": false,
+      "required_if_blefaroplastia_lado": [
+        "Inferior"
+      ],
+      "label": "Vía (blefaroplastia inferior)",
+      "options": [
+        "Transconjuntival",
+        "Subciliar"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "soporte_parpado_inferior",
+      "type": "single",
+      "required": false,
+      "required_if_blefaroplastia_lado": [
+        "Inferior"
+      ],
+      "label": "Soporte de párpado inferior",
+      "options": [
+        "Cantopexia realizada",
+        "Cantoplastia realizada",
+        "No requerido"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "rinoplastia_via",
+      "type": "single",
+      "required": false,
+      "required_if_proc_facial": [
+        "Rinoplastia / rinoseptoplastia"
+      ],
+      "label": "Rinoplastia — vía / técnica",
+      "options": [
+        "Abierta",
+        "Cerrada",
+        "Ultrasónica / piezoeléctrica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "otoplastia_tecnica",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_facial": [
+        "Otoplastia"
+      ],
+      "label": "Otoplastia — técnica",
+      "options": [
+        "Mustardé",
+        "Furnas"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "sctq_porcentaje",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Quemados / secuelas"
+      ],
+      "label": "Superficie corporal total quemada (% SCTQ)",
+      "empty_text": ""
+    },
+    {
+      "id": "profundidad_quemadura",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Quemados / secuelas"
+      ],
+      "label": "Profundidad de la quemadura",
+      "options": [
+        "Superficial",
+        "Espesor parcial superficial",
+        "Espesor parcial profundo",
+        "Espesor total"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "fase_quemado",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Quemados / secuelas"
+      ],
+      "label": "Fase",
+      "options": [
+        "Aguda",
+        "Crónica / secuelas"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_quemado_agudo",
+      "type": "multi",
+      "required": false,
+      "required_if_fase_quemado": [
+        "Aguda"
+      ],
+      "label": "Procedimiento — fase aguda",
+      "options": [
+        "Escarotomía de descompresión",
+        "Escarectomía / desbridamiento tangencial",
+        "Cobertura temporal — aloinjerto / piel de cadáver",
+        "Cobertura temporal — apósito sintético / sustituto cutáneo (Integra / Biobrane)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "ubicacion_escarotomia",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_quemado_agudo": [
+        "Escarotomía de descompresión"
+      ],
+      "label": "Ubicación de escarotomía",
+      "options": [
+        "Torácica",
+        "Extremidades"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "sangrado_escarectomia_cc",
+      "type": "free",
+      "required": false,
+      "required_if_proc_quemado_agudo": [
+        "Escarectomía / desbridamiento tangencial"
+      ],
+      "label": "Estimación de sangrado en escarectomía / desbridamiento (cc)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_quemado_cronico",
+      "type": "multi",
+      "required": false,
+      "required_if_fase_quemado": [
+        "Crónica / secuelas"
+      ],
+      "label": "Procedimiento — fase crónica / secuelas",
+      "options": [
+        "Liberación de bridas / cicatrices retráctiles",
+        "Resección de cicatriz queloide / hipertrófica + infiltración triamcinolona",
+        "Expansión tisular (colocación / extracción de expansor)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tiempo_desde_quemadura",
+      "type": "free",
+      "required": false,
+      "required_if_fase_quemado": [
+        "Crónica / secuelas"
+      ],
+      "label": "Tiempo transcurrido desde la quemadura original",
+      "empty_text": ""
+    },
+    {
+      "id": "liberacion_bridas_tecnica",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_quemado_cronico": [
+        "Liberación de bridas / cicatrices retráctiles"
+      ],
+      "label": "Técnica de liberación de bridas",
+      "options": [
+        "Z-plastias múltiples",
+        "Injerto de piel"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "volumen_expansor_cc",
+      "type": "free",
+      "required": false,
+      "required_if_proc_quemado_cronico": [
+        "Expansión tisular (colocación / extracción de expansor)"
+      ],
+      "label": "Volumen del expansor (cc)",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Drenajes / cierre / heridas"
+      ],
+      "label": "Drenaje",
+      "options": [
+        "Sí",
+        "Sin drenaje"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_drenaje": [
+        "Sí"
+      ],
+      "label": "Tipo de drenaje",
+      "options": [
+        "Aspirativo (Jackson-Pratt / Hemovac)",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_tipo_otro",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_tipo": [
+        "Otro"
+      ],
+      "label": "Tipo de drenaje (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_cantidad",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje": [
+        "Sí"
+      ],
+      "label": "Cantidad de drenajes",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_ubicacion",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje": [
+        "Sí"
+      ],
+      "label": "Ubicación del drenaje",
+      "empty_text": ""
+    },
+    {
+      "id": "tpn_vac",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Drenajes / cierre / heridas"
+      ],
+      "label": "Terapia de presión negativa (TPN / VAC)",
+      "options": [
+        "Colocada",
+        "No colocada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tpn_presion_mmhg",
+      "type": "free",
+      "required": false,
+      "required_if_tpn_vac": [
+        "Colocada"
+      ],
+      "label": "Presión TPN / VAC (mmHg)",
+      "empty_text": ""
+    },
+    {
+      "id": "tpn_modo",
+      "type": "single",
+      "required": false,
+      "required_if_tpn_vac": [
+        "Colocada"
+      ],
+      "label": "Modo TPN / VAC",
+      "options": [
+        "Continua",
+        "Intermitente"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_cierre",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Drenajes / cierre / heridas"
+      ],
+      "label": "Tipo de sutura y cierre",
+      "options": [
+        "Cierre intradérmico / subcuticular — irreabsorbible",
+        "Cierre intradérmico / subcuticular — reabsorbible",
+        "Cintas adhesivas cutáneas (Steristrips)",
+        "Pegamento quirúrgico (Dermabond)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    }
+  ],
+  "id": "cpl-plastica-v1",
+  "especialidad": "Cirugía Plástica, Reconstructiva y Estética",
+  "operaciones": [
+    "Cobertura cutánea — injertos y colgajos",
+    "Cirugía mamaria reconstructiva y estética",
+    "Contorno corporal / posbariátrica",
+    "Cirugía estética y reconstructiva facial",
+    "Manejo del paciente quemado y secuelas",
+    "Drenajes, cierre y manejo de heridas"
+  ],
+  "titulo": "Cirugía plástica, reconstructiva y estética",
+  "plantilla_texto": "Plástica — {{procedimiento_grupo}}. Abordaje {{abordaje}}{{conversion_causa}}.\nCobertura: {{indicacion_cobertura}}{{indicacion_cobertura_otro}}; injerto {{tipo_injerto_piel}} {{tecnica_injerto}} malla {{razon_malla}}; donante {{zona_donante}}{{zona_donante_otra}}; fijación {{fijacion_injerto}}; colgajo diseño {{colgajo_diseno}} irrigación {{colgajo_irrigacion}}; denom. {{colgajo_denominacion}}{{colgajo_denominacion_otro}} TRAM {{tram_modalidad}}; libre {{colgajo_libre}} anastomosis {{anastomosis_tecnica}} {{anastomosis_sutura}}; isquemia {{tiempo_isquemia_colgajo_min}} min; monitoreo {{monitoreo_viabilidad}}; viabilidad {{viabilidad_final_colgajo}}.\nMamaria: lat. {{lateralidad_mamaria}}; indicación {{indicacion_mamaria}}{{indicacion_mamaria_otro}}; {{proc_mamario}}; ginecomastia {{ginecomastia_tecnica}}; reconstrucción {{tipo_reconstruccion_mama}} {{momento_reconstruccion_mama}}; plano {{plano_implante}}; vía {{via_abordaje_mama}}; pedículo {{pediculo_reductiva}}; implante {{tipo_perfil_implante}} {{marca_volumen_protesis}}; resección Der {{peso_resecado_der_g}} g Izq {{peso_resecado_izq_g}} g.\nContorno: {{indicacion_contorno}}; TEV {{profilaxis_tev}}{{profilaxis_tev_motivo}}; {{proc_contorno}} tipo abd. {{tipo_abdominoplastia}}; lipo zonas {{zonas_liposuccion}} vol. {{volumen_aspirado_cc}} cc; plicatura {{plicatura_rectos}} {{plicatura_sutura}}; ombligo {{umbilicoplastia}}.\nFacial: indicación {{indicacion_facial}}{{indicacion_facial_otro}}; {{proc_facial}}; ritidoplastia {{ritidoplastia_detalle}}; n. facial {{nervio_facial}}; blefaro {{blefaroplastia_lado}} vía {{via_blefaroplastia_inferior}} soporte {{soporte_parpado_inferior}}; rino {{rinoplastia_via}}; oto {{otoplastia_tecnica}}.\nQuemados: SCTQ {{sctq_porcentaje}} %; profundidad {{profundidad_quemadura}}; fase {{fase_quemado}}; agudo {{proc_quemado_agudo}} escarotomía {{ubicacion_escarotomia}} sangrado {{sangrado_escarectomia_cc}} cc; crónico {{proc_quemado_cronico}} desde quemadura {{tiempo_desde_quemadura}}; bridas {{liberacion_bridas_tecnica}} expansor {{volumen_expansor_cc}} cc.\nDrenaje/cierre: {{drenaje}} {{drenaje_tipo}}{{drenaje_tipo_otro}} n={{drenaje_cantidad}} {{drenaje_ubicacion}}; TPN {{tpn_vac}} {{tpn_presion_mmhg}} mmHg {{tpn_modo}}; cierre {{tipo_cierre}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["ct-torax-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Resección pulmonar",
+        "Cirugía de la pleura (decorticación / pleurodesis)",
+        "Mediastino / timectomía",
+        "Fístula broncopleural / reintervención"
+      ]
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": true,
+      "label": "Abordaje",
+      "options": [
+        "VATS / toracoscopía",
+        "Robótico",
+        "Toracotomía posterolateral",
+        "Toracotomía anterior / axilar",
+        "Esternotomía mediana",
+        "Convertido a abierto"
+      ]
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "lateralidad",
+      "type": "single",
+      "required": true,
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral",
+        "No aplica (abordaje central / mediastínico)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_reseccion_pulmonar",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección pulmonar"
+      ],
+      "label": "Tipo de resección",
+      "options": [
+        "Neumonectomía",
+        "Lobectomía",
+        "Segmentectomía",
+        "Resección en manguito (sleeve bronquial / broncoplástica)",
+        "Wedge / resección atípica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "lobulo_reseccion",
+      "type": "multi",
+      "required": false,
+      "required_if_tipo_reseccion_pulmonar": [
+        "Lobectomía",
+        "Segmentectomía"
+      ],
+      "label": "Lóbulo(s) / segmento(s) abordado(s)",
+      "options": [
+        "Superior derecho",
+        "Medio derecho",
+        "Inferior derecho",
+        "Superior izquierdo",
+        "Inferior izquierdo",
+        "Segmento(s) — detalle en texto"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "lobulo_reseccion_detalle",
+      "type": "free",
+      "required": false,
+      "required_if_lobulo_reseccion": [
+        "Segmento(s) — detalle en texto"
+      ],
+      "label": "Segmento(s) — detalle",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_reseccion_pulmonar",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Resección pulmonar"
+      ],
+      "label": "Indicación / diagnóstico",
+      "options": [
+        "Neoplasia primaria de pulmón",
+        "Metástasis pulmonar",
+        "Bronquiectasias / infección localizada",
+        "Tuberculosis / secuelas",
+        "Malformación congénita",
+        "Trauma",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_reseccion_pulmonar_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_reseccion_pulmonar": [
+        "Otro"
+      ],
+      "label": "Indicación / diagnóstico (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "linfadenectomia_toracica",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_reseccion_pulmonar": [
+        "Neumonectomía",
+        "Lobectomía",
+        "Segmentectomía",
+        "Resección en manguito (sleeve bronquial / broncoplástica)"
+      ],
+      "label": "Linfadenectomía mediastínica / hiliar",
+      "options": [
+        "Sistemática",
+        "Sampling",
+        "No realizada",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "hermeticidad_munon_bronquial",
+      "type": "single",
+      "required": false,
+      "label": "Prueba de hermeticidad (muñón bronquial / línea de sutura pulmonar)",
+      "options": [
+        "Fuga demostrada",
+        "Sin fuga demostrada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_frenico",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_reseccion_pulmonar": [
+        "Neumonectomía",
+        "Lobectomía"
+      ],
+      "label": "Nervio frénico",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_recurrente_izquierdo",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_reseccion_pulmonar": [
+        "Neumonectomía",
+        "Lobectomía"
+      ],
+      "label": "Nervio laríngeo recurrente izquierdo",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "estructura_critica_detalle",
+      "type": "free",
+      "required": false,
+      "label": "Detalle de lesión de estructura crítica (si aplica)",
+      "empty_text": ""
+    },
+    {
+      "id": "gesto_pleural",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía de la pleura (decorticación / pleurodesis)"
+      ],
+      "label": "Gesto pleural",
+      "options": [
+        "Decorticación",
+        "Pleurodesis (talcaje / química / mecánica)",
+        "Evacuación de hemotórax / empiema"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_pleura",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía de la pleura (decorticación / pleurodesis)"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Empiema",
+        "Hemotórax retenido",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_pleura_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_pleura": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "reexpansion_pulmonar",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía de la pleura (decorticación / pleurodesis)"
+      ],
+      "label": "Reexpansión pulmonar comprobada",
+      "options": [
+        "Sí",
+        "No",
+        "No evaluada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "campo_pleura",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía de la pleura (decorticación / pleurodesis)"
+      ],
+      "label": "Clasificación del campo",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "compartimento_mediastino",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Mediastino / timectomía"
+      ],
+      "label": "Compartimento mediastínico",
+      "options": [
+        "Anterior",
+        "Medio",
+        "Posterior"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "dx_presuntivo_mediastino_anterior",
+      "type": "single",
+      "required": false,
+      "required_if_compartimento_mediastino": [
+        "Anterior"
+      ],
+      "label": "Diagnóstico presuntivo (mediastino anterior)",
+      "options": [
+        "Timoma",
+        "Linfoma",
+        "Tumor de células germinales (teratoma)",
+        "Bocio endotorácico",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "dx_presuntivo_mediastino_medio",
+      "type": "single",
+      "required": false,
+      "required_if_compartimento_mediastino": [
+        "Medio"
+      ],
+      "label": "Diagnóstico presuntivo (mediastino medio)",
+      "options": [
+        "Quiste broncogénico",
+        "Linfadenopatía",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "dx_presuntivo_mediastino_posterior",
+      "type": "single",
+      "required": false,
+      "required_if_compartimento_mediastino": [
+        "Posterior"
+      ],
+      "label": "Diagnóstico presuntivo (mediastino posterior)",
+      "options": [
+        "Tumor neurogénico (Schwannoma / Neurofibroma)",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "dx_presuntivo_mediastino_otro",
+      "type": "free",
+      "required": false,
+      "required_if_dx_presuntivo_mediastino_anterior": [
+        "Otro"
+      ],
+      "required_if_dx_presuntivo_mediastino_medio": [
+        "Otro"
+      ],
+      "required_if_dx_presuntivo_mediastino_posterior": [
+        "Otro"
+      ],
+      "label": "Diagnóstico presuntivo (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "gesto_mediastino",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Mediastino / timectomía"
+      ],
+      "label": "Gesto",
+      "options": [
+        "Resección de masa / tumor mediastínico",
+        "Timectomía",
+        "Biopsia / muestreo ganglionar"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "extension_timectomia",
+      "type": "single",
+      "required": false,
+      "required_if_gesto_mediastino": [
+        "Timectomía"
+      ],
+      "label": "Extensión de la timectomía",
+      "options": [
+        "Timectomía simple",
+        "Timectomía extendida (con grasa perithímica)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_frenico_mediastino",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Mediastino / timectomía"
+      ],
+      "label": "Nervio frénico (mediastino)",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_recurrente_izquierdo_mediastino",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Mediastino / timectomía"
+      ],
+      "label": "Nervio laríngeo recurrente izquierdo (mediastino)",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "fistula_gesto",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Fístula broncopleural / reintervención"
+      ],
+      "label": "Gesto sobre fístula / muñón",
+      "options": [
+        "Identificación de fístula broncopleural",
+        "Refuerzo del muñón bronquial",
+        "Resutura / reamputación de muñón",
+        "Cobertura con colgajo / tejido pediculado"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "hermeticidad_post_refuerzo_fistula",
+      "type": "single",
+      "required": false,
+      "required_if_fistula_gesto": [
+        "Refuerzo del muñón bronquial",
+        "Resutura / reamputación de muñón",
+        "Cobertura con colgajo / tejido pediculado"
+      ],
+      "label": "Prueba de hermeticidad tras refuerzo / reparación del muñón",
+      "options": [
+        "Fuga demostrada",
+        "Sin fuga demostrada",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "campo_fistula",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Fístula broncopleural / reintervención"
+      ],
+      "label": "Clasificación del campo",
+      "options": [
+        "Limpio",
+        "Limpio-contaminado",
+        "Contaminado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_pleural",
+      "type": "single",
+      "required": false,
+      "label": "Drenaje / tubo(s) de tórax",
+      "options": [
+        "Sí",
+        "Sin drenaje"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_pleural_calibre_fr",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_pleural": [
+        "Sí"
+      ],
+      "label": "Drenaje pleural — calibre (Fr)",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_pleural_ubicacion",
+      "type": "single",
+      "required": false,
+      "required_if_drenaje_pleural": [
+        "Sí"
+      ],
+      "label": "Drenaje pleural — ubicación",
+      "options": [
+        "5to espacio intercostal",
+        "Apical",
+        "Basal",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_pleural_ubicacion_otro",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_pleural_ubicacion": [
+        "Otro"
+      ],
+      "label": "Drenaje pleural — ubicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_pleural_cantidad",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_pleural": [
+        "Sí"
+      ],
+      "label": "Cantidad de tubos",
+      "empty_text": ""
+    }
+  ],
+  "id": "ct-torax-v1",
+  "especialidad": "Cirugía Torácica",
+  "operaciones": [
+    "Neumonectomía / lobectomía / segmentectomía / wedge",
+    "Decorticación / pleurodesis",
+    "Cirugía de mediastino / timectomía",
+    "Fístula broncopleural / reintervención"
+  ],
+  "titulo": "Cirugía torácica",
+  "plantilla_texto": "Torácica — {{procedimiento_grupo}}. Abordaje: {{abordaje}}{{conversion_causa}}. Lateralidad {{lateralidad}}.\nResección: {{tipo_reseccion_pulmonar}} {{lobulo_reseccion}}{{lobulo_reseccion_detalle}}; indicación {{indicacion_reseccion_pulmonar}}{{indicacion_reseccion_pulmonar_otro}}; linfadenectomía {{linfadenectomia_toracica}}; hermeticidad muñón {{hermeticidad_munon_bronquial}}; frénico {{nervio_frenico}}; recurrente izq. {{nervio_recurrente_izquierdo}}{{estructura_critica_detalle}}.\nPleura: {{gesto_pleural}}; indicación {{indicacion_pleura}}{{indicacion_pleura_otro}}; reexpansión {{reexpansion_pulmonar}}; campo {{campo_pleura}}.\nMediastino: {{compartimento_mediastino}}; dx ant. {{dx_presuntivo_mediastino_anterior}} / medio {{dx_presuntivo_mediastino_medio}} / post. {{dx_presuntivo_mediastino_posterior}}{{dx_presuntivo_mediastino_otro}}; gesto {{gesto_mediastino}}; timectomía {{extension_timectomia}}; frénico {{nervio_frenico_mediastino}}; recurrente izq. {{nervio_recurrente_izquierdo_mediastino}}.\nFístula: {{fistula_gesto}}; hermeticidad post-refuerzo {{hermeticidad_post_refuerzo_fistula}}; campo {{campo_fistula}}.\nDrenaje: {{drenaje_pleural}} Fr {{drenaje_pleural_calibre_fr}} {{drenaje_pleural_ubicacion}}{{drenaje_pleural_ubicacion_otro}} n={{drenaje_pleural_cantidad}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cto-traumatologia-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Miembro superior — hombro / brazo / codo",
+        "Miembro superior — antebrazo / muñeca / mano",
+        "Pelvis / acetábulo / cadera",
+        "Miembro inferior — muslo / rodilla / pierna",
+        "Miembro inferior — tobillo / pie",
+        "Columna vertebral"
+      ]
+    },
+    {
+      "id": "lateralidad",
+      "type": "single",
+      "required": false,
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": false,
+      "label": "Abordaje (si aplica)",
+      "options": [
+        "Abierto",
+        "Percutáneo / mínimamente invasivo",
+        "Artroscópico",
+        "Convertido a abierto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "estructura_hombro_brazo",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro superior — hombro / brazo / codo"
+      ],
+      "label": "Estructura afectada",
+      "options": [
+        "Clavícula",
+        "Escápula",
+        "Húmero proximal",
+        "Diáfisis humeral",
+        "Codo / húmero distal",
+        "Cúpula radial / olécranon"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_hombro_brazo",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro superior — hombro / brazo / codo"
+      ],
+      "label": "Indicación / diagnóstico",
+      "options": [
+        "Fractura aguda",
+        "Luxación",
+        "Inestabilidad crónica",
+        "Lesión degenerativa (manguito / artrosis)",
+        "Pseudoartrosis",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_hombro_brazo_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_hombro_brazo": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_fractura_abierta_hombro",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_hombro_brazo": [
+        "Fractura aguda",
+        "Pseudoartrosis"
+      ],
+      "label": "Fractura — abierta / cerrada",
+      "options": [
+        "Cerrada",
+        "Abierta"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "gustilo_anderson_hombro",
+      "type": "single",
+      "required": false,
+      "required_if_clasificacion_fractura_abierta_hombro": [
+        "Abierta"
+      ],
+      "label": "Clasificación de Gustilo-Anderson",
+      "options": [
+        "I",
+        "II",
+        "IIIA",
+        "IIIB",
+        "IIIC"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_osteosintesis_hombro",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro superior — hombro / brazo / codo"
+      ],
+      "label": "Osteosíntesis / traumatología",
+      "options": [
+        "Placa bloqueada anatómica + tornillos",
+        "Clavo endomedular (bloqueado)",
+        "Agujas de Kirschner / cerclaje en 8 (tirante)",
+        "Fijación externa"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "resultado_reduccion_hombro",
+      "type": "single",
+      "required": false,
+      "label": "Resultado de la reducción",
+      "options": [
+        "Anatómica",
+        "Aceptable",
+        "Insatisfactoria"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_radial",
+      "type": "single",
+      "required": false,
+      "required_if_estructura_hombro_brazo": [
+        "Diáfisis humeral"
+      ],
+      "label": "Nervio radial",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_artroscopia_hombro",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro superior — hombro / brazo / codo"
+      ],
+      "label": "Artroscopía / partes blandas",
+      "options": [
+        "Reparación / sutura de manguito rotador (anclajes / tacos)",
+        "Reparación de labrum / Bankart / Latarjet (inestabilidad)",
+        "Tenodesis / tenotomía de porción larga del bíceps",
+        "Bursectomía / acromioplastia"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "protesis_hombro",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro superior — hombro / brazo / codo"
+      ],
+      "label": "Artroplastia de hombro",
+      "options": [
+        "Anatómica",
+        "Inversa",
+        "Hemiartroplastia",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "estructura_antebrazo_mano",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro superior — antebrazo / muñeca / mano"
+      ],
+      "label": "Estructura afectada",
+      "options": [
+        "Radio distal",
+        "Cúbito",
+        "Escafoides / carpo",
+        "Metacarpianos / falanges"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_antebrazo_mano",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro superior — antebrazo / muñeca / mano"
+      ],
+      "label": "Indicación / diagnóstico",
+      "options": [
+        "Fractura aguda",
+        "Luxación",
+        "Inestabilidad crónica",
+        "Lesión degenerativa (artrosis / tendinopatía)",
+        "Pseudoartrosis",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_antebrazo_mano_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_antebrazo_mano": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_radio_distal",
+      "type": "single",
+      "required": false,
+      "required_if_estructura_antebrazo_mano": [
+        "Radio distal"
+      ],
+      "label": "Clasificación de fractura de radio distal",
+      "options": [
+        "Extraarticular",
+        "Intraarticular sin conminución",
+        "Intraarticular con conminución"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_antebrazo_mano",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro superior — antebrazo / muñeca / mano"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "RAFI con placa volar / dorsal",
+        "Reducción cerrada + enclavijado percutáneo (Kirschner)",
+        "Osteosíntesis de escafoides (tornillo canulado / Herbert)",
+        "Reparación / sutura tendinosa — flexores",
+        "Reparación / sutura tendinosa — extensores",
+        "Reparación nerviosa / vascular (mediano / cubital — neurorrafia)",
+        "Liberación de túnel carpiano",
+        "Cirugía de enfermedad de Dupuytren",
+        "Liberación de dedo en gatillo"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "estructura_pelvis_cadera",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Pelvis / acetábulo / cadera"
+      ],
+      "label": "Estructura afectada",
+      "options": [
+        "Anillo pélvico",
+        "Acetábulo",
+        "Cuello femoral",
+        "Intertrocantérica / subtrocantérica"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_garden",
+      "type": "single",
+      "required": false,
+      "required_if_estructura_pelvis_cadera": [
+        "Cuello femoral"
+      ],
+      "label": "Clasificación Garden (cuello femoral)",
+      "options": [
+        "I",
+        "II",
+        "III",
+        "IV"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_intertroc",
+      "type": "single",
+      "required": false,
+      "required_if_estructura_pelvis_cadera": [
+        "Intertrocantérica / subtrocantérica"
+      ],
+      "label": "Clasificación (intertrocantérica / subtrocantérica)",
+      "options": [
+        "AO/OTA 31-A1",
+        "AO/OTA 31-A2",
+        "AO/OTA 31-A3",
+        "Estable",
+        "Inestable"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_osteosintesis_cadera",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Pelvis / acetábulo / cadera"
+      ],
+      "label": "Osteosíntesis / traumatología",
+      "options": [
+        "Clavo cefalomedular (PFN / Gamma nail)",
+        "Tornillo deslizante de cadera (DHS) / tornillos canulados",
+        "RAFI de pelvis / acetábulo con placas y tornillos",
+        "Tornillos sacroilíacos percutáneos"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "resultado_reduccion_cadera",
+      "type": "single",
+      "required": false,
+      "label": "Resultado de la reducción",
+      "options": [
+        "Anatómica",
+        "Aceptable",
+        "Insatisfactoria"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "longitud_implante_cadera",
+      "type": "free",
+      "required": false,
+      "label": "Longitud de tornillos / implante",
+      "empty_text": ""
+    },
+    {
+      "id": "artroplastia_cadera",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Pelvis / acetábulo / cadera"
+      ],
+      "label": "Artroplastia de cadera",
+      "options": [
+        "Reemplazo total de cadera (RTC)",
+        "Reemplazo parcial / bipolar",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "cementacion_rtc",
+      "type": "single",
+      "required": false,
+      "required_if_artroplastia_cadera": [
+        "Reemplazo total de cadera (RTC)"
+      ],
+      "label": "Cementación (RTC)",
+      "options": [
+        "Cementado",
+        "No cementado",
+        "Híbrido"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_artroplastia_cadera",
+      "type": "single",
+      "required": false,
+      "label": "Indicación de artroplastia",
+      "options": [
+        "Fractura aguda",
+        "Artrosis primaria",
+        "Osteonecrosis",
+        "Revisión de artroplastia previa",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_artroplastia_cadera_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_artroplastia_cadera": [
+        "Otro"
+      ],
+      "label": "Indicación artroplastia (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "abordaje_cadera",
+      "type": "single",
+      "required": false,
+      "label": "Abordaje de cadera",
+      "options": [
+        "Anterior directo",
+        "Lateral",
+        "Posterior / posterolateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "estructura_muslo_rodilla",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro inferior — muslo / rodilla / pierna"
+      ],
+      "label": "Estructura afectada",
+      "options": [
+        "Fémur diafisario / distal",
+        "Rótula",
+        "Meseta tibial",
+        "Diáfisis tibial / peroné"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_muslo_rodilla",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro inferior — muslo / rodilla / pierna"
+      ],
+      "label": "Indicación / diagnóstico",
+      "options": [
+        "Fractura aguda",
+        "Luxación",
+        "Inestabilidad crónica",
+        "Lesión degenerativa (artrosis / condropatía)",
+        "Pseudoartrosis",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_muslo_rodilla_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_muslo_rodilla": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_osteosintesis_muslo",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro inferior — muslo / rodilla / pierna"
+      ],
+      "label": "Osteosíntesis",
+      "options": [
+        "Clavo endomedular de fémur / tibia (bloqueado)",
+        "RAFI de meseta tibial / fémur distal con placas de sostén / bloqueadas",
+        "Cerclaje de rótula (banda de tensión / tirante)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "arteria_poplitea",
+      "type": "single",
+      "required": false,
+      "required_if_estructura_muslo_rodilla": [
+        "Fémur diafisario / distal",
+        "Meseta tibial"
+      ],
+      "label": "Arteria poplítea",
+      "options": [
+        "Identificada y preservada",
+        "Lesión identificada intraoperatoriamente",
+        "No disecada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_peroneo",
+      "type": "single",
+      "required": false,
+      "required_if_estructura_muslo_rodilla": [
+        "Fémur diafisario / distal",
+        "Meseta tibial"
+      ],
+      "label": "Nervio peroneo",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_artroscopia_rodilla",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro inferior — muslo / rodilla / pierna"
+      ],
+      "label": "Artroscopía de rodilla / ligamentos",
+      "options": [
+        "Plástica / reconstrucción de LCA",
+        "Reconstrucción de LCP / ligamentos colaterales",
+        "Meniscectomía parcial / sutura meniscal"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "injerto_lca",
+      "type": "single",
+      "required": false,
+      "required_if_proc_artroscopia_rodilla": [
+        "Plástica / reconstrucción de LCA"
+      ],
+      "label": "Injerto LCA",
+      "options": [
+        "Autoinjerto HTH",
+        "Isquiotibiales (ST/G)",
+        "Aloinjerto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "fijacion_injerto_lca",
+      "type": "single",
+      "required": false,
+      "required_if_proc_artroscopia_rodilla": [
+        "Plástica / reconstrucción de LCA"
+      ],
+      "label": "Técnica de fijación del injerto (LCA)",
+      "options": [
+        "Tornillos interferenciales",
+        "Endobutton",
+        "Grapas",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "fijacion_injerto_lca_otro",
+      "type": "free",
+      "required": false,
+      "required_if_fijacion_injerto_lca": [
+        "Otro"
+      ],
+      "label": "Fijación injerto LCA (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "menisco_lado",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_artroscopia_rodilla": [
+        "Meniscectomía parcial / sutura meniscal"
+      ],
+      "label": "Menisco abordado",
+      "options": [
+        "Menisco interno",
+        "Menisco externo"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_lesion_meniscal",
+      "type": "single",
+      "required": false,
+      "required_if_proc_artroscopia_rodilla": [
+        "Meniscectomía parcial / sutura meniscal"
+      ],
+      "label": "Clasificación de lesión meniscal",
+      "options": [
+        "Radial",
+        "Longitudinal",
+        "Asa de balde",
+        "Degenerativa",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_lesion_meniscal_otro",
+      "type": "free",
+      "required": false,
+      "required_if_clasificacion_lesion_meniscal": [
+        "Otro"
+      ],
+      "label": "Clasificación meniscal (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "artroplastia_rodilla",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro inferior — muslo / rodilla / pierna"
+      ],
+      "label": "Artroplastia de rodilla",
+      "options": [
+        "Reemplazo total de rodilla (RTR)",
+        "Reemplazo unicompartimental",
+        "No realizada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "sustitucion_rotuliana_rtr",
+      "type": "single",
+      "required": false,
+      "required_if_artroplastia_rodilla": [
+        "Reemplazo total de rodilla (RTR)"
+      ],
+      "label": "Sustitución rotuliana (RTR)",
+      "options": [
+        "Con sustitución rotuliana",
+        "Sin sustitución rotuliana"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "estructura_tobillo_pie",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro inferior — tobillo / pie"
+      ],
+      "label": "Estructura afectada",
+      "options": [
+        "Maléolo peroneo / tibial / posterior (trimalleolar)",
+        "Astrágalo",
+        "Calcáneo",
+        "Lisfranc / metatarsianos",
+        "Hallux"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_tobillo_pie",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro inferior — tobillo / pie"
+      ],
+      "label": "Indicación / diagnóstico",
+      "options": [
+        "Fractura aguda",
+        "Luxación",
+        "Inestabilidad crónica",
+        "Lesión degenerativa (artrosis / tendinopatía)",
+        "Pseudoartrosis",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_tobillo_pie_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_tobillo_pie": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_fractura_tobillo_sistema",
+      "type": "single",
+      "required": false,
+      "required_if_estructura_tobillo_pie": [
+        "Maléolo peroneo / tibial / posterior (trimalleolar)"
+      ],
+      "label": "Sistema de clasificación (tobillo)",
+      "options": [
+        "Weber",
+        "Lauge-Hansen"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_weber",
+      "type": "single",
+      "required": false,
+      "required_if_clasificacion_fractura_tobillo_sistema": [
+        "Weber"
+      ],
+      "label": "Clasificación Weber",
+      "options": [
+        "A",
+        "B",
+        "C"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_lauge_hansen",
+      "type": "single",
+      "required": false,
+      "required_if_clasificacion_fractura_tobillo_sistema": [
+        "Lauge-Hansen"
+      ],
+      "label": "Clasificación Lauge-Hansen",
+      "options": [
+        "SA (supinación-aducción)",
+        "SER (supinación-eversión / rotación externa)",
+        "PA (pronación-abducción)",
+        "PER (pronación-eversión / rotación externa)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_tobillo_pie",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Miembro inferior — tobillo / pie"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "RAFI de tobillo (placa peroné + tornillo sindesmosis)",
+        "RAFI de calcáneo / astrágalo",
+        "Reparación / sutura de tendón de Aquiles — abierta",
+        "Reparación / sutura de tendón de Aquiles — percutánea",
+        "Corrección de hallux valgus (Scarf / Chevron / Lapidus) ± Akin",
+        "Artrodesis de tobillo",
+        "Artrodesis subastragalina",
+        "Triartrodesis de pie"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "estabilidad_sindesmosis",
+      "type": "single",
+      "required": false,
+      "required_if_proc_tobillo_pie": [
+        "RAFI de tobillo (placa peroné + tornillo sindesmosis)"
+      ],
+      "label": "Prueba de estabilidad de sindesmosis (Cotton / hook test)",
+      "options": [
+        "Estable",
+        "Inestable — requirió tornillo",
+        "No evaluada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "region_columna",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Columna vertebral"
+      ],
+      "label": "Región anatómica",
+      "options": [
+        "Cervical",
+        "Torácica / dorsal",
+        "Lumbar",
+        "Sacro"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "niveles_cervicales",
+      "type": "multi",
+      "required": false,
+      "required_if_region_columna": [
+        "Cervical"
+      ],
+      "label": "Niveles cervicales",
+      "options": [
+        "C1-C2",
+        "C2-C3",
+        "C3-C4",
+        "C4-C5",
+        "C5-C6",
+        "C6-C7",
+        "C7-T1"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "niveles_toracicos",
+      "type": "multi",
+      "required": false,
+      "required_if_region_columna": [
+        "Torácica / dorsal"
+      ],
+      "label": "Niveles torácicos / dorsales",
+      "options": [
+        "T1-T2",
+        "T2-T3",
+        "T3-T4",
+        "T4-T5",
+        "T5-T6",
+        "T6-T7",
+        "T7-T8",
+        "T8-T9",
+        "T9-T10",
+        "T10-T11",
+        "T11-T12",
+        "T12-L1"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "niveles_lumbares",
+      "type": "multi",
+      "required": false,
+      "required_if_region_columna": [
+        "Lumbar"
+      ],
+      "label": "Niveles lumbares",
+      "options": [
+        "L1-L2",
+        "L2-L3",
+        "L3-L4",
+        "L4-L5",
+        "L5-S1"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "niveles_atipicos_libre",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Columna vertebral"
+      ],
+      "label": "Niveles múltiples / atípicos (detalle libre)",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_columna",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Columna vertebral"
+      ],
+      "label": "Indicación / diagnóstico",
+      "options": [
+        "Hernia discal",
+        "Estenosis de canal",
+        "Espondilolistesis",
+        "Fractura",
+        "Tumor",
+        "Infección",
+        "Deformidad",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_columna_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_columna": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_columna",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Columna vertebral"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Discectomía / microdiscectomía",
+        "Laminectomía / descompresión del canal",
+        "Fijación / artrodesis posterior (tornillos pediculados y barras)",
+        "Fusión intersomática — TLIF",
+        "Fusión intersomática — PLIF",
+        "Fusión intersomática — ALIF",
+        "Fusión intersomática — XLIF / OLIF",
+        "Vertebroplastia / cifoplastia (PMMA)",
+        "Corrección de deformidad (escoliosis / cifosis)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "neuromonitoreo_intraoperatorio",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Columna vertebral"
+      ],
+      "label": "Monitoreo neurofisiológico intraoperatorio (potenciales evocados)",
+      "options": [
+        "Utilizado — sin cambios",
+        "Utilizado — alerta intraoperatoria",
+        "No utilizado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "estado_neurologico_post_descompresion",
+      "type": "single",
+      "required": false,
+      "label": "Estado neurológico post-descompresión",
+      "options": [
+        "Sin déficit nuevo",
+        "Déficit nuevo identificado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "plexo_lumbar_xlif",
+      "type": "single",
+      "required": false,
+      "required_if_proc_columna": [
+        "Fusión intersomática — XLIF / OLIF"
+      ],
+      "label": "Plexo lumbar (XLIF / OLIF)",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No evaluado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "duramadre",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Columna vertebral"
+      ],
+      "label": "Integridad de duramadre",
+      "options": [
+        "Íntegra",
+        "Durotomía incidental — reparada",
+        "Durotomía incidental — fuga persistente"
+      ],
+      "empty_text": ""
+    }
+  ],
+  "id": "cto-traumatologia-v1",
+  "especialidad": "Traumatología y Ortopedia",
+  "operaciones": [
+    "Osteosíntesis / artroscopía / artroplastia de miembro superior",
+    "Cirugía de pelvis / cadera",
+    "Cirugía de rodilla / pierna",
+    "Cirugía de tobillo / pie",
+    "Cirugía de columna"
+  ],
+  "titulo": "Traumatología y ortopedia",
+  "plantilla_texto": "Traumatología — {{procedimiento_grupo}}. Lateralidad {{lateralidad}}. Abordaje {{abordaje}}{{conversion_causa}}.\nHombro/brazo: {{estructura_hombro_brazo}}; indicación {{indicacion_hombro_brazo}}{{indicacion_hombro_brazo_otro}}; abierta/cerrada {{clasificacion_fractura_abierta_hombro}} Gustilo {{gustilo_anderson_hombro}}; osteosíntesis {{proc_osteosintesis_hombro}} reducción {{resultado_reduccion_hombro}}; nervio radial {{nervio_radial}}; artroscopía {{proc_artroscopia_hombro}}; prótesis {{protesis_hombro}}.\nAntebrazo/mano: {{estructura_antebrazo_mano}}; indicación {{indicacion_antebrazo_mano}}{{indicacion_antebrazo_mano_otro}}; radio distal {{clasificacion_radio_distal}}; {{proc_antebrazo_mano}}.\nPelvis/cadera: {{estructura_pelvis_cadera}}; Garden {{clasificacion_garden}}; intertroc {{clasificacion_intertroc}}; osteosíntesis {{proc_osteosintesis_cadera}} reducción {{resultado_reduccion_cadera}} longitud {{longitud_implante_cadera}}; artroplastia {{artroplastia_cadera}} {{cementacion_rtc}} indicación {{indicacion_artroplastia_cadera}}{{indicacion_artroplastia_cadera_otro}} abordaje {{abordaje_cadera}}.\nMuslo/rodilla: {{estructura_muslo_rodilla}}; indicación {{indicacion_muslo_rodilla}}{{indicacion_muslo_rodilla_otro}}; osteosíntesis {{proc_osteosintesis_muslo}}; poplítea {{arteria_poplitea}}; peroneo {{nervio_peroneo}}; artroscopía {{proc_artroscopia_rodilla}} injerto LCA {{injerto_lca}} fijación {{fijacion_injerto_lca}}{{fijacion_injerto_lca_otro}}; menisco {{menisco_lado}} {{clasificacion_lesion_meniscal}}{{clasificacion_lesion_meniscal_otro}}; artroplastia {{artroplastia_rodilla}} {{sustitucion_rotuliana_rtr}}.\nTobillo/pie: {{estructura_tobillo_pie}}; indicación {{indicacion_tobillo_pie}}{{indicacion_tobillo_pie_otro}}; clasificación {{clasificacion_fractura_tobillo_sistema}} Weber {{clasificacion_weber}} LH {{clasificacion_lauge_hansen}}; {{proc_tobillo_pie}}; sindesmosis {{estabilidad_sindesmosis}}.\nColumna: {{region_columna}}; niveles C {{niveles_cervicales}} T {{niveles_toracicos}} L {{niveles_lumbares}} {{niveles_atipicos_libre}}; indicación {{indicacion_columna}}{{indicacion_columna_otro}}; {{proc_columna}}; neuromonitoreo {{neuromonitoreo_intraoperatorio}}; neurológico {{estado_neurologico_post_descompresion}}; plexo lumbar XLIF {{plexo_lumbar_xlif}}; duramadre {{duramadre}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cu-urologia-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Cirugía renal / adrenal urológica",
+        "Cirugía ureteral / reconstructiva",
+        "Endourología / litiasis",
+        "Cirugía vesical / prostato-vesical",
+        "Patología genital masculina / escrotal / peniana"
+      ]
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": true,
+      "label": "Abordaje",
+      "options": [
+        "Abierto (lumbotomía / laparotomía)",
+        "Laparoscópico",
+        "Robótico",
+        "Retroperitoneoscópico",
+        "Endoscópico / transuretral",
+        "Percutáneo",
+        "Convertido a abierto"
+      ]
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_renal",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía renal / adrenal urológica"
+      ],
+      "label": "Procedimiento renal",
+      "options": [
+        "Nefrectomía radical",
+        "Nefrectomía parcial (preservadora de nefronas / enucleación)",
+        "Nefrectomía simple",
+        "Nefroureterectomía radical (con rodete vesical)",
+        "Pieloplastia (estenosis UPJ)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "lateralidad_renal",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía renal / adrenal urológica"
+      ],
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_renal",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía renal / adrenal urológica"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Neoplasia renal",
+        "Estenosis UPJ",
+        "Litiasis complicada",
+        "Atrofia / exclusión funcional",
+        "Trauma",
+        "Otro"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_renal_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_renal": [
+        "Otro"
+      ],
+      "label": "Indicación (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "trombo_vci",
+      "type": "single",
+      "required": false,
+      "required_if_proc_renal": [
+        "Nefrectomía radical"
+      ],
+      "label": "Trombo en VCI / trombectomía",
+      "options": [
+        "No",
+        "Sí — trombectomía"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "trombo_vci_nivel",
+      "type": "single",
+      "required": false,
+      "required_if_trombo_vci": [
+        "Sí — trombectomía"
+      ],
+      "label": "Nivel del trombo (Neves-Zincke)",
+      "options": [
+        "I (renal / infrahepático)",
+        "II (infrahepático, por encima de venas renales)",
+        "III (intrahepático / retrohepático)",
+        "IV (suprahepático / auricular)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "trombo_vci_detalle",
+      "type": "free",
+      "required": false,
+      "required_if_trombo_vci": [
+        "Sí — trombectomía"
+      ],
+      "label": "Trombo VCI — detalle (tumoral / no tumoral / extensión)",
+      "empty_text": ""
+    },
+    {
+      "id": "isquemia_renal",
+      "type": "single",
+      "required": false,
+      "required_if_proc_renal": [
+        "Nefrectomía parcial (preservadora de nefronas / enucleación)"
+      ],
+      "label": "Clampado vascular / isquemia",
+      "options": [
+        "Caliente (sin hielo)",
+        "Frío",
+        "Sin clampado (zero ischemia)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tiempo_isquemia_min",
+      "type": "free",
+      "required": false,
+      "required_if_isquemia_renal": [
+        "Caliente (sin hielo)",
+        "Frío"
+      ],
+      "label": "Tiempo de isquemia (minutos)",
+      "empty_text": ""
+    },
+    {
+      "id": "margen_nefrectomia_parcial",
+      "type": "single",
+      "required": false,
+      "required_if_proc_renal": [
+        "Nefrectomía parcial (preservadora de nefronas / enucleación)"
+      ],
+      "label": "Margen quirúrgico",
+      "options": [
+        "Libre",
+        "Comprometido",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_nefrectomia_parcial_distancia",
+      "type": "free",
+      "required": false,
+      "required_if_margen_nefrectomia_parcial": [
+        "Libre",
+        "Comprometido"
+      ],
+      "label": "Margen — distancia (mm / cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_ureteral",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía ureteral / reconstructiva"
+      ],
+      "label": "Procedimiento ureteral",
+      "options": [
+        "Ureterolitotomía (abierta / laparoscópica)",
+        "Reimplante ureterovesical",
+        "Ureteroplastia / reconstrucción ureteral (Boari / Psoas hitch)",
+        "Cateterismo ureteral / colocación de catéter Doble J"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "lateralidad_ureteral",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía ureteral / reconstructiva"
+      ],
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_reimplante",
+      "type": "single",
+      "required": false,
+      "required_if_proc_ureteral": [
+        "Reimplante ureterovesical"
+      ],
+      "label": "Técnica de reimplante",
+      "options": [
+        "Politano-Leadbetter",
+        "Lich-Gregoir",
+        "Otra"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_reimplante_otra",
+      "type": "free",
+      "required": false,
+      "required_if_tecnica_reimplante": [
+        "Otra"
+      ],
+      "label": "Técnica de reimplante (otra)",
+      "empty_text": ""
+    },
+    {
+      "id": "reconstruccion_ureteral_gesto",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_ureteral": [
+        "Ureteroplastia / reconstrucción ureteral (Boari / Psoas hitch)"
+      ],
+      "label": "Gesto reconstructivo",
+      "options": [
+        "Colgajo de Boari",
+        "Psoas hitch",
+        "Anastomosis término-terminal"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "vasos_iliacos_ureteral",
+      "type": "single",
+      "required": false,
+      "required_if_proc_ureteral": [
+        "Ureteroplastia / reconstrucción ureteral (Boari / Psoas hitch)"
+      ],
+      "label": "Vasos ilíacos",
+      "options": [
+        "Identificados y preservados",
+        "Lesión identificada intraoperatoriamente",
+        "No disecados",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_obturador_ureteral",
+      "type": "single",
+      "required": false,
+      "required_if_proc_ureteral": [
+        "Ureteroplastia / reconstrucción ureteral (Boari / Psoas hitch)"
+      ],
+      "label": "Nervio obturador",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "doble_j_lateralidad",
+      "type": "single",
+      "required": false,
+      "required_if_proc_ureteral": [
+        "Cateterismo ureteral / colocación de catéter Doble J"
+      ],
+      "label": "Catéter Doble J — lado",
+      "options": [
+        "Unilateral",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_endo_litiasis",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endourología / litiasis"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Ureterorrenoscopía (URS) rígida / flexible",
+        "Cirugía intrarrenal retrógrada (RIR / RIRC) + litotricia láser",
+        "Nefrolitotomía percutánea (NLPC / Mini-PERC)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_laser_litotricia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_endo_litiasis": [
+        "Cirugía intrarrenal retrógrada (RIR / RIRC) + litotricia láser"
+      ],
+      "label": "Láser de litotricia",
+      "options": [
+        "Holmium",
+        "Thulium",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "localizacion_calculo",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endourología / litiasis"
+      ],
+      "label": "Localización del cálculo",
+      "options": [
+        "Renal — cáliz superior",
+        "Renal — cáliz medio",
+        "Renal — cáliz inferior",
+        "Renal — pelvis",
+        "Ureteral proximal",
+        "Ureteral medio",
+        "Ureteral distal",
+        "Vesical"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "extraccion_fragmentos",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endourología / litiasis"
+      ],
+      "label": "Extracción de fragmentos",
+      "options": [
+        "Basket / cesta",
+        "Evacuación por irrigación",
+        "Polvo (dusting)"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "stent_post_litiasis",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endourología / litiasis"
+      ],
+      "label": "Stent / tutor post-procedimiento",
+      "options": [
+        "Catéter Doble J",
+        "Catéter ureteral simple",
+        "Sin tutor"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nefrostomia_post_nlpc",
+      "type": "single",
+      "required": false,
+      "required_if_proc_endo_litiasis": [
+        "Nefrolitotomía percutánea (NLPC / Mini-PERC)"
+      ],
+      "label": "Nefrostomía post-NLPC (acceso percutáneo)",
+      "options": [
+        "Nefrostomía dejada",
+        "Tubeless (sin nefrostomía)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "complicacion_endourologia",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Endourología / litiasis"
+      ],
+      "label": "Complicación endourológica intraoperatoria",
+      "options": [
+        "Sin complicaciones",
+        "Perforación ureteral",
+        "Perforación pielocalicial",
+        "Otra"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "complicacion_endourologia_otra",
+      "type": "free",
+      "required": false,
+      "required_if_complicacion_endourologia": [
+        "Otra"
+      ],
+      "label": "Complicación endourológica (otra)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_vesico_prostatico",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Cirugía vesical / prostato-vesical"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Cistectomía radical (con linfadenectomía pélvica)",
+        "Cistectomía parcial",
+        "Resección transuretral de tumor vesical (RTU-V)",
+        "Resección transuretral de próstata (RTU-P)",
+        "Enucleación prostática con láser (HoLEP / ThuLEP)",
+        "Prostatectomía abierta / adenomectomía (Freyer / Millin)",
+        "Prostatectomía radical (oncológica)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "derivacion_urinaria",
+      "type": "single",
+      "required": false,
+      "required_if_proc_vesico_prostatico": [
+        "Cistectomía radical (con linfadenectomía pélvica)"
+      ],
+      "label": "Reconstrucción / derivación urinaria",
+      "options": [
+        "Neovejiga ortotópica (ileal)",
+        "Conducto ileal (Bricker)",
+        "Ureterocutaneostomía"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ureter_derecho_cistectomia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_vesico_prostatico": [
+        "Cistectomía radical (con linfadenectomía pélvica)"
+      ],
+      "label": "Uréter derecho",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ureter_izquierdo_cistectomia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_vesico_prostatico": [
+        "Cistectomía radical (con linfadenectomía pélvica)"
+      ],
+      "label": "Uréter izquierdo",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_cistectomia_radical",
+      "type": "single",
+      "required": false,
+      "required_if_proc_vesico_prostatico": [
+        "Cistectomía radical (con linfadenectomía pélvica)"
+      ],
+      "label": "Margen quirúrgico (cistectomía radical)",
+      "options": [
+        "Libre",
+        "Comprometido",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_cistectomia_radical_distancia",
+      "type": "free",
+      "required": false,
+      "required_if_margen_cistectomia_radical": [
+        "Libre",
+        "Comprometido"
+      ],
+      "label": "Margen cistectomía — distancia",
+      "empty_text": ""
+    },
+    {
+      "id": "profundidad_rtuv",
+      "type": "single",
+      "required": false,
+      "required_if_proc_vesico_prostatico": [
+        "Resección transuretral de tumor vesical (RTU-V)"
+      ],
+      "label": "Profundidad / estadificación (RTU-V)",
+      "options": [
+        "Ta / T1 (superficial — no invade detrusor)",
+        "T2 (invade detrusor)",
+        "No evaluable"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_rtup",
+      "type": "single",
+      "required": false,
+      "required_if_proc_vesico_prostatico": [
+        "Resección transuretral de próstata (RTU-P)"
+      ],
+      "label": "Indicación (RTU-P)",
+      "options": [
+        "Obstructiva benigna (HPB)",
+        "Retención urinaria recurrente",
+        "Hematuria de origen prostático",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_rtup_otro",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_rtup": [
+        "Otro"
+      ],
+      "label": "Indicación RTU-P (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "energia_rtup",
+      "type": "single",
+      "required": false,
+      "required_if_proc_vesico_prostatico": [
+        "Resección transuretral de próstata (RTU-P)"
+      ],
+      "label": "Energía (RTU-P)",
+      "options": [
+        "Monopolar",
+        "Bipolar"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "abordaje_prostatectomia_radical",
+      "type": "single",
+      "required": false,
+      "required_if_proc_vesico_prostatico": [
+        "Prostatectomía radical (oncológica)"
+      ],
+      "label": "Abordaje (prostatectomía radical)",
+      "options": [
+        "Abierta",
+        "Laparoscópica",
+        "Robótica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "preservacion_bandeletas",
+      "type": "single",
+      "required": false,
+      "required_if_proc_vesico_prostatico": [
+        "Prostatectomía radical (oncológica)"
+      ],
+      "label": "Preservación de bandeletas neurovasculares",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_prostatectomia_radical",
+      "type": "single",
+      "required": false,
+      "required_if_proc_vesico_prostatico": [
+        "Prostatectomía radical (oncológica)"
+      ],
+      "label": "Margen quirúrgico (prostatectomía radical)",
+      "options": [
+        "Libre",
+        "Comprometido",
+        "No aplica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "margen_prostatectomia_radical_distancia",
+      "type": "free",
+      "required": false,
+      "required_if_margen_prostatectomia_radical": [
+        "Libre",
+        "Comprometido"
+      ],
+      "label": "Margen prostatectomía — distancia",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_genital",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Patología genital masculina / escrotal / peniana"
+      ],
+      "label": "Procedimiento",
+      "options": [
+        "Orquiectomía radical (vía inguinal — neoplasia)",
+        "Orquiectomía simple / subcapsular (vía escrotal)",
+        "Orquidopexia (torsión / criptorquidia)",
+        "Hidrocelectomía",
+        "Varicocelectomía",
+        "Exéresis de quiste de epidídimo / spermatocele",
+        "Circuncisión / postectomía",
+        "Penectomía",
+        "Uretroplastia (estenosis uretral)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "lateralidad_genital",
+      "type": "single",
+      "required": false,
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_hidrocelectomia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_genital": [
+        "Hidrocelectomía"
+      ],
+      "label": "Técnica de hidrocelectomía",
+      "options": [
+        "Jaboulay",
+        "Lord",
+        "Otra"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_varicocelectomia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_genital": [
+        "Varicocelectomía"
+      ],
+      "label": "Técnica de varicocelectomía",
+      "options": [
+        "Subinguinal microquirúrgica",
+        "Laparoscópica"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_quiste_epididimo",
+      "type": "single",
+      "required": false,
+      "required_if_proc_genital": [
+        "Exéresis de quiste de epidídimo / spermatocele"
+      ],
+      "label": "Indicación (quiste / spermatocele)",
+      "options": [
+        "Sintomático",
+        "Hallazgo incidental"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_penectomia",
+      "type": "single",
+      "required": false,
+      "required_if_proc_genital": [
+        "Penectomía"
+      ],
+      "label": "Tipo de penectomía",
+      "options": [
+        "Parcial",
+        "Total con urostomía perineal"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "uretroplastia_gesto",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_genital": [
+        "Uretroplastia (estenosis uretral)"
+      ],
+      "label": "Uretroplastia — gesto",
+      "options": [
+        "Injerto de mucosa bucal",
+        "Cierre primario"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "sonda_foley",
+      "type": "single",
+      "required": false,
+      "label": "Sonda vesical Foley",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "sonda_foley_calibre_fr",
+      "type": "free",
+      "required": false,
+      "required_if_sonda_foley": [
+        "Sí"
+      ],
+      "label": "Foley — calibre (Fr)",
+      "empty_text": ""
+    },
+    {
+      "id": "sonda_foley_balon_cc",
+      "type": "free",
+      "required": false,
+      "required_if_sonda_foley": [
+        "Sí"
+      ],
+      "label": "Foley — volumen de balón (cc)",
+      "empty_text": ""
+    },
+    {
+      "id": "sonda_foley_dias_previstos",
+      "type": "free",
+      "required": false,
+      "required_if_sonda_foley": [
+        "Sí"
+      ],
+      "label": "Foley — días previstos",
+      "empty_text": ""
+    },
+    {
+      "id": "cistostomia_percutanea",
+      "type": "single",
+      "required": false,
+      "label": "Sonda de talla vesical / cistostomía percutánea",
+      "options": [
+        "Sí",
+        "No"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "lavado_vesical_continuo",
+      "type": "single",
+      "required": false,
+      "label": "Lavado vesical continuo (solución fisiológica)",
+      "options": [
+        "Activo",
+        "No requerido"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_cavitario",
+      "type": "single",
+      "required": false,
+      "label": "Drenaje cavitario / retroperitoneal (lecho prostático / renal / anastomosis)",
+      "options": [
+        "Sí",
+        "Sin drenaje"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_cavitario_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_drenaje_cavitario": [
+        "Sí"
+      ],
+      "label": "Tipo de drenaje",
+      "options": [
+        "Aspirativo",
+        "Jackson-Pratt",
+        "Penrose",
+        "Otro"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_cavitario_tipo_otro",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_cavitario_tipo": [
+        "Otro"
+      ],
+      "label": "Tipo de drenaje (otro)",
+      "empty_text": ""
+    },
+    {
+      "id": "drenaje_cavitario_cantidad",
+      "type": "free",
+      "required": false,
+      "required_if_drenaje_cavitario": [
+        "Sí"
+      ],
+      "label": "Cantidad de drenajes",
+      "empty_text": ""
+    }
+  ],
+  "id": "cu-urologia-v1",
+  "especialidad": "Cirugía Urológica",
+  "operaciones": [
+    "Nefrectomía / pieloplastia",
+    "Cirugía ureteral / reconstructiva",
+    "Endourología / litiasis",
+    "Cistectomía / próstata / RTU-V",
+    "Cirugía escrotal / peniana / uretral"
+  ],
+  "titulo": "Cirugía urológica",
+  "plantilla_texto": "Urológica — {{procedimiento_grupo}}. Abordaje: {{abordaje}}{{conversion_causa}}.\nRenal: {{proc_renal}}; Lateralidad {{lateralidad_renal}}; indicación {{indicacion_renal}}{{indicacion_renal_otro}}; trombo VCI {{trombo_vci}} nivel {{trombo_vci_nivel}} {{trombo_vci_detalle}}; isquemia {{isquemia_renal}} {{tiempo_isquemia_min}} min; margen {{margen_nefrectomia_parcial}}{{margen_nefrectomia_parcial_distancia}}.\nUreteral: {{proc_ureteral}}; Lateralidad {{lateralidad_ureteral}}; reimplante {{tecnica_reimplante}}{{tecnica_reimplante_otra}}; reconstrucción {{reconstruccion_ureteral_gesto}}; ilíacos {{vasos_iliacos_ureteral}}; obturador {{nervio_obturador_ureteral}}; Doble J {{doble_j_lateralidad}}.\nLitiasis: {{proc_endo_litiasis}} {{tipo_laser_litotricia}}; cálculo {{localizacion_calculo}}; fragmentos {{extraccion_fragmentos}}; stent {{stent_post_litiasis}}; nefrostomía NLPC {{nefrostomia_post_nlpc}}; complicación {{complicacion_endourologia}}{{complicacion_endourologia_otra}}.\nVesico-prostático: {{proc_vesico_prostatico}}; derivación {{derivacion_urinaria}}; uréter der. {{ureter_derecho_cistectomia}} izq. {{ureter_izquierdo_cistectomia}}; margen cistect. {{margen_cistectomia_radical}}{{margen_cistectomia_radical_distancia}}; RTU-V profundidad {{profundidad_rtuv}}; RTU-P {{indicacion_rtup}}{{indicacion_rtup_otro}} {{energia_rtup}}; PR {{abordaje_prostatectomia_radical}} bandeletas {{preservacion_bandeletas}} margen {{margen_prostatectomia_radical}}{{margen_prostatectomia_radical_distancia}}.\nGenital: {{proc_genital}}; Lateralidad {{lateralidad_genital}}; hidrocele {{tecnica_hidrocelectomia}}; varicocele {{tecnica_varicocelectomia}}; quiste {{indicacion_quiste_epididimo}}; penectomía {{tipo_penectomia}}; uretroplastia {{uretroplastia_gesto}}.\nFoley {{sonda_foley}} Fr {{sonda_foley_calibre_fr}} balón {{sonda_foley_balon_cc}} cc días {{sonda_foley_dias_previstos}}; cistostomía {{cistostomia_percutanea}}; lavado {{lavado_vesical_continuo}}; drenaje {{drenaje_cavitario}} {{drenaje_cavitario_tipo}}{{drenaje_cavitario_tipo_otro}} n={{drenaje_cavitario_cantidad}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* auto-generated by tools/md-proforma-to-js.mjs — no editar a mano */
+(function (g) {
+  g.AF_PROFORMAS = g.AF_PROFORMAS || {};
+  g.AF_PROFORMAS["cvasc-vascular-v1"] = {
+  "slots": [
+    {
+      "id": "procedimiento_grupo",
+      "type": "single",
+      "required": true,
+      "label": "Procedimiento / foco",
+      "options": [
+        "Aórtico / abdominal",
+        "Troncos supraaórticos / carotídeo",
+        "Arterial periférico",
+        "Accesos vasculares para hemodiálisis",
+        "Venosa / linfática",
+        "Salvataje / amputaciones"
+      ]
+    },
+    {
+      "id": "lateralidad",
+      "type": "single",
+      "required": false,
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "abordaje",
+      "type": "single",
+      "required": false,
+      "label": "Abordaje (si aplica)",
+      "options": [
+        "Abierto",
+        "Endovascular / percutáneo",
+        "Híbrido",
+        "Convertido a abierto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "conversion_causa",
+      "type": "free",
+      "required": false,
+      "required_if_abordaje": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión",
+      "empty_text": ""
+    },
+    {
+      "id": "heparinizacion_sistemica",
+      "type": "single",
+      "required": false,
+      "label": "Heparinización sistémica",
+      "options": [
+        "Administrada — ACT confirmado",
+        "Administrada — sin ACT",
+        "No administrada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_aortica",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Aórtico / abdominal"
+      ],
+      "label": "Patología / indicación",
+      "options": [
+        "Aneurisma de aorta abdominal (AAA)",
+        "Síndrome aórtico agudo / disección",
+        "Oclusión aorto-ilíaca (síndrome de Leriche)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "diametro_aaa_cm",
+      "type": "free",
+      "required": false,
+      "required_if_indicacion_aortica": [
+        "Aneurisma de aorta abdominal (AAA)"
+      ],
+      "label": "Diámetro del aneurisma (cm)",
+      "empty_text": ""
+    },
+    {
+      "id": "clasificacion_stanford",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_aortica": [
+        "Síndrome aórtico agudo / disección"
+      ],
+      "label": "Clasificación de Stanford",
+      "options": [
+        "Tipo A",
+        "Tipo B"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "via_aortica",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Aórtico / abdominal"
+      ],
+      "label": "Vía / modalidad",
+      "options": [
+        "Endovascular",
+        "Abierto",
+        "Convertido a abierto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "conversion_aortica_causa",
+      "type": "free",
+      "required": false,
+      "required_if_via_aortica": [
+        "Convertido a abierto"
+      ],
+      "label": "Causa de conversión (aórtica)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_endovascular_aortico",
+      "type": "multi",
+      "required": false,
+      "required_if_via_aortica": [
+        "Endovascular",
+        "Convertido a abierto"
+      ],
+      "label": "Procedimiento endovascular",
+      "options": [
+        "EVAR (reparación endovascular de AAA)",
+        "F/BEVAR (EVAR fenestrado / con ramas viscerales)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "endoleak_control",
+      "type": "single",
+      "required": false,
+      "label": "Endoleak en angiografía de control",
+      "options": [
+        "Sin endoleak",
+        "Tipo I",
+        "Tipo II",
+        "Tipo III",
+        "Tipo IV",
+        "Tipo V (endotensión)",
+        "No evaluado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "clampeo_aortico",
+      "type": "single",
+      "required": false,
+      "required_if_via_aortica": [
+        "Abierto",
+        "Convertido a abierto"
+      ],
+      "label": "Nivel de clampeo aórtico",
+      "options": [
+        "Infrarrenal",
+        "Suprarrenal",
+        "Supra-celíaco"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tiempo_clampeo_aortico_min",
+      "type": "free",
+      "required": false,
+      "required_if_via_aortica": [
+        "Abierto",
+        "Convertido a abierto"
+      ],
+      "label": "Tiempo de clampeo aórtico (min)",
+      "empty_text": ""
+    },
+    {
+      "id": "protesis_aortica",
+      "type": "single",
+      "required": false,
+      "required_if_via_aortica": [
+        "Abierto",
+        "Convertido a abierto"
+      ],
+      "label": "Reemplazo con prótesis",
+      "options": [
+        "Recta",
+        "Bifurcada (Dacrón / PTFE)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "vasos_reimplantados",
+      "type": "multi",
+      "required": false,
+      "required_if_via_aortica": [
+        "Abierto",
+        "Convertido a abierto"
+      ],
+      "label": "Vasos reconstruidos / reimplantes",
+      "options": [
+        "Arterias renales",
+        "Mesentérica superior",
+        "Arterias ilíacas"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "manejo_ami",
+      "type": "single",
+      "required": false,
+      "required_if_via_aortica": [
+        "Abierto",
+        "Convertido a abierto"
+      ],
+      "label": "Manejo de arteria mesentérica inferior",
+      "options": [
+        "Reimplantada",
+        "Ligada",
+        "No abordada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ureter_aortico",
+      "type": "single",
+      "required": false,
+      "required_if_via_aortica": [
+        "Abierto",
+        "Convertido a abierto"
+      ],
+      "label": "Uréter",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_carotidea",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Troncos supraaórticos / carotídeo"
+      ],
+      "label": "Patología / indicación",
+      "options": [
+        "Estenosis carotídea sintomática",
+        "Estenosis carotídea asintomática",
+        "Aneurisma carotídeo",
+        "Patología del subclavio"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "lateralidad_carotidea",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Troncos supraaórticos / carotídeo"
+      ],
+      "label": "Lateralidad",
+      "options": [
+        "Derecha",
+        "Izquierda",
+        "Bilateral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "estenosis_nascet",
+      "type": "single",
+      "required": false,
+      "label": "Porcentaje de estenosis (NASCET)",
+      "options": [
+        "<50%",
+        "50-69%",
+        "70-99%",
+        "Oclusión",
+        "No evaluado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tecnica_carotidea",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Troncos supraaórticos / carotídeo"
+      ],
+      "label": "Técnica quirúrgica",
+      "options": [
+        "Endarterectomía carotídea (EAC) convencional",
+        "Endarterectomía carotídea por eversión",
+        "Angioplastia carotídea + stent con protección embólica (CAS)",
+        "Bypass subclavio-carotídeo / carotídeo-carotídeo"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "parche_eac",
+      "type": "single",
+      "required": false,
+      "required_if_tecnica_carotidea": [
+        "Endarterectomía carotídea (EAC) convencional"
+      ],
+      "label": "Parche (EAC convencional)",
+      "options": [
+        "Dacrón",
+        "PTFE",
+        "Vena autóloga",
+        "Sin parche"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "monitoreo_neuro_carotideo",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Troncos supraaórticos / carotídeo"
+      ],
+      "label": "Monitoreo neurológico intraoperatorio",
+      "options": [
+        "EEG",
+        "Somatosensorial (SSEP)",
+        "Oximetría cerebral / NIRS"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "shunt_carotideo",
+      "type": "single",
+      "required": false,
+      "label": "Shunt / derivación carotídea (T-Javid / Pruitt-Inahara)",
+      "options": [
+        "Utilizado",
+        "No utilizado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proteccion_cerebral_cas",
+      "type": "single",
+      "required": false,
+      "required_if_tecnica_carotidea": [
+        "Angioplastia carotídea + stent con protección embólica (CAS)"
+      ],
+      "label": "Dispositivo de protección cerebral (CAS)",
+      "options": [
+        "Filtro distal",
+        "Flujo reverso proximal"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_vago_x",
+      "type": "single",
+      "required": false,
+      "label": "Nervio vago (X)",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "nervio_hipogloso_xii",
+      "type": "single",
+      "required": false,
+      "label": "Nervio hipogloso (XII)",
+      "options": [
+        "Identificado y preservado",
+        "Lesión identificada intraoperatoriamente",
+        "No disecado"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "rama_marginal_mandibular_vii",
+      "type": "single",
+      "required": false,
+      "label": "Rama marginal mandibular del facial (VII)",
+      "options": [
+        "Identificada y preservada",
+        "Lesión identificada intraoperatoriamente",
+        "No disecada"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_periferica",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Arterial periférico"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Isquemia crítica de miembro",
+        "Isquemia aguda por embolia / trombosis",
+        "Aneurisma poplíteo / periférico"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "rutherford",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_periferica": [
+        "Isquemia crítica de miembro"
+      ],
+      "label": "Clasificación de Rutherford",
+      "options": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_revasc_abierta",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Arterial periférico"
+      ],
+      "label": "Revascularización abierta / quirúrgica",
+      "options": [
+        "Bypass aorto-bifemoral / aorto-monofemoral",
+        "Bypass femoro-poplíteo",
+        "Bypass femoro-distal / tibial",
+        "Embolectomía / trombectomía arterial (Fogarty)",
+        "Endarterectomía femoral (profiloplastia)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "nivel_femoro_popliteo",
+      "type": "single",
+      "required": false,
+      "required_if_proc_revasc_abierta": [
+        "Bypass femoro-poplíteo"
+      ],
+      "label": "Nivel femoro-poplíteo",
+      "options": [
+        "Supra-patelar",
+        "Infra-patelar"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "vaso_tibial_target",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_revasc_abierta": [
+        "Bypass femoro-distal / tibial"
+      ],
+      "label": "Target tibial (bypass distal)",
+      "options": [
+        "Tibial anterior",
+        "Tibial posterior",
+        "Peronea"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "material_injerto",
+      "type": "single",
+      "required": false,
+      "label": "Material del injerto",
+      "options": [
+        "Vena safena magna autóloga — in situ",
+        "Vena safena magna autóloga — invertida",
+        "Prótesis (PTFE / Dacrón)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "fogarty_fr",
+      "type": "free",
+      "required": false,
+      "required_if_proc_revasc_abierta": [
+        "Embolectomía / trombectomía arterial (Fogarty)"
+      ],
+      "label": "Catéter de Fogarty (Fr)",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_endovascular_periferico",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Arterial periférico"
+      ],
+      "label": "Endovascular / intervencionismo",
+      "options": [
+        "Angioplastia transluminal percutánea (ATP) con balón",
+        "Colocación de stent",
+        "Aterectomía (direccional / rotacional / láser)",
+        "Trombólisis dirigida por catéter (TDC) / trombectomía farmacomecánica"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_balon_atp",
+      "type": "single",
+      "required": false,
+      "required_if_proc_endovascular_periferico": [
+        "Angioplastia transluminal percutánea (ATP) con balón"
+      ],
+      "label": "Tipo de balón (ATP)",
+      "options": [
+        "Convencional",
+        "Liberador de fármaco (DEB)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_stent_periferico",
+      "type": "single",
+      "required": false,
+      "required_if_proc_endovascular_periferico": [
+        "Colocación de stent"
+      ],
+      "label": "Tipo de stent",
+      "options": [
+        "Autoexpandible",
+        "Expandible por balón",
+        "Cubierto"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "runoff_distal",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Arterial periférico"
+      ],
+      "label": "Runoff distal — vasos tibiales permeables",
+      "options": [
+        "Tibial anterior",
+        "Tibial posterior",
+        "Peronea",
+        "Ninguno permeable"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "fasciotomia",
+      "type": "single",
+      "required": false,
+      "required_if_indicacion_periferica": [
+        "Isquemia aguda por embolia / trombosis"
+      ],
+      "label": "Consideración de fasciotomía",
+      "options": [
+        "No requerida",
+        "Realizada profiláctica",
+        "Realizada terapéutica (síndrome compartimental establecido)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ubicacion_acceso_hd",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Accesos vasculares para hemodiálisis"
+      ],
+      "label": "Ubicación del acceso",
+      "options": [
+        "Antebrazo",
+        "Brazo"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "tipo_acceso_hd",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Accesos vasculares para hemodiálisis"
+      ],
+      "label": "Tipo de acceso",
+      "options": [
+        "Fístula arteriovenosa autóloga (FAV)",
+        "Acceso protésico (graft / PTFE)",
+        "Catéter de hemodiálisis"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "fav_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_acceso_hd": [
+        "Fístula arteriovenosa autóloga (FAV)"
+      ],
+      "label": "Tipo de FAV",
+      "options": [
+        "Radio-cefálica (Brescia-Cimino)",
+        "Braquio-cefálica",
+        "Braquio-basílica (trasposición de vena basílica)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "trasposicion_basilica_tiempos",
+      "type": "single",
+      "required": false,
+      "required_if_fav_tipo": [
+        "Braquio-basílica (trasposición de vena basílica)"
+      ],
+      "label": "Trasposición basílica — tiempos",
+      "options": [
+        "1 tiempo",
+        "2 tiempos"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "graft_hd_config",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_acceso_hd": [
+        "Acceso protésico (graft / PTFE)"
+      ],
+      "label": "Configuración del graft",
+      "options": [
+        "En asa (loop)",
+        "Recto (anastomosis arterio-venosa)"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "permcath_vena",
+      "type": "single",
+      "required": false,
+      "required_if_tipo_acceso_hd": [
+        "Catéter de hemodiálisis"
+      ],
+      "label": "Catéter tunelizado (Permcath) — vena",
+      "options": [
+        "Yugular interna",
+        "Subclavia",
+        "Femoral"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "fremito_soplo_io",
+      "type": "single",
+      "required": false,
+      "label": "Evaluación del frémito / soplo intraoperatorio",
+      "options": [
+        "Presente y adecuado",
+        "Ausente / débil"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "ceap_clinico",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Venosa / linfática"
+      ],
+      "label": "Clasificación CEAP (componente clínico)",
+      "options": [
+        "C0",
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "proc_venosa_superficial",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Venosa / linfática"
+      ],
+      "label": "Patología venosa superficial / várices",
+      "options": [
+        "Safenectomía / stripping",
+        "Ligadura de perforantes (abierta)",
+        "Ligadura de perforantes (SEPS endoscópica)",
+        "Fleboextracción / microflebectomías tipo Muller",
+        "Ablación térmica endovenosa — láser (EVLT)",
+        "Ablación térmica endovenosa — radiofrecuencia (RFA)",
+        "Escleroterapia con espuma"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "safena_abordada",
+      "type": "multi",
+      "required": false,
+      "required_if_proc_venosa_superficial": [
+        "Safenectomía / stripping"
+      ],
+      "label": "Safena abordada",
+      "options": [
+        "Safena magna",
+        "Safena parva"
+      ],
+      "join": ", ",
+      "empty_text": ""
+    },
+    {
+      "id": "proc_venosa_profunda",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Venosa / linfática"
+      ],
+      "label": "Patología venosa profunda / filtro de cava",
+      "options": [
+        "Trombectomía venosa iliofemoral",
+        "Colocación de filtro de vena cava inferior (FVCI)",
+        "Angioplastia + stent venoso ilíaco (síndrome de May-Thurner)"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "fvci_tipo",
+      "type": "single",
+      "required": false,
+      "required_if_proc_venosa_profunda": [
+        "Colocación de filtro de vena cava inferior (FVCI)"
+      ],
+      "label": "Tipo de filtro FVCI",
+      "options": [
+        "Temporal / removible",
+        "Permanente"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "indicacion_amputacion",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Salvataje / amputaciones"
+      ],
+      "label": "Indicación",
+      "options": [
+        "Isquemia irreversible",
+        "Necrosis tisular",
+        "Infección severa / pie diabético no revascularizable"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    },
+    {
+      "id": "nivel_amputacion",
+      "type": "single",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Salvataje / amputaciones"
+      ],
+      "label": "Nivel de amputación",
+      "options": [
+        "Amputación menor — digital",
+        "Amputación menor — transmetatarsiana",
+        "Amputación menor — Lisfranc / Chopart",
+        "Amputación infracondílea (BKA)",
+        "Amputación supracondílea (AKA)",
+        "Desarticulación de cadera",
+        "Desarticulación de rodilla",
+        "Desarticulación de tobillo / Syme"
+      ],
+      "empty_text": ""
+    },
+    {
+      "id": "justificacion_nivel_amputacion",
+      "type": "free",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Salvataje / amputaciones"
+      ],
+      "label": "Justificación del nivel (pulsos / Doppler proximal / clínico)",
+      "empty_text": ""
+    },
+    {
+      "id": "manejo_munon",
+      "type": "multi",
+      "required": false,
+      "required_if_procedimiento_grupo": [
+        "Salvataje / amputaciones"
+      ],
+      "label": "Manejo del muñón",
+      "options": [
+        "Cierre primario sin tensión",
+        "Miotendinoplastia",
+        "Drenaje dejado"
+      ],
+      "join": "; ",
+      "empty_text": ""
+    }
+  ],
+  "id": "cvasc-vascular-v1",
+  "especialidad": "Cirugía Vascular y Endovascular",
+  "operaciones": [
+    "Cirugía aórtica / abdominal (abierta o endovascular)",
+    "Cirugía carotídea / troncos supraaórticos",
+    "Revascularización arterial periférica",
+    "Accesos vasculares para hemodiálisis",
+    "Cirugía venosa",
+    "Amputaciones / salvataje de miembro"
+  ],
+  "titulo": "Cirugía vascular y endovascular",
+  "plantilla_texto": "Vascular — {{procedimiento_grupo}}. Lateralidad {{lateralidad}}{{lateralidad_carotidea}}. Abordaje {{abordaje}}{{conversion_causa}}. Heparinización {{heparinizacion_sistemica}}.\nAórtico: {{indicacion_aortica}}; Ø AAA {{diametro_aaa_cm}} cm; Stanford {{clasificacion_stanford}}; vía {{via_aortica}}{{conversion_aortica_causa}}; endovascular {{proc_endovascular_aortico}} endoleak {{endoleak_control}}; clampeo {{clampeo_aortico}} {{tiempo_clampeo_aortico_min}} min; prótesis {{protesis_aortica}}; reimplantes {{vasos_reimplantados}}; AMI {{manejo_ami}}; uréter {{ureter_aortico}}.\nCarotídeo: {{indicacion_carotidea}}; NASCET {{estenosis_nascet}}; {{tecnica_carotidea}} parche {{parche_eac}}; monitoreo {{monitoreo_neuro_carotideo}}; shunt {{shunt_carotideo}}; protección CAS {{proteccion_cerebral_cas}}; X {{nervio_vago_x}}; XII {{nervio_hipogloso_xii}}; VII marg. {{rama_marginal_mandibular_vii}}.\nPeriférico: {{indicacion_periferica}}; Rutherford {{rutherford}}; abierta {{proc_revasc_abierta}} nivel FP {{nivel_femoro_popliteo}} target {{vaso_tibial_target}} injerto {{material_injerto}} Fogarty {{fogarty_fr}} Fr; endovascular {{proc_endovascular_periferico}} balón {{tipo_balon_atp}} stent {{tipo_stent_periferico}}; runoff {{runoff_distal}}; fasciotomía {{fasciotomia}}.\nAcceso HD: lat. {{lateralidad}}; {{ubicacion_acceso_hd}}; {{tipo_acceso_hd}} FAV {{fav_tipo}} tiempos {{trasposicion_basilica_tiempos}}; graft {{graft_hd_config}}; Permcath {{permcath_vena}}; frémito {{fremito_soplo_io}}.\nVenosa: CEAP {{ceap_clinico}}; superficial {{proc_venosa_superficial}} safena {{safena_abordada}}; profunda {{proc_venosa_profunda}} FVCI {{fvci_tipo}}.\nAmputación: {{indicacion_amputacion}}; nivel {{nivel_amputacion}}; justificación {{justificacion_nivel_amputacion}}; muñón {{manejo_munon}}."
+};
+})(typeof window !== "undefined" ? window : globalThis);
+
