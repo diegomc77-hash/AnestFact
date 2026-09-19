@@ -258,18 +258,42 @@ function mergeIntervsLocalRemote(local,remote){
   return out;
 }
 
+var _afSyncLastKnownUpdatedAt={}; // clave -> updated_at remoto ya visto en esta sesión (memoria, no localStorage)
+var AFG_SYNC_UNCHANGED='__AFG_SYNC_UNCHANGED__';
+
 function fetchSyncPayload(clave){
-  var url=afSupabaseUrl()+'/rest/v1/anesfact_datos?clave=eq.'+encodeURIComponent(clave)+'&select=datos&limit=1';
   var uid=(typeof AF_AUTH!=='undefined'&&AF_AUTH.getUserId)?AF_AUTH.getUserId():'';
   var ownClave=(typeof getSyncClave==='function')?getSyncClave():'';
-  // Solo filtrar owner_id en la clave propia (no en shares — RLS del servidor decide)
-  if(uid&&clave===ownClave)url+='&owner_id=eq.'+encodeURIComponent(uid);
-  return fetch(url,{
-    headers:afSupabaseHeaders()
-  }).then(function(r){
-    if(!r.ok)return r.text().then(function(t){throw new Error('HTTP '+r.status+(t?(': '+t.slice(0,80)):''));});
-    return r.json();
-  }).then(function(rows){if(!rows||!rows.length)return null;try{return JSON.parse(rows[0].datos||'{}');}catch(e){return null;}});
+  function baseUrl(select){
+    var u=afSupabaseUrl()+'/rest/v1/anesfact_datos?clave=eq.'+encodeURIComponent(clave)+'&select='+select+'&limit=1';
+    if(uid&&clave===ownClave)u+='&owner_id=eq.'+encodeURIComponent(uid);
+    return u;
+  }
+  function fullFetch(){
+    return fetch(baseUrl('datos,updated_at'),{headers:afSupabaseHeaders()}).then(function(r){
+      if(!r.ok)return r.text().then(function(t){throw new Error('HTTP '+r.status+(t?(': '+t.slice(0,80)):''));});
+      return r.json();
+    }).then(function(rows){
+      if(!rows||!rows.length)return null;
+      if(rows[0].updated_at)_afSyncLastKnownUpdatedAt[clave]=rows[0].updated_at;
+      try{return JSON.parse(rows[0].datos||'{}');}catch(e){return null;}
+    });
+  }
+  // Chequeo liviano: solo la fecha, antes de bajar el bloque grande (`datos`).
+  // El json del chequeo va anidado para que fullFetch() por !r.ok no pase por el branch de filas.
+  return fetch(baseUrl('updated_at'),{headers:afSupabaseHeaders()}).then(function(r){
+    if(!r.ok)return fullFetch(); // si falla el chequeo liviano, comportamiento de siempre
+    return r.json().then(function(rows){
+      if(!rows||!rows.length)return null; // sin backup aún en Supabase
+      var remoteAt=rows[0].updated_at||'';
+      var known=_afSyncLastKnownUpdatedAt[clave]||'';
+      if(remoteAt&&known&&remoteAt===known){
+        try{console.log('[AFG sync] sin cambios remotos, salto fetch completo',clave);}catch(e){}
+        return AFG_SYNC_UNCHANGED;
+      }
+      return fullFetch();
+    });
+  }).catch(function(){return fullFetch();}); // ante cualquier falla, no perder el comportamiento actual
 }
 
 /** Solo la clave del usuario autenticado — NUNCA fallback a Huerta/legacy (fuga entre usuarios). */
@@ -292,7 +316,7 @@ function syncPrepareMergedPayload(){
   return fetchSyncPayloadWithFallbacks(clave).then(function(remote){
     var local=afFilterDeletedIntervs(S.intervs||[]);
     S.intervs=local;
-    if(!remote||!remote.intervs||!remote.intervs.length)return buildSyncPayload();
+    if(remote===AFG_SYNC_UNCHANGED||!remote||!remote.intervs||!remote.intervs.length)return buildSyncPayload();
     var merged=mergeIntervsLocalRemote(local,remote.intervs);
     syncApplyMergedIntervs(merged,remote);
     var data=buildSyncPayload();
@@ -493,6 +517,12 @@ function syncGuardarSupabase(data,silent){
 function syncCargarSupabase(reemplazar,silent){
   var clave=getSyncClave();
   return fetchSyncPayloadWithFallbacks(clave).then(function(data){
+    if(data===AFG_SYNC_UNCHANGED){
+      _lastSyncErr='';
+      if(!silent)syncStatus('Ya está al día','ok');
+      else syncAutoStatusUpdate();
+      return;
+    }
     if(!data||!(data.intervs&&data.intervs.length)){
       _lastSyncErr='';
       if(!silent){syncStatus('No hay backup en Supabase todav\u00eda','err');toast('Todav\u00eda no hay backup en la nube');}
