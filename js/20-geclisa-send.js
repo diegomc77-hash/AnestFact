@@ -242,6 +242,7 @@ function afBuildGeclisaClinicalPayload(i){
     antibioticoprofilaxis:atb,
     medicamentos:(f.drogas||[]).filter(function(d){return d.n&&d.n.trim();}).map(function(d){return(d.n||'')+' '+(d.d||'')+' '+(d.v||'');}).join(', '),
     peso:i.peso||'',asa:f.asa||'',
+    mayo_nro_atencion:i.mayo_nro_atencion||'',
     monEtco2:_mon.monEtco2,
     monPam:_mon.monPam,
     monEcg:_mon.monEcg,
