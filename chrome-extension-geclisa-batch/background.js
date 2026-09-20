@@ -2032,6 +2032,8 @@ function firstPendingQueueItem(queue, preferId, opts) {
   opts = opts || {};
   var skipPaused = !!opts.skipPaused;
   var skipIds = opts.skipIds || {};
+  var STALE_RUNNING_MS = 180000;
+  var now = Date.now();
   if (preferId) {
     for (var i = 0; i < items.length; i++) {
       if (String(items[i].id) === String(preferId) && items[i].status !== 'done') return items[i];
@@ -2041,8 +2043,9 @@ function firstPendingQueueItem(queue, preferId, opts) {
     var st = items[j].status || 'queued';
     if (st === 'done') continue;
     if (skipIds[String(items[j].id)]) continue;
+    var isStaleRunning = st === 'running' && (now - (items[j].updatedAt || 0)) > STALE_RUNNING_MS;
     if (skipPaused) {
-      if (st === 'queued') return items[j];
+      if (st === 'queued' || isStaleRunning) return items[j];
       continue;
     }
     if (st === 'running' || st === 'awaiting_save' || st === 'queued' || st === 'paused_error') {
