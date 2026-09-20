@@ -1,15 +1,23 @@
 {
   "manifest_version": 3,
   "name": "AnesFact GECLISA Batch (pasos 1–12)",
-  "version": "0.5.15",
-  "description": "GECLISA Mayo: Iniciar cola desde AnesFact o popup; tras GRABAR avanza sola.",
+  "version": "0.6.0",
+  "description": "GECLISA Mayo + esqueleto evweb ADAARC (Lote 1: ping/cola, sin fill).",
   "permissions": ["storage", "tabs", "scripting", "debugger", "clipboardRead", "alarms"],
   "host_permissions": [
     "http://sanatoriomayo.myvnc.com:84/*",
+    "https://adaarc.evweb.com.ar/*",
     "http://localhost/*",
     "http://127.0.0.1/*",
     "https://diegomc77-hash.github.io/*"
   ],
+  "externally_connectable": {
+    "matches": [
+      "http://localhost/*",
+      "http://127.0.0.1/*",
+      "https://diegomc77-hash.github.io/*"
+    ]
+  },
   "background": {
     "service_worker": "background.js"
   },
@@ -21,6 +29,12 @@
     {
       "matches": ["http://sanatoriomayo.myvnc.com:84/*"],
       "js": ["lib/human.js", "lib/dom.js", "content/geclisa.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    },
+    {
+      "matches": ["https://adaarc.evweb.com.ar/*"],
+      "js": ["content/evweb.js"],
       "run_at": "document_idle",
       "all_frames": true
     },

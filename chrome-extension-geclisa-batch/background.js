@@ -156,6 +156,50 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
     return true;
   }
+
+  // —— EVWEB (AFG_EVW_*) — namespace aparte de GECLISA ——
+  if (msg && msg.type === 'AFG_EVW_PING') {
+    pingEvwebForm()
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e && e.message || e) }); });
+    return true;
+  }
+  if (msg && msg.type === 'AFG_EVW_QUEUE_GET_STATE') {
+    getEvwebRunnerState()
+      .then(function (r) { sendResponse({ ok: true, state: r }); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+  if (msg && msg.type === 'AFG_EVW_QUEUE_START') {
+    runEvwebQueueAction('start')
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+  if (msg && msg.type === 'AFG_EVW_QUEUE_NEXT') {
+    runEvwebQueueAction('next')
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+  if (msg && msg.type === 'AFG_EVW_QUEUE_RETRY') {
+    runEvwebQueueAction('retry')
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+  if (msg && msg.type === 'AFG_EVW_QUEUE_ABORT') {
+    runEvwebQueueAction('abort')
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+  if (msg && msg.type === 'AFG_EVW_RUN_SINGLE') {
+    runEvwebSingle(msg)
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
 });
 
 /** Lock para no solapar dos run111 de cola. */
@@ -2032,7 +2076,7 @@ function firstPendingQueueItem(queue, preferId, opts) {
   opts = opts || {};
   var skipPaused = !!opts.skipPaused;
   var skipIds = opts.skipIds || {};
-  var STALE_RUNNING_MS = 180000;
+  var STALE_RUNNING_MS = opts.staleRunningMs != null ? Number(opts.staleRunningMs) : 180000;
   var now = Date.now();
   if (preferId) {
     for (var i = 0; i < items.length; i++) {
@@ -2336,6 +2380,404 @@ async function runQueueAction(action) {
         await setRunnerState(stFin);
         try {
           console.warn('[AFG runner] finally: status seguía running → paused_error');
+        } catch (eW) {}
+      }
+    } catch (eFinally) {}
+  }
+}
+
+/* ============================================================================
+ * EVWEB (AFG_EVW_*) — Lote 1: storage + runner esqueleto + ping.
+ * No toca runQueueAction / GECLISA. Fill real = Lote 2+.
+ * ============================================================================ */
+
+var EVWEB_HOST_PATTERN = 'https://adaarc.evweb.com.ar/*';
+var EVWEB_STALE_RUNNING_MS = 180000;
+/** Lock propio — no comparte queueRunnerBusy de GECLISA. */
+var evwebRunnerBusy = false;
+
+function defaultEvwebRunnerState() {
+  return {
+    status: 'idle',
+    currentIntervId: null,
+    currentPac: '',
+    message: '',
+    lastResult: null,
+    processedIds: [],
+    startedAt: null,
+    updatedAt: Date.now()
+  };
+}
+
+function defaultEvwebQueue() {
+  return { version: 1, updatedAt: Date.now(), items: [] };
+}
+
+async function getEvwebRunnerState() {
+  try {
+    var sess = await chrome.storage.session.get(['afg_evweb_runner_state']);
+    if (sess.afg_evweb_runner_state && sess.afg_evweb_runner_state.status) {
+      return sess.afg_evweb_runner_state;
+    }
+  } catch (e) {}
+  try {
+    var loc = await chrome.storage.local.get(['afg_evweb_runner_state']);
+    if (loc.afg_evweb_runner_state && loc.afg_evweb_runner_state.status) {
+      return loc.afg_evweb_runner_state;
+    }
+  } catch (e2) {}
+  return defaultEvwebRunnerState();
+}
+
+async function setEvwebRunnerState(state) {
+  state = state || defaultEvwebRunnerState();
+  state.updatedAt = Date.now();
+  try { await chrome.storage.session.set({ afg_evweb_runner_state: state }); } catch (e) {}
+  try { await chrome.storage.local.set({ afg_evweb_runner_state: state }); } catch (e2) {}
+  return state;
+}
+
+async function getEvwebQueue() {
+  try {
+    var sess = await chrome.storage.session.get(['afg_evweb_queue']);
+    if (sess.afg_evweb_queue && Array.isArray(sess.afg_evweb_queue.items)) {
+      return sess.afg_evweb_queue;
+    }
+  } catch (e) {}
+  try {
+    var loc = await chrome.storage.local.get(['afg_evweb_queue']);
+    if (loc.afg_evweb_queue && Array.isArray(loc.afg_evweb_queue.items)) {
+      return loc.afg_evweb_queue;
+    }
+  } catch (e2) {}
+  return defaultEvwebQueue();
+}
+
+async function setEvwebQueue(queue) {
+  queue = queue || defaultEvwebQueue();
+  queue.updatedAt = Date.now();
+  try { await chrome.storage.session.set({ afg_evweb_queue: queue }); } catch (e) {}
+  try { await chrome.storage.local.set({ afg_evweb_queue: queue }); } catch (e2) {}
+  return queue;
+}
+
+async function patchEvwebQueueItemStatus(intervId, status, message) {
+  var id = String(intervId || '').trim();
+  if (!id) return;
+  var q = await getEvwebQueue();
+  var items = q.items || [];
+  var hit = null;
+  for (var i = 0; i < items.length; i++) {
+    if (String(items[i].id) === id) {
+      hit = items[i];
+      break;
+    }
+  }
+  if (!hit) return;
+  hit.status = status;
+  hit.message = message || '';
+  hit.updatedAt = Date.now();
+  await setEvwebQueue(q);
+}
+
+async function findEvwebTab() {
+  var tabs = await chrome.tabs.query({ url: EVWEB_HOST_PATTERN });
+  if (!tabs || !tabs.length) {
+    throw new Error('Abrí evweb (adaarc.evweb.com.ar) logueado primero');
+  }
+  return tabs.find(function (t) { return t.active; }) || tabs[0];
+}
+
+/** Frame del formulario (#body_cboObraSocial) — same-origin iframe. */
+async function findEvwebFormFrameId(tabId) {
+  var frameResults = await chrome.scripting.executeScript({
+    target: { tabId: tabId, allFrames: true },
+    func: function () {
+      return {
+        isTop: window === window.top,
+        hasObra: !!document.getElementById('body_cboObraSocial'),
+        href: location.href
+      };
+    }
+  });
+  for (var i = 0; i < frameResults.length; i++) {
+    var fr = frameResults[i];
+    var r = fr.result || {};
+    if (r.hasObra) return fr.frameId;
+  }
+  throw new Error('No encontré iframe de formulario evweb (#body_cboObraSocial)');
+}
+
+/**
+ * Diagnóstico Lote 1: confirma acceso al iframe y conteo de opciones.
+ * No llena ni clickea.
+ */
+async function pingEvwebForm() {
+  var tab = await findEvwebTab();
+  var frameId = await findEvwebFormFrameId(tab.id);
+  var res = await chrome.tabs.sendMessage(tab.id, { type: 'AFG_EVW_PING' }, { frameId: frameId });
+  return Object.assign({ tabId: tab.id, frameId: frameId }, res || { ok: false, error: 'empty_ping' });
+}
+
+/**
+ * Disparo individual (sin cola). Lote 1 = solo ping.
+ * msg.intervId opcional (queda registrado en lastResult para Lote 2).
+ */
+async function runEvwebSingle(msg) {
+  msg = msg || {};
+  if (evwebRunnerBusy) {
+    return {
+      ok: false,
+      error: 'evweb_runner_busy',
+      message: 'Ya hay una corrida evweb en curso.'
+    };
+  }
+  evwebRunnerBusy = true;
+  try {
+    var ping = await pingEvwebForm();
+    var state = await setEvwebRunnerState(Object.assign(await getEvwebRunnerState(), {
+      status: ping && ping.ok ? 'awaiting_confirm' : 'paused_error',
+      currentIntervId: msg.intervId ? String(msg.intervId) : null,
+      currentPac: msg.pac || '',
+      message: ping && ping.ok
+        ? 'Lote 1: ping OK — formulario accesible (sin fill). Revisá y confirmá a mano.'
+        : ('Lote 1: ping falló — ' + ((ping && (ping.error || ping.message)) || 'fail')),
+      lastResult: { mode: 'single', ping: ping, intervId: msg.intervId || null }
+    }));
+    return {
+      ok: !!(ping && ping.ok),
+      mode: 'single',
+      ping: ping,
+      state: state,
+      fillSkipped: true,
+      message: state.message
+    };
+  } finally {
+    evwebRunnerBusy = false;
+  }
+}
+
+/**
+ * Runner de cola evweb — mismo espíritu que runQueueAction, función aparte.
+ * Lote 1: por ítem solo hace ping; deja awaiting_confirm (sin auto-submit).
+ */
+async function runEvwebQueueAction(action) {
+  if (action === 'abort') {
+    var stAbort = await getEvwebRunnerState();
+    if (stAbort.currentIntervId) {
+      await patchEvwebQueueItemStatus(stAbort.currentIntervId, 'queued', 'Abortada por el usuario');
+    }
+    evwebRunnerBusy = false;
+    var idle = defaultEvwebRunnerState();
+    idle.message = 'Cola evweb abortada';
+    await setEvwebRunnerState(idle);
+    return { ok: true, aborted: true, state: idle };
+  }
+
+  var stateGate = await getEvwebRunnerState();
+  if (action === 'start' && stateGate.status === 'awaiting_confirm') {
+    return {
+      ok: false,
+      error: 'awaiting_confirm',
+      message: 'Hay un caso evweb esperando confirmación. Tocá Siguiente o Abortar.',
+      state: stateGate
+    };
+  }
+  if (evwebRunnerBusy) {
+    return {
+      ok: false,
+      error: 'evweb_runner_busy',
+      message: 'Ya hay una corrida evweb en curso.',
+      state: stateGate,
+      busy: true
+    };
+  }
+  if (stateGate.status === 'running') {
+    try {
+      console.warn('[AFG EVW] status=running huérfano → paused_error');
+    } catch (eStale) {}
+    stateGate.status = 'paused_error';
+    stateGate.message = 'Estado running huérfano liberado. Tocá Reintentar o Iniciar cola evweb.';
+    stateGate = await setEvwebRunnerState(stateGate);
+  }
+
+  var state = stateGate;
+  if (action === 'next') {
+    if (state.status === 'awaiting_confirm' && state.currentIntervId) {
+      await patchEvwebQueueItemStatus(state.currentIntervId, 'done', '');
+      state.processedIds = (state.processedIds || []).concat([String(state.currentIntervId)]);
+      state.currentIntervId = null;
+      state.currentPac = '';
+      state.status = 'idle';
+      state.message = 'Buscando siguiente (evweb)…';
+      await setEvwebRunnerState(state);
+    } else if (state.status === 'paused_error' && state.currentIntervId) {
+      state.processedIds = (state.processedIds || []).concat([String(state.currentIntervId)]);
+      state.currentIntervId = null;
+      state.currentPac = '';
+      state.status = 'idle';
+      state.message = 'Salteado (evweb en pausa) — siguiente…';
+      await setEvwebRunnerState(state);
+    } else {
+      return {
+        ok: false,
+        error: 'not_awaiting_confirm',
+        message: 'No hay caso evweb esperando “Siguiente”. Iniciá la cola o reintentá.',
+        state: state
+      };
+    }
+  }
+  if (action === 'retry') {
+    if (!state.currentIntervId) {
+      return {
+        ok: false,
+        error: 'nothing_to_retry',
+        message: 'No hay caso evweb actual para reintentar.',
+        state: state
+      };
+    }
+  }
+
+  var preferId = action === 'retry' ? state.currentIntervId : null;
+  if (action === 'start' || action === 'next') preferId = null;
+  var skipIds = {};
+  if (action === 'start' || action === 'next') {
+    (state.processedIds || []).forEach(function (id) { skipIds[String(id)] = true; });
+  }
+  var autoAdvance = (action === 'start' || action === 'next');
+  var MAX_CONSECUTIVE_FAILURES = 3;
+  var consecutiveFailures = 0;
+  evwebRunnerBusy = true;
+
+  try {
+    while (true) {
+      var queue = await getEvwebQueue();
+      if (!queue || !queue.items || !queue.items.length) {
+        state = await setEvwebRunnerState(Object.assign(defaultEvwebRunnerState(), {
+          status: 'done_all',
+          message: 'Cola evweb vacía (afg_evweb_queue)'
+        }));
+        return { ok: false, error: 'empty_queue', message: state.message, state: state };
+      }
+      var item = firstPendingQueueItem(queue, preferId, {
+        skipPaused: autoAdvance,
+        skipIds: skipIds,
+        staleRunningMs: EVWEB_STALE_RUNNING_MS
+      });
+      if (!item) {
+        var pausedLeft = 0;
+        (queue.items || []).forEach(function (it) {
+          if ((it.status || '') === 'paused_error') pausedLeft += 1;
+        });
+        state = await setEvwebRunnerState(Object.assign(state, {
+          status: 'done_all',
+          currentIntervId: null,
+          currentPac: '',
+          message: pausedLeft
+            ? ('No quedan queued en evweb. Hay ' + pausedLeft + ' en pausa.')
+            : 'Cola evweb completa — no quedan pendientes'
+        }));
+        return { ok: true, doneAll: true, state: state };
+      }
+
+      state.status = 'running';
+      state.currentIntervId = String(item.id);
+      state.currentPac = item.pac || '';
+      state.message = 'Lote 1: ping evweb (sin fill)…';
+      state.lastResult = null;
+      if (!state.startedAt) state.startedAt = Date.now();
+      await setEvwebRunnerState(state);
+      await patchEvwebQueueItemStatus(item.id, 'running', '');
+
+      var itemFailed = false;
+      var itemFatal = false;
+      var returnValue = null;
+      try {
+        var ping = await pingEvwebForm();
+        if (!(ping && ping.ok)) {
+          var whyPing = (ping && (ping.error || ping.message)) || 'ping_failed';
+          state = await setEvwebRunnerState(Object.assign(state, {
+            status: 'paused_error',
+            message: 'Ping evweb falló: ' + whyPing,
+            lastResult: { ping: ping }
+          }));
+          await patchEvwebQueueItemStatus(item.id, 'paused_error', state.message);
+          itemFailed = true;
+          returnValue = { ok: false, error: 'ping_failed', ping: ping, state: state };
+        } else {
+          // Lote 1: no fill — pausa para revisión humana (equivalente awaiting_save GECLISA)
+          state = await setEvwebRunnerState(Object.assign(state, {
+            status: 'awaiting_confirm',
+            message: 'Lote 1: ping OK (obra=' + (ping.obraSocialOptions || 0) +
+              ', sanatorios=' + (ping.sanatoriosOptions || 0) +
+              '). Sin fill — confirmá a mano o Siguiente.',
+            lastResult: { ping: ping, fillSkipped: true },
+            currentPac: item.pac || state.currentPac || ''
+          }));
+          await patchEvwebQueueItemStatus(item.id, 'awaiting_confirm', '');
+          return {
+            ok: true,
+            awaitingConfirm: true,
+            fillSkipped: true,
+            ping: ping,
+            userMessage: state.message,
+            state: state
+          };
+        }
+      } catch (eFatal) {
+        var fatalMsg = String(eFatal && eFatal.message || eFatal);
+        try { console.error('[AFG EVW] fatal', fatalMsg); } catch (eF) {}
+        state = await setEvwebRunnerState(Object.assign(state, {
+          status: 'paused_error',
+          message: 'Runner evweb interrumpido: ' + fatalMsg,
+          lastResult: { error: fatalMsg }
+        }));
+        try {
+          await patchEvwebQueueItemStatus(item.id, 'paused_error', state.message);
+        } catch (eP) {}
+        itemFailed = true;
+        itemFatal = true;
+        returnValue = {
+          ok: false,
+          error: 'evweb_runner_fatal',
+          message: state.message,
+          state: state
+        };
+      }
+
+      if (!itemFailed) return returnValue;
+      if (!autoAdvance || itemFatal) return returnValue;
+      consecutiveFailures++;
+      if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+        state = await setEvwebRunnerState(Object.assign(state, {
+          status: 'paused_error',
+          message: consecutiveFailures + ' fallos seguidos (evweb) — freno. ' +
+            'Último: ' + (state.message || '')
+        }));
+        return {
+          ok: false,
+          error: 'too_many_consecutive_failures',
+          message: state.message,
+          state: state
+        };
+      }
+      state.currentIntervId = null;
+      state.currentPac = '';
+      state.status = 'idle';
+      await setEvwebRunnerState(state);
+    }
+  } finally {
+    evwebRunnerBusy = false;
+    try {
+      var stFin = await getEvwebRunnerState();
+      if (stFin && stFin.status === 'running') {
+        stFin.status = 'paused_error';
+        stFin.message = (stFin.message || '') +
+          (stFin.message ? ' · ' : '') +
+          'Lock evweb liberado (finally).';
+        await setEvwebRunnerState(stFin);
+        try {
+          console.warn('[AFG EVW] finally: status seguía running → paused_error');
         } catch (eW) {}
       }
     } catch (eFinally) {}
