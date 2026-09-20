@@ -200,6 +200,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
     return true;
   }
+  if (msg && msg.type === 'AFG_EVW_FILL_SINGLE') {
+    runEvwebFillPami(msg)
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
 });
 
 /** Lock para no solapar dos run111 de cola. */
@@ -2387,8 +2393,8 @@ async function runQueueAction(action) {
 }
 
 /* ============================================================================
- * EVWEB (AFG_EVW_*) — Lote 1: storage + runner esqueleto + ping.
- * No toca runQueueAction / GECLISA. Fill real = Lote 2+.
+ * EVWEB (AFG_EVW_*) — Lote 1: ping/cola; Lote 2: fill PAMI (sin auto-submit).
+ * No toca runQueueAction / GECLISA.
  * ============================================================================ */
 
 var EVWEB_HOST_PATTERN = 'https://adaarc.evweb.com.ar/*';
@@ -2520,8 +2526,22 @@ async function pingEvwebForm() {
 }
 
 /**
- * Disparo individual (sin cola). Lote 1 = solo ping.
- * msg.intervId opcional (queda registrado en lastResult para Lote 2).
+ * Manda AFG_EVW_FILL_PAMI al frame del formulario.
+ * data: pac, dni, fecha, hora, cirujano, afiliado?, obraSocial?, sanatorio?
+ */
+async function sendEvwebFillPami(data) {
+  var tab = await findEvwebTab();
+  var frameId = await findEvwebFormFrameId(tab.id);
+  var res = await chrome.tabs.sendMessage(
+    tab.id,
+    { type: 'AFG_EVW_FILL_PAMI', data: data || {} },
+    { frameId: frameId }
+  );
+  return Object.assign({ tabId: tab.id, frameId: frameId }, res || { ok: false, error: 'empty_fill' });
+}
+
+/**
+ * Disparo individual (sin cola). Lote 1 = solo ping (sin fill).
  */
 async function runEvwebSingle(msg) {
   msg = msg || {};
@@ -2540,13 +2560,13 @@ async function runEvwebSingle(msg) {
       currentIntervId: msg.intervId ? String(msg.intervId) : null,
       currentPac: msg.pac || '',
       message: ping && ping.ok
-        ? 'Lote 1: ping OK — formulario accesible (sin fill). Revisá y confirmá a mano.'
+        ? 'Lote 1: ping OK — formulario accesible (sin fill). Usá AFG_EVW_FILL_SINGLE para PAMI.'
         : ('Lote 1: ping falló — ' + ((ping && (ping.error || ping.message)) || 'fail')),
-      lastResult: { mode: 'single', ping: ping, intervId: msg.intervId || null }
+      lastResult: { mode: 'single_ping', ping: ping, intervId: msg.intervId || null }
     }));
     return {
       ok: !!(ping && ping.ok),
-      mode: 'single',
+      mode: 'single_ping',
       ping: ping,
       state: state,
       fillSkipped: true,
@@ -2558,8 +2578,110 @@ async function runEvwebSingle(msg) {
 }
 
 /**
+ * Lote 2: ping → fill PAMI → awaiting_confirm (sin auto-submit, sin upload).
+ * msg: { intervId?, pac, dni, fecha, hora, cirujano, afiliado?, obraSocial?, sanatorio? }
+ */
+async function runEvwebFillPami(msg) {
+  msg = msg || {};
+  if (evwebRunnerBusy) {
+    return {
+      ok: false,
+      error: 'evweb_runner_busy',
+      message: 'Ya hay una corrida evweb en curso.'
+    };
+  }
+  evwebRunnerBusy = true;
+  try {
+    await setEvwebRunnerState(Object.assign(await getEvwebRunnerState(), {
+      status: 'running',
+      currentIntervId: msg.intervId ? String(msg.intervId) : null,
+      currentPac: msg.pac || '',
+      message: 'Lote 2: ping + fill PAMI…',
+      lastResult: null
+    }));
+
+    var ping = await pingEvwebForm();
+    if (!(ping && ping.ok)) {
+      var statePingFail = await setEvwebRunnerState(Object.assign(await getEvwebRunnerState(), {
+        status: 'paused_error',
+        message: 'Ping evweb falló — no fill. ' + ((ping && (ping.error || ping.message)) || ''),
+        lastResult: { mode: 'fill_pami', ping: ping }
+      }));
+      return {
+        ok: false,
+        error: 'ping_failed',
+        ping: ping,
+        state: statePingFail,
+        message: statePingFail.message
+      };
+    }
+
+    var fillData = {
+      pac: msg.pac || msg.nombreApellido || '',
+      dni: msg.dni || '',
+      fecha: msg.fecha || '',
+      hora: msg.hora || '',
+      cirujano: msg.cirujano || '',
+      afiliado: msg.afiliado || msg.afil || '',
+      obraSocial: msg.obraSocial != null && msg.obraSocial !== '' ? msg.obraSocial : '382',
+      sanatorio: msg.sanatorio != null && msg.sanatorio !== '' ? msg.sanatorio : '208'
+    };
+    var fill = await sendEvwebFillPami(fillData);
+    var okFill = !!(fill && fill.ok);
+    var msgOk =
+      'Formulario PAMI completado — subí la foja de Geclisa a mano y revisá antes de Finalizar';
+    var msgFail =
+      'Fill PAMI incompleto: ' + ((fill && (fill.error || fill.message)) || 'fill_failed');
+
+    var state = await setEvwebRunnerState(Object.assign(await getEvwebRunnerState(), {
+      status: okFill ? 'awaiting_confirm' : 'paused_error',
+      currentIntervId: msg.intervId ? String(msg.intervId) : null,
+      currentPac: fillData.pac || '',
+      message: okFill ? msgOk : msgFail,
+      lastResult: {
+        mode: 'fill_pami',
+        ping: ping,
+        fill: fill,
+        fillData: {
+          pac: fillData.pac,
+          dni: fillData.dni,
+          fecha: fillData.fecha,
+          hora: fillData.hora,
+          cirujano: fillData.cirujano,
+          obraSocial: fillData.obraSocial,
+          sanatorio: fillData.sanatorio
+        }
+      }
+    }));
+
+    return {
+      ok: okFill,
+      mode: 'fill_pami',
+      ping: ping,
+      fill: fill,
+      state: state,
+      awaitingConfirm: okFill,
+      autoSubmit: false,
+      message: state.message
+    };
+  } finally {
+    evwebRunnerBusy = false;
+    try {
+      var stFin = await getEvwebRunnerState();
+      if (stFin && stFin.status === 'running') {
+        stFin.status = 'paused_error';
+        stFin.message = (stFin.message || '') +
+          (stFin.message ? ' · ' : '') +
+          'Lock evweb liberado (finally).';
+        await setEvwebRunnerState(stFin);
+      }
+    } catch (eFin) {}
+  }
+}
+
+/**
  * Runner de cola evweb — mismo espíritu que runQueueAction, función aparte.
- * Lote 1: por ítem solo hace ping; deja awaiting_confirm (sin auto-submit).
+ * Lote 1/2 cola: por ítem solo ping (fill de cola = Lote posterior con payload en item).
  */
 async function runEvwebQueueAction(action) {
   if (action === 'abort') {
