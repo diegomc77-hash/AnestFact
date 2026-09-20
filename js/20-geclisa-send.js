@@ -361,6 +361,7 @@ function afMintGeclisaToken(intervOrId, opts){
         horaFin:payload.horaFin||'',
         sector:payload.sector||i.mayo_sector||'',
         mayo_cama:payload.mayo_cama||i.mayo_cama||'',
+        mayo_nro_atencion:payload.mayo_nro_atencion||i.mayo_nro_atencion||'',
         pac:i.pac||'',
         clave:clave,
         updatedAt:Date.now()
@@ -388,7 +389,13 @@ window.addEventListener('message', function(ev){
   var d=ev.data;
   if(!d||d.source!=='AFG_EXT')return;
   if(d.type==='OPEN_ACK') window.__AFG_EXT_OPEN_ACK=true;
-  if(d.type==='BRIDGE_ALIVE') window.__AFG_BRIDGE_ALIVE=true;
+  if(d.type==='BRIDGE_ALIVE'){
+    window.__AFG_BRIDGE_ALIVE=true;
+    if(d.extensionId){
+      window.__AFG_EXT_ID=String(d.extensionId);
+      try{ localStorage.setItem('afg_ext_id', window.__AFG_EXT_ID); }catch(eId){}
+    }
+  }
   // Extensión pide token para una foja de la cola (pieza 2)
   if(d.type==='MINT_TOKEN'){
     var reqId=d.requestId||('m'+Date.now());

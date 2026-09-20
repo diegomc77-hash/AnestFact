@@ -11,7 +11,7 @@
   var lastOkSig = '';
   var lastQueueSig = '';
   var pendingMints = {};
-  var BRIDGE_VERSION = '0.5.15';
+  var BRIDGE_VERSION = '0.5.16';
 
   function normalize(detail) {
     if (!detail || !detail.token) return null;
@@ -26,6 +26,7 @@
       horaFin: detail.horaFin || '',
       sector: String(detail.sector || detail.mayo_sector || '').trim(),
       mayo_cama: detail.mayo_cama || '',
+      mayo_nro_atencion: String(detail.mayo_nro_atencion || '').trim(),
       pac: detail.pac || '',
       clave: detail.clave || '',
       updatedAt: detail.updatedAt || Date.now()
@@ -479,9 +480,14 @@
   setInterval(tick, 800);
 
   try {
-    window.postMessage({ source: 'AFG_EXT', type: 'BRIDGE_ALIVE', version: BRIDGE_VERSION }, '*');
+    window.postMessage({
+      source: 'AFG_EXT',
+      type: 'BRIDGE_ALIVE',
+      version: BRIDGE_VERSION,
+      extensionId: chrome.runtime.id
+    }, '*');
   } catch (e) {}
   try {
-    console.log('[AFG bridge]', BRIDGE_VERSION, 'inyectado en', location.href);
+    console.log('[AFG bridge]', BRIDGE_VERSION, 'inyectado en', location.href, 'ext', chrome.runtime.id);
   } catch (e2) {}
 })();

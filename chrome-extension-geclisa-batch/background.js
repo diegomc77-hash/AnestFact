@@ -442,6 +442,96 @@ async function ensureAnesFactBridge(tabId) {
   }
 }
 
+/** Re-inyecta bridge en todas las pestañas AnesFact (post-reload de extensión). */
+async function ensureBridgesOnAllAnesFactTabs() {
+  var tabs = await findAnesFactTabs();
+  var results = [];
+  for (var i = 0; i < (tabs || []).length; i++) {
+    try {
+      results.push(await ensureAnesFactBridge(tabs[i].id));
+    } catch (eTab) {
+      results.push({ ok: false, error: String(eTab && eTab.message || eTab), tabId: tabs[i].id });
+    }
+  }
+  return results;
+}
+
+/**
+ * Desde AnesFact (externally_connectable): ensure bridge → opcional focus GECLISA → runQueueAction.
+ * Evita el fallo silencioso cuando el content script murió tras reload de la extensión.
+ */
+async function handlePageQueueAction(pageAction) {
+  pageAction = String(pageAction || 'QUEUE_START').toUpperCase();
+  if (pageAction.indexOf('QUEUE_') !== 0) pageAction = 'QUEUE_' + pageAction;
+  try {
+    await ensureBridgesOnAllAnesFactTabs();
+  } catch (eEns) {
+    try { console.warn('[AFG] ensure bridges fail', eEns); } catch (eW) {}
+  }
+  if (pageAction === 'QUEUE_START' || pageAction === 'QUEUE_RETRY') {
+    try {
+      await focusOrOpenGeclisaTab();
+    } catch (eOpen) {}
+    await sleep(400);
+  }
+  var map = {
+    QUEUE_START: 'start',
+    QUEUE_RETRY: 'retry',
+    QUEUE_ABORT: 'abort',
+    QUEUE_NEXT: 'next'
+  };
+  return runQueueAction(map[pageAction] || 'start');
+}
+
+function isAllowedAnesFactExternalSender(sender) {
+  var u = String((sender && sender.url) || '');
+  if (!u) return false;
+  if (u.indexOf('https://diegomc77-hash.github.io/') === 0) return true;
+  if (/^http:\/\/localhost([:\/]|$)/.test(u)) return true;
+  if (/^http:\/\/127\.0\.0\.1([:\/]|$)/.test(u)) return true;
+  return false;
+}
+
+try {
+  chrome.runtime.onMessageExternal.addListener(function (msg, sender, sendResponse) {
+    if (!isAllowedAnesFactExternalSender(sender)) {
+      sendResponse({ ok: false, error: 'sender_not_allowed' });
+      return false;
+    }
+    if (msg && msg.type === 'AFG_PAGE_QUEUE_ACTION') {
+      handlePageQueueAction(msg.action || 'QUEUE_START')
+        .then(function (r) { sendResponse(r); })
+        .catch(function (e) { sendResponse({ ok: false, error: String(e && e.message || e) }); });
+      return true;
+    }
+    sendResponse({ ok: false, error: 'unknown_external_type' });
+    return false;
+  });
+} catch (eExt) {
+  try { console.warn('[AFG] onMessageExternal no disponible', eExt); } catch (e2) {}
+}
+
+function afgKickEnsureBridges(reason) {
+  ensureBridgesOnAllAnesFactTabs()
+    .then(function (r) {
+      try { console.log('[AFG] ensure bridges', reason || '', r && r.length); } catch (e) {}
+    })
+    .catch(function (e) {
+      try { console.warn('[AFG] ensure bridges fail', reason, e); } catch (e2) {}
+    });
+}
+
+try {
+  chrome.runtime.onInstalled.addListener(function () { afgKickEnsureBridges('onInstalled'); });
+} catch (eInst) {}
+try {
+  chrome.runtime.onStartup.addListener(function () { afgKickEnsureBridges('onStartup'); });
+} catch (eStart) {}
+// SW cold start: si hay pestañas AnesFact abiertas, reparar bridge sin esperar un click
+try {
+  afgKickEnsureBridges('sw_boot');
+} catch (eBoot) {}
+
 /**
  * Pide mint al content script de AnesFact (page world hace el RPC).
  */
@@ -627,6 +717,7 @@ function fojaToPaciente(foja) {
     hora: horaCirugia,
     sector: String(sector || '').trim(),
     dni: foja.dni || '',
+    mayo_nro_atencion: foja.mayo_nro_atencion || '',
     plantilla: foja.plantilla || null,
     token: foja.token || '',
     intervId: foja.intervId ? String(foja.intervId) : ''
@@ -699,6 +790,7 @@ async function resolvePaciente(partial) {
     horaIngreso: partial.horaIngreso || partial.horaInternacion || (fromFoja && fromFoja.horaIngreso) || '',
     hora: partial.hora || partial.horaInicio || (fromFoja && fromFoja.hora) || '',
     sector: (partial.sector || partial.mayo_sector || (fromFoja && fromFoja.sector) || '').trim(),
+    mayo_nro_atencion: (partial.mayo_nro_atencion || (fromFoja && fromFoja.mayo_nro_atencion) || '').trim(),
     plantilla: partial.plantilla || (fromFoja && fromFoja.plantilla) || null,
     token: (partial.token || (fromFoja && fromFoja.token) || sessionToken || '').trim(),
     intervId: String(partial.intervId || partial.id || (fromFoja && fromFoja.intervId) || '').trim()
@@ -1187,24 +1279,26 @@ async function debuggerClick(tabId, x, y) {
 }
 
 async function runTop12WithDebugger(tabId) {
-  // Paso 1: content solo localiza; background hace click trusted
-  var loc1 = await sendToRole(tabId, 'top', { type: 'AFG_LOCATE_STEP1' });
-  if (!loc1 || !loc1.ok) throw new Error('Paso 1 locate: ' + ((loc1 && loc1.error) || 'fail'));
-  await debuggerClick(tabId, loc1.x, loc1.y);
-  await humanDelay();
-
-  // Paso 2
-  var loc2 = await sendToRole(tabId, 'top', { type: 'AFG_LOCATE_STEP2' });
-  if (!loc2 || !loc2.ok) throw new Error('Paso 2 locate: ' + ((loc2 && loc2.error) || 'fail'));
-  await debuggerClick(tabId, loc2.x, loc2.y);
-  await humanDelay();
-
-  return {
-    ok: true,
-    step: 'top_1_2_done_debugger',
-    step1: loc1,
-    step2: loc2
-  };
+  var ATTEMPTS = 3;
+  var lastErr = null;
+  for (var attempt = 1; attempt <= ATTEMPTS; attempt++) {
+    try {
+      var loc1 = await sendToRole(tabId, 'top', { type: 'AFG_LOCATE_STEP1' });
+      if (!loc1 || !loc1.ok) throw new Error('Paso 1 locate: ' + ((loc1 && loc1.error) || 'fail'));
+      await debuggerClick(tabId, loc1.x, loc1.y);
+      await humanDelay();
+      var loc2 = await sendToRole(tabId, 'top', { type: 'AFG_LOCATE_STEP2', timeout: 4000 });
+      if (!loc2 || !loc2.ok) throw new Error('Paso 2 locate: ' + ((loc2 && loc2.error) || 'fail'));
+      await debuggerClick(tabId, loc2.x, loc2.y);
+      await humanDelay();
+      return { ok: true, step: 'top_1_2_done_debugger', step1: loc1, step2: loc2, attempts: attempt };
+    } catch (eAttempt) {
+      lastErr = eAttempt;
+      try { console.warn('[AFG bg] Paso 1-2 intento #' + attempt + ' falló:', String(eAttempt && eAttempt.message || eAttempt)); } catch (eLog) {}
+      if (attempt < ATTEMPTS) await sleep(600);
+    }
+  }
+  throw lastErr || new Error('Paso 1-2: agotados ' + ATTEMPTS + ' intentos');
 }
 
 async function run111(paciente) {
@@ -1973,7 +2067,6 @@ async function runQueueAction(action) {
     await setRunnerState(idle);
     return { ok: true, aborted: true, state: idle };
   }
-
   var stateGate = await getRunnerState();
   if (action === 'start' && stateGate.status === 'awaiting_save') {
     return {
@@ -2002,9 +2095,7 @@ async function runQueueAction(action) {
     stateGate.message = 'Estado running huérfano liberado. Tocá Reintentar o Iniciar cola.';
     stateGate = await setRunnerState(stateGate);
   }
-
   var state = stateGate;
-
   if (action === 'next') {
     if (state.status === 'awaiting_save' && state.currentIntervId) {
       await patchQueueItemStatus(state.currentIntervId, 'done', '');
@@ -2030,7 +2121,6 @@ async function runQueueAction(action) {
       };
     }
   }
-
   if (action === 'retry') {
     if (!state.currentIntervId) {
       return {
@@ -2041,171 +2131,195 @@ async function runQueueAction(action) {
       };
     }
   }
-
-  var pulled = await pullQueueFromAnesFactTabs();
-  var queue = pulled && pulled.ok ? pulled.queue : null;
-  if (!queue || !queue.items || !queue.items.length) {
-    state = await setRunnerState(Object.assign(defaultRunnerState(), {
-      status: 'done_all',
-      message: 'Cola vacía en AnesFact'
-    }));
-    return { ok: false, error: 'empty_queue', message: state.message, state: state };
-  }
-
   var preferId = action === 'retry' ? state.currentIntervId : null;
-  // Tras next, no preferir el done / el paused que acabamos de saltar
   if (action === 'start' || action === 'next') preferId = null;
-
   var skipIds = {};
   if (action === 'start' || action === 'next') {
     (state.processedIds || []).forEach(function (id) { skipIds[String(id)] = true; });
   }
-  var item = firstPendingQueueItem(queue, preferId, {
-    skipPaused: action === 'start' || action === 'next',
-    skipIds: skipIds
-  });
-
-  if (!item) {
-    var pausedLeft = 0;
-    ((queue && queue.items) || []).forEach(function (it) {
-      if ((it.status || '') === 'paused_error') pausedLeft += 1;
-    });
-    state = await setRunnerState(Object.assign(state, {
-      status: 'done_all',
-      currentIntervId: null,
-      currentPac: '',
-      message: pausedLeft
-        ? ('No quedan queued. Hay ' + pausedLeft + ' en pausa (Reintentar o sacalos de la cola).')
-        : 'Cola completa — no quedan pendientes'
-    }));
-    return { ok: true, doneAll: true, state: state };
-  }
-
+  var autoAdvance = (action === 'start' || action === 'next');
+  var MAX_CONSECUTIVE_FAILURES = 3;
+  var consecutiveFailures = 0;
   queueRunnerBusy = true;
-  state.status = 'running';
-  state.currentIntervId = String(item.id);
-  state.currentPac = item.pac || '';
-  state.message = 'Minteando token…';
-  state.lastResult = null;
-  if (!state.startedAt) state.startedAt = Date.now();
-  await setRunnerState(state);
-  await patchQueueItemStatus(item.id, 'running', '');
-
   try {
-    try {
-      console.log('[AFG runner] mint+run111', item.id, item.pac);
-    } catch (eLog) {}
-
-    var mint = await mintTokenViaAnesFactBridge(item.id);
-    if (!(mint && mint.ok && mint.foja && mint.foja.token)) {
-      var mintErr = (mint && (mint.error || mint.message)) || 'mint_failed';
-      state = await setRunnerState(Object.assign(state, {
-        status: 'paused_error',
-        message: 'Mint falló: ' + mintErr,
-        lastResult: mint
-      }));
-      await patchQueueItemStatus(item.id, 'paused_error', state.message);
-      return { ok: false, error: 'mint_failed', message: state.message, mint: mint, state: state };
-    }
-
-    state.message = 'Navegando GECLISA (reload home → 1–12)…';
-    await setRunnerState(state);
-
-    var paciente = fojaToPaciente(mint.foja) || {};
-    paciente.token = mint.foja.token;
-    paciente.intervId = String(item.id);
-    if (!paciente.sector) paciente.sector = item.sector || '';
-    if (!paciente.fechaCirugia) paciente.fechaCirugia = item.fecha || '';
-    if (!paciente.hora) paciente.hora = item.hora || '';
-
-    var resolved = await resolvePaciente(paciente);
-    if (!(resolved && resolved.ok)) {
-      state = await setRunnerState(Object.assign(state, {
-        status: 'paused_error',
-        message: (resolved && resolved.message) || 'resolvePaciente falló',
-        lastResult: resolved
-      }));
-      await patchQueueItemStatus(item.id, 'paused_error', state.message);
-      return { ok: false, error: 'resolve_failed', resolved: resolved, state: state };
-    }
-
-    var runRes = null;
-    try {
-      runRes = await run111(resolved.paciente);
-    } catch (eRun) {
-      var em = String(eRun && eRun.message || eRun);
-      var isLeave = /Abandonar el sitio|beforeunload|bloqueó el reload|¿Abandonar/i.test(em);
-      runRes = {
-        ok: false,
-        paused: true,
-        reason: isLeave ? 'beforeunload_dialog' : 'run111_exception',
-        error: em,
-        message: em
-      };
-    }
-
-    var fillOk = !!(runRes && runRes.fillOk);
-    var paused = !!(runRes && runRes.paused);
-
-    if (fillOk) {
-      state = await setRunnerState(Object.assign(state, {
-        status: 'awaiting_save',
-        message: 'Foja lista — revisá y tocá GRABAR en GECLISA; la cola sigue sola',
-        lastResult: runRes,
-        currentPac: (resolved.paciente.apellido || '') + ', ' + (resolved.paciente.nombre || '')
-      }));
-      await patchQueueItemStatus(item.id, 'awaiting_save', '');
-      try {
-        var gTab = await findGeclisaTab();
-        if (gTab && gTab.id) await armGrabarAutoNextWatcher(gTab.id);
-      } catch (eArm) {
-        try { console.warn('[AFG runner] no pude armar grabar-watch', eArm); } catch (e2) {}
+    while (true) {
+      var pulled = await pullQueueFromAnesFactTabs();
+      var queue = pulled && pulled.ok ? pulled.queue : null;
+      if (!queue || !queue.items || !queue.items.length) {
+        state = await setRunnerState(Object.assign(defaultRunnerState(), {
+          status: 'done_all',
+          message: 'Cola vacía en AnesFact'
+        }));
+        return { ok: false, error: 'empty_queue', message: state.message, state: state };
       }
-      return {
-        ok: true,
-        awaitingSave: true,
-        userMessage: state.message,
-        run: runRes,
-        foja: mint.foja,
-        state: state
-      };
+      var item = firstPendingQueueItem(queue, preferId, {
+        skipPaused: autoAdvance,
+        skipIds: skipIds
+      });
+      if (!item) {
+        var pausedLeft = 0;
+        ((queue && queue.items) || []).forEach(function (it) {
+          if ((it.status || '') === 'paused_error') pausedLeft += 1;
+        });
+        state = await setRunnerState(Object.assign(state, {
+          status: 'done_all',
+          currentIntervId: null,
+          currentPac: '',
+          message: pausedLeft
+            ? ('No quedan queued. Hay ' + pausedLeft + ' en pausa (Reintentar o sacalos de la cola).')
+            : 'Cola completa — no quedan pendientes'
+        }));
+        return { ok: true, doneAll: true, state: state };
+      }
+      state.status = 'running';
+      state.currentIntervId = String(item.id);
+      state.currentPac = item.pac || '';
+      state.message = 'Minteando token…';
+      state.lastResult = null;
+      if (!state.startedAt) state.startedAt = Date.now();
+      await setRunnerState(state);
+      await patchQueueItemStatus(item.id, 'running', '');
+      var itemFailed = false;
+      var itemFatal = false;
+      var returnValue = null;
+      try {
+        try {
+          console.log('[AFG runner] mint+run111', item.id, item.pac);
+        } catch (eLog) {}
+        var mint = await mintTokenViaAnesFactBridge(item.id);
+        if (!(mint && mint.ok && mint.foja && mint.foja.token)) {
+          var mintErr = (mint && (mint.error || mint.message)) || 'mint_failed';
+          state = await setRunnerState(Object.assign(state, {
+            status: 'paused_error',
+            message: 'Mint falló: ' + mintErr,
+            lastResult: mint
+          }));
+          await patchQueueItemStatus(item.id, 'paused_error', state.message);
+          itemFailed = true;
+          returnValue = { ok: false, error: 'mint_failed', message: state.message, mint: mint, state: state };
+        } else {
+          state.message = 'Navegando GECLISA (reload home → 1–12)…';
+          await setRunnerState(state);
+          var paciente = fojaToPaciente(mint.foja) || {};
+          paciente.token = mint.foja.token;
+          paciente.intervId = String(item.id);
+          if (!paciente.sector) paciente.sector = item.sector || '';
+          if (!paciente.fechaCirugia) paciente.fechaCirugia = item.fecha || '';
+          if (!paciente.hora) paciente.hora = item.hora || '';
+          if (!paciente.mayo_nro_atencion) paciente.mayo_nro_atencion = item.mayo_nro_atencion || '';
+          var resolved = await resolvePaciente(paciente);
+          if (!(resolved && resolved.ok)) {
+            state = await setRunnerState(Object.assign(state, {
+              status: 'paused_error',
+              message: (resolved && resolved.message) || 'resolvePaciente falló',
+              lastResult: resolved
+            }));
+            await patchQueueItemStatus(item.id, 'paused_error', state.message);
+            itemFailed = true;
+            returnValue = { ok: false, error: 'resolve_failed', resolved: resolved, state: state };
+          } else {
+            var runRes = null;
+            try {
+              runRes = await run111(resolved.paciente);
+            } catch (eRun) {
+              var em = String(eRun && eRun.message || eRun);
+              var isLeave = /Abandonar el sitio|beforeunload|bloqueó el reload|¿Abandonar/i.test(em);
+              runRes = {
+                ok: false,
+                paused: true,
+                reason: isLeave ? 'beforeunload_dialog' : 'run111_exception',
+                error: em,
+                message: em
+              };
+            }
+            var fillOk = !!(runRes && runRes.fillOk);
+            var pausedFlag = !!(runRes && runRes.paused);
+            if (fillOk) {
+              state = await setRunnerState(Object.assign(state, {
+                status: 'awaiting_save',
+                message: 'Foja lista — revisá y tocá GRABAR en GECLISA; la cola sigue sola',
+                lastResult: runRes,
+                currentPac: (resolved.paciente.apellido || '') + ', ' + (resolved.paciente.nombre || '')
+              }));
+              await patchQueueItemStatus(item.id, 'awaiting_save', '');
+              try {
+                var gTab = await findGeclisaTab();
+                if (gTab && gTab.id) await armGrabarAutoNextWatcher(gTab.id);
+              } catch (eArm) {
+                try { console.warn('[AFG runner] no pude armar grabar-watch', eArm); } catch (e2) {}
+              }
+              return {
+                ok: true,
+                awaitingSave: true,
+                userMessage: state.message,
+                run: runRes,
+                foja: mint.foja,
+                state: state
+              };
+            }
+            var why = (runRes && (runRes.message || runRes.error || runRes.reason)) ||
+              (runRes && runRes.iframe && (runRes.iframe.message || runRes.iframe.error || runRes.iframe.reason)) ||
+              'error_desconocido';
+            if (typeof why === 'string' && why.indexOf('PAUSA:') === 0) why = why.replace(/^PAUSA:\s*/, '');
+            state = await setRunnerState(Object.assign(state, {
+              status: 'paused_error',
+              message: pausedFlag ? ('PAUSA: ' + why) : ('Error: ' + why),
+              lastResult: runRes
+            }));
+            await patchQueueItemStatus(item.id, 'paused_error', state.message);
+            itemFailed = true;
+            returnValue = {
+              ok: false,
+              paused: pausedFlag,
+              error: why,
+              message: state.message,
+              run: runRes,
+              state: state
+            };
+          }
+        }
+      } catch (eFatal) {
+        var fatalMsg = String(eFatal && eFatal.message || eFatal);
+        try { console.error('[AFG runner] fatal', fatalMsg); } catch (eF) {}
+        state = await setRunnerState(Object.assign(state, {
+          status: 'paused_error',
+          message: 'Runner interrumpido: ' + fatalMsg,
+          lastResult: { error: fatalMsg }
+        }));
+        try {
+          await patchQueueItemStatus(item.id, 'paused_error', state.message);
+        } catch (eP) {}
+        itemFailed = true;
+        itemFatal = true;
+        returnValue = {
+          ok: false,
+          error: 'runner_fatal',
+          message: state.message,
+          state: state
+        };
+      }
+      if (!itemFailed) return returnValue;
+      if (!autoAdvance || itemFatal) return returnValue;
+      consecutiveFailures++;
+      if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+        state = await setRunnerState(Object.assign(state, {
+          status: 'paused_error',
+          message: consecutiveFailures + ' fallos seguidos — freno el avance automático. ' +
+            'Último: ' + (state.message || '') + '. Revisá y tocá Reintentar o Iniciar cola.'
+        }));
+        return {
+          ok: false,
+          error: 'too_many_consecutive_failures',
+          message: state.message,
+          state: state
+        };
+      }
+      // Auto-avanza solo: vuelve al inicio del while y busca el próximo pendiente.
+      state.currentIntervId = null;
+      state.currentPac = '';
+      state.status = 'idle';
+      await setRunnerState(state);
     }
-
-    var why = (runRes && (runRes.message || runRes.error || runRes.reason)) ||
-      (runRes && runRes.iframe && (runRes.iframe.message || runRes.iframe.error || runRes.iframe.reason)) ||
-      'error_desconocido';
-    if (typeof why === 'string' && why.indexOf('PAUSA:') === 0) why = why.replace(/^PAUSA:\s*/, '');
-    state = await setRunnerState(Object.assign(state, {
-      status: 'paused_error',
-      message: paused ? ('PAUSA: ' + why) : ('Error: ' + why),
-      lastResult: runRes
-    }));
-    await patchQueueItemStatus(item.id, 'paused_error', state.message);
-    return {
-      ok: false,
-      paused: paused,
-      error: why,
-      message: state.message,
-      run: runRes,
-      state: state
-    };
-  } catch (eFatal) {
-    var fatalMsg = String(eFatal && eFatal.message || eFatal);
-    try { console.error('[AFG runner] fatal', fatalMsg); } catch (eF) {}
-    state = await setRunnerState(Object.assign(state, {
-      status: 'paused_error',
-      message: 'Runner interrumpido: ' + fatalMsg,
-      lastResult: { error: fatalMsg }
-    }));
-    try {
-      await patchQueueItemStatus(item.id, 'paused_error', state.message);
-    } catch (eP) {}
-    return {
-      ok: false,
-      error: 'runner_fatal',
-      message: state.message,
-      state: state
-    };
   } finally {
     // Punto 1: el lock SIEMPRE se libera, aunque run111 cuelgue y luego rejectee/throw
     queueRunnerBusy = false;
@@ -2224,3 +2338,4 @@ async function runQueueAction(action) {
     } catch (eFinally) {}
   }
 }
+
