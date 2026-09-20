@@ -33,6 +33,7 @@
     'js/26-balance-fluidos.js',
     'js/20-geclisa-send.js',
     'js/39-geclisa-queue.js',
+    'js/40-evweb-queue.js',
     'js/23-reglas-clinicas.js',
     'js/21-metodos.js',
     'js/22-tecnica.js',
@@ -62,7 +63,7 @@
     'js/24-sw-register.js'
   ];
 
-  var CACHE_V = '12.77';
+  var CACHE_V = '12.78';
   window.AF_CACHE_V = CACHE_V;
   try { document.title = 'AnesFact v' + CACHE_V; } catch (eTit) {}
 

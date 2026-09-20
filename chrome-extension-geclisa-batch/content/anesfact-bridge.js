@@ -11,7 +11,7 @@
   var lastOkSig = '';
   var lastQueueSig = '';
   var pendingMints = {};
-  var BRIDGE_VERSION = '0.6.0';
+  var BRIDGE_VERSION = '0.6.1';
 
   function normalize(detail) {
     if (!detail || !detail.token) return null;
@@ -162,6 +162,44 @@
     });
   }
 
+  var lastEvwebQueueSig = '';
+  function publishEvwebQueue(raw, via) {
+    var queue = normalizeQueue(raw);
+    if (!queue) return Promise.resolve({ ok: false, error: 'bad_queue' });
+    var sig = String(queue.version) + '|' + String(queue.updatedAt) + '|' + queue.items.length;
+    if (sig === lastEvwebQueueSig) return Promise.resolve({ ok: true, skipped: true, queue: queue });
+
+    var payload = {
+      afg_evweb_queue: queue,
+      afg_evweb_queue_meta: { via: via || '?', href: location.href, at: Date.now() }
+    };
+    return storageSet('local', payload).then(function (rLocal) {
+      return storageSet('session', payload).then(function (rSess) {
+        if (rLocal.ok || rSess.ok) lastEvwebQueueSig = sig;
+        try {
+          console.log(
+            '[AFG bridge] evweb queue via=' + (via || '?'),
+            'v' + queue.version,
+            'items',
+            queue.items.length,
+            'local=' + (rLocal.ok ? 'ok' : rLocal.error)
+          );
+        } catch (e) {}
+        return { ok: !!(rLocal.ok || rSess.ok), queue: queue };
+      });
+    });
+  }
+
+  function readLocalStorageEvwebQueue() {
+    try {
+      var raw = localStorage.getItem('afg_evweb_queue');
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      return null;
+    }
+  }
+
   function readLocalStorageBatch() {
     try {
       var raw = localStorage.getItem('afg_pending_batch');
@@ -221,6 +259,9 @@
     }
     if (d.type === 'GECLISA_QUEUE') {
       publishQueue(d.queue, 'postMessage');
+    }
+    if (d.type === 'EVWEB_QUEUE') {
+      publishEvwebQueue(d.queue, 'postMessage');
     }
     if (d.type === 'MINT_TOKEN_RESULT') {
       var cb = pendingMints[d.requestId];
@@ -285,6 +326,9 @@
   });
   window.addEventListener('afg-geclisa-queue', function (ev) {
     publishQueue(ev && ev.detail, 'CustomEvent');
+  });
+  window.addEventListener('afg-evweb-queue', function (ev) {
+    publishEvwebQueue(ev && ev.detail, 'CustomEvent');
   });
   window.addEventListener('afg-geclisa-queue-start', function () {
     try {
@@ -475,6 +519,8 @@
     if (p) publishFoja(p, 'localStorage');
     var q = readLocalStorageQueue();
     if (q) publishQueue(q, 'localStorage');
+    var qe = readLocalStorageEvwebQueue();
+    if (qe) publishEvwebQueue(qe, 'localStorage');
   }
   tick();
   setInterval(tick, 800);

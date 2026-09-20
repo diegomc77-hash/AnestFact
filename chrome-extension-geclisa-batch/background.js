@@ -2527,16 +2527,36 @@ async function pingEvwebForm() {
 
 /**
  * Manda AFG_EVW_FILL_PAMI al frame del formulario.
- * data: pac, dni, fecha, hora, cirujano, afiliado?, obraSocial?, sanatorio?
+ * data: pac, dni, fecha, hora, cirujano, edad, afiliado, obraSocial?, sanatorio?
  */
 async function sendEvwebFillPami(data) {
   var tab = await findEvwebTab();
   var frameId = await findEvwebFormFrameId(tab.id);
+  try {
+    console.log('[AFG EVW] sendEvwebFillPami BEFORE sendMessage', {
+      tabId: tab.id,
+      frameId: frameId,
+      tabUrl: tab.url || null
+    });
+  } catch (eLog) {}
   var res = await chrome.tabs.sendMessage(
     tab.id,
-    { type: 'AFG_EVW_FILL_PAMI', data: data || {} },
+    {
+      type: 'AFG_EVW_FILL_PAMI',
+      data: data || {},
+      targetFrameId: frameId,
+      targetTabId: tab.id
+    },
     { frameId: frameId }
   );
+  try {
+    console.log('[AFG EVW] sendEvwebFillPami AFTER response', {
+      sentFrameId: frameId,
+      contentReportedFrameId: res && res.receiverFrameId,
+      contentHref: res && res.href,
+      ok: res && res.ok
+    });
+  } catch (eLog2) {}
   return Object.assign({ tabId: tab.id, frameId: frameId }, res || { ok: false, error: 'empty_fill' });
 }
 
@@ -2578,8 +2598,22 @@ async function runEvwebSingle(msg) {
 }
 
 /**
+ * Lote 3: ping + fill compartido (individual y cola).
+ * fillData: { pac, dni, fecha, hora, cirujano, edad, afiliado, obraSocial, sanatorio }
+ */
+async function doEvwebFill(fillData) {
+  var ping = await pingEvwebForm();
+  if (!(ping && ping.ok)) return { ok: false, error: 'ping_failed', ping: ping };
+  try {
+    console.log('[AFG EVW] doEvwebFill ping frameId=', ping.frameId, 'tabId=', ping.tabId);
+  } catch (ePingLog) {}
+  var fill = await sendEvwebFillPami(fillData);
+  return { ok: !!(fill && fill.ok), ping: ping, fill: fill };
+}
+
+/**
  * Lote 2: ping → fill PAMI → awaiting_confirm (sin auto-submit, sin upload).
- * msg: { intervId?, pac, dni, fecha, hora, cirujano, afiliado?, obraSocial?, sanatorio? }
+ * msg: { intervId?, pac, dni, fecha, hora, cirujano, edad, afiliado, obraSocial?, sanatorio? }
  */
 async function runEvwebFillPami(msg) {
   msg = msg || {};
@@ -2600,11 +2634,35 @@ async function runEvwebFillPami(msg) {
       lastResult: null
     }));
 
-    var ping = await pingEvwebForm();
-    if (!(ping && ping.ok)) {
+    var fillData = {
+      pac: msg.pac || msg.nombreApellido || '',
+      dni: msg.dni || '',
+      fecha: msg.fecha || '',
+      hora: msg.hora || '',
+      cirujano: msg.cirujano || '',
+      edad: msg.edad != null && msg.edad !== '' ? msg.edad : '',
+      afiliado: msg.afiliado || msg.afil || '',
+      obraSocial: msg.obraSocial != null && msg.obraSocial !== '' ? msg.obraSocial : '382',
+      sanatorio: msg.sanatorio != null && msg.sanatorio !== '' ? msg.sanatorio : '208'
+    };
+    if (fillData.fecha) {
+      fillData.fecha = formatFechaDDMMYYYY(fillData.fecha) || fillData.fecha;
+    }
+
+    var res = await doEvwebFill(fillData);
+    var ping = res && res.ping;
+    var fill = res && res.fill;
+    var okFill = !!(res && res.ok);
+    var msgOk =
+      'Formulario PAMI completado — subí la foja de Geclisa a mano y revisá antes de Finalizar';
+    var msgFail = (res && res.error === 'ping_failed')
+      ? ('Ping evweb falló — no fill. ' + ((ping && (ping.error || ping.message)) || ''))
+      : ('Fill PAMI incompleto: ' + ((fill && (fill.error || fill.message)) || 'fill_failed'));
+
+    if (!okFill && res && res.error === 'ping_failed') {
       var statePingFail = await setEvwebRunnerState(Object.assign(await getEvwebRunnerState(), {
         status: 'paused_error',
-        message: 'Ping evweb falló — no fill. ' + ((ping && (ping.error || ping.message)) || ''),
+        message: msgFail,
         lastResult: { mode: 'fill_pami', ping: ping }
       }));
       return {
@@ -2616,23 +2674,6 @@ async function runEvwebFillPami(msg) {
       };
     }
 
-    var fillData = {
-      pac: msg.pac || msg.nombreApellido || '',
-      dni: msg.dni || '',
-      fecha: msg.fecha || '',
-      hora: msg.hora || '',
-      cirujano: msg.cirujano || '',
-      afiliado: msg.afiliado || msg.afil || '',
-      obraSocial: msg.obraSocial != null && msg.obraSocial !== '' ? msg.obraSocial : '382',
-      sanatorio: msg.sanatorio != null && msg.sanatorio !== '' ? msg.sanatorio : '208'
-    };
-    var fill = await sendEvwebFillPami(fillData);
-    var okFill = !!(fill && fill.ok);
-    var msgOk =
-      'Formulario PAMI completado — subí la foja de Geclisa a mano y revisá antes de Finalizar';
-    var msgFail =
-      'Fill PAMI incompleto: ' + ((fill && (fill.error || fill.message)) || 'fill_failed');
-
     var state = await setEvwebRunnerState(Object.assign(await getEvwebRunnerState(), {
       status: okFill ? 'awaiting_confirm' : 'paused_error',
       currentIntervId: msg.intervId ? String(msg.intervId) : null,
@@ -2642,12 +2683,16 @@ async function runEvwebFillPami(msg) {
         mode: 'fill_pami',
         ping: ping,
         fill: fill,
+        frameIdSent: fill && fill.frameId,
+        receiverFrameId: fill && fill.receiverFrameId,
         fillData: {
           pac: fillData.pac,
           dni: fillData.dni,
           fecha: fillData.fecha,
           hora: fillData.hora,
           cirujano: fillData.cirujano,
+          edad: fillData.edad,
+          afiliado: fillData.afiliado,
           obraSocial: fillData.obraSocial,
           sanatorio: fillData.sanatorio
         }
@@ -2681,7 +2726,7 @@ async function runEvwebFillPami(msg) {
 
 /**
  * Runner de cola evweb — mismo espíritu que runQueueAction, función aparte.
- * Lote 1/2 cola: por ítem solo ping (fill de cola = Lote posterior con payload en item).
+ * Lote 3: por ítem ping + fill → awaiting_confirm (Finalizar manual).
  */
 async function runEvwebQueueAction(action) {
   if (action === 'abort') {
@@ -2805,7 +2850,7 @@ async function runEvwebQueueAction(action) {
       state.status = 'running';
       state.currentIntervId = String(item.id);
       state.currentPac = item.pac || '';
-      state.message = 'Lote 1: ping evweb (sin fill)…';
+      state.message = 'Lote 3: ping + fill evweb…';
       state.lastResult = null;
       if (!state.startedAt) state.startedAt = Date.now();
       await setEvwebRunnerState(state);
@@ -2815,36 +2860,39 @@ async function runEvwebQueueAction(action) {
       var itemFatal = false;
       var returnValue = null;
       try {
-        var ping = await pingEvwebForm();
-        if (!(ping && ping.ok)) {
-          var whyPing = (ping && (ping.error || ping.message)) || 'ping_failed';
+        var fillData = {
+          pac: item.pac,
+          dni: item.dni,
+          fecha: item.fecha,
+          hora: item.hora,
+          cirujano: item.ciru,
+          edad: item.edad,
+          afiliado: item.afil,
+          obraSocial: item.obraValue,
+          sanatorio: item.sanValue
+        };
+        if (fillData.fecha) {
+          fillData.fecha = formatFechaDDMMYYYY(fillData.fecha) || fillData.fecha;
+        }
+        var res = await doEvwebFill(fillData);
+        if (!(res && res.ok)) {
           state = await setEvwebRunnerState(Object.assign(state, {
             status: 'paused_error',
-            message: 'Ping evweb falló: ' + whyPing,
-            lastResult: { ping: ping }
+            message: 'Fill evweb falló: ' + ((res && (res.error || JSON.stringify(res.fill))) || 'desconocido'),
+            lastResult: res
           }));
           await patchEvwebQueueItemStatus(item.id, 'paused_error', state.message);
           itemFailed = true;
-          returnValue = { ok: false, error: 'ping_failed', ping: ping, state: state };
+          returnValue = Object.assign({ ok: false, error: 'fill_failed' }, res || {}, { state: state });
         } else {
-          // Lote 1: no fill — pausa para revisión humana (equivalente awaiting_save GECLISA)
           state = await setEvwebRunnerState(Object.assign(state, {
             status: 'awaiting_confirm',
-            message: 'Lote 1: ping OK (obra=' + (ping.obraSocialOptions || 0) +
-              ', sanatorios=' + (ping.sanatoriosOptions || 0) +
-              '). Sin fill — confirmá a mano o Siguiente.',
-            lastResult: { ping: ping, fillSkipped: true },
+            message: 'Formulario completado — subí la foja/autorización a mano y revisá antes de Finalizar',
+            lastResult: res,
             currentPac: item.pac || state.currentPac || ''
           }));
           await patchEvwebQueueItemStatus(item.id, 'awaiting_confirm', '');
-          return {
-            ok: true,
-            awaitingConfirm: true,
-            fillSkipped: true,
-            ping: ping,
-            userMessage: state.message,
-            state: state
-          };
+          return Object.assign({ ok: true, awaitingConfirm: true }, res || {}, { state: state });
         }
       } catch (eFatal) {
         var fatalMsg = String(eFatal && eFatal.message || eFatal);

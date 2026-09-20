@@ -130,7 +130,8 @@
 
   /**
    * Fill PAMI — no toca cargaArchivos ni btnAgregar.
-   * data: { pac, dni, fecha, hora, cirujano, afiliado?, obraSocial?, sanatorio? }
+   * data: { pac, dni, fecha, hora, cirujano, edad, afiliado, obraSocial?, sanatorio? }
+   * Edad y Afiliado son obligatorios en el formulario (asterisco).
    */
   async function fillPami(data) {
     data = data || {};
@@ -150,7 +151,7 @@
     if (!steps.obraSocial.ok) {
       return { ok: false, error: 'obra_social_set_failed', steps: steps };
     }
-    // Dar tiempo a JS/postback de evweb (Matrículas, etc.) tras change de obra
+    // Dar tiempo a JS de evweb (Matrículas, etc.) tras change de obra — el iframe NO se recarga
     await sleep(450);
 
     steps.sanatorios = setNativeSelect(document.getElementById('body_cboSanatorios'), sanVal);
@@ -187,13 +188,20 @@
       data.cirujano || ''
     );
 
+    if (data.edad != null && String(data.edad).trim() !== '') {
+      steps.edad = setTextInput(document.getElementById('body_txtEdad'), data.edad);
+      // body_cboTipoEdad suele venir en "Años" — no tocar
+    } else {
+      steps.edad = { ok: false, skipped: true, error: 'missing_edad' };
+    }
+
     if (data.afiliado != null && String(data.afiliado).trim() !== '') {
       steps.afiliado = setTextInput(
         document.getElementById('body_txtAfiliado'),
         data.afiliado
       );
     } else {
-      steps.afiliado = { ok: true, skipped: true };
+      steps.afiliado = { ok: false, skipped: true, error: 'missing_afiliado' };
     }
 
     var requiredOk =
@@ -204,7 +212,9 @@
       steps.minutos && steps.minutos.ok &&
       steps.nombre && steps.nombre.ok &&
       steps.dni && steps.dni.ok &&
-      steps.cirujano && steps.cirujano.ok;
+      steps.cirujano && steps.cirujano.ok &&
+      steps.edad && steps.edad.ok &&
+      steps.afiliado && steps.afiliado.ok;
 
     return {
       ok: !!requiredOk,
@@ -217,23 +227,74 @@
     };
   }
 
+  function selfFrameId() {
+    try {
+      if (chrome.runtime && typeof chrome.runtime.getFrameId === 'function') {
+        return chrome.runtime.getFrameId(window);
+      }
+    } catch (e) {}
+    return null;
+  }
+
   chrome.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
     if (!msg || !msg.type) return;
 
     if (msg.type === 'AFG_EVW_PING') {
       try {
-        sendResponse(buildPing());
+        var ping = buildPing();
+        ping.receiverFrameId = selfFrameId();
+        sendResponse(ping);
       } catch (e) {
-        sendResponse({ ok: false, error: String(e && e.message || e), href: location.href });
+        sendResponse({
+          ok: false,
+          error: String(e && e.message || e),
+          href: location.href,
+          receiverFrameId: selfFrameId()
+        });
       }
       return true;
     }
 
     if (msg.type === 'AFG_EVW_FILL_PAMI') {
+      var receiverFrameId = selfFrameId();
+      try {
+        console.log('[AFG:evweb] AFG_EVW_FILL_PAMI received', {
+          receiverFrameId: receiverFrameId,
+          targetFrameId: msg.targetFrameId,
+          targetTabId: msg.targetTabId,
+          href: location.href,
+          hasForm: hasFormSelects(),
+          frameIdMatch: msg.targetFrameId == null
+            ? null
+            : (String(msg.targetFrameId) === String(receiverFrameId))
+        });
+      } catch (eLog) {}
       fillPami(msg.data || msg)
-        .then(function (r) { sendResponse(r); })
+        .then(function (r) {
+          r.receiverFrameId = receiverFrameId;
+          r.targetFrameId = msg.targetFrameId;
+          r.frameIdMatch = msg.targetFrameId == null
+            ? null
+            : (String(msg.targetFrameId) === String(receiverFrameId));
+          try {
+            console.log('[AFG:evweb] AFG_EVW_FILL_PAMI done', {
+              ok: r.ok,
+              receiverFrameId: r.receiverFrameId,
+              targetFrameId: r.targetFrameId,
+              frameIdMatch: r.frameIdMatch,
+              error: r.error || null
+            });
+          } catch (eDone) {}
+          sendResponse(r);
+        })
         .catch(function (e) {
-          sendResponse({ ok: false, error: String(e && e.message || e) });
+          sendResponse({
+            ok: false,
+            error: String(e && e.message || e),
+            receiverFrameId: receiverFrameId,
+            targetFrameId: msg.targetFrameId,
+            href: location.href
+          });
         });
       return true;
     }

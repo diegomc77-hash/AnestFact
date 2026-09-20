@@ -2,7 +2,7 @@
 // STATIC_CORE: shell + SCRIPTS (js/load-scripts.js) + vistas (js/load-views.js).
 // Si agregás un script o vista nueva, actualizá AMBOS lados (lista acá + SCRIPTS/VIEWS/FOJA_PARTS).
 // No incluir scripts propios de valoracion.html ni CDNs (QR paciente = online).
-var CACHE_NAME = 'anesfact-v12.77';
+var CACHE_NAME = 'anesfact-v12.78';
 var STATIC_CORE = [
   'index.html',
   'valoracion.html',
@@ -46,6 +46,7 @@ var STATIC_CORE = [
   'js/26-balance-fluidos.js',
   'js/20-geclisa-send.js',
   'js/39-geclisa-queue.js',
+  'js/40-evweb-queue.js',
   'js/23-reglas-clinicas.js',
   'js/21-metodos.js',
   'js/22-tecnica.js',

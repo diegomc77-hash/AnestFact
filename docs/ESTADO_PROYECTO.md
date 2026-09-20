@@ -160,6 +160,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
+- **evweb Lote 3 (local, sin commit):** cola AnesFact `js/40-evweb-queue.js` + botón en `views/facturacion.html`; runner extensión `doEvwebFill` + fill real en cola → `awaiting_confirm`. PWA **12.78** / ext **0.6.1**. Sin upload/Finalizar/prácticas. Solo PAMI+Mayo mapeados.
 - **Egress sync (023 + skip fetch):** **12.74** en Pages. **12.75** = botón confirmar candidato en cola (app). Ext WIP (buscador/runner/canal) fuera de ese commit.
 - **P2 QR cirujano / fojaQx Paso 2.3:** **12.73** listo para Pages. Pendiente smoke Aero «prueba» + print (CyC/tiroides v2).
 - **18 especialidades no-CyC:** JS regenerado OK (fix multilínea); **smoke e2e propio pendiente** al primer uso real — ver ROADMAP § P2 smoke por especialidad. No asumir prod-ready.
@@ -181,12 +182,13 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - **P2 Gastroenterología / endoscopia (M20):** **OK de semilla** (`01-endoscopia.md`). Validación criterio Diego/AnesFact (no gastroenterólogo ni Huerta) — nota de cabecera se mantiene. Sin solape real con CG. Motor pendiente. 0 código.
 - **P2 QR cirujano / fojaQx:** Paso 1–2.2 CERRADOS. **Paso 2.3 en 12.73** (tiroides v2 + fix parser multilínea). Pendiente smoke Aero «prueba» + print.
 
-- **P4 Traditum / evweb:** ciclo + mapa Nueva Solicitud + catálogo ADAARC (`docs/evweb_catalogo_completo.md`). **Sin código.** Hueco a diseñar: estado «Pendiente de autorizar en Traditum».
+- **P4 Traditum / evweb:** Lotes 1–3 locales (ping + fill PAMI + cola AnesFact). Catálogo ADAARC sigue en `docs/evweb_catalogo_completo.md`. Pendiente: upload docs, prácticas, Finalizar, más OS/sanatorios. Hueco «Pendiente de autorizar en Traditum» sin código.
 - **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo 12.62 / 0.5.15). PWA **12.64** ya en origin (`7b3cc99`); recargar Pages aparte.
 - Ext **0.5.15** en origin/main (`5c874f8`) como backup. El viernes: recargar local en `chrome://extensions`.
 
 ## Qué se hizo (más reciente primero)
 
+- 2026-09-20 — **evweb Lote 3** (local): `afg_evweb_queue` en AnesFact (`40-evweb-queue.js`, botón Facturación); bridge → chrome.storage; `doEvwebFill` en cola y en fill individual. Pausa en `awaiting_confirm`. Sin docs/Finalizar. CACHE **12.78** / ext **0.6.1**.
 - 2026-09-19 — PWA **12.75**: botón «Confirmar candidato» en cola GECLISA (`afParseCandidatoFromMensaje` / `afGeclisaQueueConfirmCandidatoUi`) cuando pausa por nombre mismatch. Sin extensión en este commit.
 - 2026-09-19 — PWA **12.74**: sync egress — `023_datos_updated_at` + `fetchSyncPayload` skip si `updated_at` sin cambio (sentinel). Verif Huerta literal + timing OK. Sin GECLISA en este commit.
 - 2026-09-17 — PWA **12.73**: tiroides CyC Huerta v2 (6 variantes); fix `md-proforma-to-js` listas `required_if_*` multilínea (19 proformas recuperadas; 12 CyC + ORL intactos); motor `if_eq` guard 200 (solo tiroides v2 lo necesita); tests v2; ROADMAP nota smoke e2e por especialidad no-CyC. Bundle ~534 KB. Sin Edge. Sin nombres/DNI reales. Pendiente smoke Aero.
