@@ -155,15 +155,15 @@ Este archivo (`ESTADO_PROYECTO.md`) es el diario de versiones / en curso / pendi
 
 Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Snapshot al 2026-09-08:
 
-- PWA `CACHE_V`: **12.74** local/Pages (sync egress `updated_at`)
+- PWA `CACHE_V`: **12.75** (botón confirmar candidato cola GECLISA)
 - Extensión GECLISA: **0.5.15** (origin/main `5c874f8`; recargar local el viernes)
 
 ## En curso
 
-- **Egress sync (023 + skip fetch):** **12.74** en deploy — `fetchSyncPayload` chequea `updated_at` antes de bajar `datos`; SQL 023 ya en prod. Verif Huerta OK.
+- **Egress sync (023 + skip fetch):** **12.74** en Pages. **12.75** = botón confirmar candidato en cola (app). Ext WIP (buscador/runner/canal) fuera de ese commit.
 - **P2 QR cirujano / fojaQx Paso 2.3:** **12.73** listo para Pages. Pendiente smoke Aero «prueba» + print (CyC/tiroides v2).
 - **18 especialidades no-CyC:** JS regenerado OK (fix multilínea); **smoke e2e propio pendiente** al primer uso real — ver ROADMAP § P2 smoke por especialidad. No asumir prod-ready.
-- **GECLISA cola (Huerta):** Síntoma A (Iniciar app no dispara extensión) + B (PC Huerta no procesa). Auditoría 2026-09-17: A = bridge CS ausente / asimetría vs popup (no regresión fojaQx). B = perfil/URL/permisos/GECLISA login — checklist vivo. **Avisar antes de procesar a mano** la próxima cola real.
+- **GECLISA cola (Huerta):** local WIP buscador panel — Levenshtein apellido + retries hora (−3…+1) + día anterior (`geclisa.js`/`dom.js`). Sin bump/commit. También dirty previo: Paso 2 prefijo `internad*` + bridge 0.5.16 (no mezclar en el mismo commit sin OK).
 
 - **P2 Cirugía General:** **OK de semilla del set** (M1–M6). Soft handoffs aplicados. Motor pendiente. `foja.consideraciones` = fase aparte (0 código).
 - **P2 Cirugía Torácica:** **OK de semilla** (`01-torax.md`). Validación criterio Diego/AnesFact (no torácico ni Huerta) — nota de cabecera se mantiene. Motor pendiente. 0 código.
@@ -187,6 +187,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## Qué se hizo (más reciente primero)
 
+- 2026-09-19 — PWA **12.75**: botón «Confirmar candidato» en cola GECLISA (`afParseCandidatoFromMensaje` / `afGeclisaQueueConfirmCandidatoUi`) cuando pausa por nombre mismatch. Sin extensión en este commit.
 - 2026-09-19 — PWA **12.74**: sync egress — `023_datos_updated_at` + `fetchSyncPayload` skip si `updated_at` sin cambio (sentinel). Verif Huerta literal + timing OK. Sin GECLISA en este commit.
 - 2026-09-17 — PWA **12.73**: tiroides CyC Huerta v2 (6 variantes); fix `md-proforma-to-js` listas `required_if_*` multilínea (19 proformas recuperadas; 12 CyC + ORL intactos); motor `if_eq` guard 200 (solo tiroides v2 lo necesita); tests v2; ROADMAP nota smoke e2e por especialidad no-CyC. Bundle ~534 KB. Sin Edge. Sin nombres/DNI reales. Pendiente smoke Aero.
 - 2026-09-17 — Tiroides CyC **Huerta v2** local (sin bump): reemplazo `01-tiroides-paratiroides.md` (6 variantes); fix `md-proforma-to-js` listas `required_if_*` multilínea; motor `if_eq` guard 200; tests v2. Bundle ~473→~534 KB. Archivo auditoría `_01-tiroides-paratiroides-v2-APLICADO.md`. **Pendiente bump 12.73 + Pages.** Sin nombres/DNI reales.

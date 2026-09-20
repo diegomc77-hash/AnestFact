@@ -399,6 +399,29 @@ function afGeclisaQueueSetStatus(intervId, status, message) {
   return { ok: true, item: hit };
 }
 
+/** Extrae nombre real + N° de Atención de un mensaje de pausa "evolucion_nombre_mismatch". */
+function afParseCandidatoFromMensaje(msg) {
+  var s = String(msg || '');
+  var mNro = s.match(/N[°ºo.]?\s*Atenci[oó]n:?\s*(\d{4,})/i);
+  if (!mNro) return null;
+  var mNombre = s.match(/"([^"]+)"/);
+  return { nroAtencion: mNro[1], nombre: mNombre ? mNombre[1] : ('N° ' + mNro[1]) };
+}
+
+/** El usuario confirma que el candidato encontrado en GECLISA es el paciente correcto. */
+function afGeclisaQueueConfirmCandidatoUi(intervId, nro, event) {
+  if (event) { event.preventDefault(); event.stopPropagation(); }
+  var res = afPersistMayoNroAtencion(intervId, nro, { via: 'user_confirm' });
+  if (!res || !res.ok) {
+    if (typeof toast === 'function') toast('No pude guardar el N° de Atención: ' + ((res && res.error) || 'error'));
+    return;
+  }
+  afGeclisaQueueSetStatus(intervId, 'queued', '');
+  if (typeof toast === 'function') toast('Confirmado. Tocá "Iniciar cola" para reintentar.');
+  if (typeof renderGeclisaQueuePanel === 'function') renderGeclisaQueuePanel();
+  if (typeof renderHome === 'function') renderHome();
+}
+
 /**
  * Guarda N° Atención GECLISA en la intervención + ítem de cola.
  * Nunca persiste vacío. No toca el campo si `nro` no es usable.
@@ -714,6 +737,13 @@ function renderGeclisaQueuePanel() {
       html += '<div style="color:var(--text3);margin-top:2px">' + fechaTxt + (it.hora ? (' · ' + it.hora) : '') + (it.sector ? (' · ' + it.sector) : '') + '</div>';
       if (it.message) {
         html += '<div style="color:var(--red);margin-top:2px;font-size:11px">' + String(it.message).slice(0, 120) + '</div>';
+      }
+      var candidato = it.status === 'paused_error' ? afParseCandidatoFromMensaje(it.message) : null;
+      if (candidato) {
+        var candNombreSafe = String(candidato.nombre).replace(/'/g, "\\'");
+        html += '<div style="margin-top:4px">';
+        html += '<button type="button" class="btn btn-s" style="width:auto;padding:4px 8px;font-size:11px;color:var(--green);border-color:rgba(34,197,94,.45)" title="Confirmar candidato encontrado en GECLISA" onclick="afGeclisaQueueConfirmCandidatoUi(\'' + safeId + '\',\'' + candidato.nroAtencion + '\',event)">&#10003; &iquest;Es ' + candNombreSafe + '? Confirmar</button>';
+        html += '</div>';
       }
       html += '</div>';
       html += '<div class="afg-q-item-actions">';
