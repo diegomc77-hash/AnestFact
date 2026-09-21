@@ -206,6 +206,24 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
     return true;
   }
+  // CS → MAIN: set Obra Social + await PageRequestManager.endRequest (evita CSP inline)
+  if (msg && msg.type === 'AFG_EVW_SET_OBRA_AND_WAIT') {
+    setEvwebObraAndWaitPostback(
+      msg.tabId,
+      msg.frameId,
+      msg.obraVal,
+      msg.timeoutMs || 4000
+    )
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) {
+        sendResponse({
+          ok: false,
+          reason: 'executeScript_failed',
+          error: String(e && e.message || e)
+        });
+      });
+    return true;
+  }
 });
 
 /** Lock para no solapar dos run111 de cola. */
@@ -2492,6 +2510,146 @@ async function findEvwebTab() {
     throw new Error('Abrí evweb (adaarc.evweb.com.ar) logueado primero');
   }
   return tabs.find(function (t) { return t.active; }) || tabs[0];
+}
+
+/**
+ * MAIN world: arma endRequest → setea Obra Social → espera postback ASP.NET.
+ * Reasons: endRequest | timeout | no_page_request_manager | no_obra_select |
+ *   value_not_in_options | error | executeScript_failed
+ */
+async function setEvwebObraAndWaitPostback(tabId, frameId, obraVal, timeoutMs) {
+  timeoutMs = timeoutMs || 4000;
+  if (!tabId || frameId == null || frameId === '') {
+    return {
+      ok: false,
+      reason: 'executeScript_failed',
+      error: 'missing_tab_or_frame',
+      tabId: tabId || null,
+      frameId: frameId == null ? null : frameId
+    };
+  }
+  var fid = Number(frameId);
+  if (!Number.isFinite(fid)) {
+    return {
+      ok: false,
+      reason: 'executeScript_failed',
+      error: 'bad_frameId',
+      frameId: frameId
+    };
+  }
+  try {
+    var results = await chrome.scripting.executeScript({
+      target: { tabId: tabId, frameIds: [fid] },
+      world: 'MAIN',
+      args: [String(obraVal == null ? '' : obraVal), timeoutMs],
+      func: function (obraValArg, timeoutMsArg) {
+        return new Promise(function (resolve) {
+          try {
+            var el = document.getElementById('body_cboObraSocial');
+            if (!el) {
+              resolve({ ok: false, reason: 'no_obra_select' });
+              return;
+            }
+            var want = String(obraValArg == null ? '' : obraValArg);
+            var found = false;
+            var i;
+            for (i = 0; i < (el.options || []).length; i++) {
+              if (String(el.options[i].value) === want) {
+                found = true;
+                break;
+              }
+            }
+            if (!found && want.length === 1) {
+              want = '0' + want;
+              for (i = 0; i < (el.options || []).length; i++) {
+                if (String(el.options[i].value) === want) {
+                  found = true;
+                  break;
+                }
+              }
+            }
+            if (!found) {
+              resolve({
+                ok: false,
+                reason: 'value_not_in_options',
+                want: String(obraValArg),
+                options: el.options ? el.options.length : 0
+              });
+              return;
+            }
+            function fireChange() {
+              el.value = want;
+              try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (eIn) {}
+              try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (eCh) {}
+            }
+            var mgr = window.Sys && window.Sys.WebForms &&
+              window.Sys.WebForms.PageRequestManager &&
+              window.Sys.WebForms.PageRequestManager.getInstance();
+            if (!mgr) {
+              fireChange();
+              resolve({
+                ok: false,
+                reason: 'no_page_request_manager',
+                obraValue: want,
+                selected: el.value
+              });
+              return;
+            }
+            var fired = false;
+            var handler = function () {
+              if (fired) return;
+              fired = true;
+              try { mgr.remove_endRequest(handler); } catch (eRm) {}
+              resolve({
+                ok: true,
+                reason: 'endRequest',
+                obraValue: want,
+                selected: el.value
+              });
+            };
+            mgr.add_endRequest(handler);
+            fireChange();
+            setTimeout(function () {
+              if (fired) return;
+              fired = true;
+              try { mgr.remove_endRequest(handler); } catch (eRm2) {}
+              resolve({
+                ok: true,
+                reason: 'timeout',
+                obraValue: want,
+                selected: el.value
+              });
+            }, timeoutMsArg);
+          } catch (err) {
+            resolve({
+              ok: false,
+              reason: 'error',
+              error: String(err && err.message || err)
+            });
+          }
+        });
+      }
+    });
+    var row = results && results[0];
+    if (row && row.error) {
+      return {
+        ok: false,
+        reason: 'executeScript_failed',
+        error: String(row.error.message || row.error)
+      };
+    }
+    var r = row && row.result;
+    if (!r || typeof r !== 'object') {
+      return { ok: false, reason: 'executeScript_failed', error: 'empty_result' };
+    }
+    return r;
+  } catch (e) {
+    return {
+      ok: false,
+      reason: 'executeScript_failed',
+      error: String(e && e.message || e)
+    };
+  }
 }
 
 /** Frame del formulario (#body_cboObraSocial) — same-origin iframe. */

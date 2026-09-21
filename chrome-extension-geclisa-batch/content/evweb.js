@@ -66,6 +66,88 @@
     return new Promise(function (r) { setTimeout(r, ms); });
   }
 
+  /**
+   * BG → executeScript world MAIN: arm endRequest + set obra + wait.
+   * Si executeScript falla o no hay PageRequestManager → sleep(timeoutMs) de red de seguridad.
+   */
+  function setObraAndWaitViaBackground(obraVal, tabId, frameId, timeoutMs) {
+    timeoutMs = timeoutMs || 4000;
+    return new Promise(function (resolve) {
+      try {
+        chrome.runtime.sendMessage({
+          type: 'AFG_EVW_SET_OBRA_AND_WAIT',
+          tabId: tabId,
+          frameId: frameId,
+          obraVal: obraVal,
+          timeoutMs: timeoutMs
+        }, function (res) {
+          var errMsg = chrome.runtime.lastError && chrome.runtime.lastError.message;
+          if (errMsg) {
+            resolve({
+              ok: false,
+              reason: 'executeScript_failed',
+              error: errMsg
+            });
+            return;
+          }
+          resolve(res || {
+            ok: false,
+            reason: 'executeScript_failed',
+            error: 'empty_response'
+          });
+        });
+      } catch (e) {
+        resolve({
+          ok: false,
+          reason: 'executeScript_failed',
+          error: String(e && e.message || e)
+        });
+      }
+    }).then(function (settle) {
+      var needFallbackSleep =
+        settle.reason === 'executeScript_failed' ||
+        settle.reason === 'no_page_request_manager' ||
+        settle.reason === 'error';
+      if (settle.reason === 'executeScript_failed' || settle.reason === 'error') {
+        var setRes = setNativeSelect(
+          document.getElementById('body_cboObraSocial'),
+          obraVal
+        );
+        return sleep(timeoutMs).then(function () {
+          return {
+            settle: Object.assign({}, settle, { fallbackSleepMs: timeoutMs }),
+            obraSocial: setRes
+          };
+        });
+      }
+      if (settle.reason === 'no_obra_select' || settle.reason === 'value_not_in_options') {
+        return {
+          settle: settle,
+          obraSocial: {
+            ok: false,
+            error: settle.reason,
+            want: settle.want
+          }
+        };
+      }
+      var obraSocial = {
+        ok: true,
+        value: settle.obraValue || String(obraVal),
+        selected: settle.selected,
+        via: 'main'
+      };
+      if (needFallbackSleep) {
+        return sleep(timeoutMs).then(function () {
+          return {
+            settle: Object.assign({}, settle, { fallbackSleepMs: timeoutMs }),
+            obraSocial: obraSocial
+          };
+        });
+      }
+      return { settle: settle, obraSocial: obraSocial };
+    });
+  }
+
   function fireChange(el) {
     if (!el) return;
     try {
@@ -131,10 +213,12 @@
   /**
    * Fill PAMI — no toca cargaArchivos ni btnAgregar.
    * data: { pac, dni, fecha, hora, cirujano, edad, afiliado, obraSocial?, sanatorio? }
+   * meta: { tabId, frameId } para AFG_EVW_SET_OBRA_AND_WAIT (MAIN world).
    * Edad y Afiliado son obligatorios en el formulario (asterisco).
    */
-  async function fillPami(data) {
+  async function fillPami(data, meta) {
     data = data || {};
+    meta = meta || {};
     if (!hasFormSelects()) {
       return { ok: false, error: 'form_not_found', role: roleOfFrame(), href: location.href };
     }
@@ -147,14 +231,20 @@
       ? String(data.sanatorio)
       : MAYO_SANATORIO_VALUE;
 
-    steps.obraSocial = setNativeSelect(document.getElementById('body_cboObraSocial'), obraVal);
+    // Atómico en MAIN (BG): arm endRequest → set obra → wait. Fallback ~4s si falla.
+    var obraPack = await setObraAndWaitViaBackground(
+      obraVal,
+      meta.tabId,
+      meta.frameId,
+      4000
+    );
+    steps.obraSocialSettle = obraPack.settle;
+    steps.obraSocial = obraPack.obraSocial;
     if (!steps.obraSocial.ok) {
       return { ok: false, error: 'obra_social_set_failed', steps: steps };
     }
-    // Dar tiempo a JS de evweb (Matrículas, etc.) tras change de obra — el iframe NO se recarga
-    await sleep(450);
-
-    steps.sanatorios = setNativeSelect(document.getElementById('body_cboSanatorios'), sanVal);
+    var sanEl = document.getElementById('body_cboSanatorios');
+    steps.sanatorios = setNativeSelect(sanEl, sanVal);
     if (!steps.sanatorios.ok) {
       return { ok: false, error: 'sanatorio_set_failed', steps: steps };
     }
@@ -236,7 +326,7 @@
     return null;
   }
 
-  chrome.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
+  chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (!msg || !msg.type) return;
 
     if (msg.type === 'AFG_EVW_PING') {
@@ -257,6 +347,8 @@
 
     if (msg.type === 'AFG_EVW_FILL_PAMI') {
       var receiverFrameId = selfFrameId();
+      var tabId = msg.targetTabId || (sender && sender.tab && sender.tab.id) || null;
+      var frameId = msg.targetFrameId != null ? msg.targetFrameId : receiverFrameId;
       try {
         console.log('[AFG:evweb] AFG_EVW_FILL_PAMI received', {
           receiverFrameId: receiverFrameId,
@@ -269,7 +361,7 @@
             : (String(msg.targetFrameId) === String(receiverFrameId))
         });
       } catch (eLog) {}
-      fillPami(msg.data || msg)
+      fillPami(msg.data || msg, { tabId: tabId, frameId: frameId })
         .then(function (r) {
           r.receiverFrameId = receiverFrameId;
           r.targetFrameId = msg.targetFrameId;
@@ -282,6 +374,7 @@
               receiverFrameId: r.receiverFrameId,
               targetFrameId: r.targetFrameId,
               frameIdMatch: r.frameIdMatch,
+              obraSocialSettle: r.steps && r.steps.obraSocialSettle,
               error: r.error || null
             });
           } catch (eDone) {}
