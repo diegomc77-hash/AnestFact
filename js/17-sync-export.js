@@ -741,7 +741,9 @@ function afCommitAdjunto(tipo,doc){
       if(hadKey)S.cur.docs[tipo]=prev;
       else delete S.cur.docs[tipo];
       if(e&&(e.afQuota||e.name==='QuotaExceededError'||e.code===22||e.code===1014)){
-        if(typeof toast==='function'){
+        if(typeof afToastMemoriaError==='function'){
+          afToastMemoriaError('Memoria local llena: no se pudo guardar el adjunto. Liberá fojas/adjuntos viejos.');
+        }else if(typeof toast==='function'){
           toast('Memoria local llena: no se pudo guardar el adjunto. Liberá fojas/adjuntos viejos.');
         }
         try{console.warn('[AF] QuotaExceeded afCommitAdjunto',e);}catch(eL){}

@@ -66,6 +66,14 @@
     <div class="fr"><input class="fi" type="password" id="cfg-key" placeholder="AIza..." style="flex:1"><button class="btn btn-g" style="width:auto;padding:10px 14px" onclick="saveKey()">Guardar</button></div>
     <div id="key-status" style="font-size:12px;margin-top:8px;color:var(--text3)"></div>
   </div>
+  <div class="card" id="cfg-memoria-card">
+    <div class="ct">Memoria del celular / PC</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.45">
+      Si no pod&eacute;s <b>guardar fojas</b> (memoria llena o archivos locales da&ntilde;ados), repar&aacute; ac&aacute;.
+      Libera espacio en este dispositivo; <b>no borra</b> tu backup en la nube.
+    </p>
+    <button type="button" class="btn btn-g" id="cfg-reparar-memoria-btn" onclick="afRepararMemoriaLocal()">Reparar memoria</button>
+  </div>
   <div class="card" id="cfg-sync-card">
     <div class="ct">&#9729; Sincronizaci&oacute;n</div>
     <p style="font-size:12px;color:var(--text2);margin-bottom:8px">La app <b>sincroniza sola</b> con Supabase al abrir y al guardar.</p>

@@ -754,7 +754,9 @@ function afCommitGuardarLocal(){
     saveIntervsToStorage();
   }catch(e){
     if(e&&(e.afQuota||e.name==='QuotaExceededError'||e.code===22||e.code===1014)){
-      if(typeof toast==='function'){
+      if(typeof afToastMemoriaError==='function'){
+        afToastMemoriaError('Memoria local llena: liberá fojas/adjuntos viejos (no es un problema de plan).');
+      }else if(typeof toast==='function'){
         toast('Memoria local llena: liberá fojas/adjuntos viejos (no es un problema de plan).');
       }
       try{console.warn('[AF] QuotaExceeded saveIntervsToStorage',e);}catch(eL){}
@@ -812,7 +814,9 @@ function guardar(extra){
     });
   }).catch(function(e){
     if(e&&(e.afQuota||e.name==='QuotaExceededError')){
-      if(typeof toast==='function'){
+      if(typeof afToastMemoriaError==='function'){
+        afToastMemoriaError('Memoria local llena: liberá fojas/adjuntos viejos (no es un problema de plan).');
+      }else if(typeof toast==='function'){
         toast('Memoria local llena: liberá fojas/adjuntos viejos (no es un problema de plan).');
       }
       return false;

@@ -102,8 +102,12 @@ function goDock(id){
       if(typeof afCommitGuardarLocal==='function'){
         try{ afCommitGuardarLocal(); }
         catch(eQ){
-          if(eQ&&(eQ.afQuota||eQ.name==='QuotaExceededError')&&typeof toast==='function'){
-            toast('Memoria local llena — no se pudo guardar al cambiar de pantalla');
+          if(eQ&&(eQ.afQuota||eQ.name==='QuotaExceededError')){
+            if(typeof afToastMemoriaError==='function'){
+              afToastMemoriaError('Memoria local llena — no se pudo guardar al cambiar de pantalla');
+            }else if(typeof toast==='function'){
+              toast('Memoria local llena — no se pudo guardar al cambiar de pantalla');
+            }
           }
         }
       }
@@ -199,8 +203,12 @@ function goFacturacion(){
     if(typeof afCommitGuardarLocal==='function'){
       try{ afCommitGuardarLocal(); }
       catch(eQ){
-        if(eQ&&(eQ.afQuota||eQ.name==='QuotaExceededError')&&typeof toast==='function'){
-          toast('Memoria local llena — abrí Facturación igual; liberá espacio cuando puedas');
+        if(eQ&&(eQ.afQuota||eQ.name==='QuotaExceededError')){
+          if(typeof afToastMemoriaError==='function'){
+            afToastMemoriaError('Memoria local llena — abrí Facturación igual; liberá espacio cuando puedas');
+          }else if(typeof toast==='function'){
+            toast('Memoria local llena — abrí Facturación igual; liberá espacio cuando puedas');
+          }
         }
       }
     }
@@ -319,17 +327,41 @@ function afSetDockSize(size){
 afApplyDockSize();
 function irScan(){go('escanear');}
 var _tt;
-function toast(msg){
+function toast(msg, opts){
   var t=document.getElementById('toast');
   if(!t)return;
-  t.textContent=msg;
+  opts=opts||{};
+  clearTimeout(_tt);
+  t.textContent='';
+  t.innerHTML='';
+  t.classList.remove('toast-action');
+  var span=document.createElement('span');
+  span.className='toast-msg';
+  span.textContent=String(msg==null?'':msg);
+  t.appendChild(span);
+  var ms=opts.ms||2600;
+  if(opts.actionLabel&&typeof opts.onAction==='function'){
+    t.classList.add('toast-action');
+    var btn=document.createElement('button');
+    btn.type='button';
+    btn.className='toast-action-btn';
+    btn.textContent=String(opts.actionLabel);
+    btn.addEventListener('click',function(ev){
+      try{ev.preventDefault();ev.stopPropagation();}catch(e){}
+      clearTimeout(_tt);
+      t.classList.remove('show');
+      t.setAttribute('aria-hidden','true');
+      try{opts.onAction();}catch(eA){}
+    });
+    t.appendChild(btn);
+    if(opts.ms==null)ms=12000;
+  }
   t.classList.add('show');
   t.setAttribute('aria-hidden','false');
-  clearTimeout(_tt);
   _tt=setTimeout(function(){
     t.classList.remove('show');
     t.setAttribute('aria-hidden','true');
-  },2600);
+  },ms);
 }
 function _copiarTexto(text,onOk,onFail){
   if(navigator.clipboard&&window.isSecureContext){

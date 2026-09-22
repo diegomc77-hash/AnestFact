@@ -258,6 +258,7 @@ function afDocIdbPut(intervId, tipo, doc) {
           try {
             console.warn('[AF docs-idb] put fail after reset', e2);
           } catch (eL3) {}
+          if (typeof afNotifyIdbSchemaError === 'function') afNotifyIdbSchemaError();
           return false;
         });
     });
@@ -437,4 +438,138 @@ function afEmergencyNoSync() {
   } catch (e) {
     return false;
   }
+}
+
+var _afRepararMemoriaBusy = false;
+var _afMemoriaToastAt = 0;
+
+function afStripLocalDocQueues() {
+  ['afg_evweb_queue', 'afg_geclisa_queue'].forEach(function (qk) {
+    try {
+      var q = JSON.parse(localStorage.getItem(qk) || 'null');
+      if (!q || !q.items) return;
+      var changed = false;
+      q.items.forEach(function (it) {
+        if (!it || !it.docs) return;
+        Object.keys(it.docs).forEach(function (t) {
+          if (it.docs[t] && it.docs[t].data) {
+            delete it.docs[t].data;
+            it.docs[t].strippedLocal = true;
+            changed = true;
+          }
+        });
+      });
+      if (changed) localStorage.setItem(qk, JSON.stringify(q));
+    } catch (eQ) {}
+  });
+}
+
+/**
+ * Reparación local (misma lógica que el script de consola):
+ * borra IDB docs rota → migra adjuntos a IDB → strip colas → save LS.
+ * No toca Supabase. Toast OK / «seguí lleno, avisá a Diego».
+ */
+function afRepararMemoriaLocal(opts) {
+  opts = opts || {};
+  if (_afRepararMemoriaBusy) {
+    return Promise.resolve({ ok: false, error: 'busy' });
+  }
+  _afRepararMemoriaBusy = true;
+  var btn = document.getElementById('cfg-reparar-memoria-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Reparando…';
+  }
+
+  function finish(report) {
+    _afRepararMemoriaBusy = false;
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Reparar memoria';
+    }
+    if (!opts.silent && typeof toast === 'function') {
+      if (report && report.ok) {
+        toast('Memoria reparada \u2713 \u2014 prob\u00e1 Guardar');
+      } else if (report && report.error === 'busy') {
+        toast('Ya hay una reparaci\u00f3n en curso');
+      } else {
+        toast('Sigue lleno \u2014 avis\u00e1 a Diego');
+      }
+    }
+    try {
+      console.log('[AF] afRepararMemoriaLocal', report);
+    } catch (eL) {}
+    return report;
+  }
+
+  var del =
+    typeof afDocIdbDeleteDatabase === 'function'
+      ? afDocIdbDeleteDatabase()
+      : Promise.resolve(false);
+
+  return del
+    .then(function () {
+      if (typeof afDocsDetachListToIdb === 'function') {
+        return afDocsDetachListToIdb(
+          typeof S !== 'undefined' && S.intervs ? S.intervs : []
+        );
+      }
+      return typeof S !== 'undefined' ? S.intervs || [] : [];
+    })
+    .then(function (list) {
+      if (typeof S !== 'undefined') S.intervs = list || S.intervs;
+      afStripLocalDocQueues();
+      try {
+        sessionStorage.removeItem('AF_EMERGENCY_NO_SYNC');
+      } catch (eS) {}
+      try {
+        if (typeof saveIntervsToStorage === 'function') saveIntervsToStorage();
+        var len = 0;
+        try {
+          if (typeof afIntervsKey === 'function') {
+            len = (localStorage.getItem(afIntervsKey()) || '').length;
+          }
+        } catch (eLen) {}
+        if (typeof renderHome === 'function') {
+          try {
+            renderHome();
+          } catch (eR) {}
+        }
+        return finish({ ok: true, lsChars: len });
+      } catch (eSave) {
+        return finish({
+          ok: false,
+          error: 'quota',
+          detail: String((eSave && eSave.message) || eSave)
+        });
+      }
+    })
+    .catch(function (e) {
+      return finish({
+        ok: false,
+        error: 'fail',
+        detail: String((e && e.message) || e)
+      });
+    });
+}
+
+/** Toast con botón «Reparar memoria» (celular / sin consola). */
+function afToastMemoriaError(msg) {
+  var now = Date.now();
+  if (now - _afMemoriaToastAt < 2500) return;
+  _afMemoriaToastAt = now;
+  if (typeof toast !== 'function') return;
+  toast(msg || 'Problema de memoria local', {
+    actionLabel: 'Reparar memoria',
+    onAction: function () {
+      afRepararMemoriaLocal();
+    },
+    ms: 12000
+  });
+}
+
+function afNotifyIdbSchemaError() {
+  afToastMemoriaError(
+    'Archivos locales da\u00f1ados \u2014 toc\u00e1 Reparar memoria'
+  );
 }
