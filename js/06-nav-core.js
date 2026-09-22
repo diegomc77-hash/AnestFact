@@ -93,10 +93,21 @@ function afSyncDock(id){
   if(typeof afSyncDockFojaQx==='function')afSyncDockFojaQx();
 }
 function goDock(id){
+  // Guardar en memoria sin RPC de plan (evita toast falso al cambiar de dock).
   try{
     var cur=(S.hist&&S.hist.length)?S.hist[S.hist.length-1]:'';
-    if(cur==='foja'&&S.cur&&typeof guardarFoja==='function')guardarFoja();
-    else if(S.cur&&typeof guardar==='function')guardar();
+    if(S.cur){
+      if(cur==='foja'&&typeof flushFojaDomIntoCur==='function')flushFojaDomIntoCur();
+      else if(typeof flushFormIntoCur==='function')flushFormIntoCur();
+      if(typeof afCommitGuardarLocal==='function'){
+        try{ afCommitGuardarLocal(); }
+        catch(eQ){
+          if(eQ&&(eQ.afQuota||eQ.name==='QuotaExceededError')&&typeof toast==='function'){
+            toast('Memoria local llena — no se pudo guardar al cambiar de pantalla');
+          }
+        }
+      }
+    }
   }catch(e){}
   var prev=S.hist.slice();
   S.hist=[id];
@@ -183,7 +194,17 @@ function go(id,addH){
 }
 function goFacturacion(){
   if(!S.cur){toast('Creá o abrí una intervención');return;}
-  guardar();
+  try{
+    if(typeof flushFormIntoCur==='function')flushFormIntoCur();
+    if(typeof afCommitGuardarLocal==='function'){
+      try{ afCommitGuardarLocal(); }
+      catch(eQ){
+        if(eQ&&(eQ.afQuota||eQ.name==='QuotaExceededError')&&typeof toast==='function'){
+          toast('Memoria local llena — abrí Facturación igual; liberá espacio cuando puedas');
+        }
+      }
+    }
+  }catch(e){}
   go('facturacion');
 }
 function goBack(){

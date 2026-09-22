@@ -304,24 +304,48 @@ function fetchSyncPayloadWithFallbacks(primaryClave){
 
 function syncApplyMergedIntervs(merged,remoteMeta){
   var antes=(S.intervs||[]).length;
-  S.intervs=merged;
-  saveIntervsToStorage();
-  if(remoteMeta)_syncMergeMeta(remoteMeta);
-  if(typeof renderHome==='function')renderHome();
-  return S.intervs.length-antes;
+  function finish(list){
+    S.intervs=list;
+    try{saveIntervsToStorage();}catch(eQ){
+      try{console.warn('[AF sync] save tras merge',eQ);}catch(eL){}
+    }
+    if(remoteMeta)_syncMergeMeta(remoteMeta);
+    if(typeof renderHome==='function')renderHome();
+    return S.intervs.length-antes;
+  }
+  if(typeof afDocsDetachListToIdb==='function'){
+    return afDocsDetachListToIdb(merged||[]).then(function(list){
+      return afDocsWarmCacheForList(list).then(function(){ return finish(list); });
+    }).catch(function(){ return finish(merged||[]); });
+  }
+  return Promise.resolve(finish(merged||[]));
 }
 
 function syncPrepareMergedPayload(){
+  if(typeof afEmergencyNoSync==='function'&&afEmergencyNoSync()){
+    return Promise.reject(new Error('emergency_no_sync'));
+  }
   var clave=getSyncClave();
   return fetchSyncPayloadWithFallbacks(clave).then(function(remote){
     var local=afFilterDeletedIntervs(S.intervs||[]);
     S.intervs=local;
-    if(remote===AFG_SYNC_UNCHANGED||!remote||!remote.intervs||!remote.intervs.length)return buildSyncPayload();
-    var merged=mergeIntervsLocalRemote(local,remote.intervs);
-    syncApplyMergedIntervs(merged,remote);
-    var data=buildSyncPayload();
-    data.total=data.intervs.length;
-    return data;
+    var base;
+    if(remote===AFG_SYNC_UNCHANGED||!remote||!remote.intervs||!remote.intervs.length){
+      base=Promise.resolve(local);
+    }else{
+      var merged=mergeIntervsLocalRemote(local,remote.intervs);
+      base=Promise.resolve(syncApplyMergedIntervs(merged,remote)).then(function(){ return S.intervs; });
+    }
+    return base.then(function(intervs){
+      var hydrate=typeof afDocsHydrateIntervsForSync==='function'
+        ? afDocsHydrateIntervsForSync(intervs)
+        : Promise.resolve(intervs);
+      return hydrate.then(function(hydrated){
+        var data=buildSyncPayloadFromIntervs(hydrated);
+        data.total=data.intervs.length;
+        return data;
+      });
+    });
   });
 }
 
@@ -330,6 +354,10 @@ function syncPrepareMergedPayload(){
  * No espera el debounce de 2.5s. Log explícito para diagnóstico.
  */
 function syncPushAfterDelete(deletedId){
+  if(typeof afEmergencyNoSync==='function'&&afEmergencyNoSync()){
+    try{console.warn('[AF] syncPushAfterDelete bloqueado AF_EMERGENCY_NO_SYNC');}catch(e){}
+    return Promise.resolve({ok:true,skipped:'emergency_no_sync'});
+  }
   var id=String(deletedId||'');
   function run(){
     if(_syncBusy){
@@ -340,26 +368,31 @@ function syncPushAfterDelete(deletedId){
     }
     _syncBusy=true;
     S.intervs=afFilterDeletedIntervs(S.intervs||[]);
-    saveIntervsToStorage();
-    var data=buildSyncPayload();
-    try{
-      console.log('[AFG sync] push post-delete START',{
-        deletedId:id,
-        fojas:data.total,
-        tombstones:Object.keys(afGetDeletedIntervsMap()).length,
-        at:new Date().toISOString()
-      });
-    }catch(eL){}
-    return syncGuardarSupabase(data,false).then(function(){
+    try{saveIntervsToStorage();}catch(eSave){}
+    var hydrate=typeof afDocsHydrateIntervsForSync==='function'
+      ? afDocsHydrateIntervsForSync(S.intervs)
+      : Promise.resolve(S.intervs);
+    return hydrate.then(function(hydrated){
+      var data=buildSyncPayloadFromIntervs(hydrated);
       try{
-        console.log('[AFG sync] push post-delete OK',{
+        console.log('[AFG sync] push post-delete START',{
           deletedId:id,
           fojas:data.total,
-          at:new Date().toISOString(),
-          lastPush:_lastSyncPush
+          tombstones:Object.keys(afGetDeletedIntervsMap()).length,
+          at:new Date().toISOString()
         });
-      }catch(e2){}
-      return{ok:true,deletedId:id,total:data.total};
+      }catch(eL){}
+      return syncGuardarSupabase(data,false).then(function(){
+        try{
+          console.log('[AFG sync] push post-delete OK',{
+            deletedId:id,
+            fojas:data.total,
+            at:new Date().toISOString(),
+            lastPush:_lastSyncPush
+          });
+        }catch(e2){}
+        return{ok:true,deletedId:id,total:data.total};
+      });
     }).catch(function(e){
       try{console.error('[AFG sync] push post-delete FAIL',id,e&&e.message||e);}catch(e3){}
       throw e;
@@ -394,7 +427,11 @@ function mostrarCodigoScript(){var p=document.getElementById('script-code-panel'
 function copiarCodigoScript(){var ta=document.getElementById('script-code-text');if(ta){ta.select();document.execCommand('copy');toast('C\u00f3digo copiado \u2713');}}
 
 function buildSyncPayload(){
-  var intervs=afFilterDeletedIntervs(S.intervs||[]);
+  return buildSyncPayloadFromIntervs(afFilterDeletedIntervs(S.intervs||[]));
+}
+
+function buildSyncPayloadFromIntervs(intervsIn){
+  var intervs=intervsIn||[];
   if(typeof afIntervsPayloadForSync==='function')intervs=afIntervsPayloadForSync(intervs);
   var data={
     intervs:intervs,
@@ -468,29 +505,42 @@ function aplicarSyncData(data,reemplazar,silent){
   if(!nueva.length&&!(data&&data.intervs&&data.intervs.length)){
     if(!silent){syncStatus('Backup vac\u00edo en la nube','err');toast('No hay fojas en el backup');}
     else syncAutoStatusUpdate();
-    return;
+    return Promise.resolve();
   }
-  // Si la nube solo tenía fojas ya tombstoned, nueva puede quedar vacía pero es válido
-  if(reemplazar){
-    S.intervs=nueva.slice();
-    saveIntervsToStorage();
+  function after(list, statusMsg, toastMsg){
+    S.intervs=list;
+    try{saveIntervsToStorage();}catch(eQ){
+      try{console.warn('[AF sync] aplicarSyncData save',eQ);}catch(eL){}
+    }
     _syncMergeMeta(data);
-    renderHome();
-    if(!silent){syncStatus('\u2713 '+nueva.length+' fojas cargadas (reemplaz\u00f3 todo)','ok');toast('Sync completo \u2713');}
-    else{_lastSyncPull=Date.now();syncAutoStatusUpdate();}
-    return;
+    if(typeof renderHome==='function')renderHome();
+    if(typeof afDocsWarmCacheForList==='function')afDocsWarmCacheForList(list);
+    if(!silent){
+      if(statusMsg)syncStatus('\u2713 '+statusMsg,'ok');
+      if(toastMsg)toast(toastMsg);
+    }else{_lastSyncPull=Date.now();syncAutoStatusUpdate();}
+  }
+  var detach=typeof afDocsDetachListToIdb==='function'
+    ? afDocsDetachListToIdb
+    : function(x){ return Promise.resolve(x); };
+
+  if(reemplazar){
+    return detach(nueva.slice()).then(function(list){
+      after(list, list.length+' fojas cargadas (reemplaz\u00f3 todo)', 'Sync completo \u2713');
+    });
   }
   var antes=(S.intervs||[]).length;
-  S.intervs=mergeIntervsLocalRemote(S.intervs,nueva);
-  saveIntervsToStorage();
-  _syncMergeMeta(data);
-  renderHome();
-  var agregados=S.intervs.length-antes;
-  if(!silent){
-    var msg='Nube: '+nueva.length+' fojas. Nuevas aqu\u00ed: '+Math.max(0,agregados)+'. Total: '+S.intervs.length;
-    syncStatus('\u2713 '+msg,'ok');
-    toast(agregados>0?('+'+agregados+' fojas'):'Sync al d\u00eda');
-  }else{_lastSyncPull=Date.now();syncAutoStatusUpdate();}
+  var merged=mergeIntervsLocalRemote(S.intervs,nueva);
+  return detach(merged).then(function(list){
+    var agregados=list.length-antes;
+    after(
+      list,
+      agregados>0
+        ? ('Nube: '+nueva.length+' fojas. Nuevas aqu\u00ed: '+agregados+'. Total: '+list.length)
+        : ('Nube: '+nueva.length+' fojas. Total: '+list.length),
+      agregados>0 ? ('+'+agregados+' fojas') : 'Sync al d\u00eda'
+    );
+  });
 }
 
 function syncGuardarSupabase(data,silent){
@@ -596,6 +646,10 @@ function syncTraerTodo(){
 }
 
 function syncAutoPull(silent){
+  if(typeof afEmergencyNoSync==='function'&&afEmergencyNoSync()){
+    try{console.warn('[AF] syncAutoPull bloqueado AF_EMERGENCY_NO_SYNC');}catch(e){}
+    return Promise.resolve({ok:true,skipped:'emergency_no_sync'});
+  }
   if(_syncBusy)return Promise.resolve();
   _syncBusy=true;
   return syncCargarSupabase(false,!!silent).catch(function(e){
@@ -606,6 +660,10 @@ function syncAutoPull(silent){
 }
 
 function syncAutoPush(silent){
+  if(typeof afEmergencyNoSync==='function'&&afEmergencyNoSync()){
+    try{console.warn('[AF] syncAutoPush bloqueado AF_EMERGENCY_NO_SYNC');}catch(e){}
+    return Promise.resolve({ok:true,skipped:'emergency_no_sync'});
+  }
   if(_syncBusy)return Promise.resolve();
   _syncBusy=true;
   return syncPrepareMergedPayload().then(function(data){
@@ -613,6 +671,7 @@ function syncAutoPush(silent){
     _lastSyncErr='';
     return syncGuardarSupabase(data,!!silent);
   }).catch(function(e){
+    if(e&&String(e.message||e)==='emergency_no_sync')return;
     _lastSyncErr=e.message||'error';
     if(!silent)syncStatus('Error al subir: '+_lastSyncErr,'err');
     syncAutoStatusUpdate();
@@ -620,6 +679,7 @@ function syncAutoPush(silent){
 }
 
 function syncAutoPushDebounced(){
+  if(typeof afEmergencyNoSync==='function'&&afEmergencyNoSync())return;
   clearTimeout(_syncPushTimer);
   _syncPushTimer=setTimeout(function(){syncAutoPush(true);},2500);
 }
@@ -629,18 +689,35 @@ function syncCancelPushDebounced(){
 }
 
 function initAutoSync(){
-  setTimeout(function(){
-    syncAutoPull(true).then(function(){
-      return syncAutoPush(true);
-    });
-  },800);
+  if(typeof afEmergencyNoSync==='function'&&afEmergencyNoSync()){
+    try{console.warn('[AF] initAutoSync: AF_EMERGENCY_NO_SYNC activo — sin pull/push');}catch(e){}
+    syncAutoStatusUpdate();
+    return;
+  }
+  // Migrar blobs de localStorage → IndexedDB (una vez por carga)
+  var migrate=typeof afDocsDetachListToIdb==='function'
+    ? afDocsDetachListToIdb(S.intervs||[])
+    : Promise.resolve(S.intervs||[]);
+  migrate.then(function(list){
+    if(list&&list!==S.intervs)S.intervs=list;
+    try{saveIntervsToStorage();}catch(eM){}
+    if(typeof afDocsWarmCacheForList==='function')return afDocsWarmCacheForList(S.intervs);
+  }).catch(function(){}).then(function(){
+    setTimeout(function(){
+      syncAutoPull(true).then(function(){
+        return syncAutoPush(true);
+      });
+    },800);
+  });
   document.addEventListener('visibilitychange',function(){
     if(document.visibilityState==='visible'){
+      if(typeof afEmergencyNoSync==='function'&&afEmergencyNoSync())return;
       syncAutoPull(true).then(function(){return syncAutoPush(true);});
     }
   });
   setInterval(function(){
     if(document.visibilityState==='visible'){
+      if(typeof afEmergencyNoSync==='function'&&afEmergencyNoSync())return;
       syncAutoPull(true).then(function(){return syncAutoPush(true);});
     }
   },180000);
@@ -650,13 +727,41 @@ function initAutoSync(){
 function afCommitAdjunto(tipo,doc){
   if(!S.cur||!doc)return;
   if(!S.cur.docs)S.cur.docs={};
-  S.cur.docs[tipo]=doc;
-  var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});
-  if(idx>=0)S.intervs[idx]=S.cur;
-  saveIntervsToStorage();
-  if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
-  renderDocBadges();
-  toast(getNombreDoc(tipo)+' guardada \u2713');
+  var prev=S.cur.docs[tipo];
+  var hadKey=Object.prototype.hasOwnProperty.call(S.cur.docs,tipo);
+  var intervId=String(S.cur.id);
+
+  function persist(metaOrFull){
+    S.cur.docs[tipo]=metaOrFull;
+    var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});
+    if(idx>=0)S.intervs[idx]=S.cur;
+    try{
+      saveIntervsToStorage();
+    }catch(e){
+      if(hadKey)S.cur.docs[tipo]=prev;
+      else delete S.cur.docs[tipo];
+      if(e&&(e.afQuota||e.name==='QuotaExceededError'||e.code===22||e.code===1014)){
+        if(typeof toast==='function'){
+          toast('Memoria local llena: no se pudo guardar el adjunto. Liberá fojas/adjuntos viejos.');
+        }
+        try{console.warn('[AF] QuotaExceeded afCommitAdjunto',e);}catch(eL){}
+        return;
+      }
+      throw e;
+    }
+    if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+    renderDocBadges();
+    toast(getNombreDoc(tipo)+' guardada \u2713');
+  }
+
+  if(typeof afDocIdbPut==='function'&&doc.data){
+    afDocIdbPut(intervId,tipo,doc).then(function(ok){
+      if(ok&&typeof afDocMetaFromFull==='function')persist(afDocMetaFromFull(doc));
+      else persist(doc);
+    }).catch(function(){ persist(doc); });
+    return;
+  }
+  persist(doc);
 }
 
 var AF_GECLISA_PDF_MAX = 1572864; /* 1.5 MiB crudo; data-URL ~2 MB. No comprimir. */
@@ -667,6 +772,10 @@ function afDocIsP1bAlias(d){
 
 /** PDF combinado: qx es un puntero a anest, sin duplicar el blob. */
 function afResolveDoc(docs, tipo){
+  var intervId=(typeof S!=='undefined'&&S.cur&&S.cur.id)?S.cur.id:'';
+  if(typeof afDocsResolveWithCache==='function'){
+    return afDocsResolveWithCache(docs,tipo,intervId);
+  }
   var d=docs&&docs[tipo];
   if(!d)return null;
   if(!d.aliasOf)return d;
@@ -877,6 +986,19 @@ function renderDocBadges(){
     }
   }
   var docs=(S.cur&&S.cur.docs)||{};
+  var intervId=S.cur&&S.cur.id;
+  var needWarm=false;
+  ['anest','qx','auth'].forEach(function(tipo){
+    var raw=docs[tipo];
+    if(!raw||raw.data||raw.aliasOf)return;
+    if(raw.idb&&typeof afDocIdbGet==='function'&&intervId&&!afDocMemGet(intervId,tipo)){
+      needWarm=true;
+      afDocIdbGet(intervId,tipo).then(function(){ renderDocBadges(); });
+    }
+  });
+  if(needWarm){
+    // Primera pasada: mostrar badge por metadata mientras llega el blob
+  }
   ['anest','qx','auth'].forEach(function(tipo){
     var badge=document.getElementById('doc-'+tipo+'-badge');
     var prev=document.getElementById('doc-'+tipo+'-prev');
@@ -884,16 +1006,19 @@ function renderDocBadges(){
     if(!badge)return;
     var raw=docs[tipo];
     var d=afResolveDoc(docs,tipo);
-    if(raw&&d&&d.data){
+    var hasSlot=!!raw;
+    var hasData=!!(d&&d.data);
+    var pendingIdb=!!(raw&&raw.idb&&!hasData&&!raw.aliasOf);
+    if(hasSlot&&(hasData||pendingIdb||raw.aliasOf)){
       badge.style.display='inline-block';
-      var isImg=d.tipo&&d.tipo.startsWith('image/');
-      var sub=d.aliasOf
+      var isImg=hasData&&d.tipo&&d.tipo.startsWith('image/');
+      var sub=d&&d.aliasOf
         ? 'mismo archivo (qx + anest)'
-        : (d.fecha?new Date(d.fecha).toLocaleString():'');
+        : (pendingIdb?'cargando\u2026':(d&&d.fecha?new Date(d.fecha).toLocaleString():''));
       if(prev){
         prev.innerHTML='<div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--green);border-radius:8px;padding:8px 10px;margin-top:4px">'
           +(isImg?'<img src="'+d.data+'" style="height:44px;border-radius:4px;object-fit:cover">':'<span style="font-size:24px">doc</span>')
-          +'<div style="flex:1;overflow:hidden"><div style="font-size:12px;font-weight:500">'+(d.nombre||getNombreDoc(tipo))+'</div>'
+          +'<div style="flex:1;overflow:hidden"><div style="font-size:12px;font-weight:500">'+(d&&d.nombre||raw.nombre||getNombreDoc(tipo))+'</div>'
           +'<div style="font-size:11px;color:var(--text3)">'+sub+'</div></div>'
           +'<button onclick="verDoc(\''+tipo+'\')" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:13px">ver</button>'
           +'<button onclick="borrarDoc(\''+tipo+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px">\u00d7</button></div>';
@@ -906,11 +1031,13 @@ function renderDocBadges(){
     }
   });
 }
-function verDoc(tipo){
-  var docs=(S.cur&&S.cur.docs)||{};
-  var d=afResolveDoc(docs,tipo);
-  if(!d||!d.data)return;
+function afOpenDocData(d){
+  if(!d||!d.data){
+    if(typeof toast==='function')toast('Documento no disponible');
+    return;
+  }
   var w=window.open('','_blank');
+  if(!w){if(typeof toast==='function')toast('Permit\u00ed ventanas emergentes');return;}
   if(d.tipo&&d.tipo.startsWith('image/')){
     w.document.write('<img src="'+d.data+'" style="max-width:100%">');
   }else{
@@ -918,8 +1045,33 @@ function verDoc(tipo){
   }
   w.document.close();
 }
+function verDoc(tipo){
+  var docs=(S.cur&&S.cur.docs)||{};
+  var intervId=S.cur&&S.cur.id;
+  var d=afResolveDoc(docs,tipo);
+  if(d&&d.data){afOpenDocData(d);return;}
+  var raw=docs[tipo];
+  var srcTipo=(raw&&raw.aliasOf)?raw.aliasOf:tipo;
+  if(intervId&&typeof afDocIdbGet==='function'&&((raw&&raw.idb)||(docs[srcTipo]&&docs[srcTipo].idb))){
+    afDocIdbGet(intervId,srcTipo).then(function(full){
+      if(!full||!full.data){if(typeof toast==='function')toast('Documento no disponible');return;}
+      afOpenDocData({
+        nombre:d&&d.nombre||full.nombre,
+        tipo:full.tipo,
+        data:full.data,
+        fecha:full.fecha,
+        fuente:d&&d.fuente||full.fuente,
+        size:full.size,
+        aliasOf:raw&&raw.aliasOf
+      });
+    });
+    return;
+  }
+  if(typeof toast==='function')toast('Documento no disponible');
+}
 function borrarDoc(tipo){
   if(!S.cur||!S.cur.docs)return;
+  var intervId=String(S.cur.id);
   if(tipo==='qx'&&afDocIsP1bAlias(S.cur.docs.qx)){
     S.cur.mayo_pdf_qx_alias_off=true;
   }
@@ -927,6 +1079,9 @@ function borrarDoc(tipo){
     delete S.cur.docs.qx;
   }
   delete S.cur.docs[tipo];
+  if(typeof afDocIdbDelete==='function'){
+    try{afDocIdbDelete(intervId,tipo);}catch(eD){}
+  }
   var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});
   if(idx>=0)S.intervs[idx]=S.cur;
   saveIntervsToStorage();
@@ -938,14 +1093,27 @@ function cargarDocBadges(){setTimeout(renderDocBadges,100);}
 function verDocRes(tipo){verDoc(tipo);}
 function descargarDoc(tipo){
   var docs=(S.cur&&S.cur.docs)||{};
+  var intervId=S.cur&&S.cur.id;
+  function doDl(d){
+    if(!d||!d.data){if(typeof toast==='function')toast('Documento no disponible');return;}
+    var a=document.createElement('a');
+    a.href=d.data;
+    a.download=d.nombre||('doc-'+tipo);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    toast('Descargando '+d.nombre);
+  }
   var d=afResolveDoc(docs,tipo);
-  if(!d||!d.data)return;
-  var a=document.createElement('a');
-  a.href=d.data;
-  a.download=d.nombre||('doc-'+tipo);
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  toast('Descargando '+d.nombre);
+  if(d&&d.data){doDl(d);return;}
+  var raw=docs[tipo];
+  var srcTipo=(raw&&raw.aliasOf)?raw.aliasOf:tipo;
+  if(intervId&&typeof afDocIdbGet==='function'&&((raw&&raw.idb)||(docs[srcTipo]&&docs[srcTipo].idb))){
+    afDocIdbGet(intervId,srcTipo).then(function(full){
+      doDl(full?Object.assign({},raw||{},full):null);
+    });
+    return;
+  }
+  if(typeof toast==='function')toast('Documento no disponible');
 }
 

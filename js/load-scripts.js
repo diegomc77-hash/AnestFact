@@ -25,8 +25,9 @@
     'js/15-utils.js',
     'js/16-vitals-grid.js',
     'data/cirujanos-esp.js',
-    'js/17-sync-export.js',
     'js/41-adjuntos-compress.js',
+    'js/41b-docs-idb.js',
+    'js/17-sync-export.js',
     'js/18-posicion.js',
     'js/19-examen-mayo.js',
     'js/25-examen-ausc.js',
@@ -63,7 +64,7 @@
     'js/24-sw-register.js'
   ];
 
-  var CACHE_V = '12.78';
+  var CACHE_V = '12.81';
   window.AF_CACHE_V = CACHE_V;
   try { document.title = 'AnesFact v' + CACHE_V; } catch (eTit) {}
 

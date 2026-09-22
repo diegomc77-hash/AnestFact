@@ -750,7 +750,21 @@ function afCommitGuardarLocal(){
   var idx=S.intervs.findIndex(function(i){return i.id===S.cur.id;});
   if(idx>=0)S.intervs[idx]=S.cur;else S.intervs.push(S.cur);
   S.cur._ts=Date.now();
-  saveIntervsToStorage();
+  try{
+    saveIntervsToStorage();
+  }catch(e){
+    if(e&&(e.afQuota||e.name==='QuotaExceededError'||e.code===22||e.code===1014)){
+      if(typeof toast==='function'){
+        toast('Memoria local llena: liberá fojas/adjuntos viejos (no es un problema de plan).');
+      }
+      try{console.warn('[AF] QuotaExceeded saveIntervsToStorage',e);}catch(eL){}
+      var err=new Error('quota_exceeded');
+      err.name='QuotaExceededError';
+      err.afQuota=true;
+      throw err;
+    }
+    throw e;
+  }
   if(S.cur.ciru&&S.cur.ciru.trim()){
     var c=S.cur.ciru.trim();
     if(!(typeof afIsCirujanoBasura==='function'&&afIsCirujanoBasura(c))){
@@ -768,7 +782,12 @@ function guardar(extra){
   flushFormIntoCur(extra);
 
   function finishOk(){
-    afCommitGuardarLocal();
+    try{
+      afCommitGuardarLocal();
+    }catch(eSave){
+      if(eSave&&(eSave.afQuota||eSave.name==='QuotaExceededError')) return false;
+      throw eSave;
+    }
     toast('Guardado ✓');
     return true;
   }
@@ -791,7 +810,14 @@ function guardar(extra){
       }
       return finishOk();
     });
-  }).catch(function(){
+  }).catch(function(e){
+    if(e&&(e.afQuota||e.name==='QuotaExceededError')){
+      if(typeof toast==='function'){
+        toast('Memoria local llena: liberá fojas/adjuntos viejos (no es un problema de plan).');
+      }
+      return false;
+    }
+    try{console.warn('[AF] guardar catch',e);}catch(eL){}
     if(typeof toast==='function') toast('No se pudo verificar el plan. Reintentá.');
     return false;
   });

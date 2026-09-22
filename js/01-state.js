@@ -36,7 +36,14 @@ function loadIntervsFromStorage(){
   }catch(ePur){}
 }
 function saveIntervsToStorage(){
-  localStorage.setItem(afIntervsKey(),JSON.stringify(S.intervs||[]));
+  try{
+    localStorage.setItem(afIntervsKey(),JSON.stringify(S.intervs||[]));
+  }catch(e){
+    if(e&&(e.name==='QuotaExceededError'||e.code===22||e.code===1014)){
+      e.afQuota=true;
+    }
+    throw e;
+  }
 }
 
 S.key=localStorage.getItem('af_k')||'';
