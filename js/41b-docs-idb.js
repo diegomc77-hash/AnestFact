@@ -1,37 +1,164 @@
 /**
  * Adjuntos foja fuera de localStorage → IndexedDB (cuota mucho mayor).
  * En localStorage solo queda metadata (+ alias). Memoria: _afDocMemCache.
+ *
+ * Esquema: DB `anesfact_docs_v1`, store `blobs`, keyPath `key`.
+ * VER=2: si otra pestaña/extensión abrió la DB en v1 sin onupgradeneeded
+ * (DB vacía sin stores), open(1) no dispara upgrade. Bumpeamos a 2 y
+ * recreamos el store faltante; si sigue roto, deleteDatabase + reopen.
  */
 var AF_DOCS_IDB_NAME = 'anesfact_docs_v1';
 var AF_DOCS_IDB_STORE = 'blobs';
+var AF_DOCS_IDB_VER = 2;
 var _afDocIdbDb = null;
+var _afDocIdbOpenPromise = null;
 var _afDocMemCache = {};
 
 function afDocIdbKey(intervId, tipo) {
   return String(intervId || '') + '::' + String(tipo || '');
 }
 
-function afDocIdbOpen() {
-  if (_afDocIdbDb) return Promise.resolve(_afDocIdbDb);
-  if (typeof indexedDB === 'undefined') {
-    return Promise.reject(new Error('no_indexeddb'));
+function afDocIdbCloseCached() {
+  if (_afDocIdbDb) {
+    try {
+      _afDocIdbDb.close();
+    } catch (eC) {}
+    _afDocIdbDb = null;
   }
+  _afDocIdbOpenPromise = null;
+}
+
+function afDocIdbHasStore(db) {
+  try {
+    return !!(db && db.objectStoreNames && db.objectStoreNames.contains(AF_DOCS_IDB_STORE));
+  } catch (e) {
+    return false;
+  }
+}
+
+function afDocIdbDeleteDatabase() {
+  afDocIdbCloseCached();
+  if (typeof indexedDB === 'undefined') return Promise.resolve(false);
+  return new Promise(function (resolve) {
+    var req = indexedDB.deleteDatabase(AF_DOCS_IDB_NAME);
+    var done = false;
+    function finish(ok) {
+      if (done) return;
+      done = true;
+      resolve(!!ok);
+    }
+    req.onsuccess = function () {
+      finish(true);
+    };
+    req.onerror = function () {
+      finish(false);
+    };
+    req.onblocked = function () {
+      try {
+        console.warn('[AF docs-idb] deleteDatabase blocked — cerrá otras pestañas AnesFact');
+      } catch (eW) {}
+      // Seguir: a veces igual termina; si no, el reopen fallará y se reintenta.
+      setTimeout(function () {
+        finish(false);
+      }, 800);
+    };
+  });
+}
+
+function afDocIdbOpenRaw() {
   return new Promise(function (resolve, reject) {
-    var req = indexedDB.open(AF_DOCS_IDB_NAME, 1);
+    var req = indexedDB.open(AF_DOCS_IDB_NAME, AF_DOCS_IDB_VER);
     req.onupgradeneeded = function () {
       var db = req.result;
-      if (!db.objectStoreNames.contains(AF_DOCS_IDB_STORE)) {
-        db.createObjectStore(AF_DOCS_IDB_STORE, { keyPath: 'key' });
+      try {
+        if (!db.objectStoreNames.contains(AF_DOCS_IDB_STORE)) {
+          db.createObjectStore(AF_DOCS_IDB_STORE, { keyPath: 'key' });
+        }
+      } catch (eUp) {
+        reject(eUp || new Error('idb_upgrade'));
       }
     };
     req.onsuccess = function () {
-      _afDocIdbDb = req.result;
-      resolve(_afDocIdbDb);
+      resolve(req.result);
     };
     req.onerror = function () {
       reject(req.error || new Error('idb_open'));
     };
+    req.onblocked = function () {
+      try {
+        console.warn('[AF docs-idb] open blocked');
+      } catch (eB) {}
+    };
   });
+}
+
+/**
+ * Abre la DB asegurando el store `blobs`. Si hay esquema roto (v1 vacía),
+ * borra y recrea. No toca Supabase ni localStorage.
+ */
+function afDocIdbOpen(opt) {
+  var allowRecreate = !(opt && opt.allowRecreate === false);
+  if (_afDocIdbDb && afDocIdbHasStore(_afDocIdbDb)) {
+    return Promise.resolve(_afDocIdbDb);
+  }
+  if (_afDocIdbDb) afDocIdbCloseCached();
+  if (_afDocIdbOpenPromise) return _afDocIdbOpenPromise;
+
+  if (typeof indexedDB === 'undefined') {
+    return Promise.reject(new Error('no_indexeddb'));
+  }
+
+  _afDocIdbOpenPromise = afDocIdbOpenRaw()
+    .then(function (db) {
+      if (afDocIdbHasStore(db)) {
+        _afDocIdbDb = db;
+        try {
+          db.onversionchange = function () {
+            afDocIdbCloseCached();
+          };
+        } catch (eV) {}
+        return db;
+      }
+      try {
+        db.close();
+      } catch (eCl) {}
+      if (!allowRecreate) {
+        throw new Error('idb_missing_store');
+      }
+      try {
+        console.warn('[AF docs-idb] store faltante — recreando DB local');
+      } catch (eL) {}
+      return afDocIdbDeleteDatabase().then(function () {
+        return afDocIdbOpenRaw().then(function (db2) {
+          if (!afDocIdbHasStore(db2)) {
+            try {
+              db2.close();
+            } catch (e2) {}
+            throw new Error('idb_recreate_failed');
+          }
+          _afDocIdbDb = db2;
+          try {
+            db2.onversionchange = function () {
+              afDocIdbCloseCached();
+            };
+          } catch (eV2) {}
+          return db2;
+        });
+      });
+    })
+    .then(
+      function (db) {
+        _afDocIdbOpenPromise = null;
+        return db;
+      },
+      function (err) {
+        _afDocIdbOpenPromise = null;
+        afDocIdbCloseCached();
+        throw err;
+      }
+    );
+
+  return _afDocIdbOpenPromise;
 }
 
 function afDocMemSet(intervId, tipo, doc) {
@@ -71,72 +198,124 @@ function afDocMetaFromFull(doc) {
   return meta;
 }
 
+function afDocIdbIsMissingStoreError(e) {
+  if (!e) return false;
+  var name = e.name || '';
+  var msg = String(e.message || e);
+  return name === 'NotFoundError' || /object store|not found/i.test(msg);
+}
+
+function afDocIdbPutOnce(db, intervId, tipo, doc, key) {
+  return new Promise(function (resolve, reject) {
+    var tx = db.transaction(AF_DOCS_IDB_STORE, 'readwrite');
+    tx.oncomplete = function () {
+      resolve(true);
+    };
+    tx.onerror = function () {
+      reject(tx.error || new Error('idb_put'));
+    };
+    tx.objectStore(AF_DOCS_IDB_STORE).put({
+      key: key,
+      intervId: String(intervId),
+      slot: String(tipo),
+      nombre: doc.nombre || 'documento',
+      tipo: doc.tipo || 'application/octet-stream',
+      data: doc.data,
+      fecha: doc.fecha || '',
+      fuente: doc.fuente || '',
+      size: doc.size != null ? doc.size : String(doc.data).length
+    });
+  });
+}
+
 function afDocIdbPut(intervId, tipo, doc) {
   if (!doc || !doc.data) return Promise.resolve(false);
   var key = afDocIdbKey(intervId, tipo);
   afDocMemSet(intervId, tipo, doc);
-  return afDocIdbOpen().then(function (db) {
-    return new Promise(function (resolve, reject) {
-      var tx = db.transaction(AF_DOCS_IDB_STORE, 'readwrite');
-      tx.oncomplete = function () { resolve(true); };
-      tx.onerror = function () { reject(tx.error || new Error('idb_put')); };
-      tx.objectStore(AF_DOCS_IDB_STORE).put({
-        key: key,
-        intervId: String(intervId),
-        slot: String(tipo),
-        nombre: doc.nombre || 'documento',
-        tipo: doc.tipo || 'application/octet-stream',
-        data: doc.data,
-        fecha: doc.fecha || '',
-        fuente: doc.fuente || '',
-        size: doc.size != null ? doc.size : String(doc.data).length
-      });
+  return afDocIdbOpen()
+    .then(function (db) {
+      return afDocIdbPutOnce(db, intervId, tipo, doc, key);
+    })
+    .catch(function (e) {
+      if (!afDocIdbIsMissingStoreError(e)) {
+        try {
+          console.warn('[AF docs-idb] put fail', e);
+        } catch (eL) {}
+        return false;
+      }
+      try {
+        console.warn('[AF docs-idb] put NotFoundError — reset IDB y reintento');
+      } catch (eL2) {}
+      afDocIdbCloseCached();
+      return afDocIdbDeleteDatabase()
+        .then(function () {
+          return afDocIdbOpen();
+        })
+        .then(function (db2) {
+          return afDocIdbPutOnce(db2, intervId, tipo, doc, key);
+        })
+        .catch(function (e2) {
+          try {
+            console.warn('[AF docs-idb] put fail after reset', e2);
+          } catch (eL3) {}
+          return false;
+        });
     });
-  }).catch(function (e) {
-    try { console.warn('[AF docs-idb] put fail', e); } catch (eL) {}
-    return false;
-  });
 }
 
 function afDocIdbGet(intervId, tipo) {
   var mem = afDocMemGet(intervId, tipo);
   if (mem && mem.data) return Promise.resolve(mem);
-  return afDocIdbOpen().then(function (db) {
-    return new Promise(function (resolve, reject) {
-      var tx = db.transaction(AF_DOCS_IDB_STORE, 'readonly');
-      var req = tx.objectStore(AF_DOCS_IDB_STORE).get(afDocIdbKey(intervId, tipo));
-      req.onsuccess = function () {
-        var row = req.result;
-        if (!row || !row.data) {
-          resolve(null);
-          return;
-        }
-        var doc = {
-          nombre: row.nombre,
-          tipo: row.tipo,
-          data: row.data,
-          fecha: row.fecha,
-          fuente: row.fuente,
-          size: row.size
+  return afDocIdbOpen()
+    .then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction(AF_DOCS_IDB_STORE, 'readonly');
+        var req = tx.objectStore(AF_DOCS_IDB_STORE).get(afDocIdbKey(intervId, tipo));
+        req.onsuccess = function () {
+          var row = req.result;
+          if (!row || !row.data) {
+            resolve(null);
+            return;
+          }
+          var doc = {
+            nombre: row.nombre,
+            tipo: row.tipo,
+            data: row.data,
+            fecha: row.fecha,
+            fuente: row.fuente,
+            size: row.size
+          };
+          afDocMemSet(intervId, tipo, doc);
+          resolve(doc);
         };
-        afDocMemSet(intervId, tipo, doc);
-        resolve(doc);
-      };
-      req.onerror = function () { reject(req.error || new Error('idb_get')); };
+        req.onerror = function () {
+          reject(req.error || new Error('idb_get'));
+        };
+      });
+    })
+    .catch(function () {
+      return null;
     });
-  }).catch(function () { return null; });
 }
 
 function afDocIdbDelete(intervId, tipo) {
   afDocMemClear(intervId, tipo);
-  return afDocIdbOpen().then(function (db) {
-    return new Promise(function (resolve) {
-      var tx = db.transaction(AF_DOCS_IDB_STORE, 'readwrite');
-      tx.oncomplete = function () { resolve(true); };
-      tx.onerror = function () { resolve(false); };
-      tx.objectStore(AF_DOCS_IDB_STORE).delete(afDocIdbKey(intervId, tipo));
+  return afDocIdbOpen()
+    .then(function (db) {
+      return new Promise(function (resolve) {
+        var tx = db.transaction(AF_DOCS_IDB_STORE, 'readwrite');
+        tx.oncomplete = function () {
+          resolve(true);
+        };
+        tx.onerror = function () {
+          resolve(false);
+        };
+        tx.objectStore(AF_DOCS_IDB_STORE).delete(afDocIdbKey(intervId, tipo));
+      });
+    })
+    .catch(function () {
+      return false;
     });
-  }).catch(function () { return false; });
 }
 
 /** Mueve data URLs de una foja a IDB; deja metadata en el objeto. */
@@ -154,7 +333,9 @@ function afDocsDetachIntervToIdb(it) {
       });
     });
   });
-  return chain.then(function () { return it; });
+  return chain.then(function () {
+    return it;
+  });
 }
 
 function afDocsDetachListToIdb(list) {
