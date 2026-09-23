@@ -192,6 +192,7 @@ function go(id,addH){
     if(typeof renderPracs==='function')renderPracs();
     onSanChange();
     if(typeof cargarDocBadges==='function')cargarDocBadges();
+    if(typeof afRenderEvwebQueueHub==='function')afRenderEvwebQueueHub();
   }
   if(id==='ayuda'&&typeof renderAyuda==='function')renderAyuda();
   return true;
@@ -432,6 +433,14 @@ function onSanChange(){
     if(typeof afEnsureFojaQx==='function')afEnsureFojaQx(S.cur);
   }
   if(typeof afSyncDockFojaQx==='function')afSyncDockFojaQx();
+  // Favoritos de obra son por institución: refrescar lista abierta si cambió f-san.
+  if(typeof acObraSocial==='function'){
+    var acObra=document.getElementById('ac-obra');
+    var obraEl=document.getElementById('f-obra');
+    if(acObra&&obraEl&&acObra.style.display==='block'&&(obraEl.value||'').trim()){
+      acObraSocial('f-obra','ac-obra');
+    }
+  }
 }
 function afSyncSalaInstUi(){
   var sanEl=document.getElementById('f-san');

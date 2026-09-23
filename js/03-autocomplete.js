@@ -19,10 +19,91 @@ function renderAC(listId,items,labelFn,subFn,onSelect){
   };
   el.style.display='block';
 }
+/** Favoritos de obra social (estrellita) — por usuario + institución (f-san). */
+function afObraInstSlug(){
+  var san='';
+  try{
+    var el=document.getElementById('f-san');
+    if(el&&el.value)san=el.value;
+    else if(typeof S!=='undefined'&&S.cur&&S.cur.san)san=S.cur.san;
+  }catch(e){}
+  var n=(san||'').toString().trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g,'_')
+    .replace(/^_|_$/g,'');
+  return n||'sin_inst';
+}
+function afObraFavKey(){
+  var uid=(typeof AF_AUTH!=='undefined'&&AF_AUTH.getUserId)?(AF_AUTH.getUserId()||''):'';
+  return 'af_obra_favs_'+(uid||'anon')+'_'+afObraInstSlug();
+}
+function afObraFavsGet(){
+  try{
+    var raw=localStorage.getItem(afObraFavKey());
+    if(raw){var arr=JSON.parse(raw);if(Array.isArray(arr))return arr;}
+  }catch(e){}
+  // Semilla: favoritos globales previos (pre-institución), si existen.
+  try{
+    var uid=(typeof AF_AUTH!=='undefined'&&AF_AUTH.getUserId)?(AF_AUTH.getUserId()||''):'';
+    var oldRaw=localStorage.getItem('af_obra_favs_'+(uid||'anon'));
+    if(oldRaw){
+      var oldArr=JSON.parse(oldRaw);
+      if(Array.isArray(oldArr)&&oldArr.length){
+        afObraFavsSave(oldArr);
+        return oldArr;
+      }
+    }
+  }catch(e2){}
+  // Sin favoritos: arrancar con las 15 de Huerta.
+  return (typeof AF_OBRAS_HUERTA!=='undefined')?AF_OBRAS_HUERTA.slice():[];
+}
+function afObraFavsSave(list){
+  try{localStorage.setItem(afObraFavKey(),JSON.stringify(list));}catch(e){}
+}
+function afObraFavToggle(name,ev){
+  if(ev){try{ev.preventDefault();ev.stopPropagation();}catch(e){}}
+  if(!name)return;
+  var favs=afObraFavsGet();
+  var i=favs.indexOf(name);
+  if(i>=0)favs.splice(i,1);else favs.unshift(name);
+  afObraFavsSave(favs);
+  acObraSocial('f-obra','ac-obra');
+}
 function acObraSocial(fieldId,listId){
-  var q=document.getElementById(fieldId).value;
-  var items=OBRAS_SOCIALES.filter(function(x){return x.toLowerCase().indexOf(q.toLowerCase())>=0;}).slice(0,10);
-  renderAC(listId,items,function(x){return x;},null,function(i,cap){document.getElementById(fieldId).value=cap[i]||'';closeAllAC();});
+  var q=(document.getElementById(fieldId).value||'').trim();
+  var listEl=document.getElementById(listId);
+  if(!q){if(listEl)listEl.style.display='none';return;}
+  var ql=q.toLowerCase();
+  var match=function(x){return (x||'').toLowerCase().indexOf(ql)>=0;};
+  var favs=afObraFavsGet();
+  // Favoritas (estrellita) primero; resto del catálogo EVWEB después.
+  var pri=favs.filter(match);
+  var rest=OBRAS_SOCIALES.filter(function(x){
+    if(!match(x))return false;
+    return pri.indexOf(x)<0;
+  });
+  var items=pri.concat(rest).slice(0,12);
+  if(!listEl)return;
+  if(!items.length){listEl.style.display='none';return;}
+  listEl.innerHTML=items.map(function(x){
+    var isFav=favs.indexOf(x)>=0;
+    var safe=x.replace(/"/g,'&quot;');
+    return '<div class="ac-item" data-name="'+safe+'" style="display:flex;align-items:center;gap:8px" onmousedown="event.preventDefault()">'
+      +'<span class="ac-star" onclick="afObraFavToggle(this.parentNode.getAttribute(\'data-name\'),event)" style="cursor:pointer;font-size:15px;color:'+(isFav?'#f5b942':'var(--text3)')+'" title="'+(isFav?'Quitar de favoritas':'Marcar como favorita')+'">'+(isFav?'★':'☆')+'</span>'
+      +'<span style="flex:1">'+x+'</span></div>';
+  }).join('');
+  listEl.onclick=function(e){
+    var star=e.target;
+    while(star&&star!==listEl){if(star.className&&star.className.indexOf('ac-star')>=0)return;star=star.parentNode;}
+    var t=e.target;while(t&&t!==listEl){if(t.className&&t.className.indexOf('ac-item')>=0)break;t=t.parentNode;}
+    if(!t||!t.className||t.className.indexOf('ac-item')<0)return;
+    document.getElementById(fieldId).value=t.getAttribute('data-name')||'';
+    closeAllAC();
+    if(typeof renderPracs==='function')renderPracs();
+  };
+  listEl.style.display='block';
 }
 function diagParts(val){return(val||'').split(/\s*[.;+/]\s*/);}
 function diagSearchTail(val){var parts=diagParts(val);return(parts[parts.length-1]||'').trim();}

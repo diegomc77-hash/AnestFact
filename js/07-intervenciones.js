@@ -588,6 +588,7 @@ function renderSanatoriosHub(){
   host.innerHTML=html;
 }
 function renderEvwebHub(){
+  if(typeof afRenderEvwebQueueHub==='function')afRenderEvwebQueueHub();
   var abierta=document.getElementById('evweb-abierta');
   var nom=document.getElementById('evweb-abierta-nom');
   if(abierta){
@@ -841,15 +842,91 @@ function marcarListo(){
     return ok;
   });
 }
+/** Obra social actual (texto del campo + id EVWEB mapeado), para resolver códigos en vivo. */
+function afPracsObraCtx(){
+  var el=document.getElementById('f-obra');
+  var txt=el?(el.value||'').trim():((S.cur&&S.cur.obra)||'');
+  var oid=(typeof afeMapObra==='function')?afeMapObra(txt):'';
+  return {obraText:txt,obraId:oid};
+}
+function renderPracsAlert(sinResolver,total){
+  var b=document.getElementById('pracs-evweb-alert');if(!b)return;
+  if(!total||!sinResolver){b.style.display='none';return;}
+  b.style.display='block';
+  b.textContent='⚠ '+sinResolver+' de '+total+' práctica'+(total!==1?'s':'')+' sin código EVWEB confirmado. Buscalas a mano en ADAARC antes de enviar/encolar.';
+}
+/** Elegir a mano un candidato EVWEB (cuando hay varios parecidos) — queda fijo, no se recalcula solo. */
+function afPracEvwebPick(i,codigo,desc,param2,complejidad){
+  var x=S.cur&&S.cur.pracs&&S.cur.pracs[i];if(!x)return;
+  x.codigoEvweb=String(codigo);x.evwebDesc=desc||'';x.evwebParam2=(param2==null?null:param2);
+  x.evwebComplejidad=(complejidad==null?null:complejidad);
+  x.evwebMatchVia='manual';x.evwebManual=true;
+  renderPracs();
+}
+/** Volver a dejar que se resuelva solo (por si se equivocó al elegir a mano). */
+function afPracEvwebReset(i){
+  var x=S.cur&&S.cur.pracs&&S.cur.pracs[i];if(!x)return;
+  delete x.codigoEvweb;delete x.evwebDesc;delete x.evwebParam2;delete x.evwebComplejidad;delete x.evwebMatchVia;delete x.evwebManual;
+  renderPracs();
+}
 function renderPracs(){
   var c=document.getElementById('pracs-list');if(!c||!S.cur)return;
   var p=S.cur.pracs||[];
-  if(!p.length){c.innerHTML='<p style="font-size:12px;color:var(--text3)">Sin prácticas</p>';return;}
+  if(!p.length){c.innerHTML='<p style="font-size:12px;color:var(--text3)">Sin prácticas</p>';renderPracsAlert(0,0);return;}
+  var ctx=afPracsObraCtx();
+  var sinResolver=0;
   c.innerHTML=p.map(function(x,i){
-    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">'
+    var evwebHtml;
+    if(x.evwebManual&&x.codigoEvweb){
+      // Ya elegida a mano: no se vuelve a calcular sola. Queda fija hasta que se resetee.
+      var lowManual=(x.evwebComplejidad!=null&&x.comp!=null&&x.evwebComplejidad<x.comp);
+      evwebHtml='<div style="font-size:11px;color:'+(lowManual?'var(--warn)':'var(--green)')+';margin-top:2px">&#10003; EVWEB '+x.codigoEvweb+' &mdash; '+(x.evwebDesc||'')
+        +(x.evwebComplejidad!=null?' (complejidad EVWEB '+x.evwebComplejidad+')':'')
+        +(lowManual?' &mdash; ojo: menor que la complejidad ADAARC ('+x.comp+')':'')
+        +' <span style="color:var(--text3)">· elegida a mano</span> '
+        +'<a href="#" onclick="event.preventDefault();afPracEvwebReset('+i+')" style="color:var(--blue);text-decoration:underline">cambiar</a></div>';
+    }else if(!ctx.obraId){
+      evwebHtml='<div style="font-size:11px;color:var(--text3);margin-top:2px">Cargá la obra social para verificar el código EVWEB</div>';
+    }else if(typeof afeResolvePracEvweb==='function'){
+      var m=afeResolvePracEvweb(x.desc,ctx.obraId);
+      if(m&&m.resolved){
+        x.codigoEvweb=m.codigoEvweb;x.evwebDesc=m.descripcion||'';x.evwebParam2=m.param2!=null?m.param2:null;
+        x.evwebComplejidad=m.complejidad!=null?m.complejidad:null;x.evwebMatchVia=m.via||'exact';
+        // Complejidad EVWEB = param2-88 (fórmula confirmada, no 100% universal). Si da por debajo
+        // de la complejidad ADAARC de esta práctica, se avisa en vez de darlo por bueno en silencio.
+        var lower=(m.complejidad!=null&&x.comp!=null&&m.complejidad<x.comp);
+        evwebHtml='<div style="font-size:11px;color:'+(lower?'var(--warn)':'var(--green)')+';margin-top:2px">&#10003; EVWEB '+m.codigoEvweb+' &mdash; '+(m.descripcion||'')
+          +(m.complejidad!=null?' (complejidad EVWEB '+m.complejidad+')':'')
+          +(lower?' &mdash; ojo: menor que la complejidad ADAARC ('+x.comp+'), revisar':'')+'</div>';
+      }else{
+        delete x.codigoEvweb;delete x.evwebDesc;delete x.evwebParam2;delete x.evwebComplejidad;x.evwebMatchVia=(m&&m.reason)||'unresolved';
+        sinResolver++;
+        if(m&&m.candidatesList&&m.candidatesList.length){
+          // Varios candidatos parecidos: los mostramos ordenados por complejidad EVWEB (mayor primero)
+          // para que ella elija — nunca se autoselecciona ni se baja la complejidad a ciegas.
+          var opts=m.candidatesList.map(function(cd){
+            var safeDesc=(cd.descripcion||'').replace(/'/g,"\\'");
+            var cdLower=(cd.complejidad!=null&&x.comp!=null&&cd.complejidad<x.comp);
+            return '<div onclick="afPracEvwebPick('+i+',\''+cd.codigoEvweb+'\',\''+safeDesc+'\','+(cd.param2==null?'null':cd.param2)+','+(cd.complejidad==null?'null':cd.complejidad)+')" '
+              +'style="cursor:pointer;padding:5px 8px;border:1px solid var(--border);border-radius:6px;margin-top:4px;font-size:11px;display:flex;justify-content:space-between;gap:8px">'
+              +'<span><span style="font-family:monospace;color:var(--green)">'+cd.codigoEvweb+'</span> '+(cd.descripcion||'')+'</span>'
+              +'<span style="color:'+(cdLower?'var(--warn)':'var(--text3)')+';white-space:nowrap">'+(cd.complejidad!=null?'complej. '+cd.complejidad:'')+(cdLower?' &#9888;':'')+'</span></div>';
+          }).join('');
+          evwebHtml='<div style="font-size:11px;color:var(--red);margin-top:2px">&#9888; '+m.candidates+' opciones parecidas en EVWEB (complejidad ADAARC de esta práctica: '+(x.comp!=null?x.comp:'?')+') &mdash; eleg&iacute; la correcta, no se elige sola:</div>'+opts;
+        }else{
+          evwebHtml='<div style="font-size:11px;color:var(--red);margin-top:2px">&#9888; Sin código EVWEB confirmado (no aparece en el catálogo de esa obra social) &mdash; buscala a mano en ADAARC</div>';
+        }
+      }
+    }else{
+      evwebHtml='';
+    }
+    return '<div style="padding:6px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
       +'<div><span style="font-size:11px;font-family:monospace;color:var(--green)">'+x.cod+'</span> <span style="font-size:13px">'+x.desc+'</span> <span style="font-size:11px;color:var(--text3)">comp.'+(x.comp||0)+'</span></div>'
-      +'<button onclick="quitarPrac('+i+')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:20px">×</button></div>';
+      +'<button onclick="quitarPrac('+i+')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:20px">×</button></div>'
+      +evwebHtml+'</div>';
   }).join('');
+  renderPracsAlert(sinResolver,p.length);
 }
 function quitarPrac(i){S.cur.pracs.splice(i,1);renderPracs();}
 
