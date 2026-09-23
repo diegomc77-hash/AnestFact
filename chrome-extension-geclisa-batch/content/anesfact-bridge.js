@@ -11,7 +11,7 @@
   var lastOkSig = '';
   var lastQueueSig = '';
   var pendingMints = {};
-  var BRIDGE_VERSION = '0.6.4';
+  var BRIDGE_VERSION = '0.6.27';
 
   function normalize(detail) {
     if (!detail || !detail.token) return null;
@@ -131,6 +131,7 @@
     return {
       version: Number(raw.version) || 1,
       updatedAt: raw.updatedAt || Date.now(),
+      lastEnqueuedId: raw.lastEnqueuedId != null ? String(raw.lastEnqueuedId) : null,
       items: raw.items
     };
   }
@@ -163,11 +164,250 @@
   }
 
   var lastEvwebQueueSig = '';
+  var BRIDGE_DOCS_IDB_NAME = 'anesfact_docs_v1';
+  var BRIDGE_DOCS_IDB_STORE = 'blobs';
+
+  /**
+   * chrome.storage no aguanta PDFs en base64 (cuota). Guardamos meta;
+   * al fill el bridge lee data de localStorage / IndexedDB (mismo origen).
+   * No postMessage de PDFs: structured-clone de MBs → docs_timeout.
+   */
+  function slimEvwebQueueForStorage(queue) {
+    var q = normalizeQueue(queue);
+    if (!q) return null;
+    var items = (q.items || []).map(function (it) {
+      if (!it || typeof it !== 'object') return it;
+      var copy = Object.assign({}, it);
+      var docs = copy.docs || {};
+      var meta = {};
+      ['anest', 'qx', 'auth'].forEach(function (k) {
+        var d = docs[k];
+        if (!d) return;
+        meta[k] = {
+          nombre: d.nombre || k,
+          tipo: d.tipo || '',
+          hasData: !!(d.data),
+          size: d.data ? String(d.data).length : (d.size || 0),
+          idb: !!d.idb,
+          aliasOf: d.aliasOf || null
+        };
+      });
+      copy.docsMeta = meta;
+      delete copy.docs;
+      return copy;
+    });
+    return {
+      version: q.version,
+      updatedAt: q.updatedAt,
+      lastEnqueuedId: q.lastEnqueuedId != null ? String(q.lastEnqueuedId) : null,
+      items: items
+    };
+  }
+
+  function bridgeDocsDataKeys(docs) {
+    docs = docs || {};
+    return ['anest', 'qx', 'auth'].filter(function (k) {
+      return !!(docs[k] && docs[k].data);
+    });
+  }
+
+  function bridgeSnapDoc(d) {
+    if (!d || !d.data) return null;
+    return {
+      nombre: d.nombre || 'documento',
+      tipo: d.tipo || 'application/octet-stream',
+      data: d.data,
+      fecha: d.fecha || ''
+    };
+  }
+
+  function readQueueItemDocs(intervId) {
+    var id = String(intervId || '');
+    try {
+      var raw = localStorage.getItem('afg_evweb_queue');
+      var q = raw ? JSON.parse(raw) : null;
+      var it = (q && q.items || []).find(function (x) {
+        return x && String(x.id) === id;
+      });
+      if (!it || !it.docs) return null;
+      var out = {};
+      ['anest', 'qx', 'auth'].forEach(function (k) {
+        var s = bridgeSnapDoc(it.docs[k]);
+        if (s) out[k] = s;
+      });
+      return bridgeDocsDataKeys(out).length ? out : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function findIntervDocsMeta(intervId) {
+    var id = String(intervId || '');
+    var keys = [];
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k === 'af_i' || (k && k.indexOf('af_i_') === 0)) keys.push(k);
+      }
+    } catch (eK) {}
+    for (var ki = 0; ki < keys.length; ki++) {
+      try {
+        var list = JSON.parse(localStorage.getItem(keys[ki]) || '[]');
+        if (!Array.isArray(list)) continue;
+        for (var j = 0; j < list.length; j++) {
+          if (list[j] && String(list[j].id) === id && list[j].docs) {
+            return list[j].docs;
+          }
+        }
+      } catch (eP) {}
+    }
+    return null;
+  }
+
+  function idbGetDoc(intervId, tipo) {
+    return new Promise(function (resolve) {
+      try {
+        if (typeof indexedDB === 'undefined') {
+          resolve(null);
+          return;
+        }
+        // Misma VER que js/41b-docs-idb.js. Nunca open(1) sin upgrade:
+        // crea DB vacía y después el PWA no puede crear el store `blobs`.
+        var open = indexedDB.open(BRIDGE_DOCS_IDB_NAME, 2);
+        open.onupgradeneeded = function () {
+          try {
+            var dbUp = open.result;
+            if (!dbUp.objectStoreNames.contains(BRIDGE_DOCS_IDB_STORE)) {
+              dbUp.createObjectStore(BRIDGE_DOCS_IDB_STORE, { keyPath: 'key' });
+            }
+          } catch (eUp) {}
+        };
+        open.onerror = function () { resolve(null); };
+        open.onsuccess = function () {
+          try {
+            var db = open.result;
+            if (!db.objectStoreNames.contains(BRIDGE_DOCS_IDB_STORE)) {
+              resolve(null);
+              return;
+            }
+            var tx = db.transaction(BRIDGE_DOCS_IDB_STORE, 'readonly');
+            var req = tx.objectStore(BRIDGE_DOCS_IDB_STORE).get(
+              String(intervId) + '::' + String(tipo)
+            );
+            req.onsuccess = function () {
+              var row = req.result;
+              if (!row || !row.data) {
+                resolve(null);
+                return;
+              }
+              resolve({
+                nombre: row.nombre || ('doc-' + tipo),
+                tipo: row.tipo || 'application/octet-stream',
+                data: row.data,
+                fecha: row.fecha || ''
+              });
+            };
+            req.onerror = function () { resolve(null); };
+          } catch (eIn) {
+            resolve(null);
+          }
+        };
+      } catch (e) {
+        resolve(null);
+      }
+    });
+  }
+
+  /** Lee PDFs en el content script (LS + IDB). Sin roundtrip al page world. */
+  function resolveEvwebDocsInBridge(intervId) {
+    var id = String(intervId || '').trim();
+    if (!id) {
+      return Promise.resolve({
+        ok: false,
+        error: 'missing_intervId',
+        docs: {},
+        keys: [],
+        via: 'bridge'
+      });
+    }
+
+    var fromQ = readQueueItemDocs(id);
+    if (fromQ) {
+      return Promise.resolve({
+        ok: true,
+        docs: fromQ,
+        keys: bridgeDocsDataKeys(fromQ),
+        via: 'bridge_queue_ls'
+      });
+    }
+
+    var meta = findIntervDocsMeta(id) || {};
+    var slots = ['anest', 'qx', 'auth'];
+    var chain = Promise.resolve();
+    var out = {};
+
+    slots.forEach(function (tipo) {
+      chain = chain.then(function () {
+        var m = meta[tipo];
+        if (m && m.data) {
+          var s0 = bridgeSnapDoc(m);
+          if (s0) out[tipo] = s0;
+          return;
+        }
+        if (m && m.aliasOf) return;
+        return idbGetDoc(id, tipo).then(function (doc) {
+          if (doc) out[tipo] = doc;
+        });
+      });
+    });
+
+    return chain.then(function () {
+      slots.forEach(function (tipo) {
+        var m = meta[tipo];
+        if (out[tipo] || !m || !m.aliasOf) return;
+        var src = out[m.aliasOf];
+        if (src && src.data) {
+          out[tipo] = {
+            nombre: src.nombre,
+            tipo: src.tipo,
+            data: src.data,
+            fecha: src.fecha || ''
+          };
+        }
+      });
+      var keys = bridgeDocsDataKeys(out);
+      return {
+        ok: keys.length > 0,
+        docs: out,
+        keys: keys,
+        via: 'bridge_idb',
+        error: keys.length ? null : 'no_docs_data'
+      };
+    }).catch(function (e) {
+      return {
+        ok: false,
+        error: String(e && e.message || e),
+        docs: {},
+        keys: [],
+        via: 'bridge_fail'
+      };
+    });
+  }
+
   function publishEvwebQueue(raw, via) {
-    var queue = normalizeQueue(raw);
+    var full = normalizeQueue(raw);
+    if (!full) return Promise.resolve({ ok: false, error: 'bad_queue' });
+    var queue = slimEvwebQueueForStorage(full);
     if (!queue) return Promise.resolve({ ok: false, error: 'bad_queue' });
     var sig = String(queue.version) + '|' + String(queue.updatedAt) + '|' + queue.items.length;
     if (sig === lastEvwebQueueSig) return Promise.resolve({ ok: true, skipped: true, queue: queue });
+
+    var docsMetaSummary = (queue.items || []).map(function (it) {
+      return {
+        id: it.id,
+        meta: it.docsMeta ? Object.keys(it.docsMeta) : []
+      };
+    });
 
     var payload = {
       afg_evweb_queue: queue,
@@ -177,15 +417,34 @@
       return storageSet('session', payload).then(function (rSess) {
         if (rLocal.ok || rSess.ok) lastEvwebQueueSig = sig;
         try {
+          chrome.runtime.sendMessage({
+            type: 'AFG_DIAG_LOG',
+            src: 'bridge',
+            tag: 'evweb_queue_publish',
+            detail: {
+              via: via || '?',
+              items: queue.items.length,
+              version: queue.version,
+              localOk: !!rLocal.ok,
+              localErr: rLocal.error || null,
+              sessionOk: !!rSess.ok,
+              sessionErr: rSess.error || null,
+              docsMeta: docsMetaSummary,
+              slimmed: true
+            }
+          }, function () { void chrome.runtime.lastError; });
+        } catch (eDiagQ) {}
+        try {
           console.log(
             '[AFG bridge] evweb queue via=' + (via || '?'),
             'v' + queue.version,
             'items',
             queue.items.length,
+            'slimmed',
             'local=' + (rLocal.ok ? 'ok' : rLocal.error)
           );
         } catch (e) {}
-        return { ok: !!(rLocal.ok || rSess.ok), queue: queue };
+        return { ok: !!(rLocal.ok || rSess.ok), queue: queue, local: rLocal, session: rSess };
       });
     });
   }
@@ -263,6 +522,33 @@
     if (d.type === 'EVWEB_QUEUE') {
       publishEvwebQueue(d.queue, 'postMessage');
     }
+    if (d.type === 'DIAG_DUMP') {
+      var lim = d.limit != null ? d.limit : 15;
+      chrome.runtime.sendMessage({ type: 'AFG_DIAG_DUMP', limit: lim }, function (res) {
+        var err = chrome.runtime.lastError && chrome.runtime.lastError.message;
+        try {
+          var pack = res && res.pack;
+          window.postMessage({
+            source: 'AFG_EXT',
+            type: 'DIAG_DUMP_RESULT',
+            ok: !!(res && res.ok) && !err,
+            // Preferir lines cortas; entries completo solo de la cola
+            text: pack && pack.lines ? pack.lines.join('\n') : '',
+            totalEntries: pack && pack.totalEntries,
+            returned: pack && pack.returned,
+            limit: pack && pack.limit,
+            entries: pack && pack.entries,
+            error: err || (res && res.error) || null,
+            bridge: BRIDGE_VERSION
+          }, '*');
+        } catch (eDump) {}
+      });
+    }
+    if (d.type === 'DIAG_CLEAR') {
+      chrome.runtime.sendMessage({ type: 'AFG_DIAG_CLEAR' }, function () {
+        void chrome.runtime.lastError;
+      });
+    }
     if (d.type === 'MINT_TOKEN_RESULT') {
       var cb = pendingMints[d.requestId];
       if (cb) {
@@ -286,7 +572,7 @@
         } catch (e) {}
       });
     }
-    // AnesFact Home → Iniciar / Abortar cola (mismo que el popup)
+    // AnesFact Home → Iniciar / Abortar cola GECLISA (mismo que el popup)
     if (d.type === 'QUEUE_START' || d.type === 'QUEUE_RETRY' || d.type === 'QUEUE_ABORT' || d.type === 'QUEUE_NEXT') {
       var map = {
         QUEUE_START: 'AFG_QUEUE_START',
@@ -317,6 +603,53 @@
         });
       } else {
         kick();
+      }
+    }
+    // AnesFact → Iniciar / Abortar cola evweb
+    if (
+      d.type === 'EVWEB_QUEUE_START' ||
+      d.type === 'EVWEB_QUEUE_RETRY' ||
+      d.type === 'EVWEB_QUEUE_ABORT' ||
+      d.type === 'EVWEB_QUEUE_NEXT'
+    ) {
+      try {
+        chrome.runtime.sendMessage({
+          type: 'AFG_DIAG_LOG',
+          src: 'bridge',
+          tag: 'page_' + d.type,
+          detail: { href: location.href }
+        }, function () { void chrome.runtime.lastError; });
+      } catch (eDiag) {}
+      var mapEvw = {
+        EVWEB_QUEUE_START: 'AFG_EVW_QUEUE_START',
+        EVWEB_QUEUE_RETRY: 'AFG_EVW_QUEUE_RETRY',
+        EVWEB_QUEUE_ABORT: 'AFG_EVW_QUEUE_ABORT',
+        EVWEB_QUEUE_NEXT: 'AFG_EVW_QUEUE_NEXT'
+      };
+      var extEvw = mapEvw[d.type];
+      var kickEvw = function () {
+        chrome.runtime.sendMessage({ type: extEvw }, function (res) {
+          var err = chrome.runtime.lastError && chrome.runtime.lastError.message;
+          try {
+            window.postMessage({
+              source: 'AFG_EXT',
+              type: 'QUEUE_ACTION_ACK',
+              action: d.type,
+              result: res || null,
+              error: err || null
+            }, '*');
+          } catch (eAck2) {}
+        });
+      };
+      if (d.type === 'EVWEB_QUEUE_START' || d.type === 'EVWEB_QUEUE_RETRY') {
+        publishEvwebQueue(readLocalStorageEvwebQueue(), 'start_kick').finally(function () {
+          chrome.runtime.sendMessage({ type: 'AFG_OPEN_EVWEB' }, function () {
+            void chrome.runtime.lastError;
+            setTimeout(kickEvw, 500);
+          });
+        });
+      } else {
+        kickEvw();
       }
     }
   });
@@ -377,6 +710,32 @@
         } else {
           sendResponse(r || { ok: false, error: 'mint_failed' });
         }
+      });
+      return true;
+    }
+
+    if (msg.type === 'AFG_FETCH_EVWEB_DOCS') {
+      var docsIntervId = msg.intervId || msg.id;
+      if (!docsIntervId) {
+        sendResponse({ ok: false, error: 'missing_intervId' });
+        return false;
+      }
+      resolveEvwebDocsInBridge(docsIntervId).then(function (r) {
+        try {
+          chrome.runtime.sendMessage({
+            type: 'AFG_DIAG_LOG',
+            src: 'bridge',
+            tag: 'evweb_docs_fetch_page',
+            detail: {
+              intervId: String(docsIntervId),
+              ok: !!(r && r.ok),
+              keys: (r && r.keys) || [],
+              via: (r && r.via) || null,
+              error: (r && r.error) || null
+            }
+          }, function () { void chrome.runtime.lastError; });
+        } catch (eDiagD) {}
+        sendResponse(r || { ok: false, error: 'docs_fetch_failed' });
       });
       return true;
     }

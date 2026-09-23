@@ -3,7 +3,86 @@
  * Debugger: 1–2, fila paciente, Opciones (7), fila plantilla (10).
  * Click normal: lupa, Buscar, Evoluciones, Nuevo, Seleccionar plantilla.
  * detach SIEMPRE en finally (éxito, error o timeout).
+ *
+ * Diagnóstico persistente: chrome.storage.local.afg_diag_log (no hace falta
+ * tener el SW abierto durante la prueba). Volcar desde AnesFact F12 con DIAG_DUMP.
  */
+var AFG_DIAG_KEY = 'afg_diag_log';
+var AFG_DIAG_MAX = 120;
+var _afgDiagChain = Promise.resolve();
+
+function afgDiagSafe(v) {
+  try {
+    return JSON.parse(JSON.stringify(v));
+  } catch (e) {
+    return String(v);
+  }
+}
+
+/** Ring buffer persistente. src: bg|bridge|evweb */
+function afgDiag(tag, detail, src) {
+  var entry = {
+    t: new Date().toISOString(),
+    src: src || 'bg',
+    tag: String(tag || ''),
+    detail: detail == null ? null : afgDiagSafe(detail)
+  };
+  try { console.log('[AFG diag]', entry.src, entry.tag, entry.detail); } catch (eL) {}
+  _afgDiagChain = _afgDiagChain.then(function () {
+    return chrome.storage.local.get([AFG_DIAG_KEY]).then(function (got) {
+      var pack = got && got[AFG_DIAG_KEY];
+      if (!pack || !Array.isArray(pack.entries)) {
+        pack = { version: 1, updatedAt: 0, entries: [] };
+      }
+      pack.entries.push(entry);
+      if (pack.entries.length > AFG_DIAG_MAX) {
+        pack.entries = pack.entries.slice(pack.entries.length - AFG_DIAG_MAX);
+      }
+      pack.updatedAt = Date.now();
+      var o = {};
+      o[AFG_DIAG_KEY] = pack;
+      return chrome.storage.local.set(o);
+    });
+  }).catch(function () {});
+  return _afgDiagChain;
+}
+
+function afgDiagGet() {
+  return chrome.storage.local.get([AFG_DIAG_KEY]).then(function (got) {
+    return (got && got[AFG_DIAG_KEY]) || { version: 1, updatedAt: 0, entries: [] };
+  });
+}
+
+/** Últimas N entradas (para pegar en chat sin truncar). */
+function afgDiagGetTail(limit) {
+  var n = Math.max(1, Math.min(Number(limit) || 15, AFG_DIAG_MAX));
+  return afgDiagGet().then(function (pack) {
+    var all = (pack && pack.entries) || [];
+    var slice = all.slice(Math.max(0, all.length - n));
+    return {
+      version: pack.version || 1,
+      updatedAt: pack.updatedAt || 0,
+      totalEntries: all.length,
+      returned: slice.length,
+      limit: n,
+      entries: slice,
+      // Una línea por evento — más corto para copiar
+      lines: slice.map(function (e) {
+        var det = '';
+        try { det = e.detail == null ? '' : JSON.stringify(e.detail); } catch (eJ) { det = String(e.detail); }
+        if (det.length > 180) det = det.slice(0, 177) + '...';
+        return (e.t || '') + ' | ' + (e.src || '') + ' | ' + (e.tag || '') + (det ? (' | ' + det) : '');
+      })
+    };
+  });
+}
+
+function afgDiagClear() {
+  var o = {};
+  o[AFG_DIAG_KEY] = { version: 1, updatedAt: Date.now(), entries: [] };
+  return chrome.storage.local.set(o);
+}
+
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   if (msg && (msg.type === 'AFG_START_1_11' || msg.type === 'AFG_START_1_6')) {
     resolvePaciente(msg.paciente || {})
@@ -156,9 +235,42 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
     return true;
   }
+  if (msg && msg.type === 'AFG_OPEN_EVWEB') {
+    afgDiag('AFG_OPEN_EVWEB', {}, 'bg');
+    focusOrOpenEvwebTab()
+      .then(function (r) {
+        afgDiag('AFG_OPEN_EVWEB_done', r, 'bg');
+        sendResponse(r);
+      })
+      .catch(function (e) {
+        afgDiag('AFG_OPEN_EVWEB_fail', { error: String(e.message || e) }, 'bg');
+        sendResponse({ ok: false, error: String(e.message || e) });
+      });
+    return true;
+  }
+
+  if (msg && msg.type === 'AFG_DIAG_LOG') {
+    afgDiag(msg.tag || 'remote', msg.detail, msg.src || 'cs')
+      .then(function () { sendResponse({ ok: true }); })
+      .catch(function () { sendResponse({ ok: false }); });
+    return true;
+  }
+  if (msg && msg.type === 'AFG_DIAG_DUMP') {
+    afgDiagGetTail(msg.limit != null ? msg.limit : 15)
+      .then(function (pack) { sendResponse({ ok: true, pack: pack }); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
+  if (msg && msg.type === 'AFG_DIAG_CLEAR') {
+    afgDiagClear()
+      .then(function () { sendResponse({ ok: true }); })
+      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+    return true;
+  }
 
   // —— EVWEB (AFG_EVW_*) — namespace aparte de GECLISA ——
   if (msg && msg.type === 'AFG_EVW_PING') {
+    afgDiag('AFG_EVW_PING_msg', {}, 'bg');
     pingEvwebForm()
       .then(function (r) { sendResponse(r); })
       .catch(function (e) { sendResponse({ ok: false, error: String(e && e.message || e) }); });
@@ -171,9 +283,21 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     return true;
   }
   if (msg && msg.type === 'AFG_EVW_QUEUE_START') {
+    afgDiag('AFG_EVW_QUEUE_START', { via: 'runtime_message' }, 'bg');
     runEvwebQueueAction('start')
-      .then(function (r) { sendResponse(r); })
-      .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
+      .then(function (r) {
+        afgDiag('AFG_EVW_QUEUE_START_result', {
+          ok: !!(r && r.ok),
+          error: r && r.error,
+          message: r && r.message,
+          status: r && r.state && r.state.status
+        }, 'bg');
+        sendResponse(r);
+      })
+      .catch(function (e) {
+        afgDiag('AFG_EVW_QUEUE_START_throw', { error: String(e.message || e) }, 'bg');
+        sendResponse({ ok: false, error: String(e.message || e) });
+      });
     return true;
   }
   if (msg && msg.type === 'AFG_EVW_QUEUE_NEXT') {
@@ -221,6 +345,24 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           reason: 'executeScript_failed',
           error: String(e && e.message || e)
         });
+      });
+    return true;
+  }
+  // CS → MAIN: File + click/__doPostBack de #body_btnUploadArchivo (mundo página)
+  if (msg && msg.type === 'AFG_EVW_SET_FILE_AND_CLICK_UPLOAD') {
+    setEvwebFileAndClickUpload(msg)
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) {
+        sendResponse({ ok: false, error: String(e && e.message || e) });
+      });
+    return true;
+  }
+  // CS → MAIN: clasificar cboTipoDocumento_N (change sintético aislado no postbackea)
+  if (msg && msg.type === 'AFG_EVW_CLASSIFY_DOC_TIPO') {
+    setEvwebClassifyDocTipo(msg)
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) {
+        sendResponse({ ok: false, error: String(e && e.message || e) });
       });
     return true;
   }
@@ -314,6 +456,8 @@ var lastIframeNavProgress = null;
 
 var ANESFACT_TAB_URLS = [
   'https://diegomc77-hash.github.io/*',
+  'https://anestfact.diegomc77.workers.dev/*',
+  'https://*.diegomc77.workers.dev/*',
   'http://localhost/*',
   'http://127.0.0.1/*'
 ];
@@ -328,7 +472,7 @@ async function pullFojaFromAnesFactTabs() {
     return {
       ok: false,
       error: 'no_anesfact_tab',
-      message: 'No hay pestaña AnesFact abierta (GitHub Pages o localhost).'
+      message: 'No hay pestaña AnesFact abierta (Cloudflare Workers, GitHub Pages o localhost).'
     };
   }
   var best = null;
@@ -551,10 +695,80 @@ async function handlePageQueueAction(pageAction) {
   return runQueueAction(map[pageAction] || 'start');
 }
 
+/** AnesFact → cola evweb (externally_connectable): focus ADAARC → runEvwebQueueAction. */
+async function handlePageEvwebQueueAction(pageAction) {
+  pageAction = String(pageAction || 'EVWEB_QUEUE_START').toUpperCase();
+  if (pageAction.indexOf('EVWEB_QUEUE_') !== 0) {
+    if (pageAction.indexOf('QUEUE_') === 0) pageAction = 'EVWEB_' + pageAction;
+    else pageAction = 'EVWEB_QUEUE_' + pageAction.replace(/^EVWEB_/, '');
+  }
+  // Await cada diag: si el SW se suspende al enfocar ADAARC, sin await se pierde el buffer.
+  await afgDiag('handlePageEvwebQueueAction', { pageAction: pageAction }, 'bg');
+
+  // No bloquear el runner en ensureBridges (puede colgarse en pestañas zombie).
+  // El mensaje external YA llegó: AnesFact ↔ SW funciona. Bridges = best-effort con tope.
+  await afgDiag('ensure_bridges_begin', {}, 'bg');
+  try {
+    await Promise.race([
+      ensureBridgesOnAllAnesFactTabs().then(function (r) {
+        return afgDiag('ensure_bridges_done', {
+          tabs: (r && r.length) || 0,
+          oks: (r || []).filter(function (x) { return x && x.ok; }).length
+        }, 'bg');
+      }),
+      sleep(1500).then(function () {
+        return afgDiag('ensure_bridges_timeout', { ms: 1500 }, 'bg');
+      })
+    ]);
+  } catch (eEns) {
+    await afgDiag('ensure_bridges_fail', { error: String(eEns && eEns.message || eEns) }, 'bg');
+  }
+
+  try {
+    if (pageAction === 'EVWEB_QUEUE_START' || pageAction === 'EVWEB_QUEUE_RETRY') {
+      await afgDiag('focusOrOpenEvwebTab_begin', {}, 'bg');
+      try {
+        var opened = await focusOrOpenEvwebTab();
+        await afgDiag('focusOrOpenEvwebTab_done', opened, 'bg');
+      } catch (eOpen) {
+        await afgDiag('focusOrOpenEvwebTab_fail', { error: String(eOpen && eOpen.message || eOpen) }, 'bg');
+      }
+      await afgDiag('sleep_before_runner', { ms: 800 }, 'bg');
+      await sleep(800);
+    }
+
+    var map = {
+      EVWEB_QUEUE_START: 'start',
+      EVWEB_QUEUE_RETRY: 'retry',
+      EVWEB_QUEUE_ABORT: 'abort',
+      EVWEB_QUEUE_NEXT: 'next'
+    };
+    var action = map[pageAction] || 'start';
+    await afgDiag('runEvwebQueueAction_call', { action: action }, 'bg');
+    var r = await runEvwebQueueAction(action);
+    await afgDiag('handlePageEvwebQueueAction_done', {
+      pageAction: pageAction,
+      ok: !!(r && r.ok),
+      error: r && r.error,
+      message: r && r.message,
+      status: r && r.state && r.state.status
+    }, 'bg');
+    return r;
+  } catch (eFatal) {
+    await afgDiag('handlePageEvwebQueueAction_throw', {
+      pageAction: pageAction,
+      error: String(eFatal && eFatal.message || eFatal)
+    }, 'bg');
+    throw eFatal;
+  }
+}
+
 function isAllowedAnesFactExternalSender(sender) {
   var u = String((sender && sender.url) || '');
   if (!u) return false;
   if (u.indexOf('https://diegomc77-hash.github.io/') === 0) return true;
+  if (u.indexOf('https://anestfact.diegomc77.workers.dev/') === 0) return true;
+  if (/^https:\/\/[a-z0-9-]+-anestfact\.diegomc77\.workers\.dev\//i.test(u)) return true;
   if (/^http:\/\/localhost([:\/]|$)/.test(u)) return true;
   if (/^http:\/\/127\.0\.0\.1([:\/]|$)/.test(u)) return true;
   return false;
@@ -570,6 +784,38 @@ try {
       handlePageQueueAction(msg.action || 'QUEUE_START')
         .then(function (r) { sendResponse(r); })
         .catch(function (e) { sendResponse({ ok: false, error: String(e && e.message || e) }); });
+      return true;
+    }
+    if (msg && msg.type === 'AFG_PAGE_EVWEB_QUEUE_ACTION') {
+      var actionExt = msg.action || 'EVWEB_QUEUE_START';
+      // Fire-and-await chain: log + run + always reply (evita SW muerto a mitad)
+      afgDiag('AFG_PAGE_EVWEB_QUEUE_ACTION', {
+        action: actionExt,
+        senderUrl: sender && sender.url
+      }, 'bg')
+        .then(function () {
+          return handlePageEvwebQueueAction(actionExt);
+        })
+        .then(function (r) {
+          return afgDiag('AFG_PAGE_EVWEB_QUEUE_ACTION_reply', {
+            ok: !!(r && r.ok),
+            error: r && r.error,
+            message: r && r.message
+          }, 'bg').then(function () { sendResponse(r); });
+        })
+        .catch(function (e) {
+          afgDiag('AFG_PAGE_EVWEB_QUEUE_ACTION_catch', {
+            error: String(e && e.message || e)
+          }, 'bg').then(function () {
+            sendResponse({ ok: false, error: String(e && e.message || e) });
+          });
+        });
+      return true;
+    }
+    if (msg && msg.type === 'AFG_DIAG_DUMP') {
+      afgDiagGetTail(msg.limit != null ? msg.limit : 15)
+        .then(function (pack) { sendResponse({ ok: true, pack: pack }); })
+        .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
       return true;
     }
     sendResponse({ ok: false, error: 'unknown_external_type' });
@@ -642,6 +888,62 @@ async function mintTokenViaAnesFactBridge(intervId, timeoutMs) {
   return lastErr || { ok: false, error: 'mint_failed' };
 }
 
+/**
+ * Pide docs (data URL) a AnesFact al momento del fill.
+ * chrome.storage de la cola solo tiene docsMeta (sin PDF) para no romper cuota.
+ */
+async function fetchEvwebDocsViaAnesFactBridge(intervId, timeoutMs) {
+  if (!intervId) return { ok: false, error: 'missing_intervId', docs: {}, keys: [] };
+  var tabs = await findAnesFactTabs();
+  if (!tabs || !tabs.length) {
+    return {
+      ok: false,
+      error: 'no_anesfact_tab',
+      message: 'Abrí AnesFact para adjuntar docs al fill evweb.',
+      docs: {},
+      keys: []
+    };
+  }
+  var lastErr = null;
+  for (var i = 0; i < tabs.length; i++) {
+    var tab = tabs[i];
+    try {
+      var ready = await ensureAnesFactBridge(tab.id);
+      if (!(ready && ready.ok)) {
+        lastErr = ready || { ok: false, error: 'bridge_not_ready' };
+        continue;
+      }
+      var res = await chrome.tabs.sendMessage(tab.id, {
+        type: 'AFG_FETCH_EVWEB_DOCS',
+        intervId: String(intervId),
+        timeoutMs: timeoutMs || 45000
+      });
+      await afgDiag('evweb_docs_fetch', {
+        intervId: String(intervId),
+        tabId: tab.id,
+        ok: !!(res && res.ok),
+        keys: (res && res.keys) || [],
+        via: (res && res.via) || null,
+        error: (res && res.error) || null
+      }, 'bg');
+      if (res && res.ok && res.docs) {
+        return Object.assign({ tabId: tab.id }, res);
+      }
+      lastErr = res || { ok: false, error: 'empty_docs_response' };
+    } catch (eTab) {
+      lastErr = { ok: false, error: String(eTab.message || eTab) };
+    }
+  }
+  return lastErr || { ok: false, error: 'docs_fetch_failed', docs: {}, keys: [] };
+}
+
+function evwebDocsDataKeys(docs) {
+  docs = docs || {};
+  return ['anest', 'qx', 'auth'].filter(function (k) {
+    return !!(docs[k] && docs[k].data);
+  });
+}
+
 /** Enfoca pestaña GECLISA abierta; si no hay, crea una sola. Evita N ventanas nuevas. */
 async function focusOrOpenGeclisaTab() {
   var urlPattern = 'http://sanatoriomayo.myvnc.com:84/*';
@@ -659,6 +961,59 @@ async function focusOrOpenGeclisaTab() {
     active: true
   });
   return { ok: true, reused: false, tabId: created.id, count: 0 };
+}
+
+async function focusOrOpenEvwebTab() {
+  var urlPattern = 'https://adaarc.evweb.com.ar/*';
+  var tabs = await chrome.tabs.query({ url: urlPattern });
+  if (tabs && tabs.length) {
+    var withForm = tabs.filter(function (t) {
+      return /frmCargaDeIntervencion\.aspx/i.test(String(t.url || '')) &&
+        !/frmUsuarioSinLoguear/i.test(String(t.url || ''));
+    });
+    var pool = withForm.length ? withForm : tabs;
+    var tab = pool.find(function (t) { return t.active; }) || pool[0];
+    var onForm = /frmCargaDeIntervencion\.aspx/i.test(String(tab.url || '')) &&
+      !/frmUsuarioSinLoguear/i.test(String(tab.url || ''));
+    if (!onForm) {
+      var target = await resolveEvwebFormNavigationTarget(tab);
+      await afgDiag('focusOrOpenEvweb_nav', {
+        from: tab.url || null,
+        to: target.url,
+        via: target.via,
+        idUsuario: target.idUsuario || null
+      }, 'bg');
+      await chrome.tabs.update(tab.id, { url: target.url, active: true });
+    } else {
+      var idKeep = parseEvwebIdUsuarioFromUrl(tab.url);
+      if (idKeep) await rememberEvwebIdUsuario(idKeep);
+      await chrome.tabs.update(tab.id, { active: true });
+    }
+    if (tab.windowId != null) {
+      try { await chrome.windows.update(tab.windowId, { focused: true }); } catch (e) {}
+    }
+    return {
+      ok: true,
+      reused: true,
+      tabId: tab.id,
+      count: tabs.length,
+      navigatedToForm: !onForm
+    };
+  }
+  var remembered = await loadRememberedEvwebIdUsuario();
+  var createUrl = buildEvwebFormUrl(remembered);
+  var created = await chrome.tabs.create({
+    url: createUrl,
+    active: true
+  });
+  return {
+    ok: true,
+    reused: false,
+    tabId: created.id,
+    count: 0,
+    navigatedToForm: true,
+    idUsuario: remembered || null
+  };
 }
 
 /**
@@ -2100,6 +2455,7 @@ function firstPendingQueueItem(queue, preferId, opts) {
   opts = opts || {};
   var skipPaused = !!opts.skipPaused;
   var skipIds = opts.skipIds || {};
+  var preferNewest = !!opts.preferNewest;
   var STALE_RUNNING_MS = opts.staleRunningMs != null ? Number(opts.staleRunningMs) : 180000;
   var now = Date.now();
   if (preferId) {
@@ -2107,20 +2463,45 @@ function firstPendingQueueItem(queue, preferId, opts) {
       if (String(items[i].id) === String(preferId) && items[i].status !== 'done') return items[i];
     }
   }
+  // Preferencia explícita de la cola (último encolado desde AnesFact)
+  if (!preferId && queue && queue.lastEnqueuedId) {
+    for (var pi = 0; pi < items.length; pi++) {
+      if (String(items[pi].id) !== String(queue.lastEnqueuedId)) continue;
+      if (items[pi].status === 'done') break;
+      if (skipIds[String(items[pi].id)]) break;
+      var stP = items[pi].status || 'queued';
+      var staleP = stP === 'running' && (now - (items[pi].updatedAt || 0)) > STALE_RUNNING_MS;
+      if (skipPaused) {
+        if (stP === 'queued' || staleP) return items[pi];
+      } else if (stP === 'running' || stP === 'awaiting_save' || stP === 'queued' || stP === 'paused_error') {
+        return items[pi];
+      }
+      break;
+    }
+  }
+  var candidates = [];
   for (var j = 0; j < items.length; j++) {
     var st = items[j].status || 'queued';
     if (st === 'done') continue;
     if (skipIds[String(items[j].id)]) continue;
     var isStaleRunning = st === 'running' && (now - (items[j].updatedAt || 0)) > STALE_RUNNING_MS;
     if (skipPaused) {
-      if (st === 'queued' || isStaleRunning) return items[j];
+      if (st === 'queued' || isStaleRunning) candidates.push(items[j]);
       continue;
     }
     if (st === 'running' || st === 'awaiting_save' || st === 'queued' || st === 'paused_error') {
-      return items[j];
+      candidates.push(items[j]);
     }
   }
-  return null;
+  if (!candidates.length) return null;
+  if (preferNewest && candidates.length > 1) {
+    candidates.sort(function (a, b) {
+      var ta = Number(a.addedAt || a.updatedAt || 0);
+      var tb = Number(b.addedAt || b.updatedAt || 0);
+      return tb - ta;
+    });
+  }
+  return candidates[0];
 }
 
 async function runQueueAction(action) {
@@ -2416,9 +2797,154 @@ async function runQueueAction(action) {
  * ============================================================================ */
 
 var EVWEB_HOST_PATTERN = 'https://adaarc.evweb.com.ar/*';
+/**
+ * Base del formulario de carga. ADAARC exige idUsuario de la sesión
+ * (?accion=agregar&idUsuario=NNN); sin eso redirige a frmUsuarioSinLoguear.
+ */
+var EVWEB_FORM_URL_BASE =
+  'https://adaarc.evweb.com.ar/Pages/Asociaciones/frmCargaDeIntervencion.aspx?accion=agregar';
+/** @deprecated usar buildEvwebFormUrl / resolveEvwebFormNavigationTarget */
+var EVWEB_FORM_URL = EVWEB_FORM_URL_BASE;
 var EVWEB_STALE_RUNNING_MS = 180000;
 /** Lock propio — no comparte queueRunnerBusy de GECLISA. */
 var evwebRunnerBusy = false;
+/** Timestamp local del lock (SW cold start → busy=false, pero storage puede quedar running). */
+var evwebRunnerBusyAt = 0;
+var EVWEB_BUSY_STALE_MS = 90000;
+
+function parseEvwebIdUsuarioFromUrl(url) {
+  try {
+    var u = new URL(String(url || ''), 'https://adaarc.evweb.com.ar/');
+    var id = u.searchParams.get('idUsuario') || u.searchParams.get('idusuario');
+    if (id && /^\d+$/.test(id)) return id;
+  } catch (e) {}
+  var m = String(url || '').match(/[?&]idUsuario=(\d+)/i);
+  return m ? m[1] : '';
+}
+
+function buildEvwebFormUrl(idUsuario) {
+  var id = String(idUsuario || '').trim();
+  if (id && /^\d+$/.test(id)) {
+    return EVWEB_FORM_URL_BASE + '&idUsuario=' + encodeURIComponent(id);
+  }
+  return EVWEB_FORM_URL_BASE;
+}
+
+async function rememberEvwebIdUsuario(id) {
+  var s = String(id || '').trim();
+  if (!s || !/^\d+$/.test(s)) return;
+  try {
+    await chrome.storage.local.set({ afg_evweb_id_usuario: s });
+  } catch (e) {}
+}
+
+async function loadRememberedEvwebIdUsuario() {
+  try {
+    var g = await chrome.storage.local.get(['afg_evweb_id_usuario']);
+    var s = g && g.afg_evweb_id_usuario ? String(g.afg_evweb_id_usuario) : '';
+    return /^\d+$/.test(s) ? s : '';
+  } catch (e) {
+    return '';
+  }
+}
+
+/**
+ * Saca idUsuario / link al form desde la pestaña ADAARC logueada
+ * (URL, menú, HTML) — sin eso la navegación cae en SinLoguear.
+ */
+async function scrapeEvwebSessionHints(tabId) {
+  try {
+    var results = await chrome.scripting.executeScript({
+      target: { tabId: tabId, allFrames: true },
+      func: function () {
+        var idUsuario = '';
+        var formHref = '';
+        try {
+          var sp = new URLSearchParams(location.search || '');
+          idUsuario = sp.get('idUsuario') || sp.get('idusuario') || '';
+        } catch (e0) {}
+        if (!idUsuario) {
+          var mHref = String(location.href || '').match(/[?&]idUsuario=(\d+)/i);
+          if (mHref) idUsuario = mHref[1];
+        }
+        var html = '';
+        try {
+          html = (document.documentElement && document.documentElement.innerHTML) || '';
+        } catch (e1) {}
+        if (!idUsuario) {
+          var mHtml = html.match(/idUsuario\s*[=:]\s*['"]?(\d{1,8})/i);
+          if (mHtml) idUsuario = mHtml[1];
+        }
+        var anchors = [];
+        try {
+          anchors = document.querySelectorAll('a[href*="frmCargaDeIntervencion"], a[href*="CargaDeIntervencion"]');
+        } catch (e2) {}
+        for (var i = 0; i < anchors.length; i++) {
+          var href = '';
+          try {
+            href = anchors[i].href || anchors[i].getAttribute('href') || '';
+          } catch (e3) {}
+          if (!href) continue;
+          if (!formHref) formHref = href;
+          var mA = href.match(/[?&]idUsuario=(\d+)/i);
+          if (mA) {
+            idUsuario = idUsuario || mA[1];
+            formHref = href;
+            break;
+          }
+        }
+        return {
+          href: location.href,
+          idUsuario: idUsuario || '',
+          formHref: formHref || ''
+        };
+      }
+    });
+    var best = { idUsuario: '', formHref: '' };
+    for (var i = 0; i < (results || []).length; i++) {
+      var r = results[i] && results[i].result;
+      if (!r) continue;
+      if (r.idUsuario && !best.idUsuario) best.idUsuario = String(r.idUsuario);
+      if (r.formHref && /idUsuario=\d+/i.test(r.formHref)) {
+        best.formHref = r.formHref;
+        var m = r.formHref.match(/idUsuario=(\d+)/i);
+        if (m) best.idUsuario = best.idUsuario || m[1];
+      } else if (r.formHref && !best.formHref) {
+        best.formHref = r.formHref;
+      }
+    }
+    return best;
+  } catch (e) {
+    return { idUsuario: '', formHref: '' };
+  }
+}
+
+async function resolveEvwebFormNavigationTarget(tab) {
+  var id = parseEvwebIdUsuarioFromUrl(tab && tab.url);
+  var hints = { idUsuario: '', formHref: '' };
+  if (tab && tab.id) {
+    hints = await scrapeEvwebSessionHints(tab.id);
+  }
+  if (hints.idUsuario) id = id || String(hints.idUsuario);
+  if (!id) id = await loadRememberedEvwebIdUsuario();
+  if (id) await rememberEvwebIdUsuario(id);
+
+  if (hints.formHref && /idUsuario=\d+/i.test(hints.formHref)) {
+    return { url: hints.formHref, idUsuario: id, via: 'menu_link' };
+  }
+  if (hints.formHref && id) {
+    var u = hints.formHref;
+    if (!/idUsuario=/i.test(u)) {
+      u += (u.indexOf('?') >= 0 ? '&' : '?') + 'idUsuario=' + encodeURIComponent(id);
+    }
+    return { url: u, idUsuario: id, via: 'menu_link_plus_id' };
+  }
+  return {
+    url: buildEvwebFormUrl(id),
+    idUsuario: id,
+    via: id ? 'built_with_id' : 'built_without_id'
+  };
+}
 
 function defaultEvwebRunnerState() {
   return {
@@ -2429,12 +2955,100 @@ function defaultEvwebRunnerState() {
     lastResult: null,
     processedIds: [],
     startedAt: null,
+    busyAt: null,
     updatedAt: Date.now()
   };
 }
 
 function defaultEvwebQueue() {
-  return { version: 1, updatedAt: Date.now(), items: [] };
+  return { version: 1, updatedAt: Date.now(), items: [], lastEnqueuedId: null };
+}
+
+/**
+ * Tras context invalidated / SW muerto: status queda running|awaiting_confirm
+ * y el ítem en paused_error → Iniciar no manda PING (skipPaused). Liberar.
+ */
+async function liberarEvwebLocksForFreshStart(reason) {
+  reason = reason || 'fresh_start';
+  var st = await getEvwebRunnerState();
+  var refresh = await refreshEvwebQueueFromAnesFact({ allowStorageFallback: true });
+  var q = (refresh && refresh.queue) ? refresh.queue : await getEvwebQueue();
+  var idsInQueue = {};
+  (q.items || []).forEach(function (it) {
+    if (it && it.id != null) idsInQueue[String(it.id)] = true;
+  });
+  if (st && st.currentIntervId && !idsInQueue[String(st.currentIntervId)]) {
+    st.currentIntervId = null;
+    st.currentPac = '';
+  }
+  var requeued = [];
+  var now = Date.now();
+  var prevBusy = !!evwebRunnerBusy;
+  var prevStatus = st && st.status;
+  var busyStale = prevBusy && evwebRunnerBusyAt &&
+    (now - evwebRunnerBusyAt > EVWEB_BUSY_STALE_MS);
+  var storageStale = st && (st.status === 'running' || st.status === 'awaiting_confirm') &&
+    st.busyAt && (now - Number(st.busyAt) > EVWEB_BUSY_STALE_MS);
+
+  // Reencolar ítem actual + último encolado si están pausados/running/awaiting
+  var ids = {};
+  if (st && st.currentIntervId) ids[String(st.currentIntervId)] = true;
+  if (q && q.lastEnqueuedId && idsInQueue[String(q.lastEnqueuedId)]) {
+    ids[String(q.lastEnqueuedId)] = true;
+  }
+  if (st && st.currentIntervId && idsInQueue[String(st.currentIntervId)]) {
+    ids[String(st.currentIntervId)] = true;
+  }
+  (q.items || []).forEach(function (it) {
+    if (!it || !idsInQueue[String(it.id)]) return;
+    var s = it.status || '';
+    if (s === 'running' || s === 'awaiting_confirm') {
+      it.status = 'queued';
+      it.message = 'Reencolada (' + reason + ')';
+      it.updatedAt = now;
+      requeued.push(String(it.id));
+    } else if (s === 'paused_error' && ids[String(it.id)]) {
+      it.status = 'queued';
+      it.message = 'Reencolada (' + reason + ')';
+      it.updatedAt = now;
+      requeued.push(String(it.id));
+    }
+  });
+
+  var needs =
+    prevBusy ||
+    busyStale ||
+    storageStale ||
+    (st && (st.status === 'running' || st.status === 'awaiting_confirm')) ||
+    requeued.length > 0;
+
+  if (!needs) {
+    await afgDiag('evweb_lock_check_clean', {
+      status: prevStatus,
+      busy: prevBusy
+    }, 'bg');
+    return { ok: true, liberated: false, state: st };
+  }
+
+  if (requeued.length) {
+    await setEvwebQueue(slimEvwebQueueForStorage(q));
+  }
+  evwebRunnerBusy = false;
+  evwebRunnerBusyAt = 0;
+  var idle = defaultEvwebRunnerState();
+  idle.message = 'Locks liberados (' + reason + ')' +
+    (requeued.length ? (' · reencolados: ' + requeued.join(',')) : '');
+  idle.processedIds = [];
+  await setEvwebRunnerState(idle);
+  await afgDiag('evweb_locks_liberated', {
+    reason: reason,
+    prevStatus: prevStatus,
+    prevBusy: prevBusy,
+    busyStale: !!busyStale,
+    storageStale: !!storageStale,
+    requeued: requeued
+  }, 'bg');
+  return { ok: true, liberated: true, requeued: requeued, state: idle };
 }
 
 async function getEvwebRunnerState() {
@@ -2477,6 +3091,157 @@ async function getEvwebQueue() {
   return defaultEvwebQueue();
 }
 
+/** Sin PDFs en chrome.storage (cuota). Igual que bridge slimEvwebQueueForStorage. */
+function slimEvwebQueueForStorage(queue) {
+  queue = queue || defaultEvwebQueue();
+  var items = (queue.items || []).map(function (it) {
+    if (!it || typeof it !== 'object') return it;
+    var copy = Object.assign({}, it);
+    var docs = copy.docs || {};
+    var meta = {};
+    ['anest', 'qx', 'auth'].forEach(function (k) {
+      var d = docs[k];
+      if (!d) return;
+      meta[k] = {
+        nombre: d.nombre || k,
+        tipo: d.tipo || '',
+        hasData: !!(d.data),
+        size: d.data ? String(d.data).length : (d.size || 0),
+        idb: !!d.idb,
+        aliasOf: d.aliasOf || null
+      };
+    });
+    copy.docsMeta = meta;
+    delete copy.docs;
+    return copy;
+  });
+  return {
+    version: Number(queue.version) || 1,
+    updatedAt: queue.updatedAt || Date.now(),
+    lastEnqueuedId: queue.lastEnqueuedId != null ? String(queue.lastEnqueuedId) : null,
+    items: items
+  };
+}
+
+/** Fuente de verdad: localStorage afg_evweb_queue en pestaña AnesFact (como GECLISA). */
+async function pullEvwebQueueFromAnesFactTabs() {
+  var tabs = await findAnesFactTabs();
+  if (!tabs || !tabs.length) {
+    return {
+      ok: false,
+      error: 'no_anesfact_tab',
+      message: 'No hay pestaña AnesFact abierta.'
+    };
+  }
+  var best = null;
+  var inspected = [];
+  for (var i = 0; i < tabs.length; i++) {
+    var tab = tabs[i];
+    try {
+      var results = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: function () {
+          try {
+            var raw = localStorage.getItem('afg_evweb_queue');
+            if (!raw) return { href: location.href, raw: null };
+            return { href: location.href, raw: raw, parsed: JSON.parse(raw) };
+          } catch (e) {
+            return { href: location.href, error: String(e && e.message || e) };
+          }
+        }
+      });
+      var row = results && results[0] && results[0].result;
+      inspected.push({ tabId: tab.id, url: tab.url, row: row });
+      if (row && row.parsed && Array.isArray(row.parsed.items)) {
+        var cand = row.parsed;
+        if (!best || (cand.updatedAt || 0) >= (best.updatedAt || 0) ||
+            (cand.version || 0) > (best.version || 0)) {
+          best = cand;
+          best._fromTabId = tab.id;
+        }
+      }
+    } catch (eTab) {
+      inspected.push({ tabId: tab.id, url: tab.url, error: String(eTab.message || eTab) });
+    }
+  }
+  if (!best) {
+    return {
+      ok: false,
+      error: 'no_evweb_queue',
+      message: 'Sin cola evweb en AnesFact (afg_evweb_queue).',
+      inspected: inspected
+    };
+  }
+  var queue = {
+    version: Number(best.version) || 1,
+    updatedAt: best.updatedAt || Date.now(),
+    lastEnqueuedId: best.lastEnqueuedId != null ? String(best.lastEnqueuedId) : null,
+    items: best.items
+  };
+  return { ok: true, source: 'anesfact_tab', queue: queue, inspected: inspected };
+}
+
+/**
+ * Relee cola desde AnesFact y pisa chrome.storage (lista de pacientes).
+ * Conserva status del runner solo para ids que siguen en la cola LS.
+ */
+async function refreshEvwebQueueFromAnesFact(opts) {
+  opts = opts || {};
+  var pulled = await pullEvwebQueueFromAnesFactTabs();
+  if (!pulled.ok || !pulled.queue) {
+    if (opts.allowStorageFallback) {
+      var qFallback = await getEvwebQueue();
+      return {
+        ok: true,
+        source: 'storage_fallback',
+        queue: qFallback,
+        fullDocs: false,
+        pullError: pulled.error || null
+      };
+    }
+    return pulled;
+  }
+  var lsQueue = pulled.queue;
+  var stored = await getEvwebQueue();
+  var byId = {};
+  (stored.items || []).forEach(function (it) {
+    if (it && it.id != null) byId[String(it.id)] = it;
+  });
+  var mergedItems = (lsQueue.items || []).map(function (lsIt) {
+    var copy = Object.assign({}, lsIt);
+    var st = byId[String(lsIt.id)];
+    if (st) {
+      var extStatus = st.status || '';
+      if (extStatus && extStatus !== 'queued') {
+        copy.status = extStatus;
+        copy.message = st.message || copy.message || '';
+      }
+    }
+    return copy;
+  });
+  var merged = {
+    version: lsQueue.version,
+    updatedAt: lsQueue.updatedAt,
+    lastEnqueuedId: lsQueue.lastEnqueuedId,
+    items: mergedItems
+  };
+  await setEvwebQueue(slimEvwebQueueForStorage(merged));
+  await afgDiag('evweb_queue_refreshed', {
+    source: pulled.source,
+    items: merged.items.length,
+    lastEnqueuedId: merged.lastEnqueuedId,
+    pacs: merged.items.map(function (it) {
+      return { id: it.id, pac: it.pac, st: it.status };
+    })
+  }, 'bg');
+  return {
+    ok: true,
+    source: pulled.source,
+    queue: merged,
+    fullDocs: true
+  };
+}
+
 async function setEvwebQueue(queue) {
   queue = queue || defaultEvwebQueue();
   queue.updatedAt = Date.now();
@@ -2507,9 +3272,1118 @@ async function patchEvwebQueueItemStatus(intervId, status, message) {
 async function findEvwebTab() {
   var tabs = await chrome.tabs.query({ url: EVWEB_HOST_PATTERN });
   if (!tabs || !tabs.length) {
-    throw new Error('Abrí evweb (adaarc.evweb.com.ar) logueado primero');
+    throw new Error(
+      'No hay pestaña de ADAARC/evweb. Iniciar cola debería abrirla; si no, abrí adaarc.evweb.com.ar logueado.'
+    );
   }
-  return tabs.find(function (t) { return t.active; }) || tabs[0];
+  var withForm = tabs.filter(function (t) {
+    return /frmCargaDeIntervencion\.aspx/i.test(String(t.url || ''));
+  });
+  var pool = withForm.length ? withForm : tabs;
+  return pool.find(function (t) { return t.active; }) || pool[0];
+}
+
+function evwebFormMissingError(url) {
+  var u = String(url || '');
+  if (/frmUsuarioSinLoguear/i.test(u)) {
+    return (
+      'ADAARC rechazó la navegación (frmUsuarioSinLoguear): falta idUsuario de tu sesión. ' +
+      'Abrí a mano “Carga de intervención” una vez (URL con idUsuario=…), o asegurate de estar logueado en la home y reintentá Iniciar cola.'
+    );
+  }
+  return (
+    'No encontré el formulario de carga en ADAARC (#body_cboObraSocial). ' +
+    'Hace falta estar logueado. Si ves la home, Iniciar cola debería ir a carga con idUsuario; ' +
+    'si sigue fallando, abrí a mano esa pantalla y reintentá. URL: ' + u
+  );
+}
+
+/** true si algún frame tiene #body_cboObraSocial; si no, null. */
+async function probeEvwebFormFrameId(tabId) {
+  try {
+    var frameResults = await chrome.scripting.executeScript({
+      target: { tabId: tabId, allFrames: true },
+      func: function () {
+        return {
+          isTop: window === window.top,
+          hasObra: !!document.getElementById('body_cboObraSocial'),
+          href: location.href
+        };
+      }
+    });
+    for (var i = 0; i < (frameResults || []).length; i++) {
+      var fr = frameResults[i];
+      var r = fr.result || {};
+      if (r.hasObra) return fr.frameId;
+    }
+  } catch (e) {
+    /* tab aún cargando / restricted */
+  }
+  return null;
+}
+
+async function waitEvwebTabComplete(tabId, timeoutMs) {
+  timeoutMs = timeoutMs || 15000;
+  var start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    try {
+      var t = await chrome.tabs.get(tabId);
+      if (t && t.status === 'complete') return t;
+    } catch (e) {
+      throw new Error('La pestaña ADAARC se cerró mientras cargaba el formulario');
+    }
+    await sleep(250);
+  }
+  return chrome.tabs.get(tabId);
+}
+
+/**
+ * Asegura pestaña en pantalla de carga con #body_cboObraSocial.
+ * Navega con idUsuario de la sesión (menú / URL / storage); sin eso ADAARC manda a SinLoguear.
+ */
+async function ensureEvwebFormReady(tab) {
+  if (!tab || !tab.id) throw new Error('Sin pestaña ADAARC');
+  var tabId = tab.id;
+  var frameId = await probeEvwebFormFrameId(tabId);
+  if (frameId != null) {
+    var idOk = parseEvwebIdUsuarioFromUrl(tab.url);
+    if (idOk) await rememberEvwebIdUsuario(idOk);
+    await afgDiag('evweb_form_already', { tabId: tabId, url: tab.url || null, frameId: frameId }, 'bg');
+    return { tab: tab, frameId: frameId, navigated: false };
+  }
+
+  // Si ya caímos en SinLoguear, volvemos a intentar con idUsuario resuelto
+  var target = await resolveEvwebFormNavigationTarget(tab);
+  await afgDiag('evweb_form_navigate', {
+    tabId: tabId,
+    from: tab.url || null,
+    to: target.url,
+    via: target.via,
+    idUsuario: target.idUsuario || null
+  }, 'bg');
+
+  if (!target.idUsuario && !/idUsuario=\d+/i.test(target.url)) {
+    await afgDiag('evweb_form_nav_without_id', { to: target.url }, 'bg');
+  }
+
+  await chrome.tabs.update(tabId, { url: target.url, active: true });
+  await waitEvwebTabComplete(tabId, 18000);
+
+  var deadline = Date.now() + 14000;
+  while (Date.now() < deadline) {
+    var tabNow = await chrome.tabs.get(tabId);
+    if (/frmUsuarioSinLoguear/i.test(String(tabNow.url || ''))) {
+      await afgDiag('evweb_form_sin_loguear', { url: tabNow.url || null }, 'bg');
+      throw new Error(evwebFormMissingError(tabNow.url));
+    }
+    frameId = await probeEvwebFormFrameId(tabId);
+    if (frameId != null) {
+      var idKeep = parseEvwebIdUsuarioFromUrl(tabNow.url);
+      if (idKeep) await rememberEvwebIdUsuario(idKeep);
+      await afgDiag('evweb_form_ready', {
+        tabId: tabId,
+        url: tabNow.url || null,
+        frameId: frameId,
+        idUsuario: idKeep || target.idUsuario || null
+      }, 'bg');
+      return { tab: tabNow, frameId: frameId, navigated: true };
+    }
+    await sleep(400);
+  }
+
+  var tabFail = await chrome.tabs.get(tabId);
+  await afgDiag('evweb_form_missing_after_nav', {
+    tabId: tabId,
+    url: tabFail.url || null
+  }, 'bg');
+  throw new Error(evwebFormMissingError(tabFail.url));
+}
+
+/**
+ * Clasifica #body_GridView1_cboTipoDocumento_N en MAIN world.
+ * Igual que obra: arma endRequest → setea valor → __doPostBack diferido →
+ * espera endRequest o timeout (nunca colgarse).
+ * No disparar change/teclas sync: el AutoPostBack puede destruir el frame
+ * y chrome.scripting.executeScript nunca resuelve (0.6.20 hang >35s).
+ */
+async function setEvwebClassifyDocTipo(msg) {
+  msg = msg || {};
+  var tabId = msg.tabId;
+  var frameId = msg.frameId;
+  if (!tabId || frameId == null || frameId === '') {
+    return { ok: false, error: 'missing_tab_or_frame' };
+  }
+  var fid = Number(frameId);
+  if (!Number.isFinite(fid)) return { ok: false, error: 'bad_frameId', frameId: frameId };
+
+  var idx = Number(msg.idx);
+  if (!Number.isFinite(idx) || idx < 0) return { ok: false, error: 'bad_idx', idx: msg.idx };
+  var preferValue = String(msg.preferValue != null ? msg.preferValue : '');
+  var slotKey = String(msg.slotKey || '');
+  var labelHints = Array.isArray(msg.labelHints) ? msg.labelHints : [];
+  var timeoutMs = Number(msg.timeoutMs);
+  if (!Number.isFinite(timeoutMs) || timeoutMs < 1000) timeoutMs = 8000;
+  // Hard cap: si el frame muere mid-flight, executeScript no resuelve
+  var hardCapMs = timeoutMs + 2500;
+
+  try {
+    var execPromise = chrome.scripting.executeScript({
+      target: { tabId: tabId, frameIds: [fid] },
+      world: 'MAIN',
+      args: [idx, preferValue, slotKey, labelHints, timeoutMs],
+      func: function (idxArg, preferValueArg, slotKeyArg, labelHintsArg, timeoutMsArg) {
+        return new Promise(function (resolve) {
+          function norm(s) {
+            return String(s || '')
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .toLowerCase()
+              .replace(/\s+/g, ' ')
+              .trim();
+          }
+          function findSel(i) {
+            return document.getElementById('body_GridView1_cboTipoDocumento_' + i)
+              || document.querySelector('[id$="GridView1_cboTipoDocumento_' + i + '"]')
+              || document.querySelector('[id*="cboTipoDocumento_' + i + '"]');
+          }
+          function readState(i) {
+            var s = findSel(i);
+            if (!s || !s.options || !s.options.length) {
+              return { missing: true, value: '', text: '' };
+            }
+            var t = s.options[s.selectedIndex]
+              ? String(s.options[s.selectedIndex].text || '').trim()
+              : '';
+            return { missing: false, value: String(s.value || ''), text: t };
+          }
+          function parsePostBackTarget(el) {
+            if (el && el.name) return String(el.name);
+            var blob = '';
+            try {
+              blob = (el.getAttribute('onchange') || '') + '\n' + (el.getAttribute('onChange') || '');
+            } catch (eAttr) {}
+            var m = String(blob).match(
+              /__doPostBack\s*\(\s*['"]([^'"]+)['"]\s*,\s*['"]([^'"]*)['"]\s*\)/i
+            );
+            if (m) return m[1];
+            m = String(blob).match(
+              /__doPostBack\s*\(\s*(?:&#39;|&apos;|')([^'&]+)(?:&#39;|&apos;|')\s*,\s*(?:&#39;|&apos;|')([^'&]*)(?:&#39;|&apos;|')\s*\)/i
+            );
+            return m ? m[1] : null;
+          }
+          try {
+            var sel = findSel(idxArg);
+            if (!sel || !sel.options || !sel.options.length) {
+              resolve({ ok: false, error: 'select_not_found', idx: idxArg });
+              return;
+            }
+            var options = [];
+            var i;
+            for (i = 0; i < sel.options.length; i++) {
+              options.push({
+                value: String(sel.options[i].value),
+                text: String(sel.options[i].text || '').trim(),
+                index: i
+              });
+            }
+            var match = null;
+            for (i = 0; i < options.length; i++) {
+              if (options[i].value === String(preferValueArg)) {
+                match = options[i];
+                match.via = 'value';
+                break;
+              }
+            }
+            if (!match) {
+              var hints = labelHintsArg || [];
+              for (i = 0; i < options.length; i++) {
+                var t = norm(options[i].text);
+                if (!t || /clasifique|seleccione|elegir|--/.test(t)) continue;
+                for (var j = 0; j < hints.length; j++) {
+                  if (t.indexOf(norm(hints[j])) !== -1) {
+                    match = options[i];
+                    match.via = 'label';
+                    break;
+                  }
+                }
+                if (match) break;
+              }
+            }
+            if (!match) {
+              resolve({
+                ok: false,
+                error: 'tipo_option_not_found',
+                options: options,
+                want: preferValueArg,
+                slot: slotKeyArg
+              });
+              return;
+            }
+
+            var mgr = window.Sys && window.Sys.WebForms &&
+              window.Sys.WebForms.PageRequestManager &&
+              window.Sys.WebForms.PageRequestManager.getInstance
+                ? window.Sys.WebForms.PageRequestManager.getInstance()
+                : null;
+            var settled = false;
+            var handler = null;
+
+            function finish(payload) {
+              if (settled) return;
+              settled = true;
+              if (mgr && handler) {
+                try { mgr.remove_endRequest(handler); } catch (eRm) {}
+              }
+              resolve(payload);
+            }
+
+            // Valor primero, SIN change (evita postback sync que mata el frame)
+            try { sel.focus(); } catch (eF) {}
+            sel.selectedIndex = match.index;
+            sel.value = match.value;
+
+            var postTarget = parsePostBackTarget(sel);
+            var hasDoPostBack = typeof window.__doPostBack === 'function';
+
+            if (mgr) {
+              handler = function () {
+                var st = readState(idxArg);
+                var placeholder = /clasifique|seleccione|elegir/i.test(st.text) || !st.value;
+                var valueOk = String(st.value) === String(match.value);
+                finish({
+                  ok: !st.missing && !placeholder && valueOk,
+                  reason: 'endRequest',
+                  error: st.missing
+                    ? 'select_missing_after_postback'
+                    : (placeholder || !valueOk ? 'tipo_still_placeholder' : undefined),
+                  value: st.value,
+                  text: st.text,
+                  via: match.via || 'main',
+                  idx: idxArg,
+                  world: 'MAIN',
+                  postTarget: postTarget || null,
+                  options: options
+                });
+              };
+              try { mgr.add_endRequest(handler); } catch (eAdd) {
+                mgr = null;
+                handler = null;
+              }
+            }
+
+            // Postback diferido: deja que esta Promise quede armada; no change sync
+            setTimeout(function () {
+              if (settled) return;
+              try {
+                var s2 = findSel(idxArg);
+                if (s2) {
+                  s2.selectedIndex = match.index;
+                  s2.value = match.value;
+                }
+                if (hasDoPostBack && postTarget) {
+                  window.__doPostBack(postTarget, '');
+                } else if (s2 || sel) {
+                  var el = s2 || sel;
+                  try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (eIn) {}
+                  try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (eCh) {}
+                } else {
+                  finish({
+                    ok: false,
+                    error: 'select_gone_before_postback',
+                    reason: 'fire_failed',
+                    via: match.via || 'main',
+                    idx: idxArg,
+                    world: 'MAIN'
+                  });
+                }
+              } catch (eFire) {
+                finish({
+                  ok: false,
+                  error: String(eFire && eFire.message || eFire),
+                  reason: 'fire_failed',
+                  via: match.via || 'main',
+                  idx: idxArg,
+                  world: 'MAIN'
+                });
+              }
+            }, 0);
+
+            setTimeout(function () {
+              if (settled) return;
+              var st = readState(idxArg);
+              var placeholder = /clasifique|seleccione|elegir/i.test(st.text) || !st.value;
+              var valueOk = String(st.value) === String(match.value);
+              // Soft-ok si el valor quedó: endRequest a veces no llega en GridView
+              var softOk = !st.missing && !placeholder && valueOk;
+              finish({
+                ok: softOk,
+                reason: mgr ? 'timeout' : 'no_page_request_manager',
+                error: softOk ? undefined : (st.missing
+                  ? 'classify_timeout_select_missing'
+                  : 'classify_timeout'),
+                value: st.value,
+                text: st.text,
+                via: match.via || 'main',
+                idx: idxArg,
+                world: 'MAIN',
+                postTarget: postTarget || null,
+                hasDoPostBack: hasDoPostBack,
+                options: options
+              });
+            }, timeoutMsArg);
+          } catch (e) {
+            resolve({ ok: false, error: String(e && e.message || e) });
+          }
+        });
+      }
+    });
+
+    var hardTimeout = new Promise(function (resolve) {
+      setTimeout(function () {
+        resolve({ __hardTimeout: true });
+      }, hardCapMs);
+    });
+    var raced = await Promise.race([execPromise, hardTimeout]);
+    if (raced && raced.__hardTimeout) {
+      var hang = {
+        ok: false,
+        error: 'classify_executeScript_hang',
+        reason: 'hard_timeout',
+        idx: idx,
+        slot: slotKey,
+        hardCapMs: hardCapMs
+      };
+      await afgDiag('evweb_classify_main', hang, 'bg');
+      return hang;
+    }
+    var results = raced;
+    var row = results && results[0];
+    if (row && row.error) {
+      var fail = {
+        ok: false,
+        error: String(row.error.message || row.error),
+        reason: 'executeScript_failed'
+      };
+      await afgDiag('evweb_classify_main', fail, 'bg');
+      return fail;
+    }
+    var r = row && row.result;
+    await afgDiag('evweb_classify_main', {
+      ok: !!(r && r.ok),
+      error: r && r.error,
+      reason: r && r.reason,
+      value: r && r.value,
+      text: r && r.text,
+      via: r && r.via,
+      idx: idx,
+      slot: slotKey,
+      postTarget: r && r.postTarget
+    }, 'bg');
+    return r || { ok: false, error: 'empty_executeScript' };
+  } catch (e) {
+    return { ok: false, error: String(e && e.message || e) };
+  }
+}
+
+/**
+ * Setea el File en #body_cargaArchivos y dispara Cargar en MAIN world.
+ * Nunca btn.click() ni navegar href="javascript:…" (CSP de evweb lo bloquea).
+ * Solo: parsear __doPostBack / PostBackOptions e invocar la función.
+ */
+async function setEvwebFileAndClickUpload(msg) {
+  msg = msg || {};
+  var tabId = msg.tabId;
+  var frameId = msg.frameId;
+  if (!tabId || frameId == null || frameId === '') {
+    return { ok: false, error: 'missing_tab_or_frame' };
+  }
+  var fid = Number(frameId);
+  if (!Number.isFinite(fid)) return { ok: false, error: 'bad_frameId', frameId: frameId };
+
+  var dataUrl = String(msg.dataUrl || msg.data || '');
+  var comma = dataUrl.indexOf(',');
+  var b64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
+  if (!b64) return { ok: false, error: 'missing_file_data' };
+
+  var fileName = String(msg.nombre || 'documento.pdf');
+  var mime = String(msg.tipo || 'application/octet-stream');
+  if (!/\.[a-z0-9]{2,5}$/i.test(fileName)) {
+    if (/pdf/i.test(mime) || /^JVBER/i.test(b64.slice(0, 8))) fileName += '.pdf';
+    else if (/jpeg|jpg/i.test(mime)) fileName += '.jpg';
+    else if (/png/i.test(mime)) fileName += '.png';
+    else fileName += '.bin';
+  }
+
+  try {
+    var results = await chrome.scripting.executeScript({
+      target: { tabId: tabId, frameIds: [fid] },
+      world: 'MAIN',
+      args: [b64, fileName, mime],
+      func: function (b64Arg, fileNameArg, mimeArg) {
+        try {
+          var input = document.getElementById('body_cargaArchivos');
+          var btn = document.getElementById('body_btnUploadArchivo');
+          if (!input) return { ok: false, error: 'cargaArchivos_not_found' };
+          if (!btn) return { ok: false, error: 'btnUpload_not_found' };
+
+          var bin = atob(b64Arg);
+          var bytes = new Uint8Array(bin.length);
+          for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+          var file = new File([bytes], fileNameArg, { type: mimeArg || 'application/octet-stream' });
+          var dt = new DataTransfer();
+          dt.items.add(file);
+          input.files = dt.files;
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+
+          var filesLen = input.files ? input.files.length : 0;
+          if (!filesLen) return { ok: false, error: 'files_empty_after_set', filesLen: 0 };
+
+          // Solo leer atributos como string — NUNCA asignar a location ni .click()
+          // si el href es javascript: (CSP bloquea esa navegación).
+          var href = btn.getAttribute('href') || '';
+          var onclickAttr = btn.getAttribute('onclick') || '';
+          var nameAttr = btn.getAttribute('name') || '';
+          var blob = href + '\n' + onclickAttr;
+
+          function parseDoPostBack(src) {
+            var m = String(src || '').match(
+              /__doPostBack\s*\(\s*['"]([^'"]+)['"]\s*,\s*['"]([^'"]*)['"]\s*\)/i
+            );
+            if (m) return { target: m[1], arg: m[2] };
+            // HTML entities en el atributo
+            m = String(src || '').match(
+              /__doPostBack\s*\(\s*(?:&#39;|&apos;|')([^'&]+)(?:&#39;|&apos;|')\s*,\s*(?:&#39;|&apos;|')([^'&]*)(?:&#39;|&apos;|')\s*\)/i
+            );
+            if (m) return { target: m[1], arg: m[2] };
+            return null;
+          }
+
+          function parsePostBackOptionsTarget(src) {
+            // WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions("TARGET", ...
+            var m = String(src || '').match(
+              /WebForm_PostBackOptions\s*\(\s*['"]([^'"]+)['"]/i
+            );
+            return m ? m[1] : null;
+          }
+
+          var clickVia = null;
+          var parsed = parseDoPostBack(blob);
+          if (parsed && typeof window.__doPostBack === 'function') {
+            clickVia = 'doPostBack';
+            window.__doPostBack(parsed.target, parsed.arg);
+          } else {
+            var optTarget = parsePostBackOptionsTarget(blob);
+            if (optTarget && typeof window.__doPostBack === 'function') {
+              clickVia = 'doPostBack_from_options';
+              window.__doPostBack(optTarget, '');
+            } else if (typeof window.__doPostBack === 'function') {
+              // Fallbacks típicos ASP.NET LinkButton
+              var candidates = [];
+              if (nameAttr) candidates.push(nameAttr);
+              if (btn.id) {
+                candidates.push(btn.id);
+                candidates.push(btn.id.replace(/_/g, '$'));
+                if (btn.id.indexOf('body_') === 0) {
+                  candidates.push('ctl00$' + btn.id.replace(/_/g, '$'));
+                }
+              }
+              var fired = false;
+              for (var c = 0; c < candidates.length; c++) {
+                if (!candidates[c]) continue;
+                try {
+                  window.__doPostBack(candidates[c], '');
+                  clickVia = 'doPostBack_fallback:' + candidates[c];
+                  fired = true;
+                  break;
+                } catch (ePb) {}
+              }
+              if (!fired) {
+                return {
+                  ok: false,
+                  error: 'doPostBack_unavailable',
+                  href: href.slice(0, 160),
+                  hasDoPostBack: typeof window.__doPostBack === 'function',
+                  nameAttr: nameAttr || null,
+                  btnId: btn.id || null
+                };
+              }
+            } else {
+              return {
+                ok: false,
+                error: 'no___doPostBack',
+                href: href.slice(0, 160),
+                note: 'No se llama btn.click() (CSP bloquea javascript: URLs)'
+              };
+            }
+          }
+
+          return {
+            ok: true,
+            filesLen: filesLen,
+            fileName: fileNameArg,
+            fileSize: file.size,
+            clickVia: clickVia,
+            href: href.slice(0, 160),
+            tag: btn.tagName,
+            hasDoPostBack: typeof window.__doPostBack === 'function',
+            avoidedJsNav: true
+          };
+        } catch (e) {
+          return { ok: false, error: String(e && e.message || e) };
+        }
+      }
+    });
+    var r = results && results[0] && results[0].result;
+    await afgDiag('evweb_upload_main', {
+      ok: !!(r && r.ok),
+      error: r && r.error,
+      clickVia: r && r.clickVia,
+      filesLen: r && r.filesLen,
+      fileSize: r && r.fileSize,
+      href: r && r.href,
+      avoidedJsNav: !!(r && r.avoidedJsNav)
+    }, 'bg');
+    return r || { ok: false, error: 'empty_executeScript' };
+  } catch (e) {
+    return { ok: false, error: String(e && e.message || e) };
+  }
+}
+
+/** Cuenta filas del GridView (íconos trash / selects tipo) en el frame del form. */
+async function countEvwebGridRows(tabId, frameId) {
+  if (!tabId || frameId == null) return 0;
+  var fid = Number(frameId);
+  if (!Number.isFinite(fid)) return 0;
+  try {
+    var results = await chrome.scripting.executeScript({
+      target: { tabId: tabId, frameIds: [fid] },
+      world: 'MAIN',
+      func: function () {
+        var grid = document.getElementById('body_GridView1')
+          || document.querySelector('[id$="GridView1"]')
+          || document.querySelector('table[id*="GridView"]');
+        var n = 0;
+        if (grid) {
+          n = grid.querySelectorAll('.fa-trash, a[id*="btnEliminar"], [id*="Eliminar"]').length;
+        }
+        if (!n) {
+          try {
+            n = document.querySelectorAll(
+              '#body_GridView1 .fa-trash, [id$="GridView1"] .fa-trash, a[id*="GridView1"][id*="Eliminar"]'
+            ).length;
+          } catch (e) {}
+        }
+        if (!n) {
+          try {
+            n = document.querySelectorAll('[id*="cboTipoDocumento_"]').length;
+          } catch (e2) {}
+        }
+        return n;
+      }
+    });
+    var r = results && results[0] && results[0].result;
+    return Number(r) || 0;
+  } catch (e) {
+    return 0;
+  }
+}
+
+/**
+ * Tras __doPostBack de Cargar: la página a menudo hace reload REAL (no UpdatePanel).
+ * No se puede esperar sendResponse del CS que murió. Esperar loading→complete
+ * o que crezca el grid (caso AJAX).
+ */
+function waitEvwebAfterUploadPostback(tabId, beforeCount, timeoutMs) {
+  timeoutMs = timeoutMs || 20000;
+  beforeCount = Number(beforeCount) || 0;
+  return new Promise(function (resolve) {
+    var done = false;
+    var sawLoading = false;
+    var startedAt = Date.now();
+    var poll = null;
+
+    function finish(payload) {
+      if (done) return;
+      done = true;
+      try { chrome.tabs.onUpdated.removeListener(onUpdated); } catch (eRm) {}
+      if (poll) clearInterval(poll);
+      clearTimeout(timer);
+      resolve(payload);
+    }
+
+    function onUpdated(id, info) {
+      if (id !== tabId) return;
+      if (info.status === 'loading') {
+        sawLoading = true;
+        return;
+      }
+      if (info.status === 'complete' && (sawLoading || Date.now() - startedAt > 400)) {
+        setTimeout(function () {
+          probeEvwebFormFrameId(tabId).then(function (fid) {
+            return countEvwebGridRows(tabId, fid).then(function (after) {
+              finish({
+                ok: true,
+                via: 'tab_reload',
+                afterCount: after,
+                beforeCount: beforeCount,
+                frameId: fid,
+                rowGrew: after > beforeCount
+              });
+            });
+          }).catch(function (e) {
+            finish({
+              ok: true,
+              via: 'tab_reload',
+              afterCount: beforeCount,
+              beforeCount: beforeCount,
+              frameId: null,
+              rowGrew: false,
+              probeError: String(e && e.message || e)
+            });
+          });
+        }, 500);
+      }
+    }
+
+    chrome.tabs.onUpdated.addListener(onUpdated);
+
+    poll = setInterval(function () {
+      if (done) return;
+      probeEvwebFormFrameId(tabId).then(function (fid) {
+        if (fid == null) return null;
+        return countEvwebGridRows(tabId, fid).then(function (after) {
+          if (after > beforeCount) {
+            finish({
+              ok: true,
+              via: 'rows_poll',
+              afterCount: after,
+              beforeCount: beforeCount,
+              frameId: fid,
+              rowGrew: true
+            });
+          }
+        });
+      }).catch(function () {});
+    }, 400);
+
+    var timer = setTimeout(function () {
+      probeEvwebFormFrameId(tabId).then(function (fid) {
+        return countEvwebGridRows(tabId, fid).then(function (after) {
+          finish({
+            ok: after > beforeCount,
+            via: 'timeout',
+            afterCount: after,
+            beforeCount: beforeCount,
+            frameId: fid,
+            rowGrew: after > beforeCount
+          });
+        });
+      }).catch(function () {
+        finish({
+          ok: false,
+          via: 'timeout',
+          afterCount: beforeCount,
+          beforeCount: beforeCount,
+          frameId: null,
+          rowGrew: false
+        });
+      });
+    }, timeoutMs);
+  });
+}
+
+var EVW_DOC_TIPO_BG = { anest: '1', qx: '2', auth: '7' };
+var EVW_DOC_LABEL_BG = {
+  anest: ['foja anestesica', 'foja anestésica', 'foja de anestesia'],
+  qx: ['foja quirurgica', 'foja quirúrgica'],
+  auth: [
+    'autorizacion de obra social',
+    'autorización de obra social',
+    'autorizacion',
+    'autorización'
+  ]
+};
+
+/** Snapshot de filas/tipo en el grid (post-reload, mensaje nuevo / executeScript). */
+async function inspectEvwebUploadGrid(tabId, frameId) {
+  if (!tabId || frameId == null) return { rows: [], count: 0 };
+  var fid = Number(frameId);
+  if (!Number.isFinite(fid)) return { rows: [], count: 0 };
+  try {
+    var results = await chrome.scripting.executeScript({
+      target: { tabId: tabId, frameIds: [fid] },
+      world: 'MAIN',
+      func: function () {
+        function findSel(i) {
+          return document.getElementById('body_GridView1_cboTipoDocumento_' + i)
+            || document.querySelector('[id$="GridView1_cboTipoDocumento_' + i + '"]')
+            || document.querySelector('[id*="cboTipoDocumento_' + i + '"]');
+        }
+        function extractName(idx) {
+          var sel = findSel(idx);
+          if (!sel) return '';
+          var tr = null;
+          try { tr = sel.closest('tr'); } catch (e) {}
+          if (!tr) return '';
+          try {
+            var clone = tr.cloneNode(true);
+            var kill = clone.querySelectorAll('select, option, script, style, .fa-trash');
+            for (var k = 0; k < kill.length; k++) {
+              try { kill[k].parentNode.removeChild(kill[k]); } catch (eRm) {}
+            }
+            var text = String(clone.textContent || '').replace(/\s+/g, ' ').trim();
+            var m = text.match(/[\w.\-() ]+\.(pdf|jpe?g|png|bin)/i);
+            return m ? m[0].trim() : text.slice(0, 120);
+          } catch (e2) {
+            return '';
+          }
+        }
+        var rows = [];
+        var nodes = document.querySelectorAll('[id*="cboTipoDocumento_"]');
+        var seen = {};
+        for (var i = 0; i < nodes.length; i++) {
+          var m = String(nodes[i].id || '').match(/cboTipoDocumento_(\d+)\s*$/i);
+          if (!m) continue;
+          var idx = Number(m[1]);
+          if (!Number.isFinite(idx) || seen[idx]) continue;
+          seen[idx] = true;
+          var sel = findSel(idx);
+          var text = '';
+          try {
+            text = sel && sel.options && sel.options[sel.selectedIndex]
+              ? String(sel.options[sel.selectedIndex].text || '')
+              : '';
+          } catch (eT) {}
+          var val = sel ? String(sel.value || '') : '';
+          var placeholder = !val || /clasifique|seleccione|elegir/i.test(text);
+          rows.push({
+            idx: idx,
+            value: val,
+            text: text,
+            placeholder: placeholder,
+            fileName: extractName(idx)
+          });
+        }
+        rows.sort(function (a, b) { return a.idx - b.idx; });
+        return { rows: rows, count: rows.length };
+      }
+    });
+    return (results && results[0] && results[0].result) || { rows: [], count: 0 };
+  } catch (e) {
+    return { rows: [], count: 0, error: String(e && e.message || e) };
+  }
+}
+
+function sameEvwebDocName(a, b) {
+  function norm(s) {
+    return String(s || '').replace(/^.*[\\/]/, '').toLowerCase().trim()
+      .replace(/\.[a-z0-9]{1,5}$/i, '');
+  }
+  var na = norm(a);
+  var nb = norm(b);
+  return !!(na && nb && na === nb);
+}
+
+/**
+ * Una subida orquestada en BG: doPostBack → wait reload → verify grid → classify.
+ * No depende de un content script vivo a través de la recarga.
+ */
+async function uploadEvwebOneDocViaBackground(tabId, frameId, doc, slotKey, tipoValue) {
+  slotKey = slotKey || '';
+  tipoValue = String(tipoValue == null ? (EVW_DOC_TIPO_BG[slotKey] || '') : tipoValue);
+  var before = await countEvwebGridRows(tabId, frameId);
+  var inspect0 = await inspectEvwebUploadGrid(tabId, frameId);
+  var claimed = {};
+  var rows0 = (inspect0 && inspect0.rows) || [];
+  for (var ri = 0; ri < rows0.length; ri++) {
+    var row = rows0[ri];
+    if (!row.placeholder && String(row.value) === tipoValue) {
+      await afgDiag('evweb_upload_skip_existing', {
+        slot: slotKey,
+        idx: row.idx,
+        mode: 'already_classified',
+        value: row.value
+      }, 'bg');
+      return {
+        ok: true,
+        skipped: true,
+        skipReason: 'already_in_grid',
+        idx: row.idx,
+        tipoValue: row.value,
+        nombre: row.fileName || (doc && doc.nombre)
+      };
+    }
+  }
+  for (ri = 0; ri < rows0.length; ri++) {
+    row = rows0[ri];
+    if (!row.placeholder) continue;
+    if (sameEvwebDocName(row.fileName, doc && doc.nombre)) {
+      var classOnly = await setEvwebClassifyDocTipo({
+        tabId: tabId,
+        frameId: frameId,
+        idx: row.idx,
+        preferValue: tipoValue,
+        slotKey: slotKey,
+        labelHints: EVW_DOC_LABEL_BG[slotKey] || [],
+        timeoutMs: 8000
+      });
+      return Object.assign({
+        skipped: true,
+        skipReason: 'classify_only',
+        nombre: row.fileName || (doc && doc.nombre)
+      }, classOnly || { ok: false, error: 'classify_failed' });
+    }
+  }
+
+  await afgDiag('upload_begin', {
+    slot: slotKey,
+    before: before,
+    fileName: doc && doc.nombre,
+    tabId: tabId,
+    frameId: frameId
+  }, 'bg');
+
+  var clickRes;
+  try {
+    clickRes = await setEvwebFileAndClickUpload({
+      tabId: tabId,
+      frameId: frameId,
+      dataUrl: doc && doc.data,
+      nombre: doc && doc.nombre,
+      tipo: doc && doc.tipo
+    });
+  } catch (eClick) {
+    clickRes = {
+      ok: false,
+      error: String(eClick && eClick.message || eClick),
+      assumedMaybeFired: true
+    };
+  }
+
+  // Frame destruido mid-flight = doPostBack probablemente disparó reload
+  var errStr = String((clickRes && clickRes.error) || '');
+  var frameDied = /frame|Receiving end|channel closed|No frame|Cannot access/i.test(errStr);
+  if ((!clickRes || !clickRes.ok) && frameDied) {
+    clickRes = {
+      ok: true,
+      assumedFired: true,
+      clickVia: 'doPostBack_frame_died',
+      error: errStr,
+      fileName: doc && doc.nombre
+    };
+  }
+  if (!clickRes || !clickRes.ok) {
+    return {
+      ok: false,
+      error: (clickRes && clickRes.error) || 'upload_main_failed',
+      detail: clickRes || null
+    };
+  }
+
+  var settle = await waitEvwebAfterUploadPostback(tabId, before, 22000);
+  await afgDiag('evweb_upload_settle', {
+    slot: slotKey,
+    before: before,
+    settle: settle,
+    assumedFired: !!(clickRes && clickRes.assumedFired)
+  }, 'bg');
+
+  var tab = null;
+  try { tab = await chrome.tabs.get(tabId); } catch (eT) {}
+  var ready = await ensureEvwebFormReady(tab || { id: tabId });
+  var fid = ready.frameId;
+  var after = settle.afterCount;
+  if (fid != null) {
+    after = await countEvwebGridRows(tabId, fid);
+  }
+  if (!(after > before) && !(settle && settle.rowGrew)) {
+    // Último chance: inspect grid
+    var inspFail = await inspectEvwebUploadGrid(tabId, fid);
+    if (!(inspFail && inspFail.count > before)) {
+      return {
+        ok: false,
+        error: 'upload_timeout_after_reload',
+        before: before,
+        after: after,
+        settle: settle,
+        clickVia: clickRes.clickVia || null
+      };
+    }
+    after = inspFail.count;
+  }
+
+  var idx = Math.max(0, after - 1);
+  var insp = await inspectEvwebUploadGrid(tabId, fid);
+  var matchRow = null;
+  var rows = (insp && insp.rows) || [];
+  for (var i = 0; i < rows.length; i++) {
+    if (sameEvwebDocName(rows[i].fileName, doc && doc.nombre)) {
+      matchRow = rows[i];
+      break;
+    }
+  }
+  if (!matchRow && rows.length) {
+    matchRow = rows[rows.length - 1];
+  }
+  if (matchRow) idx = matchRow.idx;
+
+  if (matchRow && !matchRow.placeholder && String(matchRow.value) === tipoValue) {
+    return {
+      ok: true,
+      idx: idx,
+      tipoValue: matchRow.value,
+      tipoText: matchRow.text,
+      nombre: clickRes.fileName || (doc && doc.nombre),
+      clickVia: clickRes.clickVia || null,
+      settleVia: settle.via,
+      alreadyClassified: true
+    };
+  }
+
+  var classRes = await setEvwebClassifyDocTipo({
+    tabId: tabId,
+    frameId: fid,
+    idx: idx,
+    preferValue: tipoValue,
+    slotKey: slotKey,
+    labelHints: EVW_DOC_LABEL_BG[slotKey] || [],
+    timeoutMs: 8000
+  });
+
+  // Classify también puede recargar: si channel/frame muere, wait + re-inspect
+  if ((!classRes || !classRes.ok) && classRes &&
+      /frame|channel closed|hang|timeout/i.test(String(classRes.error || classRes.reason || ''))) {
+    await waitEvwebAfterUploadPostback(tabId, after, 12000);
+    try { tab = await chrome.tabs.get(tabId); } catch (eT2) {}
+    ready = await ensureEvwebFormReady(tab || { id: tabId });
+    fid = ready.frameId;
+    var insp2 = await inspectEvwebUploadGrid(tabId, fid);
+    var rows2 = (insp2 && insp2.rows) || [];
+    for (var j = 0; j < rows2.length; j++) {
+      if (String(rows2[j].value) === tipoValue && !rows2[j].placeholder) {
+        classRes = {
+          ok: true,
+          value: rows2[j].value,
+          text: rows2[j].text,
+          via: 'post_reload_inspect',
+          reason: 'verified_after_reload',
+          idx: rows2[j].idx
+        };
+        idx = rows2[j].idx;
+        break;
+      }
+    }
+  }
+
+  await afgDiag('upload_classify', {
+    slot: slotKey,
+    idx: idx,
+    ok: !!(classRes && classRes.ok),
+    error: classRes && classRes.error,
+    reason: classRes && classRes.reason,
+    value: classRes && classRes.value,
+    text: classRes && classRes.text,
+    settleVia: settle.via
+  }, 'bg');
+
+  if (!classRes || !classRes.ok) {
+    return {
+      ok: false,
+      error: (classRes && classRes.error) || 'classify_failed',
+      idx: idx,
+      detail: classRes || null,
+      settle: settle,
+      clickVia: clickRes.clickVia || null
+    };
+  }
+
+  return {
+    ok: true,
+    idx: idx,
+    tipoValue: classRes.value,
+    tipoText: classRes.text || null,
+    classifyVia: classRes.via || null,
+    nombre: clickRes.fileName || (doc && doc.nombre),
+    size: clickRes.fileSize || null,
+    clickVia: clickRes.clickVia || null,
+    settleVia: settle.via,
+    frameId: fid
+  };
+}
+
+async function uploadEvwebDocsViaBackground(tabId, frameId, docs) {
+  docs = docs || {};
+  var order = ['anest', 'qx', 'auth'];
+  var results = {};
+  var attempted = 0;
+  var failed = null;
+  var fid = frameId;
+
+  for (var i = 0; i < order.length; i++) {
+    var key = order[i];
+    var doc = docs[key];
+    if (!doc || !doc.data) {
+      results[key] = { ok: true, skipped: true };
+      continue;
+    }
+    attempted += 1;
+
+    // Tras cada upload el frameId puede cambiar
+    try {
+      var tab = await chrome.tabs.get(tabId);
+      var ready = await ensureEvwebFormReady(tab);
+      fid = ready.frameId;
+      tabId = ready.tab.id;
+    } catch (eReady) {
+      failed = { slot: key, error: String(eReady && eReady.message || eReady) };
+      results[key] = { ok: false, error: failed.error };
+      break;
+    }
+
+    var up = await uploadEvwebOneDocViaBackground(
+      tabId,
+      fid,
+      doc,
+      key,
+      EVW_DOC_TIPO_BG[key]
+    );
+    results[key] = up;
+    if (up && up.frameId != null) fid = up.frameId;
+    if (!up || !up.ok) {
+      failed = { slot: key, error: (up && up.error) || 'upload_failed', detail: up };
+      break;
+    }
+    await sleep(500);
+  }
+
+  var out = {
+    ok: !failed,
+    attempted: attempted,
+    failed: failed,
+    results: results,
+    via: 'background_post_reload'
+  };
+  await afgDiag('upload_done', {
+    ok: out.ok,
+    attempted: attempted,
+    failed: failed,
+    results: Object.keys(results).reduce(function (acc, k) {
+      var r = results[k];
+      acc[k] = r
+        ? {
+          ok: r.ok,
+          skipped: !!r.skipped,
+          error: r.error || null,
+          settleVia: r.settleVia || null,
+          clickVia: r.clickVia || null,
+          tipoValue: r.tipoValue || null
+        }
+        : null;
+      return acc;
+    }, {})
+  }, 'bg');
+  return out;
 }
 
 /**
@@ -2654,22 +4528,11 @@ async function setEvwebObraAndWaitPostback(tabId, frameId, obraVal, timeoutMs) {
 
 /** Frame del formulario (#body_cboObraSocial) — same-origin iframe. */
 async function findEvwebFormFrameId(tabId) {
-  var frameResults = await chrome.scripting.executeScript({
-    target: { tabId: tabId, allFrames: true },
-    func: function () {
-      return {
-        isTop: window === window.top,
-        hasObra: !!document.getElementById('body_cboObraSocial'),
-        href: location.href
-      };
-    }
-  });
-  for (var i = 0; i < frameResults.length; i++) {
-    var fr = frameResults[i];
-    var r = fr.result || {};
-    if (r.hasObra) return fr.frameId;
-  }
-  throw new Error('No encontré iframe de formulario evweb (#body_cboObraSocial)');
+  var frameId = await probeEvwebFormFrameId(tabId);
+  if (frameId != null) return frameId;
+  var tab = null;
+  try { tab = await chrome.tabs.get(tabId); } catch (e) {}
+  throw new Error(evwebFormMissingError(tab && tab.url));
 }
 
 /**
@@ -2677,45 +4540,192 @@ async function findEvwebFormFrameId(tabId) {
  * No llena ni clickea.
  */
 async function pingEvwebForm() {
-  var tab = await findEvwebTab();
-  var frameId = await findEvwebFormFrameId(tab.id);
-  var res = await chrome.tabs.sendMessage(tab.id, { type: 'AFG_EVW_PING' }, { frameId: frameId });
-  return Object.assign({ tabId: tab.id, frameId: frameId }, res || { ok: false, error: 'empty_ping' });
+  try {
+    await afgDiag('pingEvwebForm_begin', {}, 'bg');
+    var tab = await findEvwebTab();
+    await afgDiag('pingEvwebForm_tab', { tabId: tab.id, url: tab.url || null }, 'bg');
+    var ready = await ensureEvwebFormReady(tab);
+    tab = ready.tab;
+    var frameId = ready.frameId;
+    await afgDiag('pingEvwebForm_send', {
+      tabId: tab.id,
+      frameId: frameId,
+      url: tab.url || null,
+      navigated: !!ready.navigated
+    }, 'bg');
+    var res = await chrome.tabs.sendMessage(tab.id, { type: 'AFG_EVW_PING' }, { frameId: frameId });
+    await afgDiag('pingEvwebForm_ok', {
+      tabId: tab.id,
+      frameId: frameId,
+      ok: res && res.ok,
+      hasObra: res && res.hasObra
+    }, 'bg');
+    return Object.assign({ tabId: tab.id, frameId: frameId }, res || { ok: false, error: 'empty_ping' });
+  } catch (e) {
+    await afgDiag('pingEvwebForm_fail', { error: String(e && e.message || e) }, 'bg');
+    throw e;
+  }
 }
 
 /**
- * Manda AFG_EVW_FILL_PAMI al frame del formulario.
- * data: pac, dni, fecha, hora, cirujano, edad, afiliado, obraSocial?, sanatorio?
+ * Manda AFG_EVW_FILL_PAMI al frame del formulario (solo campos).
+ * Uploads van aparte en uploadEvwebDocsViaBackground — __doPostBack recarga
+ * la página y mataría el canal de este sendMessage.
+ * data: pac, dni, fecha, hora, cirujano, edad, afiliado, obraSocial?, sanatorio?, docs?
  */
 async function sendEvwebFillPami(data) {
-  var tab = await findEvwebTab();
-  var frameId = await findEvwebFormFrameId(tab.id);
   try {
-    console.log('[AFG EVW] sendEvwebFillPami BEFORE sendMessage', {
+    var docs = (data && data.docs) || null;
+    var docsKeys = docs ? Object.keys(docs) : [];
+    await afgDiag('sendEvwebFillPami_begin', {
+      pac: data && data.pac,
+      obraSocial: data && data.obraSocial,
+      sanatorio: data && data.sanatorio,
+      docsKeys: docsKeys
+    }, 'bg');
+    var tab = await findEvwebTab();
+    var ready = await ensureEvwebFormReady(tab);
+    tab = ready.tab;
+    var frameId = ready.frameId;
+    await afgDiag('sendEvwebFillPami_before', {
       tabId: tab.id,
       frameId: frameId,
-      tabUrl: tab.url || null
-    });
-  } catch (eLog) {}
-  var res = await chrome.tabs.sendMessage(
-    tab.id,
-    {
-      type: 'AFG_EVW_FILL_PAMI',
-      data: data || {},
-      targetFrameId: frameId,
-      targetTabId: tab.id
-    },
-    { frameId: frameId }
-  );
-  try {
-    console.log('[AFG EVW] sendEvwebFillPami AFTER response', {
+      tabUrl: tab.url || null,
+      navigated: !!ready.navigated,
+      pac: data && data.pac,
+      obraSocial: data && data.obraSocial,
+      sanatorio: data && data.sanatorio,
+      docsKeys: docsKeys,
+      skipUploadsInCs: true,
+      obesidadMorbida: !!(data && data.obesidadMorbida),
+      pracsCount: data && data.pracs ? data.pracs.length : 0,
+      pracsResolved: data && data.pracs
+        ? data.pracs.filter(function (p) { return p && p.codigoEvweb; }).length
+        : 0
+    }, 'bg');
+
+    // Campos sin docs ni pracs: uploads/pracs van después (reload de Cargar)
+    var fillData = Object.assign({}, data || {}, { skipUploads: true, skipPracs: true });
+    delete fillData.docs;
+
+    var res;
+    try {
+      res = await chrome.tabs.sendMessage(
+        tab.id,
+        {
+          type: 'AFG_EVW_FILL_PAMI',
+          data: fillData,
+          targetFrameId: frameId,
+          targetTabId: tab.id
+        },
+        { frameId: frameId }
+      );
+    } catch (eFill) {
+      var errFill = String(eFill && eFill.message || eFill);
+      await afgDiag('sendEvwebFillPami_fail', { error: errFill, phase: 'fields' }, 'bg');
+      throw eFill;
+    }
+
+    await afgDiag('sendEvwebFillPami_after', {
       sentFrameId: frameId,
       contentReportedFrameId: res && res.receiverFrameId,
-      contentHref: res && res.href,
-      ok: res && res.ok
-    });
-  } catch (eLog2) {}
-  return Object.assign({ tabId: tab.id, frameId: frameId }, res || { ok: false, error: 'empty_fill' });
+      ok: res && res.ok,
+      error: res && res.error,
+      uploadsDeferred: !!(res && res.steps && res.steps.uploads && res.steps.uploads.deferred),
+      obesidad: res && res.steps && res.steps.obesidad
+    }, 'bg');
+
+    if (!(res && res.ok)) {
+      return Object.assign({ tabId: tab.id, frameId: frameId }, res || { ok: false, error: 'empty_fill' });
+    }
+
+    // Uploads en BG: sobreviven reload tras __doPostBack
+    var uploads = { ok: true, attempted: 0, skipped: true, reason: 'no_docs' };
+    if (evwebDocsDataKeys(docs).length) {
+      uploads = await uploadEvwebDocsViaBackground(tab.id, frameId, docs);
+      res.steps = res.steps || {};
+      res.steps.uploads = uploads;
+      res.touchedCargaArchivos = !!(uploads && uploads.attempted > 0);
+      if (!(uploads && uploads.ok)) {
+        res.ok = false;
+        res.error = uploads && uploads.failed
+          ? ('upload_failed:' + uploads.failed.slot)
+          : 'upload_failed';
+      }
+    } else {
+      res.steps = res.steps || {};
+      res.steps.uploads = uploads;
+    }
+
+    await afgDiag('sendEvwebFillPami_uploads_done', {
+      ok: !!(res && res.ok),
+      error: res && res.error,
+      touchedCargaArchivos: !!(res && res.touchedCargaArchivos),
+      uploadsAttempted: uploads && uploads.attempted,
+      uploadsOk: uploads && uploads.ok,
+      uploadsFailed: uploads && uploads.failed,
+      uploadsVia: uploads && uploads.via
+    }, 'bg');
+
+    // Prácticas + re-tilar obesidad DESPUÉS de uploads (reload borra el DOM)
+    var pracs = Array.isArray(data && data.pracs) ? data.pracs : [];
+    var needPostUploadUi = !!((data && data.obesidadMorbida) || pracs.length);
+    if (res.ok && needPostUploadUi) {
+      try {
+        var tabNow = await chrome.tabs.get(tab.id);
+        var ready2 = await ensureEvwebFormReady(tabNow);
+        tab = ready2.tab;
+        frameId = ready2.frameId;
+        var pracsRes = await chrome.tabs.sendMessage(
+          tab.id,
+          {
+            type: 'AFG_EVW_FILL_PRACS',
+            pracs: pracs,
+            obesidadMorbida: !!(data && data.obesidadMorbida),
+            targetFrameId: frameId,
+            targetTabId: tab.id
+          },
+          { frameId: frameId }
+        );
+        res.steps = res.steps || {};
+        res.steps.pracs = pracsRes || { ok: false, error: 'empty_pracs' };
+        if (pracsRes && pracsRes.obesidad) {
+          res.steps.obesidad = pracsRes.obesidad;
+        }
+        await afgDiag('sendEvwebFillPami_pracs_done', {
+          ok: !!(pracsRes && pracsRes.ok),
+          attempted: pracsRes && pracsRes.attempted,
+          leftOpen: pracsRes && pracsRes.leftOpenForManual,
+          obesidad: pracsRes && pracsRes.obesidad,
+          results: pracsRes && pracsRes.results
+            ? pracsRes.results.map(function (x) {
+              return {
+                selected: !!x.selected,
+                leftOpen: !!x.leftOpen,
+                reason: x.reason || null,
+                codigoEvweb: x.codigoEvweb || null
+              };
+            })
+            : null
+        }, 'bg');
+      } catch (ePracs) {
+        res.steps = res.steps || {};
+        res.steps.pracs = {
+          ok: false,
+          error: String(ePracs && ePracs.message || ePracs)
+        };
+        await afgDiag('sendEvwebFillPami_pracs_fail', {
+          error: String(ePracs && ePracs.message || ePracs)
+        }, 'bg');
+        // No tumbar el fill: Huerta completa a mano (awaiting_confirm)
+      }
+    }
+
+    return Object.assign({ tabId: tab.id, frameId: frameId }, res);
+  } catch (e) {
+    await afgDiag('sendEvwebFillPami_fail', { error: String(e && e.message || e) }, 'bg');
+    throw e;
+  }
 }
 
 /**
@@ -2757,7 +4767,7 @@ async function runEvwebSingle(msg) {
 
 /**
  * Lote 3: ping + fill compartido (individual y cola).
- * fillData: { pac, dni, fecha, hora, cirujano, edad, afiliado, obraSocial, sanatorio }
+ * fillData: { pac, dni, fecha, hora, cirujano, edad, afiliado, obraSocial, sanatorio, docs? }
  */
 async function doEvwebFill(fillData) {
   var ping = await pingEvwebForm();
@@ -2788,7 +4798,7 @@ async function runEvwebFillPami(msg) {
       status: 'running',
       currentIntervId: msg.intervId ? String(msg.intervId) : null,
       currentPac: msg.pac || '',
-      message: 'Lote 2: ping + fill PAMI…',
+      message: 'Lote 4: ping + fill + docs…',
       lastResult: null
     }));
 
@@ -2801,21 +4811,32 @@ async function runEvwebFillPami(msg) {
       edad: msg.edad != null && msg.edad !== '' ? msg.edad : '',
       afiliado: msg.afiliado || msg.afil || '',
       obraSocial: msg.obraSocial != null && msg.obraSocial !== '' ? msg.obraSocial : '382',
-      sanatorio: msg.sanatorio != null && msg.sanatorio !== '' ? msg.sanatorio : '208'
+      sanatorio: msg.sanatorio != null && msg.sanatorio !== '' ? msg.sanatorio : '208',
+      docs: msg.docs || null,
+      obesidadMorbida: !!msg.obesidadMorbida,
+      pracs: Array.isArray(msg.pracs) ? msg.pracs : []
     };
     if (fillData.fecha) {
       fillData.fecha = formatFechaDDMMYYYY(fillData.fecha) || fillData.fecha;
+    }
+    if (msg.intervId && !evwebDocsDataKeys(fillData.docs).length) {
+      var fetchedSingle = await fetchEvwebDocsViaAnesFactBridge(msg.intervId);
+      if (fetchedSingle && fetchedSingle.docs) {
+        fillData.docs = fetchedSingle.docs;
+      }
     }
 
     var res = await doEvwebFill(fillData);
     var ping = res && res.ping;
     var fill = res && res.fill;
     var okFill = !!(res && res.ok);
-    var msgOk =
-      'Formulario PAMI completado — subí la foja de Geclisa a mano y revisá antes de Finalizar';
+    var upAtt = fill && fill.steps && fill.steps.uploads && fill.steps.uploads.attempted;
+    var msgOk = (upAtt > 0)
+      ? ('Formulario + ' + upAtt + ' doc(s) OK — revisá y Finalizá a mano (sin auto-submit)')
+      : 'Formulario OK (sin docs subidos) — revisá y Finalizá a mano';
     var msgFail = (res && res.error === 'ping_failed')
       ? ('Ping evweb falló — no fill. ' + ((ping && (ping.error || ping.message)) || ''))
-      : ('Fill PAMI incompleto: ' + ((fill && (fill.error || fill.message)) || 'fill_failed'));
+      : ('Fill incompleto: ' + ((fill && (fill.error || fill.message)) || 'fill_failed'));
 
     if (!okFill && res && res.error === 'ping_failed') {
       var statePingFail = await setEvwebRunnerState(Object.assign(await getEvwebRunnerState(), {
@@ -2852,7 +4873,8 @@ async function runEvwebFillPami(msg) {
           edad: fillData.edad,
           afiliado: fillData.afiliado,
           obraSocial: fillData.obraSocial,
-          sanatorio: fillData.sanatorio
+          sanatorio: fillData.sanatorio,
+          docsKeys: fillData.docs ? Object.keys(fillData.docs) : []
         }
       }
     }));
@@ -2887,35 +4909,61 @@ async function runEvwebFillPami(msg) {
  * Lote 3: por ítem ping + fill → awaiting_confirm (Finalizar manual).
  */
 async function runEvwebQueueAction(action) {
+  await afgDiag('runEvwebQueueAction', { action: action }, 'bg');
   if (action === 'abort') {
     var stAbort = await getEvwebRunnerState();
     if (stAbort.currentIntervId) {
       await patchEvwebQueueItemStatus(stAbort.currentIntervId, 'queued', 'Abortada por el usuario');
     }
     evwebRunnerBusy = false;
+    evwebRunnerBusyAt = 0;
     var idle = defaultEvwebRunnerState();
     idle.message = 'Cola evweb abortada';
     await setEvwebRunnerState(idle);
+    await afgDiag('runEvweb_aborted', {}, 'bg');
     return { ok: true, aborted: true, state: idle };
   }
 
+  // Iniciar / Reintentar: limpiar locks de intentos muertos (context invalidated, etc.)
+  if (action === 'start' || action === 'retry') {
+    await liberarEvwebLocksForFreshStart(action === 'start' ? 'start' : 'retry');
+  }
+
   var stateGate = await getEvwebRunnerState();
+  await afgDiag('runEvweb_state_gate', {
+    status: stateGate && stateGate.status,
+    currentIntervId: stateGate && stateGate.currentIntervId,
+    busy: !!evwebRunnerBusy,
+    busyAt: evwebRunnerBusyAt || null,
+    storageBusyAt: stateGate && stateGate.busyAt
+  }, 'bg');
+
+  // Tras liberar, awaiting_confirm ya no debería bloquear start
   if (action === 'start' && stateGate.status === 'awaiting_confirm') {
+    await afgDiag('runEvweb_blocked_awaiting_confirm', { status: stateGate.status }, 'bg');
     return {
       ok: false,
       error: 'awaiting_confirm',
-      message: 'Hay un caso evweb esperando confirmación. Tocá Siguiente o Abortar.',
+      message: 'Hay un caso evweb esperando confirmación. Tocá Abortar y luego Iniciar.',
       state: stateGate
     };
   }
   if (evwebRunnerBusy) {
-    return {
-      ok: false,
-      error: 'evweb_runner_busy',
-      message: 'Ya hay una corrida evweb en curso.',
-      state: stateGate,
-      busy: true
-    };
+    var age = evwebRunnerBusyAt ? (Date.now() - evwebRunnerBusyAt) : null;
+    if (age != null && age > EVWEB_BUSY_STALE_MS) {
+      await afgDiag('runEvweb_busy_stale_force_clear', { ageMs: age }, 'bg');
+      evwebRunnerBusy = false;
+      evwebRunnerBusyAt = 0;
+    } else {
+      await afgDiag('runEvweb_blocked_busy', { ageMs: age }, 'bg');
+      return {
+        ok: false,
+        error: 'evweb_runner_busy',
+        message: 'Ya hay una corrida evweb en curso. Abortá o esperá ~90 s.',
+        state: stateGate,
+        busy: true
+      };
+    }
   }
   if (stateGate.status === 'running') {
     try {
@@ -2973,21 +5021,37 @@ async function runEvwebQueueAction(action) {
   var MAX_CONSECUTIVE_FAILURES = 3;
   var consecutiveFailures = 0;
   evwebRunnerBusy = true;
+  evwebRunnerBusyAt = Date.now();
+  state.busyAt = evwebRunnerBusyAt;
+  await setEvwebRunnerState(state);
 
   try {
     while (true) {
-      var queue = await getEvwebQueue();
+      var refreshQ = await refreshEvwebQueueFromAnesFact({ allowStorageFallback: true });
+      var queue = refreshQ && refreshQ.queue ? refreshQ.queue : await getEvwebQueue();
+      await afgDiag('runEvweb_queue_loaded', {
+        source: refreshQ && refreshQ.source,
+        fullDocs: !!(refreshQ && refreshQ.fullDocs),
+        pullError: refreshQ && refreshQ.pullError,
+        items: queue && queue.items ? queue.items.length : 0,
+        lastEnqueuedId: queue && queue.lastEnqueuedId,
+        statuses: (queue && queue.items || []).map(function (it) {
+          return { id: it.id, st: it.status, pac: it.pac };
+        })
+      }, 'bg');
       if (!queue || !queue.items || !queue.items.length) {
         state = await setEvwebRunnerState(Object.assign(defaultEvwebRunnerState(), {
           status: 'done_all',
           message: 'Cola evweb vacía (afg_evweb_queue)'
         }));
+        await afgDiag('runEvweb_empty_queue', {}, 'bg');
         return { ok: false, error: 'empty_queue', message: state.message, state: state };
       }
       var item = firstPendingQueueItem(queue, preferId, {
         skipPaused: autoAdvance,
         skipIds: skipIds,
-        staleRunningMs: EVWEB_STALE_RUNNING_MS
+        staleRunningMs: EVWEB_STALE_RUNNING_MS,
+        preferNewest: action === 'start' || action === 'next'
       });
       if (!item) {
         var pausedLeft = 0;
@@ -3002,13 +5066,26 @@ async function runEvwebQueueAction(action) {
             ? ('No quedan queued en evweb. Hay ' + pausedLeft + ' en pausa.')
             : 'Cola evweb completa — no quedan pendientes'
         }));
+        await afgDiag('runEvweb_no_pending_item', { pausedLeft: pausedLeft }, 'bg');
         return { ok: true, doneAll: true, state: state };
       }
+
+      await afgDiag('runEvweb_item_begin', {
+        id: item.id,
+        pac: item.pac,
+        dni: item.dni || '',
+        status: item.status,
+        obraValue: item.obraValue,
+        sanValue: item.sanValue,
+        addedAt: item.addedAt || null,
+        lastEnqueuedId: queue.lastEnqueuedId || null,
+        preferNewest: action === 'start' || action === 'next'
+      }, 'bg');
 
       state.status = 'running';
       state.currentIntervId = String(item.id);
       state.currentPac = item.pac || '';
-      state.message = 'Lote 3: ping + fill evweb…';
+      state.message = 'Lote 4: ping + fill + docs…';
       state.lastResult = null;
       if (!state.startedAt) state.startedAt = Date.now();
       await setEvwebRunnerState(state);
@@ -3027,12 +5104,55 @@ async function runEvwebQueueAction(action) {
           edad: item.edad,
           afiliado: item.afil,
           obraSocial: item.obraValue,
-          sanatorio: item.sanValue
+          sanatorio: item.sanValue,
+          docs: item.docs || null,
+          obesidadMorbida: !!item.obesidadMorbida,
+          pracs: Array.isArray(item.pracs) ? item.pracs : []
         };
         if (fillData.fecha) {
           fillData.fecha = formatFechaDDMMYYYY(fillData.fecha) || fillData.fecha;
         }
+
+        // Cola en chrome.storage va slim (sin PDF). Pedir data a AnesFact.
+        var needDocs = !evwebDocsDataKeys(fillData.docs).length;
+        var expectMeta = item.docsMeta && Object.keys(item.docsMeta).length > 0;
+        if (needDocs) {
+          var fetched = await fetchEvwebDocsViaAnesFactBridge(item.id);
+          if (fetched && fetched.docs && evwebDocsDataKeys(fetched.docs).length) {
+            fillData.docs = fetched.docs;
+            needDocs = false;
+          } else if (expectMeta) {
+            state = await setEvwebRunnerState(Object.assign(state, {
+              status: 'paused_error',
+              message: 'No pude leer los adjuntos desde AnesFact (' +
+                ((fetched && (fetched.error || fetched.message)) || 'sin data') +
+                '). Abrí AnesFact y reintentá.',
+              lastResult: { error: 'docs_fetch_failed', fetched: fetched }
+            }));
+            await patchEvwebQueueItemStatus(item.id, 'paused_error', state.message);
+            itemFailed = true;
+            returnValue = {
+              ok: false,
+              error: 'docs_fetch_failed',
+              fetched: fetched,
+              state: state
+            };
+          }
+        }
+
+        if (!itemFailed) {
         var res = await doEvwebFill(fillData);
+        var upAttQ = res && res.fill && res.fill.steps && res.fill.steps.uploads
+          && res.fill.steps.uploads.attempted;
+        await afgDiag('runEvweb_doEvwebFill', {
+          ok: !!(res && res.ok),
+          error: res && res.error,
+          message: res && res.message,
+          pac: item.pac,
+          docsKeys: evwebDocsDataKeys(fillData.docs),
+          uploadsAttempted: upAttQ || 0,
+          touchedCarga: !!(res && res.fill && res.fill.touchedCargaArchivos)
+        }, 'bg');
         if (!(res && res.ok)) {
           state = await setEvwebRunnerState(Object.assign(state, {
             status: 'paused_error',
@@ -3043,14 +5163,18 @@ async function runEvwebQueueAction(action) {
           itemFailed = true;
           returnValue = Object.assign({ ok: false, error: 'fill_failed' }, res || {}, { state: state });
         } else {
+          var okMsg = (upAttQ > 0)
+            ? ('Formulario + ' + upAttQ + ' doc(s) OK — revisá y Finalizá a mano')
+            : 'Formulario OK (sin docs subidos) — revisá adjuntos y Finalizá a mano';
           state = await setEvwebRunnerState(Object.assign(state, {
             status: 'awaiting_confirm',
-            message: 'Formulario completado — subí la foja/autorización a mano y revisá antes de Finalizar',
+            message: okMsg,
             lastResult: res,
             currentPac: item.pac || state.currentPac || ''
           }));
           await patchEvwebQueueItemStatus(item.id, 'awaiting_confirm', '');
           return Object.assign({ ok: true, awaitingConfirm: true }, res || {}, { state: state });
+        }
         }
       } catch (eFatal) {
         var fatalMsg = String(eFatal && eFatal.message || eFatal);
@@ -3096,17 +5220,21 @@ async function runEvwebQueueAction(action) {
     }
   } finally {
     evwebRunnerBusy = false;
+    evwebRunnerBusyAt = 0;
     try {
       var stFin = await getEvwebRunnerState();
-      if (stFin && stFin.status === 'running') {
-        stFin.status = 'paused_error';
-        stFin.message = (stFin.message || '') +
-          (stFin.message ? ' · ' : '') +
-          'Lock evweb liberado (finally).';
+      if (stFin) {
+        stFin.busyAt = null;
+        if (stFin.status === 'running') {
+          stFin.status = 'paused_error';
+          stFin.message = (stFin.message || '') +
+            (stFin.message ? ' · ' : '') +
+            'Lock evweb liberado (finally).';
+          try {
+            console.warn('[AFG EVW] finally: status seguía running → paused_error');
+          } catch (eW) {}
+        }
         await setEvwebRunnerState(stFin);
-        try {
-          console.warn('[AFG EVW] finally: status seguía running → paused_error');
-        } catch (eW) {}
       }
     } catch (eFinally) {}
   }

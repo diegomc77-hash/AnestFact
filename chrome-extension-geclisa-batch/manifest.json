@@ -1,21 +1,25 @@
 {
   "manifest_version": 3,
   "name": "AnesFact GECLISA Batch (pasos 1–12)",
-  "version": "0.6.4",
-  "description": "GECLISA Mayo + esqueleto evweb ADAARC (Lote 1: ping/cola, sin fill).",
+  "version": "0.6.27",
+  "description": "GECLISA Mayo + evweb ADAARC (cola + idUsuario sesión).",
   "permissions": ["storage", "tabs", "scripting", "debugger", "clipboardRead", "alarms"],
   "host_permissions": [
     "http://sanatoriomayo.myvnc.com:84/*",
     "https://adaarc.evweb.com.ar/*",
     "http://localhost/*",
     "http://127.0.0.1/*",
-    "https://diegomc77-hash.github.io/*"
+    "https://diegomc77-hash.github.io/*",
+    "https://anestfact.diegomc77.workers.dev/*",
+    "https://*.diegomc77.workers.dev/*"
   ],
   "externally_connectable": {
     "matches": [
       "http://localhost/*",
       "http://127.0.0.1/*",
-      "https://diegomc77-hash.github.io/*"
+      "https://diegomc77-hash.github.io/*",
+      "https://anestfact.diegomc77.workers.dev/*",
+      "https://*.diegomc77.workers.dev/*"
     ]
   },
   "background": {
@@ -42,7 +46,9 @@
       "matches": [
         "http://localhost/*",
         "http://127.0.0.1/*",
-        "https://diegomc77-hash.github.io/*"
+        "https://diegomc77-hash.github.io/*",
+        "https://anestfact.diegomc77.workers.dev/*",
+        "https://*.diegomc77.workers.dev/*"
       ],
       "js": ["content/anesfact-bridge.js"],
       "run_at": "document_idle",

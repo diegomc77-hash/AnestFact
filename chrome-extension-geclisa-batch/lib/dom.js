@@ -10,6 +10,26 @@
       .replace(/[\u0300-\u036f]/g, '');
   }
 
+  /** Distancia de edición simple (Levenshtein), para tolerar errores de tipeo de 1-2 letras. */
+  function levenshtein(a, b) {
+    a = String(a || ''); b = String(b || '');
+    var m = a.length, n = b.length;
+    if (!m) return n;
+    if (!n) return m;
+    var prev = new Array(n + 1);
+    var curr = new Array(n + 1);
+    for (var j = 0; j <= n; j++) prev[j] = j;
+    for (var i = 1; i <= m; i++) {
+      curr[0] = i;
+      for (var j2 = 1; j2 <= n; j2++) {
+        var cost = a.charAt(i - 1) === b.charAt(j2 - 1) ? 0 : 1;
+        curr[j2] = Math.min(prev[j2] + 1, curr[j2 - 1] + 1, prev[j2 - 1] + cost);
+      }
+      var tmp = prev; prev = curr; curr = tmp;
+    }
+    return prev[n];
+  }
+
   /** Normaliza a DD/MM/AAAA (acepta ISO YYYY-MM-DD o ya DD/MM/AAAA). */
   function formatFechaGeclisa(fecha) {
     var s = norm(fecha);
@@ -384,6 +404,7 @@
   g.AFG.findInputNearLabel = findInputNearLabel;
   g.AFG.norm = norm;
   g.AFG.quitarAcentos = quitarAcentos;
+  g.AFG.levenshtein = levenshtein;
   g.AFG.formatFechaGeclisa = formatFechaGeclisa;
   g.AFG.formatHoraGeclisa = formatHoraGeclisa;
   g.AFG.addDaysGeclisa = addDaysGeclisa;

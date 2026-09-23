@@ -56,7 +56,7 @@
 
     if (msg.type === 'AFG_LOCATE_STEP2') {
       if (!IS_TOP) { sendResponse({ ok: false, error: 'not_top' }); return true; }
-      locateStep2()
+      locateStep2(msg.timeout)
         .then(function (r) { sendResponse(r); })
         .catch(function (e) { sendResponse({ ok: false, error: String(e.message || e) }); });
       return true;
@@ -140,30 +140,22 @@
     });
   }
 
-  async function locateStep2() {
-    log('Locate paso 2: Historias clínicas internados');
+  async function locateStep2(timeoutMs) {
+    var timeout = timeoutMs || 15000;
+    var PREFIJO = 'historias clínicas internad'; // estable: GECLISA alterna "internados"/"internadas" sin aviso
+    log('Locate paso 2: prefijo "' + PREFIJO + '"');
     var sub = await AFG.waitFor(function () {
-      var li = AFG.findSubItemByText(document, 'Historias clínicas internados')
-        || AFG.findByExactText(document, 'Historias clínicas internados', ['li'])
-        || AFG.findByContainsText(document, 'Historias clínicas internados', ['li']);
+      var li = AFG.findSubItemByText(document, PREFIJO)
+        || AFG.findByContainsText(document, PREFIJO, ['li']);
       if (!li) return null;
       var a = li.querySelector('a[href],a[routerlink],a[ng-reflect-router-link],a');
       return a || li;
-    }, { label: 'submenú Historias clínicas internados', timeout: 15000 });
+    }, { label: 'submenú Historias clínicas internad@s', timeout: timeout });
     try { sub.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e) {}
     await AFG.sleep(80);
     var pt = AFG.centerPoint(sub);
     log('Paso 2 target', sub.tagName, sub.getAttribute('href') || '', 'center', pt.x, pt.y);
-    return {
-      ok: true,
-      step: 2,
-      x: pt.x,
-      y: pt.y,
-      w: pt.w,
-      h: pt.h,
-      tag: sub.tagName,
-      href: sub.getAttribute('href') || null
-    };
+    return { ok: true, step: 2, x: pt.x, y: pt.y, w: pt.w, h: pt.h, tag: sub.tagName, href: sub.getAttribute('href') || null };
   }
 
   async function runIframe311(paciente) {
@@ -173,6 +165,7 @@
     var fechaCirugia = AFG.formatFechaGeclisa(paciente.fechaCirugia || paciente.fecha || '');
     var horaCirugia = AFG.formatHoraGeclisa(paciente.hora || paciente.horaInicio || '');
     var sector = AFG.norm(paciente.sector || paciente.mayo_sector || '');
+    var nroAtencionConocido = AFG.norm(paciente.mayo_nro_atencion || '');
     if (!apellido) {
       return {
         ok: false,
@@ -239,7 +232,7 @@
       fila: AFG.norm(patientRow.innerText || '').slice(0, 160)
     });
 
-    var steps711 = await runIframe711FromRow(plantilla, patientRow, located, apellido, nombre, paciente.pac || '');
+    var steps711 = await runIframe711FromRow(plantilla, patientRow, located, apellido, nombre, paciente.pac || '', nroAtencionConocido);
     if (!steps711.ok) return steps711;
 
     return {
@@ -263,7 +256,7 @@
   }
 
   /** Desde fila ya ubicada en el panel: Opciones -> Evoluciones -> verificar encabezado -> Nuevo -> plantilla. */
-  async function runIframe711FromRow(plantilla, patientRow, located, apellidoExpected, nombreExpected, pacExpected) {
+  async function runIframe711FromRow(plantilla, patientRow, located, apellidoExpected, nombreExpected, pacExpected, nroAtencionExpected) {
     log('Paso 7b: Opciones en fila del paciente (debugger)');
     var opciones = findOpcionesInRow(patientRow);
     if (!opciones) {
@@ -292,17 +285,19 @@
     }, { label: 'encabezado Evolucion (apellido + N Atencion)', timeout: 15000 });
 
     var match = namesMatchExpected(headerInfo.apellido, headerInfo.nombre, apellidoExpected, nombreExpected, pacExpected);
-    log('Paso 8b encabezado:', headerInfo, 'match=', match);
-    if (!match) {
+    var matchPorNroAtencion = !!(nroAtencionExpected && headerInfo.nroAtencion && String(headerInfo.nroAtencion) === String(nroAtencionExpected));
+    log('Paso 8b encabezado:', headerInfo, 'match=', match, 'matchPorNroAtencion=', matchPorNroAtencion);
+    if (!match && !matchPorNroAtencion) {
       return {
         ok: false,
         paused: true,
         reason: 'evolucion_nombre_mismatch',
         nroAtencion: headerInfo.nroAtencion || null,
         evolucionHeader: headerInfo,
-        expected: { apellido: apellidoExpected, nombre: nombreExpected, pac: pacExpected || '' },
+        expected: { apellido: apellidoExpected, nombre: nombreExpected, pac: pacExpected || '', nroAtencion: nroAtencionExpected || null },
         message: 'PAUSA: encabezado Evolucion "' + (headerInfo.raw || '') +
           '" no coincide con ' + (pacExpected || (apellidoExpected + ', ' + nombreExpected)) +
+          (nroAtencionExpected ? ' (ni con N° Atención conocido ' + nroAtencionExpected + ')' : '') +
           '. No toco Nuevo.'
       };
     }
@@ -518,32 +513,43 @@
 
   /**
    * Panel internados: Ubicacion ya=2, set Sector+Fecha+Hora, click Consultar,
-   * buscar fila por apellido/nombre. Reintentos: -1h mismo sector, luego otros sectores.
+   * buscar fila por apellido/nombre. Reintentos: offsets de hora en sector
+   * esperado, otros sectores, y día anterior (internación previa).
    * NO usa el modal #btnBuscarPaciente.
    */
   async function locateByFechaSectorRetries(apellido, nombre, fechaCirugia, horaInicio, sectorPrimary) {
-    var fecha = AFG.formatFechaGeclisa(fechaCirugia);
+    var fecha0 = AFG.formatFechaGeclisa(fechaCirugia);
+    var fechaM1 = AFG.addDaysGeclisa(fechaCirugia, -1);
     var hora0 = AFG.formatHoraGeclisa(horaInicio);
-    var horaM1 = AFG.addHoursGeclisa(hora0, -1);
     var primary = AFG.norm(sectorPrimary);
-
+    // Offsets de hora para el sector esperado: cubre ingreso varias horas antes
+    // (o poco después) de la hora de cirugía cargada en AnesFact, que no siempre
+    // coincide con la hora real de aparición en el panel de ubicación.
+    var HORA_OFFSETS_PRIMARY = [0, -1, -2, -3, 1];
     var attempts = [];
-    function pushAttempt(sec, hora, label) {
+    function pushAttempt(fecha, sec, hora, label) {
       var tag = fecha + '|' + sec + '|' + (hora || '-') + '|' + label;
       for (var i = 0; i < attempts.length; i++) {
         if (attempts[i].tag === tag) return;
       }
       attempts.push({ fecha: fecha, sector: sec, hora: hora, label: label, tag: tag });
     }
-
-    pushAttempt(primary, hora0, 'primario_consultar');
-    if (horaM1 && horaM1 !== hora0) {
-      pushAttempt(primary, horaM1, 'primario_hora-1_consultar');
+    function buildDayAttempts(fecha, suffix) {
+      for (var oi = 0; oi < HORA_OFFSETS_PRIMARY.length; oi++) {
+        var off = HORA_OFFSETS_PRIMARY[oi];
+        var h = off === 0 ? hora0 : AFG.addHoursGeclisa(hora0, off);
+        if (!h) continue;
+        pushAttempt(fecha, primary, h, 'primario_h' + (off >= 0 ? '+' + off : off) + suffix);
+      }
+      for (var si = 0; si < GECLISA_SECTORES_FALLBACK.length; si++) {
+        var sec = GECLISA_SECTORES_FALLBACK[si];
+        if (sec === primary) continue;
+        pushAttempt(fecha, sec, hora0, 'fallback_sector' + suffix);
+      }
     }
-    for (var si = 0; si < GECLISA_SECTORES_FALLBACK.length; si++) {
-      var sec = GECLISA_SECTORES_FALLBACK[si];
-      if (sec === primary) continue;
-      pushAttempt(sec, hora0, 'fallback_sector_consultar');
+    buildDayAttempts(fecha0, '_consultar');
+    if (fechaM1 && fechaM1 !== fecha0) {
+      buildDayAttempts(fechaM1, '_diaAnterior_consultar');
     }
 
     var tried = [];
@@ -595,7 +601,8 @@
           filtrosProbados: tried,
           diagnose: matchInfo,
           message: 'PAUSA: ' + hits.length + ' filas con ' + apellido + ' en panel (' + a.tag +
-            '). Combinaciones: ' + tried.join(' -> ')
+            '). Candidatos: ' + matchInfo.withApellido.join(' || ') +
+            '. Combinaciones: ' + tried.join(' -> ')
         };
       }
       if (hits.length === 1) {
@@ -744,8 +751,23 @@
       if (out.sampleRows.length < 20) {
         out.sampleRows.push(raw.slice(0, 140));
       }
-      if (txt.indexOf(ap) < 0) continue;
-      var rowSnap = raw.slice(0, 140);
+      var apMatch = txt.indexOf(ap) >= 0;
+      var apFuzzyTok = null;
+      if (!apMatch && ap.length >= 4) {
+        var rowTokens = txt.split(/[^a-z]+/i).filter(Boolean);
+        var thr = ap.length <= 6 ? 1 : 2;
+        for (var ti = 0; ti < rowTokens.length; ti++) {
+          var tkn = rowTokens[ti];
+          if (Math.abs(tkn.length - ap.length) > thr) continue;
+          if (AFG.levenshtein(ap, tkn) <= thr) { apFuzzyTok = tkn; break; }
+        }
+      }
+      if (!apMatch && !apFuzzyTok) continue;
+      var nroAt = null;
+      try { nroAt = extractNroAtencionFromRow(tr); } catch (eNro) {}
+      var rowSnap = raw.slice(0, 140) +
+        (apFuzzyTok ? '  [match aproximado: "' + apFuzzyTok + '" vs "' + ap + '"]' : '') +
+        (nroAt ? '  [N° Atención: ' + nroAt + ']' : '');
       out.withApellido.push(rowSnap);
       if (nm && txt.indexOf(nm) < 0) {
         out.rejectedNombre.push({ row: rowSnap, needNm1: nm, reason: 'nm1_not_in_row_text' });
