@@ -1,40 +1,41 @@
-# Deploy AnesFact en Cloudflare Pages (Ticket 3)
+# Deploy AnesFact en Cloudflare (Ticket 3)
 
 Reemplazo gradual de GitHub Pages (ToS SaaS). GitHub Pages puede seguir vivo hasta apagarlo a propósito.
 
+**Nota (Bug 2, 2026-09-23):** el proyecto quedó como **Worker con assets estáticos** (`npx wrangler deploy`), no Pages clásico. La URL real es `*.workers.dev`, no `*.pages.dev`.
+
+## URL de producción
+
+- **Producción:** `https://anestfact.diegomc77.workers.dev`
+- **Previews de rama:** `https://<rama>-anestfact.diegomc77.workers.dev`
+
 ## Una vez en el dashboard de Cloudflare
 
-1. [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
-2. Repo: el mismo de AnesFact (producción o el que ya pushea Pages).
-3. Build settings:
-   - **Framework preset:** None
-   - **Build command:** (vacío)
-   - **Build output directory:** `/` (raíz del repo estático)
-4. **Project name:** `anestfact` → URL fija `https://anestfact.pages.dev` (ya autorizada en `seguridad.js` y en la extensión).
-5. Deploy. Probar login + sync en esa URL.
+1. [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages** → proyecto **anestfact** (conectado al repo GitHub).
+2. Build settings típicos (Workers Builds / wrangler):
+   - Deploy con assets estáticos desde la raíz del repo
+   - Obligatorio: `.assetsignore` en la raíz (excluye `tools/`, `backup/`) — sin eso falla con `Asset too large` (>25 MB)
+3. Tras cada push a `main`, el check GitHub **Workers Builds: anestfact** debe quedar en Success.
+4. Probar login + sync en `https://anestfact.diegomc77.workers.dev`.
 
-## `.assetsignore` (obligatorio)
-
-Cloudflare rechaza archivos >25 MB. En la raíz del repo está `.assetsignore` que excluye `tools/` (incluye `tools/apk-ref/app.zip` ~63 MB) y `backup/`. Sin ese archivo el build falla con `Asset too large`.
-
-Dominio custom (opcional, después): Pages → Custom domains. Si agregás uno nuevo, sumarlo a `DOMINIOS_EXACTOS` en `seguridad.js` y a `host_permissions` / `externally_connectable` / content_scripts de `chrome-extension-geclisa-batch/manifest.json`, y a `ANESFACT_TAB_URLS` + `isAllowedAnesFactExternalSender` en `background.js`. Recargar la extensión.
+Dominio custom (opcional, después): Custom domains. Si agregás uno nuevo, sumarlo a `DOMINIOS_EXACTOS` en `seguridad.js` y a `host_permissions` / `externally_connectable` / content_scripts de `chrome-extension-geclisa-batch/manifest.json`, y a `ANESFACT_TAB_URLS` + `isAllowedAnesFactExternalSender` en `background.js`. Recargar la extensión.
 
 ## Código ya preparado en el repo
 
 | Archivo | Qué |
 |---|---|
-| `.assetsignore` | Excluye `tools/` y `backup/` del upload a Pages |
-| `seguridad.js` | Autoriza `anestfact.pages.dev` y `*.anestfact.pages.dev` |
-| Extensión ≥ **0.6.26** | `host_permissions`, bridge, external sender |
+| `.assetsignore` | Excluye `tools/` y `backup/` del upload |
+| `seguridad.js` | Autoriza `anestfact.diegomc77.workers.dev` y previews `*-anestfact.diegomc77.workers.dev` |
+| Extensión ≥ **0.6.27** | Hosts Workers (`*.diegomc77.workers.dev` en match patterns; el bridge solo acepta sufijo `-anestfact…`) |
 | GitHub Pages | Sigue autorizado (`diegomc77-hash.github.io`) hasta que lo cortes |
 
 ## Supabase Auth — redirect URLs
 
-En Supabase → Authentication → URL Configuration, agregar:
+En Supabase → Authentication → URL Configuration, agregar (y quitar las de `.pages.dev` si quedaron):
 
-- `https://anestfact.pages.dev`
-- `https://anestfact.pages.dev/**` (si pedís wildcards)
-- Previews si los usás: `https://*.anestfact.pages.dev/**`
+- `https://anestfact.diegomc77.workers.dev`
+- `https://anestfact.diegomc77.workers.dev/**` (si pedís wildcards)
+- Previews si los usás: `https://*-anestfact.diegomc77.workers.dev/**`
 
 Sin eso el login/recovery puede fallar en el dominio nuevo aunque `seguridad.js` deje pasar.
 

@@ -44,7 +44,19 @@ grant select, insert, update, delete on public.tu_tabla to service_role;
 
 **Nota de diligencia (no bloquea nada, ya existe hoy igual):** Cloudflare, como Supabase, pide consentimiento escrito / BAA para guardar o transmitir PHI (info de salud, definición HIPAA). En esta arquitectura los datos de pacientes nunca pasan por el hosting estático (van directo navegador↔Supabase), así que el hosting no es donde vive el riesgo. El riesgo real (si existe) ya está en Supabase desde el día 1, sin cambiar con esta migración. HIPAA es ley de EE.UU., no aplica en Argentina (acá rige la Ley 25.326). Riesgo contractual bajo, no legal.
 
-**Bug encontrado 2026-09-23 (Diego creó el proyecto en Cloudflare, falló el build):** el deploy falla con `Asset too large` — `tools/apk-ref/app.zip` (63 MB, un APK de referencia para desarrollo, no parte de la app) supera el límite de 25 MB por archivo de Cloudflare Workers/Pages. **Fix:** `.assetsignore` en la raíz excluye `tools/` (y `backup/`). Confirmar build Success en Cloudflare.
+**Bug 1 encontrado 2026-09-23 (Diego creó el proyecto en Cloudflare, falló el build):** el deploy falla con `Asset too large` — `tools/apk-ref/app.zip` (63 MB, un APK de referencia para desarrollo, no parte de la app) supera el límite de 25 MB por archivo de Cloudflare Workers/Pages. **Resuelto por Cursor:** `.assetsignore` en la raíz excluyendo `tools/` y `backup/`, commit `1850f8d`, build pasó a Success.
+
+**Bug 2 encontrado 2026-09-23 (auditado por Claude, viendo la pantalla real de Cloudflare):** el proyecto no quedó como Cloudflare Pages clásico — el log de build muestra `npx wrangler deploy`, que es el comando de **Cloudflare Workers** (con assets estáticos), no de Pages. La URL real de producción es **`anestfact.diegomc77.workers.dev`** — NO `anestfact.pages.dev` como se asumió y se dejó configurado en el código. Las previews de rama quedan como `<rama>-anestfact.diegomc77.workers.dev`.
+
+**Fix para Cursor — reemplazar `anestfact.pages.dev` por `anestfact.diegomc77.workers.dev` en:**
+- `seguridad.js` (`DOMINIOS_EXACTOS` y el chequeo de sufijo de previews — ahora sería sufijo `-anestfact.diegomc77.workers.dev`, no `.anestfact.pages.dev`)
+- `chrome-extension-geclisa-batch/manifest.json` (`host_permissions`, `externally_connectable`, `content_scripts` matches)
+- `docs/DEPLOY_CLOUDFLARE_PAGES.md` (corregir la URL documentada)
+- Avisar a Diego que también tiene que corregir la redirect URL en Supabase Auth (`https://anestfact.diegomc77.workers.dev` en vez de `.pages.dev`) y recargar la extensión con la versión nueva.
+
+No probar login hasta que esto esté corregido — con la config actual, `seguridad.js` va a bloquear el acceso a esa URL real con "ACCESO NO AUTORIZADO". **Resuelto por Cursor:** PWA 12.99 / ext 0.6.27, `seguridad.js`/extensión/doc corregidos. Diego agregó las Redirect URLs en Supabase Auth. Login en el navegador anda bien.
+
+**Bug 3 encontrado 2026-09-23 (Diego probó instalar la PWA en la PC → 404):** `manifest.json` (raíz del repo) tiene `"start_url": "/AnestFact/"` y `"scope": "/AnestFact/"` — rutas absolutas pensadas para la subcarpeta de GitHub Pages (`diegomc77-hash.github.io/AnestFact/`). En Cloudflare la app vive en la raíz del dominio (`anestfact.diegomc77.workers.dev/`, sin subcarpeta), así que al instalar la PWA intenta abrir una ruta que no existe → 404. **Fix para Cursor:** cambiar ambas líneas a rutas relativas: `"start_url": "./"` y `"scope": "./"` — así funciona igual en GitHub Pages (con subcarpeta) y en Cloudflare (en la raíz), sin romper ninguno de los dos. Revisar también que no haya otras rutas absolutas con `/AnestFact/` hardcodeado en `manifest.json` o en los ícones. Bump de versión correspondiente si se toca `manifest.json` (no está en la lista de version-sync habitual, pero conviene forzar que los navegadores relean el manifest — se puede lograr solo con el cache-busting `?v=` que ya trae `index.html`, no necesita entrar en `check-version-sync`).
 
 ## 4. Ticket — dashboard de "lleno" de Supabase en el panel admin (tiempo real, con barritas)
 

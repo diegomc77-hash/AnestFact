@@ -1,4 +1,4 @@
-﻿// Carga topbar + vistas HTML y arranca la app (tras Supabase Auth)
+// Carga topbar + vistas HTML y arranca la app (tras Supabase Auth)
 
 (function () {
   var VIEWS = ['home', 'preop', 'sanatorios', 'evweb', 'legales', 'herramientas', 'nueva', 'facturacion', 'escanear', 'config', 'foja', 'fojaQx', 'nom', 'geclisa', 'resumen', 'ayuda', 'admin'];
@@ -76,7 +76,7 @@
   }
 
   function fetchHtml(url) {
-      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=12.83';
+      var bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=13.00';
     return fetch(bust).then(function (r) {
       if (!r.ok) throw new Error(url + ' HTTP ' + r.status);
       return r.text();

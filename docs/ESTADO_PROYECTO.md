@@ -63,6 +63,7 @@ Prueba con nombre **prueba** y DNI ficticio cuando se pueda; en Mayo real, no co
 |---|---|
 | `docs/DISENO_PC_HOME.md` | **Home por institución, no por foja** (PC primero, misma lógica en móvil; PC hoy = columna 520px). Leer el archivo completo antes de tocar Home/dock/layout. |
 | `docs/ROADMAP_ESCALAMIENTO.md` | Fases P/U + empaquetado + P1b GET GECLISA + **P4 Traditum** (reconocimiento 2026-09-10, sin código) + **P6 buzón auth** (idea) + **P2 regla organización catálogo** (sin duplicar especialidades). |
+| `docs/ROADMAP_EVWEB_OBESIDAD_PRACTICAS.md` | Obesidad mórbida + prácticas en cola/fill EVWEB; matching CSV APROSS/PAMI/IOSFA; ART pendiente Sole. |
 | `docs/P2_QR_CIRUJANO.md` | P2 QR cirujano / `fojaQx`: OK Huerta + alcance Aero/públicos/Mayo (flag); gate §8 Paso 1 en auditoría. |
 | `docs/P2_PROFORMAS_CYC.md` | Puntero → `docs/proformas-cyc/` (CyC). No editar clínica acá. |
 | `docs/proformas-cyc/README.md` | P2 CyC: **13 proformas OK de semilla**; motor de código pendiente. |
@@ -135,6 +136,8 @@ Prueba con nombre **prueba** y DNI ficticio cuando se pueda; en Mayo real, no co
 | Archivo | Qué trata |
 |---|---|
 | `docs/DEPLOY_V8.md` | Publicar PWA (Pages) + orden de migraciones v8. |
+| `docs/DEPLOY_CLOUDFLARE_PAGES.md` | Ticket 3: Worker+assets `anestfact.diegomc77.workers.dev` (no Pages clásico); Auth redirect URLs. |
+| `docs/AVISO_INFRA_GRANTS_MIGRACION.md` | GRANT Data API (deadline 30/10/2026) + Storage adjuntos + Cloudflare Pages + dashboard admin uso infra. Orden: GRANT → Storage → dashboard → Cloudflare. |
 | `docs/DESPLEGAR_QR.md` | Deploy Edge Functions de valoración QR. |
 | `docs/EJECUTAR_VALORACION_QR.md` | Paso a paso de la migración QR en Supabase. |
 | `docs/SUPABASE_ADMIN.md` | Panel admin / planes sin pisar fojas de Huerta. |
@@ -160,7 +163,19 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- **evweb Lote 3 — validado en vivo (sitio real):** cola AnesFact `afg_evweb_queue` → bridge → `doEvwebFill` en cola; Sanatorio OK vía `AFG_EVW_SET_OBRA_AND_WAIT` (MAIN/`endRequest`). Queda `awaiting_confirm` (sin Finalizar). PWA **12.78** / ext **0.6.4**. Pendiente: upload docs, prácticas, más OS/sanatorios.
+- **Infra:** ver `docs/AVISO_INFRA_GRANTS_MIGRACION.md`. **Ticket 3 Bug 3:** `manifest.json` `start_url`/`scope` → `./` (PWA **13.00**). Bug 2 Workers URL: ext **0.6.27**. **Ticket 5** POSPUESTO.
+- **Búsqueda NOM + favoritos:** PWA **12.95** — `buscarNom` rankea prefijo de palabra → substring desc → código exacto (sin sección). Estrellitas NOM (`af_nom_favs_<uid>`). Favoritos obra por institución: `af_obra_favs_<uid>_<f-san>` (semilla desde clave global vieja o Huerta 15).
+- **evweb obesidad + prácticas:** PWA **12.93+** / ext **0.6.25** — catálogo **25885** / **15** obras. **Pendiente smoke:** foja mutual nueva + cola EVWEB.
+- **evweb upload reload (channel closed):** ext **0.6.24** — uploads en BG post-reload.
+- **evweb cola paciente viejo (grave):** ext **0.6.23** / PWA **12.88** — runner relee `afg_evweb_queue` desde LS AnesFact.
+- **evweb docs.anest:** PWA **12.88** — al encolar, genera PDF foja anestésica (`afBuildFojaAnestPrintHtml` + html2pdf CDN, mismo layout que imprimir).
+- **evweb auth classify:** ext **0.6.23** — más hints label; bug abierto si sigue placeholder (pedir diag `upload_classify` con `reason`).
+- **evweb upload duplicados:** ext **0.6.22** — skip por grid si fila/tipo ya existe.
+- **evweb classify hang:** ext **0.6.21** — `endRequest` + timeout (no hang).
+- **evweb start stuck:** ext **0.6.20** — Iniciar libera locks + reencola.
+- **evweb upload:** **0.6.19** Cargar sin javascript: CSP.
+- **QuotaExceeded / adjuntos (PROD):** **12.83 Pages** — botón **Reparar memoria** (toast + Configuración). IDB v2 en 12.82.
+- **evweb Lote 4:** `afeNorm` tildes (**12.82**). Pendiente smoke Aero + deploy.
 - **Egress sync (023 + skip fetch):** **12.74** en Pages. **12.75** = botón confirmar candidato en cola (app). Ext WIP (buscador/runner/canal) fuera de ese commit.
 - **P2 QR cirujano / fojaQx Paso 2.3:** **12.73** listo para Pages. Pendiente smoke Aero «prueba» + print (CyC/tiroides v2).
 - **18 especialidades no-CyC:** JS regenerado OK (fix multilínea); **smoke e2e propio pendiente** al primer uso real — ver ROADMAP § P2 smoke por especialidad. No asumir prod-ready.
@@ -182,12 +197,37 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 - **P2 Gastroenterología / endoscopia (M20):** **OK de semilla** (`01-endoscopia.md`). Validación criterio Diego/AnesFact (no gastroenterólogo ni Huerta) — nota de cabecera se mantiene. Sin solape real con CG. Motor pendiente. 0 código.
 - **P2 QR cirujano / fojaQx:** Paso 1–2.2 CERRADOS. **Paso 2.3 en 12.73** (tiroides v2 + fix parser multilínea). Pendiente smoke Aero «prueba» + print.
 
-- **P4 Traditum / evweb:** Lote 3 **validado en vivo** (cola + fill PAMI/Mayo + `endRequest` MAIN). Catálogo ADAARC en `docs/evweb_catalogo_completo.md`. Pendiente: upload docs, prácticas, Finalizar, más OS/sanatorios. Hueco «Pendiente de autorizar en Traditum» sin código.
+- **P4 Traditum / evweb:** Lote 3 validado; **Lote 4 local** (IOSFA/Aero + upload docs). Pendiente: smoke Aero, prácticas, Finalizar. Catálogo ADAARC en `docs/evweb_catalogo_completo.md`. Hueco Traditum sin código.
 - **Retomar:** bloque **Retomar — 2026-09-08** arriba (viernes: prueba en vivo 12.62 / 0.5.15). PWA **12.64** ya en origin (`7b3cc99`); recargar Pages aparte.
 - Ext **0.5.15** en origin/main (`5c874f8`) como backup. El viernes: recargar local en `chrome://extensions`.
 
 ## Qué se hizo (más reciente primero)
 
+- 2026-09-22 — **0.6.25 / 12.90:** matching prácticas EVWEB (CSV APROSS/PAMI/IOSFA → `codigoEvweb` solo si match único); fill `chkObesidad` + tecleo `txtCodigoPractica` (select solo por código). Catálogo `data/evweb-practicas-match.js`. Sin ART.
+- 2026-09-21 — **ext 0.6.24:** upload docs en BG post-reload (`waitEvwebAfterUploadPostback`); FILL_PAMI solo campos — evita "message channel closed" / `evweb_runner_fatal` falso.
+- 2026-09-22 — **PWA 12.81 Pages** (`9179ee2`): adjuntos → IndexedDB; `afCommitAdjunto` sin rollback ciego; QuotaExceeded toasts; `tools/emergency-strip-local-docs.js`. Evweb Lote 4 sigue solo local.
+- 2026-09-21 — **0.6.23 / 12.88:** cola evweb sincronizada desde LS AnesFact (fix paciente anterior); PDF anest al encolar; hints auth classify.
+- 2026-09-21 — **ext 0.6.22:** upload docs no re-sube si el GridView ya tiene ese tipo (o fila+nombre pendiente de clasificar); evita duplicados en reintento.
+- 2026-09-21 — **ext 0.6.21:** classify docs (MAIN) con endRequest + timeout; no hang si postback no dispara endRequest / frame muere.
+- 2026-09-21 — **0.6.20 / 12.87:** Iniciar cola libera locks huérfanos y reencola current/último paused; logs StartUi + ACK; busy stale 90s.
+- 2026-09-21 — **ext 0.6.19:** upload Cargar: nunca navegar `href=javascript:__doPostBack` (CSP); parse + `window.__doPostBack(...)`. Evita channel closed.
+- 2026-09-21 — **ext 0.6.18:** `cboTipoDocumento` en MAIN world (focus + selectedIndex + change/teclas); change sintético del CS no dispara postback ASP.NET.
+- 2026-09-21 — **ext 0.6.17:** tras upload espera `cboTipoDocumento_N` + set por value 1/2/7 o texto (Foja quirúrgica / auth / anest); diag `upload_classify`. Idea anotada: PDF único «Documentación completa» (sin codear).
+- 2026-09-21 — **ext 0.6.16:** upload docs en MAIN (`__doPostBack` / File+Cargar); evita click aislado que no dispara AJAX → `upload_timeout`.
+- 2026-09-21 — **12.86 / 0.6.15:** cola evweb Quitar/Vaciar + dump consola; Iniciar prioriza último encolado (`lastEnqueuedId` / `preferNewest`).
+- 2026-09-21 — **ext 0.6.14:** upload sin exigir `#body_GridView1` previo (aparece tras 1ª fila); fecha sin focus + `closeEvwebCalendar`; scroll a `cargaArchivos`.
+- 2026-09-21 — **ext 0.6.13:** docs fetch sin postMessage a page (timeout); bridge lee `afg_evweb_queue` LS + IDB `anesfact_docs_v1`.
+- 2026-09-21 — **ext 0.6.12 / PWA 12.85:** upload docs desconectado por cola sin data en storage. Slim `docsMeta` + `FETCH_EVWEB_DOCS` al fill; diag `upload_begin`/`upload_done`/`evweb_docs_fetch`. Sin Finalizar.
+- 2026-09-21 — **ext 0.6.11:** navegar a carga con `idUsuario` (scrape menú/URL + remember storage); detecta SinLoguear; evita URL sin sesión.
+- 2026-09-21 — **ext 0.6.10:** `ensureEvwebFormReady` — si la pestaña es home, navega a formulario carga y espera Obra Social; error en castellano si no logueado.
+- 2026-09-21 — **ext 0.6.9:** DIAG_DUMP `limit` default 15 + `lines` compactas (anti truncate chat).
+- 2026-09-21 — **ext 0.6.8:** `handlePageEvwebQueueAction` — `ensureBridges` con timeout 1.5s (no bloquea runner); `await afgDiag` en open/ping/fill/cola; tags `ensure_bridges_*`, `focusOrOpenEvwebTab_*`, `runEvweb_*`. Hipótesis: hang bridges / SW suspend sin flush.
+- 2026-09-21 — **ext 0.6.7 diag persistente:** `afgDiag` → `chrome.storage.local.afg_diag_log` (bg/bridge/evweb); volcado AnesFact F12 `DIAG_DUMP` / `tools/afg-diag-dump-paste.js`. Sin 3 consolas en vivo.
+- 2026-09-21 — **evweb Iniciar cola (12.84 / ext 0.6.6):** `afEvwebQueueStartUi` → bridge `EVWEB_QUEUE_START` / `AFG_PAGE_EVWEB_QUEUE_ACTION` + `AFG_OPEN_EVWEB`; UI foja/Facturación/dock (Agregar + Iniciar); Facturación demoted a link; marca local en details. Sin memoria/Fase B.
+- 2026-09-21 — **evweb cola UX (12.83):** tras encolar toast con conteo + `afRenderEvwebQueueHub` en hosts `[data-evweb-queue-list]` (dock, Facturación, fin foja Aero); botón encolar al final foja Aero; docs arriba / encolar abajo en Facturación; copy Cola extensión ≠ Marca local. Sin Fase B Home-institución.
+- 2026-09-21 — **evweb `afeNorm` tildes (12.82):** foja canónica `Hospital Aeronáutico` → `AERONÁUTICO` no matcheaba `AFE_SAN_MAP` (`AERONAUTICO`). NFD + strip diacríticos + colapso espacios.
+- 2026-09-21 — **QuotaExceeded prod + IndexedDB adjuntos (local 12.81):** script emergencia strip LS (`tools/emergency-strip-local-docs.js`, sin push/tombstones, `AF_EMERGENCY_NO_SYNC`); `js/41b-docs-idb.js` + detach en sync/guardar; hydrate push/cola; badges/verDoc async IDB. Sin deploy aún.
+- 2026-09-21 — **evweb Lote 4** (local): `AFE_OBRA_MAP` IOSFA=105; `AFE_SAN_MAP` Aeronáutico=384; snapshot `docs` resuelto (sin alias); upload secuencial `body_cargaArchivos` + tipo 1/2/7; poll filas `.fa-trash`. CACHE **12.79** / ext **0.6.5**. Sin Finalizar. Pendiente smoke Aero.
 - 2026-09-20 — **evweb Lote 3 validado en vivo** (sitio real, no mock): cola `afg_evweb_queue` + bridge + `doEvwebFill`; Obra/Sanatorio/Fecha/Hora/Pac/DNI/Cirujano/Edad/Afiliado OK; `obraSocialSettle.reason: endRequest` (MAIN `PageRequestManager`). `awaiting_confirm`, sin Finalizar. Commits `30e1bbe` + `c3c3dad`. PWA **12.78** / ext **0.6.4**.
 - 2026-09-20 — **evweb Lote 3** (código): `afg_evweb_queue` en AnesFact (`40-evweb-queue.js`, botón Facturación); bridge → chrome.storage; `doEvwebFill` en cola y en fill individual. Pausa en `awaiting_confirm`. Sin docs/Finalizar. CACHE **12.78** / ext **0.6.1** (luego fix Sanatorio → **0.6.4**).
 - 2026-09-19 — PWA **12.75**: botón «Confirmar candidato» en cola GECLISA (`afParseCandidatoFromMensaje` / `afGeclisaQueueConfirmCandidatoUi`) cuando pausa por nombre mismatch. Sin extensión en este commit.

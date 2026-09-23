@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   // Si agregás/quitás un script acá, actualizá también STATIC_CORE en sw.js (precache shell).
   var SCRIPTS = [
     'js/00-env.js',
@@ -64,7 +64,7 @@
     'js/24-sw-register.js'
   ];
 
-  var CACHE_V = '12.83';
+  var CACHE_V = '13.00';
   window.AF_CACHE_V = CACHE_V;
   try { document.title = 'AnesFact v' + CACHE_V; } catch (eTit) {}
 
