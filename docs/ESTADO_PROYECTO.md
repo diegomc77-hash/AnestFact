@@ -163,7 +163,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- **Infra:** ver `docs/AVISO_INFRA_GRANTS_MIGRACION.md`. **Ticket 8:** cola EVWEB con mismas clases `.afg-q-*` / color-por-estado que GECLISA (PWA **13.02**). **Ticket 6** en main (13.01). **Ticket 5** POSPUESTO.
+- **Infra:** ver `docs/AVISO_INFRA_GRANTS_MIGRACION.md`. **Ticket 9a/9b:** validate bloquea prácticas sin `codigoEvweb`; lista muestra "Sin código EVWEB" + "Sin: docs" (PWA **13.03**). **Ticket 8** cerrado. **Ticket 5** POSPUESTO.
 - **Búsqueda NOM + favoritos:** PWA **12.95** — `buscarNom` rankea prefijo de palabra → substring desc → código exacto (sin sección). Estrellitas NOM (`af_nom_favs_<uid>`). Favoritos obra por institución: `af_obra_favs_<uid>_<f-san>` (semilla desde clave global vieja o Huerta 15).
 - **evweb obesidad + prácticas:** PWA **12.93+** / ext **0.6.25** — catálogo **25885** / **15** obras. **Pendiente smoke:** foja mutual nueva + cola EVWEB.
 - **evweb upload reload (channel closed):** ext **0.6.24** — uploads en BG post-reload.

@@ -271,6 +271,17 @@ function afEvwebQueueValidate(i){
   if(!(i.afil||'').trim()) e.push('Falta N° afiliado');
   if(!afeMapObra(i.obra)) e.push('Obra social "'+(i.obra||'')+'" sin mapear (AFE_OBRA_MAP)');
   if(!afeMapSan(i.san)) e.push('Sanatorio "'+(i.san||'')+'" sin mapear (AFE_SAN_MAP)');
+  // Ticket 9a: si hay prácticas, cada una debe tener codigoEvweb (auto o manual).
+  // Sin prácticas → no bloquea (distinto de "con prácticas sin código").
+  var obraValue = afeMapObra(i.obra);
+  var pracSnaps = afeSnapshotPracs(i.pracs, obraValue);
+  if (pracSnaps.length) {
+    pracSnaps.forEach(function(p){
+      if (p && p.codigoEvweb) return;
+      var desc = ((p && (p.desc || p.cod)) || '?').trim() || '?';
+      e.push('Práctica "'+desc+'" sin código EVWEB — resolvela en Facturación antes de encolar');
+    });
+  }
   return e;
 }
 function afEvwebQueueHydrateCurFromDom(interv){
@@ -322,6 +333,37 @@ function afEvwebQueueDocsLabel(it){
   return keys.map(nice).join(', ');
 }
 
+/** Prácticas del ítem de cola sin codigoEvweb (Ticket 9a, aviso en lista). */
+function afEvwebQueueUnresolvedPracDescs(it){
+  var out = [];
+  ((it && it.pracs) || []).forEach(function(p){
+    if (!p || p.codigoEvweb) return;
+    var desc = String((p.desc || p.cod || '?')).trim() || '?';
+    out.push(desc);
+  });
+  return out;
+}
+
+/** Docs anest/qx/auth sin blob en el ítem (Ticket 9b — aviso, no bloqueo). */
+function afEvwebQueueMissingDocLabels(it){
+  function nice(k){
+    if (k === 'anest') return 'foja anestésica';
+    if (k === 'qx') return 'foja quirúrgica';
+    if (k === 'auth') return 'autorización';
+    return k;
+  }
+  function hasDoc(tipo){
+    var d = it && it.docs && it.docs[tipo];
+    if (!d) return false;
+    return !!(d.data || d.aliasOf || d.idb || d.storage || d.storagePath);
+  }
+  var miss = [];
+  ['anest', 'qx', 'auth'].forEach(function(t){
+    if (!hasDoc(t)) miss.push(nice(t));
+  });
+  return miss;
+}
+
 function afEvwebQueueListHtml(){
   var q = afEvwebQueueLoad();
   var items = (q && q.items) ? q.items : [];
@@ -361,6 +403,18 @@ function afEvwebQueueListHtml(){
     }
     if (it.message) {
       html += '<div style="color:var(--red);margin-top:2px;font-size:11px">' + String(it.message).slice(0, 120) + '</div>';
+    }
+    var unresolved = afEvwebQueueUnresolvedPracDescs(it);
+    if (unresolved.length) {
+      html += '<div style="color:var(--red);margin-top:2px;font-size:11px">Sin código EVWEB: '
+        + unresolved.map(function(d){ return String(d).replace(/</g,'&lt;'); }).join(', ')
+        + '</div>';
+    }
+    var missingDocs = afEvwebQueueMissingDocLabels(it);
+    if (missingDocs.length) {
+      html += '<div style="color:var(--red);margin-top:2px;font-size:11px">Sin: '
+        + missingDocs.join(', ')
+        + '</div>';
     }
     html += '</div>';
     html += '<div class="afg-q-item-actions">';
@@ -534,9 +588,7 @@ function afEvwebQueueAdd(interv){
     afEvwebQueueSave(q);
     afEvwebQueueNotifyEnqueued(snap);
     var nDocs = snap.docs ? Object.keys(snap.docs).length : 0;
-    if (!nDocs && typeof toast === 'function') {
-      toast('En cola evweb sin adjuntos (foja/auth). La extensión los pedirá al fill si están en la foja.');
-    }
+    // Ticket 9b: el aviso de docs faltantes es persistente en afEvwebQueueListHtml (no toast).
     return {ok:true, item:snap, already:already, docsCount:nDocs};
   }
 

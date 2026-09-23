@@ -153,6 +153,51 @@ Con adjuntos movidos a Storage: ~200MB/año de texto puro entre 10 anestesistas 
 
 **Fix para Cursor:** reescribir `afEvwebQueueListHtml()` para que reutilice las mismas clases CSS y el mismo patrón de color-por-estado que ya usa GECLISA, en vez de inventar un estilo nuevo — mismo criterio visual en las dos colas de la misma app. No toca lógica de negocio, solo el HTML/CSS de renderizado. Riesgo: bajo.
 
-**Hecho Cursor (PWA 13.02):** `afEvwebQueueListHtml` usa `.afg-q-item` / `.afg-q-name` / color-por-estado (misma escala que GECLISA; `awaiting_confirm` → `var(--estado-cola)`). Pendiente auditoría.
+**Auditoría 2026-09-23 — CONFIRMADO EN `origin/main`, TICKET CERRADO.** Commit `31d26ea`, PWA 13.02. Verificado en el código real (no solo en el reporte de Cursor):
+- `afEvwebQueueListHtml()` en `js/40-evweb-queue.js` ahora arma cada ítem numerado (`idx+1`), con `.afg-q-item` / `.afg-q-item-body` / `.afg-q-name` / `.afg-q-item-actions` — mismas clases que usa GECLISA.
+- Color por estado (`stColor`) igual al patrón de GECLISA: `paused_error` → `var(--red)`, `awaiting_confirm` → `var(--estado-cola)`, `running` → `var(--blue)`, `done` → `var(--green)`.
+- Botón "Quitar" pasó de texto grande a ícono ✕ chico (solo visible si no está `done`/`running`).
+- Metadatos (obra/sanatorio/docs) ahora en texto legible en vez de claves técnicas crudas.
+- Clases y variables CSS (`.afg-q-item`, `.afg-q-item-body`, `.afg-q-name`, `.afg-q-item-actions`, `--red`, `--blue`, `--green`, `--estado-cola`) confirmadas presentes en `styles.css`.
+- `js/40-evweb-queue.js` está registrado en `SCRIPTS` (`js/load-scripts.js`) y `views/evweb.html` tiene el host `data-evweb-queue-list` sin cambios necesarios.
+- Versión de caché **13.02** consistente en los 6 archivos de sync: `index.html`, `js/load-scripts.js`, `js/load-views.js`, `sw.js`, `js/24-sw-register.js`, `valoracion.html`.
+- No toca `fill.js`, IDs GECLISA ni lógica de negocio — solo renderizado. Riesgo confirmado bajo.
+
+## Orden de ejecución — actualización final
+
+7. ~~**Prolijizar cola EVWEB** (Ticket 8)~~ — ✅ CERRADO. Confirmado en `origin/main` (commit `31d26ea`, PWA 13.02).
+
+## 9. Ticket — la cola EVWEB deja encolar una foja sin código EVWEB/ADAARC resuelto
+
+**Origen:** Diego cargó una foja a la cola EVWEB y la dejó pasar con todo completo menos el código EVWEB de la práctica — debería haber avisado que faltaba eso.
+
+**Auditado y confirmado.** En Facturación (`js/07-intervenciones.js`, `renderPracs()`/`renderPracsAlert()`) ya existe un cartel visual: `⚠ N de M prácticas sin código EVWEB confirmado. Buscalas a mano en ADAARC antes de enviar/encolar` — pero es solo informativo en esa pantalla, no bloquea nada.
+
+La función que sí decide si se puede encolar, `afEvwebQueueValidate(i)` en `js/40-evweb-queue.js`, chequea paciente, fecha, hora, DNI, edad, N° afiliado, obra social mapeada y sanatorio mapeado — **pero nunca mira si las prácticas (`i.pracs`) tienen `codigoEvweb` resuelto**. Por eso una foja con una práctica sin código EVWEB se encola igual, sin ningún error.
+
+**Fix para Cursor:**
+- En `afEvwebQueueValidate(i)`, agregar el mismo criterio de bloqueo que ya usa para obra/sanatorio: si `i.pracs` tiene al menos una práctica sin `codigoEvweb` (ni resuelto automático ni elegido a mano — `evwebManual`), agregar un error tipo `'Práctica "'+desc+'" sin código EVWEB — resolvela en Facturación antes de encolar'` por cada práctica sin resolver. Reusar la misma lógica que ya cuenta `sinResolver` en `renderPracs()`.
+- Fojas sin ninguna práctica cargada (`pracs` vacío) quedan exentas de este chequeo — no es lo mismo "sin prácticas" que "con prácticas sin código".
+- En `afEvwebQueueListHtml()` (`js/40-evweb-queue.js`), si el ítem ya en cola tiene alguna práctica sin código (por ejemplo si se agregó antes de este fix, o si se reabrió y se agregó una práctica nueva sin resolver), mostrar el mismo tipo de aviso rojo que ya se usa para `it.message`, para que no quede escondido dentro de la cola.
+- No toca `fill.js`, IDs GECLISA, ni la lógica de resolución de códigos EVWEB (`afeResolvePracEvweb`) — solo agrega el bloqueo que falta en la validación de encolado. Riesgo: bajo.
+
+### 9b. Mismo problema, pero con los documentos adjuntos (foja Qx / foja anestésica / autorización)
+
+**Origen:** Diego notó, en la misma prueba, que tampoco avisa si falta un adjunto.
+
+**Auditado y confirmado — es el mismo patrón que 9a, más silencioso todavía.** Hoy en toda la cadena EVWEB no hay ningún chequeo real por tipo de documento:
+- `afEvwebQueueValidate(i)` (`js/40-evweb-queue.js`) no mira `docs` en absoluto — no forma parte de los requisitos para encolar.
+- En `enqueueWithDocs()` (mismo archivo) hay un único `toast()` — *"En cola evweb sin adjuntos (foja/auth)..."* — y **solo se dispara si los 3 documentos (anest/qx/auth) están vacíos a la vez**. Si falta uno solo (por ejemplo, se adjuntó la foja Qx pero no la autorización), no aparece nada, ni toast ni error. Además un toast es un mensaje que se borra solo a los pocos segundos — no queda visible si se vuelve a mirar la cola después.
+- Confirmé también en `chrome-extension-geclisa-batch/content/evweb.js` (línea ~1022, comentario propio del código): *"Orden: anest → qx → auth. Faltantes se saltan (no error)"* — la extensión, al momento de llenar ADAARC, directamente salta el documento que no está, sin marcarlo como problema en ningún lado.
+
+**Ojo antes de bloquear como en 9a:** a diferencia del código EVWEB (que siempre hace falta), no tengo evidencia en el código de que los 3 documentos sean obligatorios en todos los casos — puede depender de la obra social o el tipo de intervención (no hay ningún campo que diga "este doc es requerido para esta foja"). Por eso el fix acá no es bloquear el encolado a ciegas, sino **hacer visible y persistente lo que hoy es invisible**, y que Diego decida caso por caso si falta algo real.
+
+**Fix para Cursor:**
+- En `afEvwebQueueListHtml()`, agregar por ítem una línea de aviso (mismo estilo rojo que ya usa `it.message`) listando qué documentos de los 3 (`anest`/`qx`/`auth`) NO tienen dato cargado — ej. *"Sin: foja quirúrgica, autorización"* — visible siempre que falte al menos uno, no solo cuando faltan los tres.
+- Sacar (o dejar solo como fallback) el `toast` actual de "sin adjuntos", ya que un aviso que se borra solo no sirve para esto — la cola necesita el estado visible de forma persistente, igual que ya se decidió para el ticket 9a.
+- No agregar bloqueo duro (a diferencia de 9a) salvo que Diego confirme que sí hay documentos siempre obligatorios — eso lo tiene que decir él, no se asume desde el código.
+- No toca `fill.js`, IDs GECLISA, ni la lógica de la extensión (`evweb.js`) — solo hace visible en AnesFact lo que la extensión ya sabe que se está saltando. Riesgo: bajo.
+
+**Hecho Cursor (PWA 13.03):** 9a bloqueo en `afEvwebQueueValidate` + aviso en lista; 9b "Sin: …" persistente en lista; toast de "sin adjuntos" removido. Pendiente auditoría.
 
 Cada ticket lo implementa Cursor; Claude audita el resultado contra este documento antes de darlo por cerrado.
