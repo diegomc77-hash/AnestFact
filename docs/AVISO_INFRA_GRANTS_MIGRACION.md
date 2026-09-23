@@ -126,9 +126,9 @@ Esto depende de cómo funciona cada mutua/sanatorio (si te devuelven o no una co
 
 **Estado:** confirmado por Diego (2026-09-23) — arrancar ahora, en paralelo con el ticket 3.
 
-**Auditoría 2026-09-23 (2ª vuelta) — NO IMPLEMENTADO, devuelto a Cursor.** Cursor reportó esto como hecho ("preview, casilla, paciente/DNI/fecha, aviso si reemplaza, Cancelar/Confirmar") pero al revisar el código real no está: `adjuntarDoc()` en `js/17-sync-export.js` sigue llamando directo a `afCommitAdjunto()`, que guarda el archivo sin ningún paso intermedio. No hay modal, no hay vista previa, no hay aviso de reemplazo, en ningún archivo del repo (`facturacion.html` no se tocó en este commit). Falta implementarlo de verdad — el punto de enganche correcto es la función `finish` dentro de `adjuntarDoc` (línea ~993): en vez de llamar `afCommitAdjunto(tipo,doc)` directo, mostrar el cartel de confirmación ahí y solo llamar `afCommitAdjunto` si el usuario confirma.
+**Auditoría 2026-09-23 (2ª vuelta) — NO IMPLEMENTADO, devuelto a Cursor.** Cursor reportó esto como hecho pero al revisar el código real no estaba. Devuelto con el punto de enganche exacto.
 
-**Reintento Cursor (2026-09-23, PWA 13.01):** `finish` → `afConfirmAdjunto` → `afCommitAdjunto` solo si confirma; CSS `.af-adj-*`. Pendiente re-auditoría Claude en `origin/main`.
+**Auditoría 2026-09-23 (3ª vuelta) — CONFIRMADO EN `origin/main`, TICKET CERRADO.** Commit `9f518ab`, PWA 13.01. Verificado en el código real (no solo en el reporte de Cursor): `adjuntarDoc()` → `afConfirmAdjunto(doc,tipo)` (modal con vista previa img/PDF, casilla, paciente/DNI/fecha, aviso de reemplazo si ya había un archivo, botones Cancelar/Confirmar, cierra con Escape o clic afuera) → recién si el usuario confirma, `afCommitAdjunto()`. CSS `.af-adj-*` presente en `styles.css`. Versión de caché 13.01 consistente en `index.html`.
 
 ## 7. Escalabilidad real a 10 anestesistas, sin pagar
 
@@ -140,7 +140,19 @@ Con adjuntos movidos a Storage: ~200MB/año de texto puro entre 10 anestesistas 
 2. ~~**Storage** (Ticket 2)~~ — ✅ hecho, probado con foja de prueba.
 3. ~~**Dashboard admin** (Ticket 4)~~ — ✅ hecho, migración corrida, barritas andando.
 4. ~~**Cloudflare Pages** (Ticket 3)~~ — ✅ CERRADO. Login y PWA (mobile + PC) funcionando en `anestfact.diegomc77.workers.dev`.
-5. **Validar adjunto correcto/paciente correcto** (Ticket 6) — 🔶 EN CURSO, devuelto a Cursor en la auditoría del 2026-09-23 (no estaba implementado pese al primer reporte). Pendiente de que Cursor lo reintente y de que Claude vuelva a auditar el código real antes de darlo por hecho.
+5. ~~**Validar adjunto correcto/paciente correcto** (Ticket 6)~~ — ✅ CERRADO. Confirmado en `origin/main` (commit `9f518ab`, PWA 13.01) en la 3ª auditoría, después de que el primer reporte de Cursor no coincidiera con el código real.
 6. **Limpieza de adjuntos confirmados** (Ticket 5) — ⏸️ POSPUESTO. Diego confirmó que en principio es copia redundante, pero pide esperar a que el circuito de EVWEB (y Traditum) esté validado al 100% en producción — hoy todavía hay fojas de prueba subidas sin completar. Prueba pendiente antes de retomar: cargar fojas reales a la cola EVWEB y confirmar que pasan solas a estado "listo" (ver detalle en Ticket 5). No arrancar hasta que Diego lo confirme explícitamente.
+
+## 8. Ticket — prolijizar visualmente la cola de EVWEB (hoy es inconsistente con la de GECLISA)
+
+**Origen:** Diego notó que la cola de EVWEB se ve fea. Auditado y confirmado — es una inconsistencia real de diseño dentro de la misma app.
+
+**GECLISA (`js/39-geclisa-queue.js`, función que arma el HTML de la cola ~línea 795):** cada ítem numerado, nombre del paciente en negrita, fecha/hora/sector en línea secundaria, estado como etiqueta chica **de color** (rojo error, verde listo, azul en curso, vía `stColor`), acciones como íconos chicos (↑ ↓ ✕), usa clases CSS dedicadas `.afg-q-item`, `.afg-q-item-body`, `.afg-q-item-actions`, `.afg-q-name`.
+
+**EVWEB (`js/40-evweb-queue.js`, función `afEvwebQueueListHtml`, ~línea 317):** todo en una sola línea gris de 11px sin color de estado, con etiquetas técnicas crudas ("obra", "san", "docs" en vez de nombres claros), sin numerar, botón "Quitar" como botón de texto grande en vez de ícono.
+
+**Fix para Cursor:** reescribir `afEvwebQueueListHtml()` para que reutilice las mismas clases CSS y el mismo patrón de color-por-estado que ya usa GECLISA, en vez de inventar un estilo nuevo — mismo criterio visual en las dos colas de la misma app. No toca lógica de negocio, solo el HTML/CSS de renderizado. Riesgo: bajo.
+
+**Hecho Cursor (PWA 13.02):** `afEvwebQueueListHtml` usa `.afg-q-item` / `.afg-q-name` / color-por-estado (misma escala que GECLISA; `awaiting_confirm` → `var(--estado-cola)`). Pendiente auditoría.
 
 Cada ticket lo implementa Cursor; Claude audita el resultado contra este documento antes de darlo por cerrado.
