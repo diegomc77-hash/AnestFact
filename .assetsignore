@@ -1,0 +1,5 @@
+# Cloudflare Pages / Workers static assets — no subir material de desarrollo.
+# Ver docs/AVISO_INFRA_GRANTS_MIGRACION.md Ticket 3 (límite 25 MB/archivo).
+tools/
+backup/
+.git/
