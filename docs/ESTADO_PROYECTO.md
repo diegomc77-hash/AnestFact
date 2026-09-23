@@ -163,7 +163,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- **Infra:** ver `docs/AVISO_INFRA_GRANTS_MIGRACION.md`. **Ticket 3 Bug 3:** `manifest.json` `start_url`/`scope` → `./` (PWA **13.00**). Bug 2 Workers URL: ext **0.6.27**. **Ticket 5** POSPUESTO.
+- **Infra:** ver `docs/AVISO_INFRA_GRANTS_MIGRACION.md`. **Ticket 6:** `afConfirmAdjunto` en `adjuntarDoc` (PWA **13.01**) — pendiente auditoría Claude. **Ticket 3** Bugs 1–3 en main. **Ticket 5** POSPUESTO.
 - **Búsqueda NOM + favoritos:** PWA **12.95** — `buscarNom` rankea prefijo de palabra → substring desc → código exacto (sin sección). Estrellitas NOM (`af_nom_favs_<uid>`). Favoritos obra por institución: `af_obra_favs_<uid>_<f-san>` (semilla desde clave global vieja o Huerta 15).
 - **evweb obesidad + prácticas:** PWA **12.93+** / ext **0.6.25** — catálogo **25885** / **15** obras. **Pendiente smoke:** foja mutual nueva + cola EVWEB.
 - **evweb upload reload (channel closed):** ext **0.6.24** — uploads en BG post-reload.

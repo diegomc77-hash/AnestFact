@@ -965,7 +965,13 @@ function adjuntarDoc(input,tipo){
   if(!file)return;
   if(!S.cur){toast('Abrí una intervención primero');return;}
   if(file.size>500*1024)toast('Ajustando\u2026');
-  var finish=function(doc){afCommitAdjunto(tipo,doc);};
+  // Ticket 6: confirmar DESPUÉS de preparar el doc (preview = lo que se va a guardar).
+  var finish=function(doc){
+    if(!doc||!doc.data){toast('No se pudo leer el archivo');return;}
+    afConfirmAdjunto(doc,tipo).then(function(ok){
+      if(ok)afCommitAdjunto(tipo,doc);
+    });
+  };
   var fallback=function(){
     var reader=new FileReader();
     reader.onload=function(e){
@@ -976,6 +982,92 @@ function adjuntarDoc(input,tipo){
   };
   if(typeof afPrepareAdjunto!=='function'){fallback();return;}
   afPrepareAdjunto(file).then(finish).catch(fallback);
+}
+
+/**
+ * Ticket 6: cartel antes de afCommitAdjunto.
+ * @param {object} doc — ya preparado ({nombre,tipo,data,...})
+ * @param {string} tipo — anest|qx|auth
+ * @returns {Promise<boolean>}
+ */
+function afConfirmAdjunto(doc,tipo){
+  return new Promise(function(resolve){
+    var existing=S.cur&&S.cur.docs&&S.cur.docs[tipo];
+    var hasExisting=!!(existing&&(existing.data||existing.idb||existing.storage||existing.aliasOf||existing.nombre));
+    var pac=(S.cur&&(S.cur.pac||'').trim())||'(sin paciente)';
+    var dni=(S.cur&&(S.cur.dni||'').trim())||'';
+    var fecha=(S.cur&&(S.cur.fecha||'').trim())||'';
+    var slotName=typeof getNombreDoc==='function'?getNombreDoc(tipo):(tipo||'Adjunto');
+    var mime=(doc&&doc.tipo)||'';
+    var fname=(doc&&doc.nombre)||'archivo';
+    var isImg=mime.indexOf('image/')===0||/^data:image\//i.test(doc.data||'');
+    var isPdf=mime==='application/pdf'||/\.pdf$/i.test(fname)||/^data:application\/pdf/i.test(doc.data||'');
+    var sizeApprox=doc.size!=null?doc.size:String(doc.data||'').length;
+
+    var prev=document.getElementById('af-adjunto-confirm');
+    if(prev&&prev.parentNode)prev.parentNode.removeChild(prev);
+
+    var overlay=document.createElement('div');
+    overlay.id='af-adjunto-confirm';
+    overlay.className='af-adj-overlay';
+    overlay.setAttribute('role','dialog');
+    overlay.setAttribute('aria-modal','true');
+
+    var box=document.createElement('div');
+    box.className='af-adj-box card';
+
+    var previewHtml='';
+    if(isImg&&doc.data){
+      previewHtml='<img class="af-adj-preview" src="'+doc.data+'" alt="Vista previa">';
+    }else if(isPdf&&doc.data){
+      previewHtml='<embed class="af-adj-preview-pdf" src="'+doc.data+'" type="application/pdf">';
+    }else{
+      previewHtml='<div class="af-adj-preview-fallback">'+String(fname).replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</div>';
+    }
+
+    var replaceHtml=hasExisting
+      ? '<p class="af-adj-warn">Ya hab&iacute;a un archivo en <strong>'+slotName+'</strong>'
+        +(existing.nombre?' (&laquo;'+String(existing.nombre).replace(/&/g,'&amp;').replace(/</g,'&lt;')+'&raquo;)':'')
+        +'. Si confirm&aacute;s, se <strong>reemplaza</strong>.</p>'
+      : '';
+
+    function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+
+    box.innerHTML=
+      '<div class="ct">Confirmar adjunto</div>'
+      +'<p class="af-adj-meta">Casilla: <strong>'+esc(slotName)+'</strong></p>'
+      +'<p class="af-adj-meta">Paciente: <strong>'+esc(pac)+'</strong>'
+      +(dni?' · DNI '+esc(dni):'')
+      +(fecha?' · '+esc(fecha):'')
+      +'</p>'
+      +'<p class="af-adj-meta">Archivo: <strong>'+esc(fname)+'</strong>'
+      +' · '+Math.max(1,Math.round(sizeApprox/1024))+' KB</p>'
+      +replaceHtml
+      +'<div class="af-adj-preview-wrap">'+previewHtml+'</div>'
+      +'<p class="af-adj-hint">Confirm&aacute; que este archivo es <strong>'+esc(slotName)+'</strong> de este paciente.</p>'
+      +'<div class="af-adj-actions">'
+      +'<button type="button" class="btn btn-s af-adj-cancel" style="flex:1">Cancelar</button>'
+      +'<button type="button" class="btn af-adj-ok" style="flex:1">'+(hasExisting?'Reemplazar':'Confirmar')+'</button>'
+      +'</div>';
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    function cleanup(ok){
+      if(overlay.parentNode)overlay.parentNode.removeChild(overlay);
+      document.removeEventListener('keydown',onKey);
+      resolve(!!ok);
+    }
+    function onKey(e){
+      if(e.key==='Escape'){e.preventDefault();cleanup(false);}
+    }
+    document.addEventListener('keydown',onKey);
+    box.querySelector('.af-adj-cancel').onclick=function(){cleanup(false);};
+    box.querySelector('.af-adj-ok').onclick=function(){cleanup(true);};
+    overlay.addEventListener('click',function(e){
+      if(e.target===overlay)cleanup(false);
+    });
+  });
 }
 function getNombreDoc(tipo){return tipo==='anest'?'Foja Anest\u00e9sica':tipo==='qx'?'Foja Quir\u00fargica':'Autorizaci\u00f3n';}
 function renderDocBadges(){

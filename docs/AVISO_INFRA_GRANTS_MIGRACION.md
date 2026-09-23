@@ -56,7 +56,9 @@ grant select, insert, update, delete on public.tu_tabla to service_role;
 
 No probar login hasta que esto esté corregido — con la config actual, `seguridad.js` va a bloquear el acceso a esa URL real con "ACCESO NO AUTORIZADO". **Resuelto por Cursor:** PWA 12.99 / ext 0.6.27, `seguridad.js`/extensión/doc corregidos. Diego agregó las Redirect URLs en Supabase Auth. Login en el navegador anda bien.
 
-**Bug 3 encontrado 2026-09-23 (Diego probó instalar la PWA en la PC → 404):** `manifest.json` (raíz del repo) tiene `"start_url": "/AnestFact/"` y `"scope": "/AnestFact/"` — rutas absolutas pensadas para la subcarpeta de GitHub Pages (`diegomc77-hash.github.io/AnestFact/`). En Cloudflare la app vive en la raíz del dominio (`anestfact.diegomc77.workers.dev/`, sin subcarpeta), así que al instalar la PWA intenta abrir una ruta que no existe → 404. **Fix para Cursor:** cambiar ambas líneas a rutas relativas: `"start_url": "./"` y `"scope": "./"` — así funciona igual en GitHub Pages (con subcarpeta) y en Cloudflare (en la raíz), sin romper ninguno de los dos. Revisar también que no haya otras rutas absolutas con `/AnestFact/` hardcodeado en `manifest.json` o en los ícones. Bump de versión correspondiente si se toca `manifest.json` (no está en la lista de version-sync habitual, pero conviene forzar que los navegadores relean el manifest — se puede lograr solo con el cache-busting `?v=` que ya trae `index.html`, no necesita entrar en `check-version-sync`).
+**Bug 3 encontrado 2026-09-23 (Diego probó instalar la PWA en la PC → 404):** `manifest.json` (raíz del repo) tiene `"start_url": "/AnestFact/"` y `"scope": "/AnestFact/"` — rutas absolutas pensadas para la subcarpeta de GitHub Pages (`diegomc77-hash.github.io/AnestFact/`). En Cloudflare la app vive en la raíz del dominio (`anestfact.diegomc77.workers.dev/`, sin subcarpeta), así que al instalar la PWA intenta abrir una ruta que no existe → 404. **Fix para Cursor:** cambiar ambas líneas a rutas relativas: `"start_url": "./"` y `"scope": "./"`. **Resuelto por Cursor, confirmado por Claude (verificado en vivo con fetch al manifest.json de producción, no solo en local):** commit `b4c2e97`, build Cloudflare success, PWA 13.00. Instalación mobile OK. Instalación PC: el primer intento no tomaba el cambio (Chrome tenía cacheado el intento fallido anterior); se resolvió borrando todos los datos del sitio en `chrome://settings/content/all` y reinstalando. Diego confirmó "ya está todo ok".
+
+**TICKET 3 — CERRADO (2026-09-23).** Login y PWA funcionando en `https://anestfact.diegomc77.workers.dev` tanto en mobile como en PC. GitHub Pages sigue activo en paralelo, sin apuro para apagarlo.
 
 ## 4. Ticket — dashboard de "lleno" de Supabase en el panel admin (tiempo real, con barritas)
 
@@ -126,6 +128,8 @@ Esto depende de cómo funciona cada mutua/sanatorio (si te devuelven o no una co
 
 **Auditoría 2026-09-23 (2ª vuelta) — NO IMPLEMENTADO, devuelto a Cursor.** Cursor reportó esto como hecho ("preview, casilla, paciente/DNI/fecha, aviso si reemplaza, Cancelar/Confirmar") pero al revisar el código real no está: `adjuntarDoc()` en `js/17-sync-export.js` sigue llamando directo a `afCommitAdjunto()`, que guarda el archivo sin ningún paso intermedio. No hay modal, no hay vista previa, no hay aviso de reemplazo, en ningún archivo del repo (`facturacion.html` no se tocó en este commit). Falta implementarlo de verdad — el punto de enganche correcto es la función `finish` dentro de `adjuntarDoc` (línea ~993): en vez de llamar `afCommitAdjunto(tipo,doc)` directo, mostrar el cartel de confirmación ahí y solo llamar `afCommitAdjunto` si el usuario confirma.
 
+**Reintento Cursor (2026-09-23, PWA 13.01):** `finish` → `afConfirmAdjunto` → `afCommitAdjunto` solo si confirma; CSS `.af-adj-*`. Pendiente re-auditoría Claude en `origin/main`.
+
 ## 7. Escalabilidad real a 10 anestesistas, sin pagar
 
 Con adjuntos movidos a Storage: ~200MB/año de texto puro entre 10 anestesistas activos al ritmo de Huerta → **~2.5 años** de runway en el límite gratis de 500MB de la base. Storage (fotos/PDFs): más ajustado, capaz ~1 año según cuánto se suba. Revisar 1 vez por mes el tamaño real en el panel de Supabase (Project Settings → Database → Usage) en vez de estimar a ciegas — o, una vez armado el Ticket 4, directamente en el panel admin de la app.
@@ -135,8 +139,8 @@ Con adjuntos movidos a Storage: ~200MB/año de texto puro entre 10 anestesistas 
 1. ~~**GRANT patch** (Ticket 1)~~ — ✅ hecho, corrido en Supabase.
 2. ~~**Storage** (Ticket 2)~~ — ✅ hecho, probado con foja de prueba.
 3. ~~**Dashboard admin** (Ticket 4)~~ — ✅ hecho, migración corrida, barritas andando.
-4. **Validar adjunto correcto/paciente correcto** (Ticket 6) — ✅ confirmado, **arrancar ahora**.
-5. **Cloudflare Pages** (Ticket 3) — ✅ confirmado, **arrancar ahora**, en paralelo con el ticket 6 (no se pisan: uno es frontend/adjuntos, el otro es infraestructura de hosting).
+4. ~~**Cloudflare Pages** (Ticket 3)~~ — ✅ CERRADO. Login y PWA (mobile + PC) funcionando en `anestfact.diegomc77.workers.dev`.
+5. **Validar adjunto correcto/paciente correcto** (Ticket 6) — 🔶 EN CURSO, devuelto a Cursor en la auditoría del 2026-09-23 (no estaba implementado pese al primer reporte). Pendiente de que Cursor lo reintente y de que Claude vuelva a auditar el código real antes de darlo por hecho.
 6. **Limpieza de adjuntos confirmados** (Ticket 5) — ⏸️ POSPUESTO. Diego confirmó que en principio es copia redundante, pero pide esperar a que el circuito de EVWEB (y Traditum) esté validado al 100% en producción — hoy todavía hay fojas de prueba subidas sin completar. Prueba pendiente antes de retomar: cargar fojas reales a la cola EVWEB y confirmar que pasan solas a estado "listo" (ver detalle en Ticket 5). No arrancar hasta que Diego lo confirme explícitamente.
 
 Cada ticket lo implementa Cursor; Claude audita el resultado contra este documento antes de darlo por cerrado.
