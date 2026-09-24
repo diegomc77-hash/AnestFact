@@ -295,6 +295,75 @@ function loadAdminDemoAlerts(){
   });
 }
 
+function adminFmtBytes(n){
+  if(n == null || isNaN(n)) return '—';
+  var u = ['B','KB','MB','GB'];
+  var v = Number(n);
+  var i = 0;
+  while(v >= 1024 && i < u.length - 1){ v /= 1024; i++; }
+  return (i === 0 ? v : v.toFixed(v >= 10 ? 1 : 2)) + ' ' + u[i];
+}
+
+function adminBarTone(pct){
+  if(pct >= 85) return 'danger';
+  if(pct >= 60) return 'warn';
+  return '';
+}
+
+function adminInfraBar(label, used, limit, hideIfNull){
+  if(used == null && hideIfNull){
+    return '<div class="admin-infra-row"><div class="admin-infra-lbl"><span>'+adminEscape(label)+'</span><span>—</span></div>'
+      +'<p class="admin-infra-meta">Disponible cuando exista el bucket Storage (migración 025).</p></div>';
+  }
+  var lim = Number(limit) || 1;
+  var u = Number(used) || 0;
+  var pct = Math.max(0, Math.min(100, Math.round((u / lim) * 1000) / 10));
+  var tone = adminBarTone(pct);
+  return '<div class="admin-infra-row"><div class="admin-infra-lbl"><span>'+adminEscape(label)+'</span>'
+    +'<span>'+adminEscape(adminFmtBytes(u))+' / '+adminEscape(adminFmtBytes(lim))+' ('+pct+'%)</span></div>'
+    +'<div class="admin-bar"><div class="admin-bar-fill'+(tone?' '+tone:'')+'" style="width:'+pct+'%"></div></div></div>';
+}
+
+function loadAdminInfraUsage(){
+  var box = document.getElementById('admin-infra-usage');
+  if(!box) return;
+  box.innerHTML = '<p class="admin-muted">Cargando…</p>';
+  adminRpc('af_admin_infra_usage', {})
+    .then(function(j){
+      if(!j || j.ok === false){
+        box.innerHTML = '<p class="admin-muted" style="color:var(--red)">Sin datos</p>';
+        return;
+      }
+      var lim = j.limits || {};
+      var html = '';
+      html += adminInfraBar('Base de datos', j.db_size_bytes, lim.db_bytes || 524288000, false);
+      html += adminInfraBar('Storage (adjuntos)', j.storage_size_bytes, lim.storage_bytes || 1073741824, true);
+      var mauLim = lim.mau || 50000;
+      var mau = Number(j.mau_count) || 0;
+      var mauPct = Math.max(0, Math.min(100, Math.round((mau / mauLim) * 1000) / 10));
+      var mauTone = adminBarTone(mauPct);
+      html += '<div class="admin-infra-row"><div class="admin-infra-lbl"><span>MAU (últimos 30 días)</span>'
+        +'<span>'+mau+' / '+mauLim+' ('+mauPct+'%)</span></div>'
+        +'<div class="admin-bar"><div class="admin-bar-fill'+(mauTone?' '+mauTone:'')+'" style="width:'+mauPct+'%"></div></div></div>';
+      html += '<div class="admin-infra-meta">Filas · datos: '+(j.datos_rows!=null?j.datos_rows:'—')
+        +' · pacientes: '+(j.pacientes_rows!=null?j.pacientes_rows:'—')
+        +' · qr_tokens: '+(j.qr_tokens_rows!=null?j.qr_tokens_rows:'—')
+        +' · valoraciones: '+(j.valoraciones_rows!=null?j.valoraciones_rows:'—')
+        +' · vínculos: '+(j.vinculos_rows!=null?j.vinculos_rows:'—')+'</div>';
+      html += '<p class="admin-infra-meta">Egress: revisar en supabase.com/dashboard (no expuesto por SQL).</p>';
+      if(j.ts) html += '<p class="admin-infra-meta">Actualizado: '+adminEscape(String(j.ts))+'</p>';
+      box.innerHTML = html;
+    })
+    .catch(function(e){
+      var msg = e && e.message ? String(e.message) : String(e);
+      if(msg.indexOf('af_admin_infra_usage') >= 0 || msg.indexOf('42883') >= 0 || msg.indexOf('PGRST202') >= 0 || msg.indexOf('Could not find') >= 0){
+        box.innerHTML = '<p class="admin-muted" style="color:var(--red)">Falta ejecutar en Supabase: 026_admin_infra_usage.sql</p>';
+      } else {
+        box.innerHTML = '<p class="admin-muted" style="color:var(--red)">Error: '+adminEscape(msg)+'</p>';
+      }
+    });
+}
+
 function loadAdminPanel(){
   if(!isAdmin()){
     adminSetStatus('Acceso denegado', false);
@@ -304,6 +373,7 @@ function loadAdminPanel(){
   _adminPlanFetch = null; // forzar lista fresca al abrir panel
   loadAdminPlanRequests();
   loadAdminDemoAlerts();
+  loadAdminInfraUsage();
   adminRpc('af_admin_list_users')
     .then(function(users){
       users = users || [];
