@@ -164,9 +164,9 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
+- **Ticket 11 CERRADO** (2026-09-24): 4 pruebas Diego OK (Mayo+PAMI, Mayo+ART/demás, Mayo+APROSS, Aero+IOSFA). Merge FF a **main** `124c4f2` (PWA **13.14** / ext **0.6.28**).
 - **UI toast + Aero/IOSFA:** PWA **13.14** — toast wrap si msg >50 chars; `onSanChange` autocompleta `#f-obra` = IOSFA al elegir Aeronáutico.
 - **Sync payload / timeout 57014:** PWA **13.13** — `syncBuildCloudSafePayload` migra data-URLs → IDB y sube solo meta (ya no rehidrata blobs a `anesfact_datos`). Helpers `afDocsAuditInlineData` / `afSyncMeasureRemoteRowSize` / `afSyncRepairInlineDocsAndPush`. Pendiente: Diego logueado → medir fila antes/después.
-- **Ticket 11 (riesgos facturación EVWEB):** rama `ticket-11-evweb-docs` — PWA **13.12** + ext **0.6.28**. 11a–11e + PDF anest html2canvas/jsPDF (13.11) + validate Aero solo IOSFA. Pendiente smoke Diego + merge a main.
 - **Infra:** ver `docs/AVISO_INFRA_GRANTS_MIGRACION.md`. **Ext 0.6.28**. PWA **13.07**. **Ticket 5** POSPUESTO.
 - **Búsqueda NOM + favoritos:** PWA **12.95** — `buscarNom` rankea prefijo de palabra → substring desc → código exacto (sin sección). Estrellitas NOM (`af_nom_favs_<uid>`). Favoritos obra por institución: `af_obra_favs_<uid>_<f-san>` (semilla desde clave global vieja o Huerta 15).
 - **evweb obesidad + prácticas:** PWA **12.93+** / ext **0.6.25** — catálogo **25885** / **15** obras. **Pendiente smoke:** foja mutual nueva + cola EVWEB.
