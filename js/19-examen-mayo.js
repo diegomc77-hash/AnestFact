@@ -303,6 +303,7 @@ function renderFojaPorSanatorio(){
   var aea=document.getElementById('aero-evweb-actions');
   var esAero=san.toLowerCase().indexOf('aero')>=0||san.toLowerCase().indexOf('aeron')>=0;
   if(aea)aea.style.display=(!esMayo&&esAero)?'block':'none';
+  if(!esMayo&&esAero&&typeof afRenderEvwebQueueHub==='function')afRenderEvwebQueueHub();
   var bqx=document.getElementById('btn-foja-qx');
   if(bqx){
     var qxOn=typeof afFojaQxEnabled==='function'&&afFojaQxEnabled(san);

@@ -109,7 +109,7 @@ function assertPlanServer(funcion){
     return Promise.resolve({ ok: false, error: 'no_auth' });
   }
   if(afRpcForceFail()){
-    return Promise.resolve({ ok: false, error: 'rpc_fail' });
+    return Promise.resolve({ ok: false, error: 'rpc_fail', detail: 'AF_TEST_RPC_FAIL' });
   }
   var san = afSanatorioAssertNombre();
   var cacheKey = funcion + ':' + (USER_PLAN || '') + ':' + san;
@@ -121,15 +121,30 @@ function assertPlanServer(funcion){
     headers: afSupabaseHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify({ p_feature: funcion || '', p_sanatorio: san })
   }).then(function(r){
-    if(!r.ok) throw new Error('rpc '+r.status);
+    if(!r.ok){
+      return r.text().then(function(t){
+        return {
+          ok: false,
+          error: 'rpc_fail',
+          status: r.status,
+          detail: String(t || '').slice(0, 240)
+        };
+      });
+    }
     return r.json();
   }).then(function(j){
+    if(j && j.ok === false && j.error === 'rpc_fail') return j;
     _planAssertCache[cacheKey] = { t: Date.now(), v: j };
     if(j && j.plan && !USER_IS_ADMIN) USER_PLAN = j.plan;
     if(j && j.sanatorios && USER_PROFILE) USER_PROFILE.sanatorios_permitidos = j.sanatorios;
     return j;
-  }).catch(function(){
-    return { ok: false, error: 'rpc_fail' };
+  }).catch(function(e){
+    try { console.warn('[AF] assertPlanServer catch', e); } catch (eLog) {}
+    return {
+      ok: false,
+      error: 'rpc_fail',
+      detail: String(e && e.message || e)
+    };
   });
 }
 
@@ -262,7 +277,13 @@ function checkPlan(funcion){
 function handleAssertFail(res, funcion){
   if(!res || res.ok) return true;
   if(res.error === 'rpc_fail'){
-    if(typeof toast === 'function') toast('No se pudo verificar el plan. Reintentá.');
+    var tip = '';
+    if(res.status) tip += ' HTTP ' + res.status;
+    if(res.detail) tip += (tip ? ' · ' : ' ') + String(res.detail).slice(0, 100);
+    if(typeof toast === 'function'){
+      toast('No se pudo verificar el plan.' + (tip ? tip : ' Reintentá.'));
+    }
+    try { console.warn('[AF] assertPlanServer rpc_fail', res); } catch (eW) {}
     return false;
   }
   if(res.error === 'bloqueado'){ mostrarMensajeBloqueado(); return false; }
