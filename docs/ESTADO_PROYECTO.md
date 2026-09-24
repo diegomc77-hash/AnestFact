@@ -164,7 +164,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- **Ticket 11 (riesgos facturación EVWEB):** PWA **13.07** + ext **0.6.28** — 11a paciente en FILL_PRACS; 11b no autogen Geclisa + bloqueo qx/anest; 11c modal confirm Aero; 11d APROSS solo auth; 11e aviso faltantes por mutual. Docs: `AVISO` §11 + `ROADMAP_AUTORIZACIONES_EVWEB.md`. Pendiente smoke Diego + auditoría Claude.
+- **Ticket 11 (riesgos facturación EVWEB):** rama `ticket-11-evweb-docs` — PWA **13.12** + ext **0.6.28**. 11a–11e + PDF anest html2canvas/jsPDF (13.11) + validate Aero solo IOSFA (`afEvwebQueueValidate`). Pendiente smoke Diego + merge a main.
 - **Infra:** ver `docs/AVISO_INFRA_GRANTS_MIGRACION.md`. **Ext 0.6.28**. PWA **13.07**. **Ticket 5** POSPUESTO.
 - **Búsqueda NOM + favoritos:** PWA **12.95** — `buscarNom` rankea prefijo de palabra → substring desc → código exacto (sin sección). Estrellitas NOM (`af_nom_favs_<uid>`). Favoritos obra por institución: `af_obra_favs_<uid>_<f-san>` (semilla desde clave global vieja o Huerta 15).
 - **evweb obesidad + prácticas:** PWA **12.93+** / ext **0.6.25** — catálogo **25885** / **15** obras. **Pendiente smoke:** foja mutual nueva + cola EVWEB.

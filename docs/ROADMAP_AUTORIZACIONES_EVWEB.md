@@ -14,7 +14,7 @@ _Regla de negocio confirmada con Diego (2026-09-24). Implementación: Ticket 11 
 
 | Sanatorio | Autogen PDF anestésica (`afGenerateAnestDocForEvweb`) |
 |---|---|
-| **Hospital Aeronáutico** | Permitido, **solo** si falta `docs.anest` y la mutual no es APROSS. Debe pasar por modal `afConfirmAdjunto` (Ticket 11c). |
+| **Hospital Aeronáutico** | Permitido, **solo** si falta `docs.anest` y la mutual no es APROSS. Debe pasar por modal `afConfirmAdjunto` (Ticket 11c). Encolar solo con obra mapeada **IOSFA** (`105`); si no, `afEvwebQueueValidate` bloquea. |
 | **Institución Geclisa** (p.ej. Mayo) | **Nunca** autogenerar. Exigir fojas reales (salvo APROSS). |
 
 ## Relacionado

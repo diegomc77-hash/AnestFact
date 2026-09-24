@@ -333,6 +333,10 @@ function afEvwebQueueValidate(i){
   // Ticket 9a: si hay prácticas, cada una debe tener codigoEvweb (auto o manual).
   // Sin prácticas → no bloquea (distinto de "con prácticas sin código").
   var obraValue = afeMapObra(i.obra);
+  // Aero solo factura IOSFA. No toca docs requeridos (grupo genérico + auth).
+  if (afEvwebIsAeroSan(i) && obraValue && obraValue !== AFE_OBRA_MAP['IOSFA']) {
+    e.push('Hospital Aeronáutico solo atiende IOSFA — revisá la obra social cargada en esta foja');
+  }
   var pracSnaps = afeSnapshotPracs(i.pracs, obraValue);
   if (pracSnaps.length) {
     pracSnaps.forEach(function(p){
