@@ -195,6 +195,10 @@ function afDocMetaFromFull(doc) {
   if (doc.fuente) meta.fuente = doc.fuente;
   if (doc.size != null) meta.size = doc.size;
   else if (doc.data) meta.size = String(doc.data).length;
+  if (doc.storage && doc.storagePath) {
+    meta.storage = true;
+    meta.storagePath = doc.storagePath;
+  }
   return meta;
 }
 
@@ -319,11 +323,85 @@ function afDocIdbDelete(intervId, tipo) {
     });
 }
 
+/** ¿doc.data es un data-URL completo (no pasó por IDB/Storage)? */
+function afDocsIsInlineDataUrl(d) {
+  return !!(d && typeof d.data === 'string' && d.data.indexOf('data:') === 0);
+}
+
+/**
+ * Diagnóstico: fojas con docs[slot].data aún embebido (payload sync hinchado).
+ * No muda datos. Seguro para consola: no incluye el blob ni nombres reales largos.
+ */
+function afDocsAuditInlineData(list) {
+  var report = {
+    fojas: 0,
+    inlineCount: 0,
+    inline: [],
+    totalChars: 0,
+    metaIdb: 0,
+    metaStorage: 0,
+    alias: 0
+  };
+  (list || []).forEach(function (it) {
+    if (!it || !it.docs) return;
+    report.fojas++;
+    Object.keys(it.docs).forEach(function (slot) {
+      var d = it.docs[slot];
+      if (!d) return;
+      if (d.aliasOf && !d.data) {
+        report.alias++;
+        return;
+      }
+      if (afDocsIsInlineDataUrl(d)) {
+        report.inlineCount++;
+        report.totalChars += d.data.length;
+        report.inline.push({
+          id: String(it.id),
+          slot: slot,
+          chars: d.data.length,
+          kb: Math.round(d.data.length / 1024),
+          fuente: d.fuente || '',
+          nombre: (d.nombre || '').slice(0, 40)
+        });
+      } else if (d.idb) report.metaIdb++;
+      else if (d.storage) report.metaStorage++;
+    });
+  });
+  report.totalKB = Math.round(report.totalChars / 1024);
+  report.totalMB = Math.round((report.totalChars / 1048576) * 100) / 100;
+  return report;
+}
+
+/**
+ * Copia para anesfact_datos: sin data-URL. Deja meta idb/storage/alias
+ * (mismo criterio que afCommitAdjunto tras afDocIdbPut).
+ */
+function afDocsStripDataForCloudSync(list) {
+  return (list || []).map(function (it) {
+    if (!it || !it.docs) return it;
+    var copy = Object.assign({}, it, { docs: {} });
+    Object.keys(it.docs).forEach(function (slot) {
+      var d = it.docs[slot];
+      if (!d) return;
+      if (d.aliasOf && !d.data) {
+        copy.docs[slot] = { aliasOf: d.aliasOf, fuente: d.fuente };
+        return;
+      }
+      if (d.data) {
+        copy.docs[slot] = afDocMetaFromFull(d);
+        return;
+      }
+      copy.docs[slot] = d;
+    });
+    return copy;
+  });
+}
+
 /** Mueve data URLs de una foja a IDB; deja metadata en el objeto. */
 function afDocsDetachIntervToIdb(it) {
   if (!it || !it.id || !it.docs) return Promise.resolve(it);
   var id = String(it.id);
-  var slots = ['anest', 'qx', 'auth'];
+  var slots = Object.keys(it.docs);
   var chain = Promise.resolve();
   slots.forEach(function (tipo) {
     chain = chain.then(function () {
@@ -399,7 +477,7 @@ function afDocsResolveWithCache(docs, tipo, intervId) {
   return d;
 }
 
-/** Para sync push: clona intervs con data rehidratada desde IDB/mem. */
+/** Para sync push / colas: clona intervs con data rehidratada desde IDB/mem (sigue trayendo data). */
 function afDocsHydrateIntervsForSync(intervs) {
   var list = intervs || [];
   return afDocsWarmCacheForList(list).then(function () {
@@ -416,7 +494,9 @@ function afDocsHydrateIntervsForSync(intervs) {
             data: full.data,
             fecha: full.fecha,
             fuente: full.fuente,
-            size: full.size
+            size: full.size,
+            storage: it.docs[tipo].storage || full.storage,
+            storagePath: it.docs[tipo].storagePath || full.storagePath
           };
         } else if (it.docs[tipo].aliasOf) {
           copy.docs[tipo] = {

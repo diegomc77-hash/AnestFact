@@ -336,10 +336,13 @@ function toast(msg, opts){
   t.textContent='';
   t.innerHTML='';
   t.classList.remove('toast-action');
+  t.classList.remove('toast-wrap');
+  var text=String(msg==null?'':msg);
   var span=document.createElement('span');
   span.className='toast-msg';
-  span.textContent=String(msg==null?'':msg);
+  span.textContent=text;
   t.appendChild(span);
+  if(text.length>50)t.classList.add('toast-wrap');
   var ms=opts.ms||2600;
   if(opts.actionLabel&&typeof opts.onAction==='function'){
     t.classList.add('toast-action');
@@ -420,6 +423,18 @@ function onSanChange(){
   setTimeout(renderFojaPorSanatorio,50);
   var aw=document.getElementById('f-aero-wrap');
   if(aw)aw.style.display=s==='Hospital Aeronáutico'?'block':'none';
+  // Aero siempre IOSFA (default editable; no limpiar al salir de Aero)
+  var isAero=(typeof afEvwebIsAeroSan==='function')
+    ? afEvwebIsAeroSan(s)
+    : (typeof afIsAeroInterv==='function' ? !!afIsAeroInterv({san:s}) : s==='Hospital Aeronáutico');
+  if(isAero){
+    var obraEl=document.getElementById('f-obra');
+    if(obraEl){
+      obraEl.value='IOSFA';
+      if(typeof S!=='undefined'&&S.cur)S.cur.obra='IOSFA';
+      if(typeof renderPracs==='function'){try{renderPracs();}catch(eP){}}
+    }
+  }
   var sw=document.getElementById('f-sisalud-ubic-wrap');
   if(sw)sw.style.display=(typeof afFojaEsSisalud==='function'&&afFojaEsSisalud(s))?'block':'none';
   if(typeof afSyncSalaInstUi==='function')afSyncSalaInstUi();

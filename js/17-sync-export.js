@@ -321,6 +321,124 @@ function syncApplyMergedIntervs(merged,remoteMeta){
   return Promise.resolve(finish(merged||[]));
 }
 
+/**
+ * Payload para anesfact_datos: migra data-URLs → IDB y NUNCA rehidrata blobs
+ * al JSON de la nube (eso hinchaba ~MB y disparaba 57014 statement timeout).
+ * Si hay Ticket 2 (Storage), sube y deja refs; si no, solo meta idb.
+ */
+function syncBuildCloudSafePayload(intervs){
+  var list0=intervs||[];
+  var audit=typeof afDocsAuditInlineData==='function'?afDocsAuditInlineData(list0):null;
+  if(audit&&audit.inlineCount){
+    try{console.warn('[AF sync] data-URLs inline → IDB',audit.inlineCount,audit.totalKB+'KB');}catch(eA){}
+  }
+  var detach=typeof afDocsDetachListToIdb==='function'
+    ? afDocsDetachListToIdb(list0)
+    : Promise.resolve(list0);
+  return detach.then(function(list){
+    if(typeof S!=='undefined')S.intervs=list;
+    try{if(typeof saveIntervsToStorage==='function')saveIntervsToStorage();}catch(eS){}
+    try{if(typeof afStripLocalDocQueues==='function')afStripLocalDocQueues();}catch(eQ){}
+    var forCloud;
+    if(typeof afDocsPayloadForStorageSync==='function'&&typeof afDocsHydrateIntervsForSync==='function'){
+      forCloud=afDocsHydrateIntervsForSync(list).then(function(hydrated){
+        return afDocsPayloadForStorageSync(hydrated).then(function(ready){
+          // Seguridad: aunque falle algún upload, no mandar data-URL a la tabla
+          return typeof afDocsStripDataForCloudSync==='function'
+            ? afDocsStripDataForCloudSync(ready)
+            : ready;
+        });
+      });
+    }else if(typeof afDocsStripDataForCloudSync==='function'){
+      forCloud=Promise.resolve(afDocsStripDataForCloudSync(list));
+    }else{
+      forCloud=Promise.resolve(list);
+    }
+    return forCloud.then(function(ready){
+      var data=buildSyncPayloadFromIntervs(ready);
+      data.total=data.intervs.length;
+      try{
+        var bodyKB=Math.round(JSON.stringify(data).length/1024);
+        console.log('[AF sync] payload cloud',bodyKB+'KB','fojas',data.total,
+          audit&&audit.inlineCount?('migratedInline='+audit.inlineCount):'');
+      }catch(eL){}
+      return data;
+    });
+  });
+}
+
+/** Tamaño real de la fila del usuario en anesfact_datos (chars del JSON `datos`). */
+function afSyncMeasureRemoteRowSize(){
+  var clave=getSyncClave();
+  if(!clave||typeof afSupabaseUrl!=='function'){
+    return Promise.resolve({ok:false,error:'no_clave'});
+  }
+  var uid=(typeof AF_AUTH!=='undefined'&&AF_AUTH.getUserId)?AF_AUTH.getUserId():'';
+  var u=afSupabaseUrl()+'/rest/v1/anesfact_datos?clave=eq.'+encodeURIComponent(clave)+
+    '&select=clave,updated_at,datos&limit=1';
+  if(uid)u+='&owner_id=eq.'+encodeURIComponent(uid);
+  return fetch(u,{headers:afSupabaseHeaders()}).then(function(r){
+    if(!r.ok){
+      return r.text().then(function(t){
+        return {ok:false,error:'HTTP '+r.status,tip:String(t||'').slice(0,120)};
+      });
+    }
+    return r.json().then(function(rows){
+      if(!rows||!rows.length)return {ok:true,empty:true,clave:clave,chars:0,kb:0,mb:0};
+      var raw=rows[0].datos;
+      var chars=typeof raw==='string'?raw.length:JSON.stringify(raw||'').length;
+      return {
+        ok:true,
+        empty:false,
+        clave:rows[0].clave||clave,
+        updated_at:rows[0].updated_at||'',
+        chars:chars,
+        kb:Math.round(chars/1024),
+        mb:Math.round((chars/1048576)*100)/100
+      };
+    });
+  }).catch(function(e){
+    return {ok:false,error:String((e&&e.message)||e)};
+  });
+}
+
+/**
+ * Diagnóstico + migración IDB + push. Loguea tamaño remoto antes/después.
+ * Uso: afSyncRepairInlineDocsAndPush() en consola (logueado).
+ */
+function afSyncRepairInlineDocsAndPush(opts){
+  opts=opts||{};
+  var silent=!!opts.silent;
+  var before=null;
+  var auditLocal=typeof afDocsAuditInlineData==='function'
+    ? afDocsAuditInlineData(typeof S!=='undefined'?S.intervs:[])
+    : null;
+  try{console.log('[AF sync repair] audit local',auditLocal);}catch(e0){}
+  return afSyncMeasureRemoteRowSize().then(function(m0){
+    before=m0;
+    try{console.log('[AF sync repair] remoto ANTES',m0);}catch(e1){}
+    if(!silent&&typeof syncStatus==='function'){
+      syncStatus('Reparando adjuntos y subiendo…','info');
+    }
+    return syncPrepareMergedPayload();
+  }).then(function(data){
+    return syncGuardarSupabase(data,silent);
+  }).then(function(){
+    return afSyncMeasureRemoteRowSize();
+  }).then(function(m1){
+    try{console.log('[AF sync repair] remoto DESPUÉS',m1,'ANTES',before);}catch(e2){}
+    if(!silent&&typeof toast==='function'){
+      var a=before&&before.kb!=null?before.kb+'KB':'?';
+      var b=m1&&m1.kb!=null?m1.kb+'KB':'?';
+      toast('Sync OK — nube '+a+' → '+b);
+    }
+    return {ok:true,before:before,after:m1,auditLocal:auditLocal};
+  }).catch(function(e){
+    try{console.error('[AF sync repair] FAIL',e);}catch(e3){}
+    return {ok:false,error:String((e&&e.message)||e),before:before,auditLocal:auditLocal};
+  });
+}
+
 function syncPrepareMergedPayload(){
   if(typeof afEmergencyNoSync==='function'&&afEmergencyNoSync()){
     return Promise.reject(new Error('emergency_no_sync'));
@@ -337,14 +455,7 @@ function syncPrepareMergedPayload(){
       base=Promise.resolve(syncApplyMergedIntervs(merged,remote)).then(function(){ return S.intervs; });
     }
     return base.then(function(intervs){
-      var hydrate=typeof afDocsHydrateIntervsForSync==='function'
-        ? afDocsHydrateIntervsForSync(intervs)
-        : Promise.resolve(intervs);
-      return hydrate.then(function(hydrated){
-        var data=buildSyncPayloadFromIntervs(hydrated);
-        data.total=data.intervs.length;
-        return data;
-      });
+      return syncBuildCloudSafePayload(intervs);
     });
   });
 }
@@ -369,11 +480,7 @@ function syncPushAfterDelete(deletedId){
     _syncBusy=true;
     S.intervs=afFilterDeletedIntervs(S.intervs||[]);
     try{saveIntervsToStorage();}catch(eSave){}
-    var hydrate=typeof afDocsHydrateIntervsForSync==='function'
-      ? afDocsHydrateIntervsForSync(S.intervs)
-      : Promise.resolve(S.intervs);
-    return hydrate.then(function(hydrated){
-      var data=buildSyncPayloadFromIntervs(hydrated);
+    return syncBuildCloudSafePayload(S.intervs).then(function(data){
       try{
         console.log('[AFG sync] push post-delete START',{
           deletedId:id,
@@ -549,10 +656,12 @@ function syncGuardarSupabase(data,silent){
   var row={clave:clave,datos:JSON.stringify(data)};
   var oid=(typeof AF_AUTH!=='undefined'&&AF_AUTH.getUserId)?AF_AUTH.getUserId():'';
   if(oid)row.owner_id=oid;
+  var bodyStr=JSON.stringify(row);
+  var bodyKB=Math.round(bodyStr.length/1024);
   return fetch(afSupabaseUrl()+'/rest/v1/anesfact_datos',{
     method:'POST',
     headers:afSupabaseHeaders({'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'}),
-    body:JSON.stringify(row)
+    body:bodyStr
   }).then(function(r){
     if(r.ok||r.status===201||r.status===204){
       _lastSyncPush=Date.now();
@@ -560,7 +669,19 @@ function syncGuardarSupabase(data,silent){
       else syncAutoStatusUpdate();
       return true;
     }
-    return r.text().then(function(t){throw new Error('Supabase HTTP '+r.status+': '+t.slice(0,100));});
+    return r.text().then(function(t){
+      var tip=String(t||'').slice(0,180);
+      try{console.warn('[AF] syncGuardarSupabase fail',r.status,bodyKB+'KB',tip);}catch(eL){}
+      if(/demo_sync_bloqueado/i.test(tip)){
+        throw new Error(tip.indexOf('vencida')>=0
+          ? 'Demo vencida — no se puede subir a la nube'
+          : 'Demo: tope semanal de fojas en la nube (5)');
+      }
+      if(r.status===413||bodyKB>900){
+        throw new Error('Payload sync demasiado grande ('+bodyKB+' KB). Liberá adjuntos o avisá a Diego.');
+      }
+      throw new Error('Supabase HTTP '+r.status+': '+tip);
+    });
   });
 }
 
@@ -1103,7 +1224,8 @@ function renderDocBadges(){
     var hasSlot=!!raw;
     var hasData=!!(d&&d.data);
     var pendingIdb=!!(raw&&raw.idb&&!hasData&&!raw.aliasOf);
-    if(hasSlot&&(hasData||pendingIdb||raw.aliasOf)){
+    var pendingStorage=!!(raw&&raw.storage&&raw.storagePath&&!hasData&&!raw.aliasOf);
+    if(hasSlot&&(hasData||pendingIdb||pendingStorage||raw.aliasOf)){
       badge.style.display='inline-block';
       var isImg=hasData&&d.tipo&&d.tipo.startsWith('image/');
       var sub=d&&d.aliasOf
@@ -1144,6 +1266,14 @@ function verDoc(tipo){
   var intervId=S.cur&&S.cur.id;
   var d=afResolveDoc(docs,tipo);
   if(d&&d.data){afOpenDocData(d);return;}
+  if(typeof afDocEnsureLocalData==='function'){
+    if(typeof toast==='function')toast('Descargando adjunto…');
+    afDocEnsureLocalData(docs,tipo,intervId).then(function(full){
+      if(!full||!full.data){if(typeof toast==='function')toast('Documento no disponible');return;}
+      afOpenDocData(full);
+    });
+    return;
+  }
   var raw=docs[tipo];
   var srcTipo=(raw&&raw.aliasOf)?raw.aliasOf:tipo;
   if(intervId&&typeof afDocIdbGet==='function'&&((raw&&raw.idb)||(docs[srcTipo]&&docs[srcTipo].idb))){
@@ -1200,6 +1330,10 @@ function descargarDoc(tipo){
   }
   var d=afResolveDoc(docs,tipo);
   if(d&&d.data){doDl(d);return;}
+  if(typeof afDocEnsureLocalData==='function'){
+    afDocEnsureLocalData(docs,tipo,intervId).then(function(full){ doDl(full); });
+    return;
+  }
   var raw=docs[tipo];
   var srcTipo=(raw&&raw.aliasOf)?raw.aliasOf:tipo;
   if(intervId&&typeof afDocIdbGet==='function'&&((raw&&raw.idb)||(docs[srcTipo]&&docs[srcTipo].idb))){

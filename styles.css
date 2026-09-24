@@ -102,6 +102,7 @@ body.has-dock #toast{bottom:var(--dock-clear)}
 body:has(#view-nueva.active) #toast,body:has(#view-foja.active) #toast{bottom:108px}
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1;visibility:visible}
 #toast.toast-action{display:flex;align-items:center;gap:10px;white-space:normal;pointer-events:auto;border-radius:16px;padding:10px 12px 10px 14px;line-height:1.35}
+#toast.toast-wrap{white-space:normal;text-align:left;line-height:1.35}
 #toast .toast-msg{flex:1;min-width:0}
 #toast .toast-action-btn{flex-shrink:0;border:0;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;background:var(--green);color:#052e16;font-family:inherit}
 #toast .toast-action-btn:active{opacity:.85}
