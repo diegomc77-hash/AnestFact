@@ -39,3 +39,8 @@ CREATE POLICY foja_qx_select_own ON public.anesfact_foja_qx
 
 GRANT SELECT ON public.anesfact_foja_qx TO authenticated;
 GRANT ALL ON public.anesfact_foja_qx TO service_role;
+
+-- Data API grants (docs/AVISO_INFRA_GRANTS_MIGRACION.md — post-2026-10-30)
+GRANT SELECT ON public.anesfact_foja_qx TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.anesfact_foja_qx TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.anesfact_foja_qx TO service_role;

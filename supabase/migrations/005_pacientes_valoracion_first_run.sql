@@ -132,6 +132,20 @@ CREATE POLICY foja_vinculos_insert_own ON public.anesfact_foja_vinculos
 CREATE POLICY foja_vinculos_update_own ON public.anesfact_foja_vinculos
   FOR UPDATE USING (owner_id = auth.uid());
 
+-- Data API grants (docs/AVISO_INFRA_GRANTS_MIGRACION.md — post-2026-10-30)
+GRANT SELECT ON public.anesfact_pacientes TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.anesfact_pacientes TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.anesfact_pacientes TO service_role;
+GRANT SELECT ON public.anesfact_qr_tokens TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.anesfact_qr_tokens TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.anesfact_qr_tokens TO service_role;
+GRANT SELECT ON public.anesfact_valoraciones TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.anesfact_valoraciones TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.anesfact_valoraciones TO service_role;
+GRANT SELECT ON public.anesfact_foja_vinculos TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.anesfact_foja_vinculos TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.anesfact_foja_vinculos TO service_role;
+
 -- 4) Triggers
 CREATE OR REPLACE FUNCTION public.af_set_updated_at()
 RETURNS trigger
