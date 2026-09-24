@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AnesFact GECLISA Batch (pasos 1–12)",
-  "version": "0.6.27",
+  "version": "0.6.28",
   "description": "GECLISA Mayo + evweb ADAARC (cola + idUsuario sesión).",
   "permissions": ["storage", "tabs", "scripting", "debugger", "clipboardRead", "alarms"],
   "host_permissions": [

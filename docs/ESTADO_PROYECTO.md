@@ -64,6 +64,7 @@ Prueba con nombre **prueba** y DNI ficticio cuando se pueda; en Mayo real, no co
 | `docs/DISENO_PC_HOME.md` | **Home por institución, no por foja** (PC primero, misma lógica en móvil; PC hoy = columna 520px). Leer el archivo completo antes de tocar Home/dock/layout. |
 | `docs/ROADMAP_ESCALAMIENTO.md` | Fases P/U + empaquetado + P1b GET GECLISA + **P4 Traditum** (reconocimiento 2026-09-10, sin código) + **P6 buzón auth** (idea) + **P2 regla organización catálogo** (sin duplicar especialidades). |
 | `docs/ROADMAP_EVWEB_OBESIDAD_PRACTICAS.md` | Obesidad mórbida + prácticas en cola/fill EVWEB; matching CSV APROSS/PAMI/IOSFA; ART pendiente Sole. |
+| `docs/ROADMAP_AUTORIZACIONES_EVWEB.md` | Docs por mutual (PAMI / ART / APROSS) + cuándo autogen foja Aero. Ticket 11. |
 | `docs/P2_QR_CIRUJANO.md` | P2 QR cirujano / `fojaQx`: OK Huerta + alcance Aero/públicos/Mayo (flag); gate §8 Paso 1 en auditoría. |
 | `docs/P2_PROFORMAS_CYC.md` | Puntero → `docs/proformas-cyc/` (CyC). No editar clínica acá. |
 | `docs/proformas-cyc/README.md` | P2 CyC: **13 proformas OK de semilla**; motor de código pendiente. |
@@ -163,7 +164,8 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- **Infra:** ver `docs/AVISO_INFRA_GRANTS_MIGRACION.md`. **Ext 0.6.27** en main (`c595d1a`) — fill EVWEB. PWA **13.05**. **Ticket 5** POSPUESTO.
+- **Ticket 11 (riesgos facturación EVWEB):** PWA **13.07** + ext **0.6.28** — 11a paciente en FILL_PRACS; 11b no autogen Geclisa + bloqueo qx/anest; 11c modal confirm Aero; 11d APROSS solo auth; 11e aviso faltantes por mutual. Docs: `AVISO` §11 + `ROADMAP_AUTORIZACIONES_EVWEB.md`. Pendiente smoke Diego + auditoría Claude.
+- **Infra:** ver `docs/AVISO_INFRA_GRANTS_MIGRACION.md`. **Ext 0.6.28**. PWA **13.07**. **Ticket 5** POSPUESTO.
 - **Búsqueda NOM + favoritos:** PWA **12.95** — `buscarNom` rankea prefijo de palabra → substring desc → código exacto (sin sección). Estrellitas NOM (`af_nom_favs_<uid>`). Favoritos obra por institución: `af_obra_favs_<uid>_<f-san>` (semilla desde clave global vieja o Huerta 15).
 - **evweb obesidad + prácticas:** PWA **12.93+** / ext **0.6.25** — catálogo **25885** / **15** obras. **Pendiente smoke:** foja mutual nueva + cola EVWEB.
 - **evweb upload reload (channel closed):** ext **0.6.24** — uploads en BG post-reload.

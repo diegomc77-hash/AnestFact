@@ -46,6 +46,65 @@ function afeMapSan(t){
   for (var key in AFE_SAN_MAP) { if (k.indexOf(key) !== -1) return AFE_SAN_MAP[key]; }
   return '';
 }
+
+/** Ticket 11 — mutual/institución para reglas de documentos. */
+function afEvwebIsAeroSan(sanOrInterv){
+  if (sanOrInterv && typeof sanOrInterv === 'object') {
+    if (typeof afIsAeroInterv === 'function') return !!afIsAeroInterv(sanOrInterv);
+    sanOrInterv = sanOrInterv.san;
+  }
+  var s = String(sanOrInterv || '').toLowerCase();
+  return s.indexOf('aero') >= 0 || s.indexOf('aeron') >= 0;
+}
+function afEvwebObraId(obraOrItem){
+  if (obraOrItem && typeof obraOrItem === 'object') {
+    if (obraOrItem.obraValue) return String(obraOrItem.obraValue);
+    return afeMapObra(obraOrItem.obra);
+  }
+  return afeMapObra(obraOrItem);
+}
+function afEvwebIsAprossObra(obraOrItem){
+  var id = afEvwebObraId(obraOrItem);
+  if (id === '259') return true;
+  var k = afeNorm(typeof obraOrItem === 'object' ? (obraOrItem.obra || '') : obraOrItem);
+  return k.indexOf('APROSS') >= 0;
+}
+function afEvwebIsPamiObra(obraOrItem){
+  var id = afEvwebObraId(obraOrItem);
+  if (id === '382') return true;
+  var k = afeNorm(typeof obraOrItem === 'object' ? (obraOrItem.obra || '') : obraOrItem);
+  return k.indexOf('PAMI') >= 0;
+}
+/** ¿Hay blob/meta real en la ranura? (no cuenta PDF inexistente). */
+function afEvwebIntervHasDoc(i, tipo){
+  var d = i && i.docs && i.docs[tipo];
+  if (!d) return false;
+  return !!(d.data || d.aliasOf || d.idb || d.storage || d.storagePath);
+}
+/**
+ * Slots de docs según mutual (Ticket 11b/11d/11e).
+ * APROSS → solo auth. PAMI → qx+anest. ART/otras → las 3.
+ * Institución Geclisa (no Aero): bloqueo duro de fojas en validate.
+ * Aero: no exige fojas en validate (autogen anest); sí auth si no es PAMI.
+ */
+function afEvwebRequiredDocSlots(i, opts){
+  opts = opts || {};
+  var forBlock = !!opts.forBlock;
+  if (afEvwebIsAprossObra(i)) return ['auth'];
+  if (afEvwebIsPamiObra(i)) {
+    if (forBlock && afEvwebIsAeroSan(i)) return []; // Aero+PAMI: autogen, no bloquear
+    return ['anest', 'qx'];
+  }
+  // ART / demás (salvo APROSS)
+  if (forBlock && afEvwebIsAeroSan(i)) return ['auth']; // fojas vía autogen/manual; auth sí
+  return ['anest', 'qx', 'auth'];
+}
+function afEvwebDocSlotLabel(tipo){
+  if (tipo === 'anest') return 'foja anestésica';
+  if (tipo === 'qx') return 'foja quirúrgica';
+  if (tipo === 'auth') return 'autorización';
+  return tipo;
+}
 /** Snapshot de un doc para la cola: siempre objeto completo (resuelve aliasOf). Sin data → null. */
 function afeDocSnap(docs, tipo){
   docs = docs || {};
@@ -282,6 +341,15 @@ function afEvwebQueueValidate(i){
       e.push('Práctica "'+desc+'" sin código EVWEB — resolvela en Facturación antes de encolar');
     });
   }
+  // Ticket 11b/11d: docs obligatorios según mutual / institución
+  afEvwebRequiredDocSlots(i, { forBlock: true }).forEach(function(slot){
+    if (afEvwebIntervHasDoc(i, slot)) return;
+    if (slot === 'anest' || slot === 'qx') {
+      e.push('Falta ' + afEvwebDocSlotLabel(slot) + ' de Geclisa (no se autogenera en esta institución)');
+    } else {
+      e.push('Falta ' + afEvwebDocSlotLabel(slot) + ' (docs.auth)');
+    }
+  });
   return e;
 }
 function afEvwebQueueHydrateCurFromDom(interv){
@@ -344,22 +412,17 @@ function afEvwebQueueUnresolvedPracDescs(it){
   return out;
 }
 
-/** Docs anest/qx/auth sin blob en el ítem (Ticket 9b — aviso, no bloqueo). */
+/** Docs faltantes según mutual (Ticket 9b + 11e — aviso, no bloqueo). */
 function afEvwebQueueMissingDocLabels(it){
-  function nice(k){
-    if (k === 'anest') return 'foja anestésica';
-    if (k === 'qx') return 'foja quirúrgica';
-    if (k === 'auth') return 'autorización';
-    return k;
-  }
   function hasDoc(tipo){
     var d = it && it.docs && it.docs[tipo];
     if (!d) return false;
     return !!(d.data || d.aliasOf || d.idb || d.storage || d.storagePath);
   }
+  var slots = afEvwebRequiredDocSlots(it, { forBlock: false });
   var miss = [];
-  ['anest', 'qx', 'auth'].forEach(function(t){
-    if (!hasDoc(t)) miss.push(nice(t));
+  slots.forEach(function(t){
+    if (!hasDoc(t)) miss.push(afEvwebDocSlotLabel(t));
   });
   return miss;
 }
@@ -529,6 +592,10 @@ function afEvwebQueueNotifyEnqueued(snap){
 
 function afEvwebDocsNeedAnestGenerate(interv){
   if (!interv || !interv.foja) return false;
+  // Ticket 11b: nunca autogenerar en institución Geclisa (solo Aeronáutico)
+  if (!afEvwebIsAeroSan(interv)) return false;
+  // Ticket 11d: APROSS no lleva fojas
+  if (afEvwebIsAprossObra(interv)) return false;
   var d = interv.docs && interv.docs.anest;
   if (d && (d.data || d.idb || d.storage || d.aliasOf)) return false;
   return typeof afGenerateAnestDocForEvweb === 'function';
@@ -547,14 +614,36 @@ function afEvwebEnsureAnestDoc(interv){
       toast('Generando PDF foja anestésica para evweb…');
     }
     afGenerateAnestDocForEvweb(interv).then(function(doc){
-      if (doc && doc.data) {
+      if (!doc || !doc.data) {
+        resolve(interv);
+        return;
+      }
+      function commitGenerated(){
         interv.docs = interv.docs || {};
         interv.docs.anest = doc;
         if (typeof toast === 'function') {
           toast('Foja anestésica lista para cola evweb');
         }
+        resolve(interv);
       }
-      resolve(interv);
+      // Ticket 11c: misma confirmación visual que Ticket 6 (afConfirmAdjunto)
+      if (typeof afConfirmAdjunto === 'function') {
+        afConfirmAdjunto(doc, 'anest').then(function(ok){
+          if (ok) {
+            commitGenerated();
+            return;
+          }
+          interv.__anestConfirmCancelled = true;
+          if (typeof toast === 'function') {
+            toast('No confirmaste la foja anestésica — no se agregó a la cola');
+          }
+          resolve(interv);
+        }).catch(function(){
+          commitGenerated();
+        });
+        return;
+      }
+      commitGenerated();
     }).catch(function(e){
       try { console.warn('[AF evweb] anest PDF', e); } catch (eL) {}
       if (typeof toast === 'function') {
@@ -595,6 +684,9 @@ function afEvwebQueueAdd(interv){
   function finishEnqueue(docsObj){
     var merged = Object.assign({}, interv, { docs: docsObj || interv.docs });
     return afEvwebEnsureAnestDoc(merged).then(function(withAnest){
+      if (withAnest && withAnest.__anestConfirmCancelled) {
+        return { ok: false, error: 'anest_confirm_cancelled' };
+      }
       return enqueueWithDocs(withAnest.docs);
     });
   }

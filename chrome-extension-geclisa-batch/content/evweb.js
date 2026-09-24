@@ -344,6 +344,22 @@
   async function fillEvwebPracticas(pracs, meta) {
     meta = meta || {};
     pracs = pracs || [];
+    // Ticket 11a: re-chequear paciente (el form puede haber quedado de otra foja tras uploads/reload)
+    var pacCheck = checkEvwebFormPacienteMatch({
+      pac: meta.pac,
+      dni: meta.dni,
+      nombreApellido: meta.nombreApellido
+    });
+    if (!pacCheck.ok) {
+      return {
+        ok: false,
+        error: pacCheck.error,
+        detail: pacCheck.detail,
+        attempted: 0,
+        results: [],
+        message: 'El formulario evweb ya tiene otro paciente cargado. Recarg\u00e1 la p\u00e1gina de ADAARC antes de continuar para no mezclar datos.'
+      };
+    }
     if (!pracs.length) {
       return { ok: true, skipped: true, attempted: 0, results: [] };
     }
@@ -1469,13 +1485,28 @@
       var pracs = (msg.pracs || (msg.data && msg.data.pracs) || []);
       var obesidadWant = msg.obesidadMorbida;
       if (obesidadWant == null && msg.data) obesidadWant = msg.data.obesidadMorbida;
+      var expectedPac = msg.pac != null ? msg.pac : (msg.data && msg.data.pac);
+      var expectedDni = msg.dni != null ? msg.dni : (msg.data && msg.data.dni);
+      // Ticket 11a: abortar antes de obesidad/prácticas si el form tiene otro paciente
+      var prePac = checkEvwebFormPacienteMatch({ pac: expectedPac, dni: expectedDni });
+      if (!prePac.ok) {
+        sendResponse({
+          ok: false,
+          error: prePac.error,
+          detail: prePac.detail,
+          message: 'El formulario evweb ya tiene otro paciente cargado. Recarg\u00e1 la p\u00e1gina de ADAARC antes de continuar para no mezclar datos.'
+        });
+        return true;
+      }
       var obesidadStep = null;
       if (obesidadWant != null) {
         obesidadStep = setEvwebObesidadCheckbox(!!obesidadWant);
       }
       fillEvwebPracticas(pracs, {
         tabId: msg.targetTabId || (sender && sender.tab && sender.tab.id) || null,
-        frameId: msg.targetFrameId != null ? msg.targetFrameId : selfFrameId()
+        frameId: msg.targetFrameId != null ? msg.targetFrameId : selfFrameId(),
+        pac: expectedPac,
+        dni: expectedDni
       })
         .then(function (r) {
           r = r || {};

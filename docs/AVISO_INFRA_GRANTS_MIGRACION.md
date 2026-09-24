@@ -234,4 +234,48 @@ La función que sí decide si se puede encolar, `afEvwebQueueValidate(i)` en `js
 
 Durante la auditoría del punto anterior se notó que `js/41c-docs-storage.js` (el archivo del Ticket 2, migración de adjuntos a Supabase Storage, marcado ✅ cerrado en una sesión anterior) **tampoco aparece en el `SCRIPTS` de producción** (`anestfact.diegomc77.workers.dev/js/load-scripts.js?v=13.04`). No es urgente — los adjuntos siguen guardándose como antes (base64 en `anesfact_datos`), no se rompe nada — pero indica que ese cierre pudo haberse dado solo con el reporte de Cursor, sin verificar producción como se hizo recién acá. **Pendiente:** re-auditar el Ticket 2 contra producción real antes de asumir que sigue cerrado.
 
+## 11. Ticket — riesgos de facturación en cola EVWEB (5 partes)
+
+**Origen:** Diego — foja/práctica/autorización mal cargadas en ADAARC pueden facturar mal. Regla de negocio por mutual (ver también `docs/ROADMAP_AUTORIZACIONES_EVWEB.md`):
+
+| Mutual | Fojas | Autorización |
+|---|---|---|
+| **PAMI** | Qx + Anestésica bajadas de **Geclisa**. Sin autogenerar. | No lleva. |
+| **ART y demás** (todas salvo APROSS) con Geclisa | Fojas Geclisa (reales). | Manual → `docs.auth`. |
+| **APROSS** | **No lleva fojas.** | Solo auth vía Traditum (cirugía→anestesia), manual por ahora → `docs.auth`. |
+
+**No tocar:** `fill.js`, IDs GECLISA.
+
+### 11a — paciente equivocado en ADAARC
+
+`checkEvwebFormPacienteMatch()` en `chrome-extension-geclisa-batch/content/evweb.js` solo corría en `fillPami`, antes del reload por adjuntos. El paso `AFG_EVW_FILL_PRACS` (background → `fillEvwebPracticas`) no la volvía a llamar.
+
+**Fix:** repetir el chequeo al inicio de `AFG_EVW_FILL_PRACS` / `fillEvwebPracticas`; pasar `pac`/`dni` en el mensaje desde `background.js`. Si no coincide → `form_paciente_distinto`, no agregar práctica. Ext **0.6.28**.
+
+### 11b — foja no-oficial subida para Geclisa
+
+`afEvwebEnsureAnestDoc()` / `afEvwebDocsNeedAnestGenerate()` autogeneraban PDF sin mirar institución.
+
+**Fix:** si `interv.san` **no** es Aeronáutico → nunca autogenerar. En `afEvwebQueueValidate(i)` bloquear si faltan `docs.qx` / `docs.anest` reales (institución Geclisa). Autogen solo Aeronáutico.
+
+### 11c — foja Aeronáutico sin revisión
+
+El PDF de `afGenerateAnestDocForEvweb` no pasaba por `afConfirmAdjunto` (Ticket 6).
+
+**Fix:** en `afEvwebEnsureAnestDoc()`, después de generar, pedir confirmación en el modal; si cancela → no encolar el adjunto (ni la foja a la cola).
+
+### 11d — APROSS no debe pedir fojas
+
+Con 11b, APROSS quedaría bloqueada pidiendo qx/anest.
+
+**Fix:** excluir APROSS del bloqueo de fojas; en cambio bloquear si falta `docs.auth`.
+
+### 11e — aviso de documentos faltantes según mutual
+
+`afEvwebQueueMissingDocLabels()` (Ticket 9b) trataba qx/anest/auth igual para todas.
+
+**Fix:** PAMI → avisar solo qx/anest (nunca auth). ART/otras → las 3. APROSS → solo auth (nunca fojas).
+
+**Estado (2026-09-24):** implementado en Cursor — PWA **13.07** (`js/40-evweb-queue.js`) + ext **0.6.28**. Pendiente auditoría Claude + smoke Diego.
+
 Cada ticket lo implementa Cursor; Claude audita el resultado contra este documento antes de darlo por cerrado.

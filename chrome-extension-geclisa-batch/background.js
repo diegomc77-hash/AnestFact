@@ -4682,6 +4682,9 @@ async function sendEvwebFillPami(data) {
             type: 'AFG_EVW_FILL_PRACS',
             pracs: pracs,
             obesidadMorbida: !!(data && data.obesidadMorbida),
+            // Ticket 11a: pac/dni esperados para re-chequear form tras reload de adjuntos
+            pac: data && data.pac,
+            dni: data && data.dni,
             targetFrameId: frameId,
             targetTabId: tab.id
           },
@@ -4692,8 +4695,17 @@ async function sendEvwebFillPami(data) {
         if (pracsRes && pracsRes.obesidad) {
           res.steps.obesidad = pracsRes.obesidad;
         }
+        // Ticket 11a: paciente distinto → abortar (no sumar práctica sobre otro)
+        if (pracsRes && pracsRes.error === 'form_paciente_distinto') {
+          res.ok = false;
+          res.error = 'form_paciente_distinto';
+          res.detail = pracsRes.detail;
+          res.message = pracsRes.message ||
+            'El formulario evweb ya tiene otro paciente cargado. Recargá ADAARC antes de continuar.';
+        }
         await afgDiag('sendEvwebFillPami_pracs_done', {
           ok: !!(pracsRes && pracsRes.ok),
+          error: pracsRes && pracsRes.error,
           attempted: pracsRes && pracsRes.attempted,
           leftOpen: pracsRes && pracsRes.leftOpenForManual,
           obesidad: pracsRes && pracsRes.obesidad,
@@ -4717,7 +4729,7 @@ async function sendEvwebFillPami(data) {
         await afgDiag('sendEvwebFillPami_pracs_fail', {
           error: String(ePracs && ePracs.message || ePracs)
         }, 'bg');
-        // No tumbar el fill: Huerta completa a mano (awaiting_confirm)
+        // No tumbar el fill por fallo de canal: Huerta completa a mano (awaiting_confirm)
       }
     }
 
