@@ -1114,11 +1114,51 @@
    * data: { pac, dni, fecha, hora, cirujano, edad, afiliado, obraSocial?, sanatorio?, docs? }
    * meta: { tabId, frameId } para AFG_EVW_SET_OBRA_AND_WAIT (MAIN world).
    */
+  function evwDigits(v) {
+    return String(v == null ? '' : v).replace(/\D+/g, '');
+  }
+
+  /**
+   * Evita mezclar datos de dos pacientes: si el form ya tiene un DNI/nombre
+   * cargado (de una carga anterior sin cerrar) y no coincide con el paciente
+   * que se va a llenar ahora, aborta en vez de pisar/sumar encima.
+   */
+  function checkEvwebFormPacienteMatch(data) {
+    var dniEl = document.getElementById('body_txtDni');
+    var nomEl = document.getElementById('body_txtNombreApellido');
+    var curDni = evwDigits(dniEl && dniEl.value);
+    var curNom = String((nomEl && nomEl.value) || '').trim();
+    if (!curDni && !curNom) {
+      return { ok: true };
+    }
+    var wantDni = evwDigits(data.dni);
+    var wantNom = String(data.pac || data.nombreApellido || '').trim();
+    var dniMatches = !curDni || !wantDni || curDni === wantDni;
+    var nomMatches = !curNom || !wantNom || curNom === wantNom;
+    if (dniMatches && nomMatches) {
+      return { ok: true };
+    }
+    return {
+      ok: false,
+      error: 'form_paciente_distinto',
+      detail: { curDni: curDni, curNom: curNom, wantDni: wantDni, wantNom: wantNom }
+    };
+  }
+
   async function fillPami(data, meta) {
     data = data || {};
     meta = meta || {};
     if (!hasFormSelects()) {
       return { ok: false, error: 'form_not_found', role: roleOfFrame(), href: location.href };
+    }
+    var pacCheck = checkEvwebFormPacienteMatch(data);
+    if (!pacCheck.ok) {
+      return {
+        ok: false,
+        error: pacCheck.error,
+        detail: pacCheck.detail,
+        message: 'El formulario evweb ya tiene otro paciente cargado. Recarg\u00e1 la p\u00e1gina de ADAARC antes de continuar para no mezclar datos.'
+      };
     }
 
     var steps = {};
