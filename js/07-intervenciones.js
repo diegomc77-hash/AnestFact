@@ -869,15 +869,64 @@ function afPracEvwebReset(i){
   delete x.codigoEvweb;delete x.evwebDesc;delete x.evwebParam2;delete x.evwebComplejidad;delete x.evwebMatchVia;delete x.evwebManual;
   renderPracs();
 }
+/** Ticket 13 — sync UI + i.pracs para código 9000 (solo mutuales AFE_PREANEST_OBRAS). */
+function afSyncPreanestUi(){
+  var wrap=document.getElementById('f-preanest-wrap');
+  var cb=document.getElementById('f-preanest');
+  if(!wrap||!cb||!S.cur)return;
+  var obraEl=document.getElementById('f-obra');
+  var obra=(obraEl&&obraEl.value)||S.cur.obra||'';
+  var needs=typeof afEvwebNeedsPreanest==='function'&&afEvwebNeedsPreanest(obra);
+  wrap.style.display=needs?'flex':'none';
+  if(!needs){
+    cb.checked=false;
+    if(S.cur.pracs&&S.cur.pracs.length){
+      var before=S.cur.pracs.length;
+      S.cur.pracs=S.cur.pracs.filter(function(p){return !(p&&p.esPreanest);});
+      if(S.cur.pracs.length!==before&&typeof saveIntervsToStorage==='function'){
+        try{saveIntervsToStorage();}catch(e){}
+      }
+    }
+    return;
+  }
+  var has=(S.cur.pracs||[]).some(function(p){return p&&p.esPreanest;});
+  cb.checked=!!has;
+}
+function afTogglePreanestPrac(on){
+  if(!S.cur)return;
+  if(!S.cur.pracs)S.cur.pracs=[];
+  if(on){
+    if(!S.cur.pracs.some(function(p){return p&&p.esPreanest;})){
+      S.cur.pracs.push({
+        cod:'9000',
+        desc:'EVALUACION PRE ANESTESICA-EV',
+        comp:null,
+        esPreanest:true,
+        codigoEvweb:'9000',
+        evwebDesc:'EVALUACION PRE ANESTESICA-EV',
+        evwebMatchVia:'preanest'
+      });
+    }
+  }else{
+    S.cur.pracs=S.cur.pracs.filter(function(p){return !(p&&p.esPreanest);});
+  }
+  var idx=S.intervs.findIndex(function(x){return x.id===S.cur.id;});
+  if(idx>=0)S.intervs[idx]=S.cur;
+  if(typeof saveIntervsToStorage==='function'){try{saveIntervsToStorage();}catch(e){}}
+  renderPracs();
+}
 function renderPracs(){
   var c=document.getElementById('pracs-list');if(!c||!S.cur)return;
+  afSyncPreanestUi();
   var p=S.cur.pracs||[];
   if(!p.length){c.innerHTML='<p style="font-size:12px;color:var(--text3)">Sin prácticas</p>';renderPracsAlert(0,0);return;}
   var ctx=afPracsObraCtx();
   var sinResolver=0;
   c.innerHTML=p.map(function(x,i){
     var evwebHtml;
-    if(x.evwebManual&&x.codigoEvweb){
+    if(x.esPreanest&&x.codigoEvweb){
+      evwebHtml='<div style="font-size:11px;color:var(--green);margin-top:2px">&#10003; EVWEB '+x.codigoEvweb+' &mdash; '+(x.desc||'')+' <span style="color:var(--text3)">· preanestésica</span></div>';
+    }else if(x.evwebManual&&x.codigoEvweb){
       // Ya elegida a mano: no se vuelve a calcular sola. Queda fija hasta que se resetee.
       var lowManual=(x.evwebComplejidad!=null&&x.comp!=null&&x.evwebComplejidad<x.comp);
       evwebHtml='<div style="font-size:11px;color:'+(lowManual?'var(--warn)':'var(--green)')+';margin-top:2px">&#10003; EVWEB '+x.codigoEvweb+' &mdash; '+(x.evwebDesc||'')

@@ -26,6 +26,13 @@
   <div class="card">
     <div class="ct">Pr&aacute;cticas ADAARC</div>
     <div id="pracs-evweb-alert" style="display:none;font-size:12px;color:var(--red);background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.35);border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.4"></div>
+    <div id="f-preanest-wrap" class="tog-row" style="display:none;margin-bottom:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:14px">Evaluaci&oacute;n preanest&eacute;sica (c&oacute;digo evweb 9000)</div>
+        <div style="font-size:11px;color:var(--text3)">Se suma como pr&aacute;ctica aparte en la misma carga EVWEB</div>
+      </div>
+      <label class="tog"><input type="checkbox" id="f-preanest" onchange="afTogglePreanestPrac(this.checked)"><span class="ts"></span></label>
+    </div>
     <div id="pracs-list"><p style="font-size:12px;color:var(--text3)">Sin pr&aacute;cticas</p></div>
     <div class="tile-row" style="margin-top:10px;margin-bottom:0">
       <button type="button" class="tile tile-foja" onclick="go('nom')">

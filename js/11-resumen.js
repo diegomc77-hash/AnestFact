@@ -1,6 +1,6 @@
 function renderResumen(){
   var c=document.getElementById('resumen-cont');if(!c||!S.cur)return;
-  var i=S.cur;var f=i.foja||{};
+  var i=S.cur;
   function campo(icon,label,val){
     return'<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--text3);font-weight:500;margin-bottom:3px">'+icon+' '+label+'</div>'
       +'<div class="cp-row"><span style="font-family:monospace;font-size:13px;color:'+(val?'var(--text)':'var(--text3)')+'">'+( val||'— vacío')+'</span>'
@@ -9,9 +9,19 @@ function renderResumen(){
   var mods=calcMods(i);
   var modsHtml=mods.length?'<div class="card"><div class="ct">Modificadores</div>'+mods.map(function(m){return'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span>'+m.l+'</span>'+(m.r?'<span class="badge by">+'+m.r+'%</span>':'')+(m.cp?'<span class="badge by">+'+m.cp+' comp.</span>':'')+'</div>';}).join('')+'</div>':'';
   var pracsHtml=i.pracs&&i.pracs.length?'<div class="card"><div class="ct">Prácticas ADAARC</div>'+i.pracs.map(function(p){return'<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--text3);margin-bottom:3px">'+p.cod+' · comp.'+p.comp+'</div><div class="cp-row"><span style="font-family:monospace;font-size:13px">'+p.desc+'</span><button onclick="copyVal(\''+p.cod+'\',\'Código\')" style="background:none;border:none;font-size:18px;cursor:pointer">📋</button></div></div>';}).join('')+'</div>':'';
+  var chkItems=[
+    {id:'ck1',txt:'<b>Foja anestésica</b> — impresa con firma y sello',done:typeof afEvwebIntervHasDoc==='function'?afEvwebIntervHasDoc(i,'anest'):!!(i.docs&&i.docs.anest)},
+    {id:'ck2',txt:'<b>Foja quirúrgica</b> — cargada en GECLISA o adjuntada',done:typeof afEvwebIntervHasDoc==='function'?afEvwebIntervHasDoc(i,'qx'):!!(i.docs&&i.docs.qx)},
+    {id:'ck3',txt:'<b>Autorización</b> — recibida por WhatsApp/mail',done:typeof afEvwebIntervHasDoc==='function'?afEvwebIntervHasDoc(i,'auth'):!!(i.docs&&i.docs.auth)},
+    // ck4: misma señal que marcarEnviado() — manual; no hay feedback automático de la extensión todavía
+    {id:'ck4',txt:'<b>Subida a evweb</b> — 3 documentos a ADAARC',done:i.estado==='enviado_evweb'||i.estado==='enviado_geclisa'}
+  ];
   var chkHtml='<div class="card"><div class="ct">Checklist evweb</div>'
-    +[{id:'ck1',txt:'<b>Foja anestésica</b> — impresa con firma y sello',done:!!(f.tec||f.obs)},{id:'ck2',txt:'<b>Foja quirúrgica</b> — cargada en GECLISA o adjuntada',done:false},{id:'ck3',txt:'<b>Autorización</b> — recibida por WhatsApp/mail',done:false},{id:'ck4',txt:'<b>Subida a evweb</b> — 3 documentos a ADAARC',done:false}]
-    .map(function(x){return'<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="toggleChk(\''+x.id+'\')">'+'<div class="chk-box'+(x.done?' checked':'')+'" id="'+x.id+'">'+(x.done?'✓':'')+'</div><div style="font-size:13px;color:var(--text2)">'+x.txt+'</div></div>';}).join('')+'</div>';
+    +chkItems.map(function(x){
+      return'<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border)">'
+        +'<div class="chk-box'+(x.done?' checked':'')+'" id="'+x.id+'">'+(x.done?'✓':'')+'</div>'
+        +'<div style="font-size:13px;color:var(--text2)">'+x.txt+'</div></div>';
+    }).join('')+'</div>';
   c.innerHTML=chkHtml+'<div class="card"><div class="ct">Campos para evweb</div>'
     +campo('🏥','Obra social',i.obra)+campo('📅','Fecha',fmt(i.fecha))+campo('🕐','Hora inicio',i.hora)
     +campo('👤','Paciente',i.pac)+campo('🎂','Edad',i.edad?i.edad+' años':'')+campo('🪪','DNI',i.dni)
@@ -26,7 +36,6 @@ function renderResumen(){
     +'<p style="font-size:11px;color:var(--text3);margin:-4px 0 12px;line-height:1.35">Marca local en AnesFact (Mayo → GECLISA / Aero → evweb). No consulta el sistema destino.</p>'
     +'<button class="btn btn-s" style="margin-bottom:24px;color:var(--red);border-color:rgba(239,68,68,.45)" onclick="borrarIntervencion(S.cur&&S.cur.id)">🗑 Borrar foja</button>';
 }
-function toggleChk(id){var b=document.getElementById(id);if(!b)return;var d=b.classList.contains('checked');b.classList.toggle('checked',!d);b.textContent=d?'':'✓';}
 function calcMods(i){
   var m=[];
   if(i.fecha&&i.hora){var dt=new Date(i.fecha+'T'+i.hora),h=dt.getHours(),d=dt.getDay();if(h>=20||h<7)m.push({l:'Nocturno (20–7hs)',r:35});if(d===0||(d===6&&h>=13))m.push({l:'Fin de semana',r:50});}

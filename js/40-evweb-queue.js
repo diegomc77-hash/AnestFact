@@ -19,6 +19,18 @@ var AFE_OBRA_MAP = {
   'PROVINCIA ART': '420',
   'PRODUCTORES DE FRUTAS': '70'
 };
+/** Ticket 13 — mutuales que suman código 9000 (evaluación preanestésica) como práctica extra. */
+var AFE_PREANEST_OBRAS = [
+  'PAMI',
+  'FEDERACION PATRONAL ART',
+  'OMINT ART',
+  'EXPERTA ART',
+  'ANDINA ART',
+  'BERKLEY',
+  'LA HOLANDO ART',
+  'PREVENCION',
+  'PROVINCIA ART'
+];
 var AFE_SAN_MAP = {
   'MAYO': '208',
   'SANATORIO MAYO': '208',
@@ -45,6 +57,16 @@ function afeMapSan(t){
   var k = afeNorm(t);
   for (var key in AFE_SAN_MAP) { if (k.indexOf(key) !== -1) return AFE_SAN_MAP[key]; }
   return '';
+}
+
+/** ¿La obra mapeada está en AFE_PREANEST_OBRAS? (Ticket 13 — checkbox 9000). */
+function afEvwebNeedsPreanest(obraOrItem){
+  var id = afEvwebObraId(obraOrItem);
+  if (!id || !AFE_PREANEST_OBRAS || !AFE_PREANEST_OBRAS.length) return false;
+  for (var i = 0; i < AFE_PREANEST_OBRAS.length; i++) {
+    if (AFE_OBRA_MAP[AFE_PREANEST_OBRAS[i]] === id) return true;
+  }
+  return false;
 }
 
 /** Ticket 11 — mutual/institución para reglas de documentos. */

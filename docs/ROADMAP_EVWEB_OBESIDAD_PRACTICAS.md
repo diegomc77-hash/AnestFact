@@ -28,6 +28,8 @@ Por cada práctica que Huerta carga en la foja (`S.cur.pracs[]`, código tipo `E
 
 Implementación: `data/evweb-practicas-match.js` (gen. `tools/gen-evweb-practicas-match.mjs`) + `afeResolvePracEvweb` / `afeSnapshotPracs` en `js/40-evweb-queue.js`. Solo exacto o mismos tokens. **`AFE_OBRA_MAP` (PWA 12.92):** 15 mutuales — 382 PAMI, 105 IOSFA, 259 APROSS, 228 Federación Patronal ART, 119 OMINT ART, 258 Experta ART, 433 Andina ART, 76 Horizonte, 227 Berkley, 37 OSPECOR, 5 La Holando ART, 263 Prevención, 437 APOS Mayo, 420 Provincia ART, 70 Productores de Frutas.
 
+**Ticket 13 (PWA 13.15):** código **9000** `EVALUACION PRE ANESTESICA-EV` como práctica extra (checkbox Facturación) para 9 mutuales en `AFE_PREANEST_OBRAS` (PAMI + 8 ART). CSV `docs/evweb_practicas_preanest_9000.csv` → regen match. No IOSFA / APROSS / demás.
+
 ### 2. Fill automático en EVWEB (`FILL_PAMI`, ya recibe `obesidadMorbida` y `pracs[]`) — **hecho ext 0.6.25**
 1. Tildar `body_chkObesidad` si `obesidadMorbida` es true.
 2. Por cada práctica:
