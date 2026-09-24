@@ -361,23 +361,19 @@ function _buildObsAdicionalSheet(i,obsText,signImg,pageNum,totalPages){
     +'</div>';
 }
 
-function imprimirFoja(){
-  // Defensa en profundidad: no confiar solo en el botón guarded
-  if(typeof checkPlan==='function' && !checkPlan('imprimir')) return;
-  if(typeof flushFormIntoCur==='function'&&document.getElementById('f-pac'))flushFormIntoCur();
-  if(typeof flushFojaDomIntoCur==='function'&&document.getElementById('fj-tec'))flushFojaDomIntoCur();
-  if(typeof guardar==='function'&&document.getElementById('f-pac'))guardar();
-  var i=S.cur;if(!i){toast('Complet\u00e1 los datos primero');return;}
+/** HTML completo de impresión (misma salida que imprimirFoja). Para cola evweb / PDF. */
+function afBuildFojaAnestPrintHtml(interv){
+  var i=interv||null;
+  if(!i)return '';
   var f=i.foja||{};
   _afPrintFirmaOpts={colegio:!(typeof afFojaEsSisalud==='function'&&afFojaEsSisalud(i.san))};
-  // La ventana de impresión NO incluye overlay de secreto médico (solo pantalla app)
   var signSrc=(typeof AfFirma!=='undefined'&&AfFirma.getPng&&AfFirma.getPng())||f.sign||S.signData||'';
   var signImg=signSrc?('<img src="'+signSrc+'" style="max-height:46px;max-width:130px;display:block;margin:0 auto 3px;filter:grayscale(1) brightness(0) contrast(2)">'):('<div style="height:46px"></div>');
   var drogaLines=(f.drogas||[]).map(function(d){return(d.n||'')+' '+(d.d||'')+' '+(d.v||'');}).filter(function(x){return x.trim();}).join(' \u00b7 ');
-  var vgCols=(VG.cols&&VG.cols.length)?VG.cols:(f.vg_cols&&f.vg_cols.length?f.vg_cols:[]);
-  var vgCells=(VG.cols&&VG.cols.length)?VG.cells:(f.vg_cells||{});
-  var vgObs=(VG.cols&&VG.cols.length)?VG.obs:(f.vg_obs||{});
-  var vgFluidos=(VG.cols&&VG.cols.length)?VG.fluidos:(f.vg_fluidos||{});
+  var vgCols=(VG.cols&&VG.cols.length&&S.cur&&String(S.cur.id)===String(i.id))?VG.cols:(f.vg_cols&&f.vg_cols.length?f.vg_cols:[]);
+  var vgCells=(VG.cols&&VG.cols.length&&S.cur&&String(S.cur.id)===String(i.id))?VG.cells:(f.vg_cells||{});
+  var vgObs=(VG.cols&&VG.cols.length&&S.cur&&String(S.cur.id)===String(i.id))?VG.obs:(f.vg_obs||{});
+  var vgFluidos=(VG.cols&&VG.cols.length&&S.cur&&String(S.cur.id)===String(i.id))?VG.fluidos:(f.vg_fluidos||{});
 
   var perPage=vgCols.length?_chartColsPerPage(vgCols.length):24;
   var chartChunks=[];
@@ -406,9 +402,93 @@ function imprimirFoja(){
     pagesHtml+=_buildObsAdicionalSheet(i,obsOverflow,signImg,chartChunks.length+1,totalPages);
   }
 
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Foja de Anestesia</title><style>'
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Foja de Anestesia</title><style>'
     +_buildPrintStyles()+'</style></head><body>'+pagesHtml+'</body></html>';
+}
 
+function afLoadHtml2PdfOnce(){
+  if(window.html2pdf)return Promise.resolve(window.html2pdf);
+  return new Promise(function(resolve,reject){
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    s.async=true;
+    s.onload=function(){window.html2pdf?resolve(window.html2pdf):reject(new Error('html2pdf_missing'));};
+    s.onerror=function(){reject(new Error('html2pdf_load_failed'));};
+    document.head.appendChild(s);
+  });
+}
+
+/**
+ * Genera docs.anest (PDF data URL) desde la foja — mismo layout que imprimir.
+ * Requiere red la 1a vez (html2pdf CDN). Sin imprimir / sin ventana emergente.
+ */
+function afGenerateAnestDocForEvweb(interv){
+  return new Promise(function(resolve,reject){
+    if(!interv)return reject(new Error('no_interv'));
+    if(typeof afBuildFojaAnestPrintHtml!=='function')return reject(new Error('print_html_unavailable'));
+    var html=afBuildFojaAnestPrintHtml(interv);
+    if(!html)return reject(new Error('empty_print_html'));
+    var iframe=document.createElement('iframe');
+    iframe.setAttribute('aria-hidden','true');
+    iframe.style.cssText='position:fixed;left:-10000px;top:0;width:210mm;height:297mm;border:0;visibility:hidden;';
+    document.body.appendChild(iframe);
+    var idoc=iframe.contentDocument||iframe.contentWindow.document;
+    idoc.open();
+    idoc.write(html);
+    idoc.close();
+    var signWait=700;
+    setTimeout(function(){
+      afLoadHtml2PdfOnce().then(function(h2p){
+        var el=idoc.body;
+        if(!el)throw new Error('iframe_body_missing');
+        return h2p().set({
+          margin:[4,4,4,4],
+          filename:'foja-anest.pdf',
+          image:{type:'jpeg',quality:0.92},
+          html2canvas:{scale:2,useCORS:true,logging:false},
+          jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+          pagebreak:{mode:['css','legacy']}
+        }).from(el).outputPdf('blob');
+      }).then(function(blob){
+        try{document.body.removeChild(iframe);}catch(eRm){}
+        var reader=new FileReader();
+        reader.onload=function(){
+          var base=(interv.pac||'foja-anest').replace(/[^\w\s.-áéíóúñ]/gi,'').trim().replace(/\s+/g,'-')||'foja-anest';
+          resolve({
+            nombre:base+'-anest.pdf',
+            tipo:'application/pdf',
+            data:reader.result,
+            fuente:'anesfact_print',
+            fecha:new Date().toISOString().slice(0,10)
+          });
+        };
+        reader.onerror=function(){reject(reader.error||new Error('read_blob_failed'));};
+        reader.readAsDataURL(blob);
+      }).catch(function(e){
+        try{document.body.removeChild(iframe);}catch(eRm2){}
+        reject(e);
+      });
+    },signWait);
+  });
+}
+
+function afFlushIntervDomIfCurrent(interv){
+  try{
+    if(!interv||!S.cur||String(S.cur.id)!==String(interv.id))return interv;
+    if(typeof flushFormIntoCur==='function'&&document.getElementById('f-pac'))flushFormIntoCur();
+    if(typeof flushFojaDomIntoCur==='function'&&document.getElementById('fj-tec'))flushFojaDomIntoCur();
+  }catch(e){}
+  return interv;
+}
+
+function imprimirFoja(){
+  if(typeof checkPlan==='function' && !checkPlan('imprimir')) return;
+  if(typeof flushFormIntoCur==='function'&&document.getElementById('f-pac'))flushFormIntoCur();
+  if(typeof flushFojaDomIntoCur==='function'&&document.getElementById('fj-tec'))flushFojaDomIntoCur();
+  if(typeof guardar==='function'&&document.getElementById('f-pac'))guardar();
+  var i=S.cur;if(!i){toast('Complet\u00e1 los datos primero');return;}
+  var html=afBuildFojaAnestPrintHtml(i);
+  var signSrc=(typeof AfFirma!=='undefined'&&AfFirma.getPng&&AfFirma.getPng())||(i.foja&&i.foja.sign)||S.signData||'';
   var w=window.open('','_blank');if(!w){toast('Permitir ventanas emergentes');return;}
   w.document.write(html);w.document.close();
   setTimeout(function(){w.print();},signSrc?700:400);
