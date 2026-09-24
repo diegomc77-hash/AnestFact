@@ -181,28 +181,46 @@ function _vgMarkLeft(i, n, lockCols){
   return 'calc('+AF_PRINT_VG_YCOL+' + '+(i+0.5)+' * ((100% - '+AF_PRINT_VG_YCOL+') / '+denom+'))';
 }
 
-function _buildPrintStyles(){
-  return '*{box-sizing:border-box;margin:0;padding:0}'
-    +'@page{size:A4 portrait;margin:0}'
-    +'html,body{margin:0;padding:0;background:#fff}'
-    +'.pg{width:210mm;height:297mm;max-height:297mm;padding:5mm 8mm;page-break-after:always;overflow:hidden;font-family:Arial,Helvetica,sans-serif;font-size:10.5px;color:#000;line-height:1.3;display:flex;flex-direction:column}'
-    +'.pg:last-child{page-break-after:auto}'
-    +'.pg-fill{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}'
-    +'.pg-footer{flex-shrink:0}'
-    +'.hoja-n{text-align:right;font-size:8px;font-weight:bold;color:#333;margin:-2px 0 4px}'
-    +'h1{font-size:14px;text-align:center;font-weight:bold;border-bottom:2px solid #000;padding-bottom:5px;margin-bottom:7px;letter-spacing:.07em}'
-    +'.af-pg-hdr{padding-top:4mm}'
-    +'.af-pg-hdr h1{font-size:13px;margin-bottom:4px;padding-bottom:3px}'
-    +'.af-ph{display:flex;align-items:stretch;height:13.5mm;margin:0 0 2.5mm;flex-shrink:0;overflow:hidden}'
-    +'.af-ph-png{display:block}'
-    +'.af-ph-png img{height:13.5mm;width:auto;max-width:100%;display:block;object-fit:contain}'
-    +'.af-ph-name{flex:0 0 34%;border:0.3mm solid #555;display:flex;flex-direction:column;justify-content:center;padding:0 2mm;font-weight:700;font-size:9px;letter-spacing:.05em;color:#444;line-height:1.12;text-transform:uppercase}'
-    +'.af-ph-gov{flex:1;min-width:0;height:13.5mm;object-fit:contain;object-position:left center}'
-    +'.r{display:flex;gap:5px;margin-bottom:5px;align-items:flex-end}'
-    +'.f{border-bottom:1.5px solid #000;padding:0 2px 1px;min-height:17px;flex:1;font-size:10.5px;word-wrap:break-word}'
-    +'.l{font-size:8px;color:#333;font-weight:bold;text-transform:uppercase;display:block;margin-bottom:1px}'
-    +'.s{font-size:9px;font-weight:bold;text-transform:uppercase;border-bottom:1px solid #555;margin:5px 0 3px;padding-bottom:1px}'
-    +'.chk{display:inline-block;width:10px;height:10px;border:1px solid #000;margin-right:3px;text-align:center;line-height:9px;font-size:9px;vertical-align:middle}';
+/**
+ * scope: si se pasa (ej. '.af-print-capture'), cada regla queda anidada bajo
+ * ese selector en vez de apuntar a html/body/* global — así se puede inyectar
+ * temporalmente en el <head> de la página principal (ver afGenerateAnestDocForEvweb)
+ * sin romper el resto de la UI mientras se genera el PDF.
+ */
+function _buildPrintStyles(scope){
+  var rules=[
+    '*{box-sizing:border-box;margin:0;padding:0}',
+    '@page{size:A4 portrait;margin:0}',
+    'html,body{margin:0;padding:0;background:#fff}',
+    '.pg{width:210mm;height:297mm;max-height:297mm;padding:5mm 8mm;page-break-after:always;overflow:hidden;font-family:Arial,Helvetica,sans-serif;font-size:10.5px;color:#000;line-height:1.3;display:flex;flex-direction:column}',
+    '.pg:last-child{page-break-after:auto}',
+    '.pg-fill{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}',
+    '.pg-footer{flex-shrink:0}',
+    '.hoja-n{text-align:right;font-size:8px;font-weight:bold;color:#333;margin:-2px 0 4px}',
+    'h1{font-size:14px;text-align:center;font-weight:bold;border-bottom:2px solid #000;padding-bottom:5px;margin-bottom:7px;letter-spacing:.07em}',
+    '.af-pg-hdr{padding-top:4mm}',
+    '.af-pg-hdr h1{font-size:13px;margin-bottom:4px;padding-bottom:3px}',
+    '.af-ph{display:flex;align-items:stretch;height:13.5mm;margin:0 0 2.5mm;flex-shrink:0;overflow:hidden}',
+    '.af-ph-png{display:block}',
+    '.af-ph-png img{height:13.5mm;width:auto;max-width:100%;display:block;object-fit:contain}',
+    '.af-ph-name{flex:0 0 34%;border:0.3mm solid #555;display:flex;flex-direction:column;justify-content:center;padding:0 2mm;font-weight:700;font-size:9px;letter-spacing:.05em;color:#444;line-height:1.12;text-transform:uppercase}',
+    '.af-ph-gov{flex:1;min-width:0;height:13.5mm;object-fit:contain;object-position:left center}',
+    '.r{display:flex;gap:5px;margin-bottom:5px;align-items:flex-end}',
+    '.f{border-bottom:1.5px solid #000;padding:0 2px 1px;min-height:17px;flex:1;font-size:10.5px;word-wrap:break-word}',
+    '.l{font-size:8px;color:#333;font-weight:bold;text-transform:uppercase;display:block;margin-bottom:1px}',
+    '.s{font-size:9px;font-weight:bold;text-transform:uppercase;border-bottom:1px solid #555;margin:5px 0 3px;padding-bottom:1px}',
+    '.chk{display:inline-block;width:10px;height:10px;border:1px solid #000;margin-right:3px;text-align:center;line-height:9px;font-size:9px;vertical-align:middle}'
+  ];
+  if(!scope)return rules.join('');
+  return rules.map(function(rule){
+    if(rule.indexOf('@page')===0)return ''; // @page no tiene sentido fuera de una ventana de impresión real
+    var m=rule.match(/^([^{]+)\{(.*)\}$/);
+    if(!m)return '';
+    if(m[1]==='html,body')return scope+'{'+m[2]+'}';
+    if(m[1]==='*')return scope+' *{'+m[2]+'}';
+    var selectors=m[1].split(',').map(function(s){return scope+' '+s.trim();}).join(',');
+    return selectors+'{'+m[2]+'}';
+  }).join('');
 }
 
 function _buildChartLegend(){
@@ -362,7 +380,12 @@ function _buildObsAdicionalSheet(i,obsText,signImg,pageNum,totalPages){
 }
 
 /** HTML completo de impresión (misma salida que imprimirFoja). Para cola evweb / PDF. */
-function afBuildFojaAnestPrintHtml(interv){
+/**
+ * Solo el contenido de las páginas (sin <html>/<head>/<style>) — reusado por
+ * afBuildFojaAnestPrintHtml (ventana real de impresión) y por
+ * afGenerateAnestDocForEvweb (captura en el propio documento, ver ese fix).
+ */
+function afBuildFojaAnestPagesHtml(interv){
   var i=interv||null;
   if(!i)return '';
   var f=i.foja||{};
@@ -402,6 +425,13 @@ function afBuildFojaAnestPrintHtml(interv){
     pagesHtml+=_buildObsAdicionalSheet(i,obsOverflow,signImg,chartChunks.length+1,totalPages);
   }
 
+  return pagesHtml;
+}
+
+/** HTML completo (para la ventana real de impresión — imprimirFoja). */
+function afBuildFojaAnestPrintHtml(interv){
+  var pagesHtml=afBuildFojaAnestPagesHtml(interv);
+  if(!pagesHtml)return '';
   return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Foja de Anestesia</title><style>'
     +_buildPrintStyles()+'</style></head><body>'+pagesHtml+'</body></html>';
 }
@@ -421,54 +451,91 @@ function afLoadHtml2PdfOnce(){
 /**
  * Genera docs.anest (PDF data URL) desde la foja — mismo layout que imprimir.
  * Requiere red la 1a vez (html2pdf CDN). Sin imprimir / sin ventana emergente.
+ *
+ * FIX 2026-09-24 (bug encontrado por Diego en Aeronáutico — foja subida a
+ * evweb salía como texto plano sin estilos, ilegible): la versión anterior
+ * armaba el contenido en un <iframe> con su propio documento (idoc.write) y
+ * corría html2canvas sobre iframe.contentDocument.body. html2canvas calcula
+ * estilos con window.getComputedStyle() del documento principal, no del
+ * documento del iframe — al ser un documento distinto, no encontraba el
+ * <style> que se había escrito ahí adentro y renderizaba con estilos por
+ * defecto del navegador (de ahí el texto plano sin tabla/bordes/recuadros).
+ * Fix: renderizar en un <div> agregado directo al documento principal
+ * (mismo window, mismo document.styleSheets que ve html2canvas), con el CSS
+ * de impresión inyectado con scope (".af-print-capture ...") para que no
+ * afecte el resto de la app mientras el div está en el DOM. Se saca todo
+ * (div + <style>) apenas termina, haya salido bien o mal.
  */
 function afGenerateAnestDocForEvweb(interv){
   return new Promise(function(resolve,reject){
     if(!interv)return reject(new Error('no_interv'));
-    if(typeof afBuildFojaAnestPrintHtml!=='function')return reject(new Error('print_html_unavailable'));
-    var html=afBuildFojaAnestPrintHtml(interv);
-    if(!html)return reject(new Error('empty_print_html'));
-    var iframe=document.createElement('iframe');
-    iframe.setAttribute('aria-hidden','true');
-    iframe.style.cssText='position:fixed;left:-10000px;top:0;width:210mm;height:297mm;border:0;visibility:hidden;';
-    document.body.appendChild(iframe);
-    var idoc=iframe.contentDocument||iframe.contentWindow.document;
-    idoc.open();
-    idoc.write(html);
-    idoc.close();
-    var signWait=700;
-    setTimeout(function(){
-      afLoadHtml2PdfOnce().then(function(h2p){
-        var el=idoc.body;
-        if(!el)throw new Error('iframe_body_missing');
-        return h2p().set({
-          margin:[4,4,4,4],
-          filename:'foja-anest.pdf',
-          image:{type:'jpeg',quality:0.92},
-          html2canvas:{scale:2,useCORS:true,logging:false},
-          jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-          pagebreak:{mode:['css','legacy']}
-        }).from(el).outputPdf('blob');
-      }).then(function(blob){
-        try{document.body.removeChild(iframe);}catch(eRm){}
-        var reader=new FileReader();
-        reader.onload=function(){
-          var base=(interv.pac||'foja-anest').replace(/[^\w\s.-áéíóúñ]/gi,'').trim().replace(/\s+/g,'-')||'foja-anest';
-          resolve({
-            nombre:base+'-anest.pdf',
-            tipo:'application/pdf',
-            data:reader.result,
-            fuente:'anesfact_print',
-            fecha:new Date().toISOString().slice(0,10)
-          });
-        };
-        reader.onerror=function(){reject(reader.error||new Error('read_blob_failed'));};
-        reader.readAsDataURL(blob);
-      }).catch(function(e){
-        try{document.body.removeChild(iframe);}catch(eRm2){}
-        reject(e);
+    if(typeof afBuildFojaAnestPagesHtml!=='function')return reject(new Error('print_html_unavailable'));
+    var pagesHtml=afBuildFojaAnestPagesHtml(interv);
+    if(!pagesHtml)return reject(new Error('empty_print_html'));
+
+    var SCOPE_CLASS='af-print-capture';
+    var styleEl=document.createElement('style');
+    styleEl.setAttribute('data-af-print-capture','1');
+    styleEl.textContent=_buildPrintStyles('.'+SCOPE_CLASS);
+    document.head.appendChild(styleEl);
+
+    var el=document.createElement('div');
+    el.className=SCOPE_CLASS;
+    el.setAttribute('aria-hidden','true');
+    // Fuera de pantalla pero en el flujo normal del documento (NO display:none
+    // ni visibility:hidden — html2canvas no puede rasterizar lo que no tiene
+    // layout real).
+    el.style.cssText='position:fixed;left:-10000px;top:0;width:210mm;background:#fff;';
+    el.innerHTML=pagesHtml;
+    document.body.appendChild(el);
+
+    function cleanup(){
+      try{document.body.removeChild(el);}catch(eRm){}
+      try{document.head.removeChild(styleEl);}catch(eRm2){}
+    }
+
+    // Esperar a que las imágenes (firma, encabezado institucional) terminen
+    // de cargar antes de capturar — un timeout fijo puede correr antes de
+    // que el <img> pinte, dejando ese recuadro vacío en el PDF.
+    var imgs=el.querySelectorAll('img');
+    var imgsReady=Promise.all(Array.prototype.map.call(imgs,function(img){
+      if(img.complete)return Promise.resolve();
+      return new Promise(function(res){
+        img.addEventListener('load',res,{once:true});
+        img.addEventListener('error',res,{once:true});
       });
-    },signWait);
+    }));
+
+    imgsReady.then(function(){
+      return afLoadHtml2PdfOnce();
+    }).then(function(h2p){
+      return h2p().set({
+        margin:[4,4,4,4],
+        filename:'foja-anest.pdf',
+        image:{type:'jpeg',quality:0.92},
+        html2canvas:{scale:2,useCORS:true,logging:false},
+        jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+        pagebreak:{mode:['css','legacy']}
+      }).from(el).outputPdf('blob');
+    }).then(function(blob){
+      cleanup();
+      var reader=new FileReader();
+      reader.onload=function(){
+        var base=(interv.pac||'foja-anest').replace(/[^\w\s.-áéíóúñ]/gi,'').trim().replace(/\s+/g,'-')||'foja-anest';
+        resolve({
+          nombre:base+'-anest.pdf',
+          tipo:'application/pdf',
+          data:reader.result,
+          fuente:'anesfact_print',
+          fecha:new Date().toISOString().slice(0,10)
+        });
+      };
+      reader.onerror=function(){reject(reader.error||new Error('read_blob_failed'));};
+      reader.readAsDataURL(blob);
+    }).catch(function(e){
+      cleanup();
+      reject(e);
+    });
   });
 }
 
