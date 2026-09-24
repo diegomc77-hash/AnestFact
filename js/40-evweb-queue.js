@@ -619,12 +619,37 @@ function afEvwebEnsureAnestDoc(interv){
         return;
       }
       function commitGenerated(){
+        // Queue snapshot necesita el blob (afeDocSnap). S.cur puede quedar en meta IDB.
         interv.docs = interv.docs || {};
         interv.docs.anest = doc;
-        if (typeof toast === 'function') {
-          toast('Foja anestésica lista para cola evweb');
+        function finishUi(metaOrFull){
+          try {
+            if (typeof S !== 'undefined' && S.cur && String(S.cur.id) === String(interv.id)) {
+              S.cur.docs = S.cur.docs || {};
+              S.cur.docs.anest = metaOrFull || doc;
+            }
+          } catch (eCur) {}
+          if (typeof renderDocBadges === 'function') {
+            try { renderDocBadges(); } catch (eBadge) {}
+          }
+          if (typeof toast === 'function') {
+            toast('Foja anestésica lista para cola evweb');
+          }
+          resolve(interv);
         }
-        resolve(interv);
+        var id = interv && interv.id;
+        if (id && doc && doc.data && typeof afDocIdbPut === 'function') {
+          afDocIdbPut(String(id), 'anest', doc).then(function(ok){
+            var stored = (ok && typeof afDocMetaFromFull === 'function')
+              ? afDocMetaFromFull(doc)
+              : doc;
+            finishUi(stored);
+          }).catch(function(){
+            finishUi(doc);
+          });
+          return;
+        }
+        finishUi(doc);
       }
       // Ticket 11c: misma confirmación visual que Ticket 6 (afConfirmAdjunto)
       if (typeof afConfirmAdjunto === 'function') {
@@ -659,7 +684,7 @@ function afEvwebQueueAdd(interv){
   var errs = afEvwebQueueValidate(interv);
   if (errs.length) {
     if (typeof toast === 'function') toast('No se agregó a cola evweb: '+errs.join('; '));
-    return {ok:false, errors:errs};
+    return Promise.resolve({ok:false, errors:errs});
   }
 
   function enqueueWithDocs(docsObj){
@@ -687,6 +712,10 @@ function afEvwebQueueAdd(interv){
       if (withAnest && withAnest.__anestConfirmCancelled) {
         return { ok: false, error: 'anest_confirm_cancelled' };
       }
+      // Propagar docs generados al interv original (S.cur) antes del snapshot
+      if (withAnest && withAnest.docs) {
+        interv.docs = withAnest.docs;
+      }
       return enqueueWithDocs(withAnest.docs);
     });
   }
@@ -699,7 +728,7 @@ function afEvwebQueueAdd(interv){
     });
     if (needsHydrate && typeof afDocEnsureLocalData === 'function') {
       if (typeof toast === 'function') toast('Preparando adjuntos para cola evweb…');
-      Promise.all(['anest','qx','auth'].map(function(t){
+      return Promise.all(['anest','qx','auth'].map(function(t){
         return afDocEnsureLocalData(interv.docs, t, interv.id).then(function(full){
           if (full && full.data) {
             interv.docs = interv.docs || {};
@@ -707,25 +736,25 @@ function afEvwebQueueAdd(interv){
           }
         });
       })).then(function(){
-        finishEnqueue(interv.docs);
+        return finishEnqueue(interv.docs);
       }).catch(function(){
-        finishEnqueue(interv.docs);
+        return finishEnqueue(interv.docs);
       });
-      return {ok:true, pendingHydrate:true};
     }
     if (needsHydrate && typeof afDocsHydrateIntervsForSync === 'function') {
       if (typeof toast === 'function') toast('Preparando adjuntos para cola evweb…');
-      afDocsHydrateIntervsForSync([interv]).then(function(list){
+      return afDocsHydrateIntervsForSync([interv]).then(function(list){
         var hydrated = (list && list[0]) || interv;
-        finishEnqueue(hydrated.docs);
+        if (hydrated && hydrated.docs) interv.docs = hydrated.docs;
+        return finishEnqueue(interv.docs);
       }).catch(function(){
-        finishEnqueue(interv.docs);
+        return finishEnqueue(interv.docs);
       });
-      return {ok:true, pendingHydrate:true};
     }
   }
-  finishEnqueue(interv.docs);
-  return {ok:true, pendingAnest:true};
+  // Siempre devolver la promesa de finishEnqueue (generate+confirm anest) —
+  // el caller debe esperar antes de afCommitGuardarLocal.
+  return finishEnqueue(interv.docs);
 }
 
 function afAgregarAColaEvweb(){
@@ -739,22 +768,24 @@ function afAgregarAColaEvweb(){
   } catch (eFj) {}
   if (!S.cur) {
     if (typeof toast === 'function') toast('Abrí una foja primero');
-    return {ok:false, error:'no_cur'};
+    return Promise.resolve({ok:false, error:'no_cur'});
   }
   afEvwebQueueHydrateCurFromDom(S.cur);
-  var r = afEvwebQueueAdd(S.cur);
-  try {
-    if (typeof afCommitGuardarLocal === 'function') afCommitGuardarLocal();
-  } catch (eSave) {
-    if (eSave && (eSave.afQuota || eSave.name === 'QuotaExceededError')) {
-      if (r && r.ok && typeof toast === 'function') {
-        toast('En cola evweb; foja no persistió (memoria local llena)');
+  return afEvwebQueueAdd(S.cur).then(function(r){
+    if (!r || !r.ok) return r;
+    try {
+      if (typeof afCommitGuardarLocal === 'function') afCommitGuardarLocal();
+    } catch (eSave) {
+      if (eSave && (eSave.afQuota || eSave.name === 'QuotaExceededError')) {
+        if (typeof toast === 'function') {
+          toast('En cola evweb; foja no persistió (memoria local llena)');
+        }
+      } else {
+        try { console.warn('[AF] cola evweb save', eSave); } catch (eL) {}
       }
-    } else {
-      try { console.warn('[AF] cola evweb save', eSave); } catch (eL) {}
     }
-  }
-  return r;
+    return r;
+  });
 }
 
 /** Reusa afg_ext_id / bridge (misma extensión que GECLISA). */

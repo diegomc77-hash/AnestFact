@@ -436,21 +436,55 @@ function afBuildFojaAnestPrintHtml(interv){
     +_buildPrintStyles()+'</style></head><body>'+pagesHtml+'</body></html>';
 }
 
-function afLoadHtml2PdfOnce(){
-  if(window.html2pdf)return Promise.resolve(window.html2pdf);
+function _afLoadScriptOnce(src){
   return new Promise(function(resolve,reject){
     var s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    s.src=src;
     s.async=true;
-    s.onload=function(){window.html2pdf?resolve(window.html2pdf):reject(new Error('html2pdf_missing'));};
-    s.onerror=function(){reject(new Error('html2pdf_load_failed'));};
+    s.onload=function(){resolve();};
+    s.onerror=function(){reject(new Error('script_load_failed:'+src));};
     document.head.appendChild(s);
   });
 }
 
 /**
+ * Carga html2canvas y jsPDF como librerías sueltas (no el bundle html2pdf.js).
+ *
+ * FIX 2026-09-24 (v2 — la foja de Aeronáutico salía en blanco al subirla a
+ * evweb, incluso después del fix de estilos): el wrapper html2pdf.js
+ * (html2canvas + jsPDF + su propio Worker interno con es6-promise) devuelve
+ * un PDF válido pero completamente en blanco para este elemento, tanto si
+ * está fuera de pantalla (left:-10000px) como si está a la vista — probado
+ * de forma aislada en un navegador controlado, variando cada parámetro. La
+ * captura llamando a html2canvas() directamente sobre el mismo elemento, con
+ * las mismas opciones, funciona perfectamente (imagen correcta, con texto y
+ * bordes). El bug está en el pipeline interno de html2pdf.js, no en
+ * html2canvas ni en el contenido/CSS. Por eso ahora se cargan html2canvas y
+ * jsPDF sueltos y se arma el PDF a mano, página por página (una llamada a
+ * html2canvas por cada .pg, agregada como imagen a una página de jsPDF),
+ * salteando por completo el wrapper de html2pdf.js.
+ */
+function afLoadPdfLibsOnce(){
+  if(window.html2canvas && window.jspdf && window.jspdf.jsPDF){
+    return Promise.resolve();
+  }
+  var loaders=[];
+  if(!window.html2canvas){
+    loaders.push(_afLoadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'));
+  }
+  if(!(window.jspdf && window.jspdf.jsPDF)){
+    loaders.push(_afLoadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'));
+  }
+  return Promise.all(loaders).then(function(){
+    if(!window.html2canvas)throw new Error('html2canvas_missing');
+    if(!(window.jspdf && window.jspdf.jsPDF))throw new Error('jspdf_missing');
+  });
+}
+
+/**
  * Genera docs.anest (PDF data URL) desde la foja — mismo layout que imprimir.
- * Requiere red la 1a vez (html2pdf CDN). Sin imprimir / sin ventana emergente.
+ * Requiere red la 1a vez (CDN html2canvas + jsPDF). Sin imprimir / sin
+ * ventana emergente.
  *
  * FIX 2026-09-24 (bug encontrado por Diego en Aeronáutico — foja subida a
  * evweb salía como texto plano sin estilos, ilegible): la versión anterior
@@ -463,8 +497,18 @@ function afLoadHtml2PdfOnce(){
  * Fix: renderizar en un <div> agregado directo al documento principal
  * (mismo window, mismo document.styleSheets que ve html2canvas), con el CSS
  * de impresión inyectado con scope (".af-print-capture ...") para que no
- * afecte el resto de la app mientras el div está en el DOM. Se saca todo
- * (div + <style>) apenas termina, haya salido bien o mal.
+ * afecte el resto de la app mientras el div está en el DOM.
+ *
+ * FIX 2026-09-24 (v2 — después del fix de estilos, la foja pasó a salir
+ * completamente en blanco): probado de forma aislada, el wrapper html2pdf.js
+ * (html2canvas + jsPDF + su Worker interno) devuelve un PDF en blanco para
+ * este elemento sin importar dónde esté posicionado — el bug está en el
+ * pipeline interno de html2pdf.js, no en el contenido/CSS ni en html2canvas
+ * (llamando a html2canvas directo sobre el mismo elemento, con las mismas
+ * opciones, el resultado es correcto). Por eso ahora se arma el PDF a mano:
+ * html2canvas se llama directo, una vez por cada página (.pg), y cada imagen
+ * resultante se agrega como una página de jsPDF — sin pasar por html2pdf.js.
+ * Se saca del DOM todo (div + <style>) apenas termina, haya salido bien o mal.
  */
 function afGenerateAnestDocForEvweb(interv){
   return new Promise(function(resolve,reject){
@@ -507,16 +551,27 @@ function afGenerateAnestDocForEvweb(interv){
     }));
 
     imgsReady.then(function(){
-      return afLoadHtml2PdfOnce();
-    }).then(function(h2p){
-      return h2p().set({
-        margin:[4,4,4,4],
-        filename:'foja-anest.pdf',
-        image:{type:'jpeg',quality:0.92},
-        html2canvas:{scale:2,useCORS:true,logging:false},
-        jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-        pagebreak:{mode:['css','legacy']}
-      }).from(el).outputPdf('blob');
+      return afLoadPdfLibsOnce();
+    }).then(function(){
+      var pageEls=Array.prototype.slice.call(el.querySelectorAll('.pg'));
+      if(!pageEls.length)throw new Error('no_pages_found');
+
+      var jsPDFCtor=window.jspdf.jsPDF;
+      var pdf=new jsPDFCtor({unit:'mm',format:'a4',orientation:'portrait'});
+
+      function renderPage(i){
+        if(i>=pageEls.length)return Promise.resolve();
+        return window.html2canvas(pageEls[i],{scale:2,useCORS:true,logging:false}).then(function(canvas){
+          var imgData=canvas.toDataURL('image/jpeg',0.92);
+          if(i>0)pdf.addPage();
+          pdf.addImage(imgData,'JPEG',0,0,210,297);
+          return renderPage(i+1);
+        });
+      }
+
+      return renderPage(0).then(function(){
+        return pdf.output('blob');
+      });
     }).then(function(blob){
       cleanup();
       var reader=new FileReader();
