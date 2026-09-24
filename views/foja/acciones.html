@@ -18,12 +18,22 @@
   </div>
 
   <div id="aero-evweb-actions" style="display:none;margin-bottom:16px">
-    <div class="card" style="border-color:rgba(20,184,166,.45);background:rgba(20,184,166,.06);padding:12px 14px">
-      <div class="ct" style="color:#14B8A6;margin:0 0 8px">&#9992; evweb (marca local)</div>
-      <button class="btn btn-s" style="width:100%;margin-top:4px;font-size:13px;padding:10px" type="button" onclick="afToggleEnviadoEvwebManual(null,event,'manual_foja')" id="btn-mark-enviado-evweb">&#10003; Marcar / quitar enviado evweb</button>
-      <p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.4">
-        Marca solo en AnesFact (si ya cargaste en ADAARC/evweb). No verifica evweb en vivo ni hay automatizaci&oacute;n de env&iacute;o todav&iacute;a.
+    <div class="card" style="border-color:rgba(20,184,166,.45);background:rgba(20,184,166,.06);padding:12px 14px;border-left:4px solid #14B8A6">
+      <div class="ct" style="color:#14B8A6;margin:0 0 8px">Cola evweb (extensi&oacute;n)</div>
+      <p style="font-size:12px;color:var(--text3);margin:0 0 10px;line-height:1.4">
+        Primero <b>Agregar a cola</b>, despu&eacute;s <b>Iniciar cola</b> (abre ADAARC y arranca la extensi&oacute;n). Igual que GECLISA.
       </p>
+      <div data-evweb-queue-list id="evweb-queue-list-foja" style="font-size:13px;margin-bottom:10px"></div>
+      <button class="btn btn-b" style="width:100%;margin-top:4px;font-size:14px;padding:12px" type="button" onclick="afAgregarAColaEvweb()">Agregar a cola evweb</button>
+      <button class="btn btn-b" style="width:100%;margin-top:8px;font-size:14px;padding:12px" type="button" onclick="afEvwebQueueStartUi(event)">&#9654; Iniciar cola</button>
+      <p style="font-size:12px;margin:10px 0 0;line-height:1.4">
+        <a href="#" onclick="event.preventDefault();goFacturacion();" style="color:var(--blue);text-decoration:underline">&#191;Faltan adjuntos? Ir a Facturaci&oacute;n</a>
+      </p>
+      <details style="margin-top:10px;font-size:12px;color:var(--text3)">
+        <summary style="cursor:pointer;color:var(--text2)">Ya lo cargu&eacute; a mano (marca local)</summary>
+        <p style="margin:8px 0;line-height:1.4">Solo AnesFact. No abre ADAARC ni mueve la cola de la extensi&oacute;n.</p>
+        <button class="btn btn-s" style="width:100%;font-size:13px;padding:10px" type="button" onclick="afToggleEnviadoEvwebManual(null,event,'manual_foja')" id="btn-mark-enviado-evweb">&#10003; Marcar / quitar enviado evweb</button>
+      </details>
     </div>
   </div>
 
