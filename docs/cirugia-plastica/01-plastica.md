@@ -1,0 +1,885 @@
+# Módulo — Cirugía Plástica, Reconstructiva y Estética
+
+**id:** `cpl-plastica-v1` · especialidad: Cirugía Plástica, Reconstructiva y Estética ·  
+**Estado:** **OK de semilla** (2026-09-14). Sin motor P2.
+
+Índice: [README.md](README.md)
+
+Consentimiento / gasas / ATB = cáscara A4 de Foja Qx (no van acá).
+
+## Validación clínica (leer antes de auditar)
+
+**Este módulo no tiene el mismo nivel de validación directa que Cabeza y
+Cuello ni Cirugía General.** CyC y CG fueron validados por la Dra. Huerta
+en su disciplina. Ella **no** es cirujana plástica: el bosquejo y las
+correcciones aplicadas aquí son **criterio clínico del equipo AnesFact
+(Diego)** — auditoría con rigor de especialista de la disciplina,
+pensado para uso por cirujano/a plástico/a real, **sin** reemplazar la
+revisión futura de un/a especialista. Misma salvedad que Torácica /
+Urológica / Ginecológica / Traumatología / Vascular.
+
+## Correcciones aplicadas al bosquejo (17)
+
+**§1 Cobertura cutánea:** (1) indicación · (2) tiempo isquemia colgajo
+libre · (3) viabilidad final · (4) TRAM ≠ DIEP + TRAM pediculado/libre.
+
+**§2 Mamaria:** (5) lateralidad ± Bilateral · (6) tipo/perfil implante ·
+(7) tipo reconstrucción · (8) momento reconstrucción · indicación
+(sin duplicar post-mastectomía).
+
+**§3 Contorno:** (9) indicación posbariátrica/estética · (10) profilaxis
+TEV (seguridad).
+
+**§4 Facial:** (11) nervio facial (ritidoplastia) · (12) soporte párpado
+inferior · indicación.
+
+**§5 Quemados:** (13) % SCTQ · (14) profundidad · (15) sangrado
+escarectomía.
+
+**§6 Drenajes/cierre:** (16) drenaje tipo+cantidad+ubicación ·
+(17) TPN presión propia.
+
+Tipografía: **Lateralidad** (no «Laterallidad»).
+
+**Nota clínica abierta:** «Surcolateral» (denominación de colgajo) =
+término del bosquejo original, **sin confirmar**; requiere aclaración
+de un cirujano plástico real antes de usarse en producción. No
+reinterpretar.
+
+---
+
+## Proforma — Cirugía plástica, reconstructiva y estética
+
+```text
+id:            cpl-plastica-v1
+especialidad:  "Cirugía Plástica, Reconstructiva y Estética"
+operaciones: [
+  "Cobertura cutánea — injertos y colgajos",
+  "Cirugía mamaria reconstructiva y estética",
+  "Contorno corporal / posbariátrica",
+  "Cirugía estética y reconstructiva facial",
+  "Manejo del paciente quemado y secuelas",
+  "Drenajes, cierre y manejo de heridas"
+]
+titulo: "Cirugía plástica, reconstructiva y estética"
+
+slots:
+
+  # ========== Índice ==========
+  - id: procedimiento_grupo
+    type: single
+    required: true
+    label: Procedimiento / foco
+    options:
+      - Cobertura cutánea — injertos y colgajos
+      - Cirugía mamaria
+      - Contorno corporal / posbariátrica
+      - Facial — estética / reconstructiva
+      - Quemados / secuelas
+      - Drenajes / cierre / heridas
+
+  - id: abordaje
+    type: single
+    required: false
+    label: Abordaje (si aplica)
+    options:
+      - Abierto
+      - Endoscópico / mínimamente invasivo
+      - Convertido a abierto
+    empty_text: ""
+
+  - id: conversion_causa
+    type: free
+    required: false
+    required_if_abordaje: [Convertido a abierto]
+    label: Causa de conversión
+    empty_text: ""
+
+  # ========== 1. Cobertura cutánea ==========
+  - id: indicacion_cobertura
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Cobertura cutánea — injertos y colgajos]
+    label: Indicación / diagnóstico
+    options:
+      - Defecto traumático
+      - Defecto oncológico post-resección
+      - Quemadura
+      - Úlcera crónica
+      - Reconstrucción congénita
+      - Otro
+    join: "; "
+    empty_text: ""
+
+  - id: indicacion_cobertura_otro
+    type: free
+    required: false
+    required_if_indicacion_cobertura: [Otro]
+    label: Indicación (otro)
+    empty_text: ""
+
+  - id: tipo_injerto_piel
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Cobertura cutánea — injertos y colgajos]
+    label: Injerto de piel — tipo
+    options:
+      - Espesor parcial (STSG)
+      - Espesor total (FTSG)
+    join: ", "
+    empty_text: ""
+
+  - id: tecnica_injerto
+    type: single
+    required: false
+    required_if_tipo_injerto_piel: [Espesor parcial (STSG), Espesor total (FTSG)]
+    label: Técnica del injerto
+    options:
+      - En malla (meshed)
+      - Lámina entera (unmeshed)
+    empty_text: ""
+
+  - id: razon_malla
+    type: single
+    required: false
+    required_if_tecnica_injerto: [En malla (meshed)]
+    label: Razón de malla
+    options: ["1.5:1", "3:1"]
+    empty_text: ""
+
+  - id: zona_donante
+    type: multi
+    required: false
+    required_if_tipo_injerto_piel: [Espesor parcial (STSG), Espesor total (FTSG)]
+    label: Zona donante
+    options:
+      - Muslo
+      - Región retroauricular
+      - Región inguinal
+      - Abdomen
+      - Otra
+    join: ", "
+    empty_text: ""
+
+  - id: zona_donante_otra
+    type: free
+    required: false
+    required_if_zona_donante: [Otra]
+    label: Zona donante (otra)
+    empty_text: ""
+
+  - id: fijacion_injerto
+    type: multi
+    required: false
+    required_if_tipo_injerto_piel: [Espesor parcial (STSG), Espesor total (FTSG)]
+    label: Fijación del injerto
+    options:
+      - Sutura / agrafes
+      - Cura acompasada / cura de balsa (tie-over)
+      - Terapia de presión negativa (VAC)
+    join: "; "
+    empty_text: ""
+
+  - id: colgajo_diseno
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Cobertura cutánea — injertos y colgajos]
+    label: Colgajo — tipo por diseño
+    options:
+      - De avance
+      - De rotación
+      - De transposición
+      - En Z (Z-plastia) / V-Y
+    join: ", "
+    empty_text: ""
+
+  - id: colgajo_irrigacion
+    type: single
+    required: false
+    required_if_colgajo_diseno:
+      - De avance
+      - De rotación
+      - De transposición
+      - En Z (Z-plastia) / V-Y
+    label: Colgajo — tipo por irrigación
+    options:
+      - Aleatorio
+      - Axial / pediculado
+    empty_text: ""
+
+  - id: colgajo_denominacion
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Cobertura cutánea — injertos y colgajos]
+    label: Colgajo — denominación específica
+    options:
+      - Inguinal
+      - Surcolateral
+      - Anterolateral de muslo (ALT)
+      - TRAM
+      - DIEP
+      - Dorsal ancho
+      - Otro
+    join: ", "
+    empty_text: ""
+    # NOTA: «Surcolateral» — término del bosquejo original, sin confirmar;
+    # requiere aclaración de un cirujano plástico real antes de usarse en
+    # producción. No reinterpretar (Sural / Supraclavicular / Escapular /
+    # Toracolateral, etc.).
+
+  - id: colgajo_denominacion_otro
+    type: free
+    required: false
+    required_if_colgajo_denominacion: [Otro]
+    label: Denominación (otro)
+    empty_text: ""
+
+  - id: tram_modalidad
+    type: single
+    required: false
+    required_if_colgajo_denominacion: [TRAM]
+    label: TRAM — modalidad
+    options: [Pediculado, Libre]
+    empty_text: ""
+
+  - id: colgajo_libre
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Cobertura cutánea — injertos y colgajos]
+    label: Colgajo microvascularizado / libre
+    options: [Sí, No]
+    empty_text: ""
+
+  - id: anastomosis_tecnica
+    type: single
+    required: false
+    required_if_colgajo_libre: [Sí]
+    label: Anastomosis arterial / venosa — técnica
+    options:
+      - Término-terminal
+      - Término-lateral
+    empty_text: ""
+
+  - id: anastomosis_sutura
+    type: single
+    required: false
+    required_if_colgajo_libre: [Sí]
+    label: Anastomosis — sutura / coupler
+    options:
+      - Monofilamento 8-0
+      - Monofilamento 9-0
+      - Monofilamento 10-0
+      - Coupler
+    empty_text: ""
+
+  - id: tiempo_isquemia_colgajo_min
+    type: free
+    required: false
+    required_if_colgajo_libre: [Sí]
+    label: Tiempo de isquemia del colgajo libre (min)
+    empty_text: ""
+
+  - id: monitoreo_viabilidad
+    type: multi
+    required: false
+    required_if_colgajo_libre: [Sí]
+    label: Monitoreo de viabilidad
+    options:
+      - Doppler acústico
+      - Llenado capilar
+      - Temperatura
+    join: ", "
+    empty_text: ""
+
+  - id: viabilidad_final_colgajo
+    type: single
+    required: false
+    required_if_colgajo_diseno:
+      - De avance
+      - De rotación
+      - De transposición
+      - En Z (Z-plastia) / V-Y
+    required_if_colgajo_denominacion:
+      - Inguinal
+      - Surcolateral
+      - Anterolateral de muslo (ALT)
+      - TRAM
+      - DIEP
+      - Dorsal ancho
+      - Otro
+    required_if_colgajo_libre: [Sí]
+    label: Viabilidad final del colgajo al cierre
+    options:
+      - Viable — sin compromiso
+      - Viable — compromiso venoso parcial resuelto
+      - Comprometido — requirió reexploración
+    empty_text: ""
+
+  # ========== 2. Cirugía mamaria ==========
+  - id: lateralidad_mamaria
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Cirugía mamaria]
+    label: Lateralidad
+    options: [Derecha, Izquierda, Bilateral]
+    empty_text: ""
+
+  - id: indicacion_mamaria
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Cirugía mamaria]
+    label: Indicación / diagnóstico
+    options:
+      - Estética primaria
+      - Macromastia sintomática
+      - Asimetría mamaria
+      - Ptosis mamaria
+      - Otro
+    join: "; "
+    empty_text: ""
+
+  - id: indicacion_mamaria_otro
+    type: free
+    required: false
+    required_if_indicacion_mamaria: [Otro]
+    label: Indicación mamaria (otro)
+    empty_text: ""
+
+  - id: proc_mamario
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Cirugía mamaria]
+    label: Procedimiento específico
+    options:
+      - Mamoplastia de aumento (implantes)
+      - Mamoplastia reductiva / mastopexia
+      - Reconstrucción mamaria post-mastectomía
+      - Corrección de ginecomastia
+    join: "; "
+    empty_text: ""
+
+  - id: ginecomastia_tecnica
+    type: multi
+    required: false
+    required_if_proc_mamario: [Corrección de ginecomastia]
+    label: Técnica (ginecomastia)
+    options:
+      - Liposucción
+      - Exéresis glandular directa
+    join: ", "
+    empty_text: ""
+
+  - id: tipo_reconstruccion_mama
+    type: single
+    required: false
+    required_if_proc_mamario: [Reconstrucción mamaria post-mastectomía]
+    label: Tipo de reconstrucción post-mastectomía
+    options:
+      - Basada en implante
+      - Autóloga (colgajo)
+      - Combinada (implante + colgajo)
+    empty_text: ""
+
+  - id: momento_reconstruccion_mama
+    type: single
+    required: false
+    required_if_proc_mamario: [Reconstrucción mamaria post-mastectomía]
+    label: Momento de la reconstrucción
+    options: [Inmediata, Diferida]
+    empty_text: ""
+
+  - id: plano_implante
+    type: single
+    required: false
+    required_if_proc_mamario: [Mamoplastia de aumento (implantes)]
+    required_if_tipo_reconstruccion_mama:
+      - Basada en implante
+      - Combinada (implante + colgajo)
+    label: Plano de colocación del implante / expansor
+    options:
+      - Subglandular
+      - Subfascial
+      - Subpectoral / plano dual (dual plane)
+    empty_text: ""
+
+  - id: via_abordaje_mama
+    type: single
+    required: false
+    required_if_proc_mamario:
+      - Mamoplastia de aumento (implantes)
+      - Mamoplastia reductiva / mastopexia
+      - Reconstrucción mamaria post-mastectomía
+    label: Vía de abordaje
+    options:
+      - Periareolar
+      - Inframamaria
+      - Axilar
+    empty_text: ""
+
+  - id: pediculo_reductiva
+    type: single
+    required: false
+    required_if_proc_mamario: [Mamoplastia reductiva / mastopexia]
+    label: Técnica pediculada (reductiva / mastopexia)
+    options:
+      - Pedículo superior
+      - Pedículo inferior
+      - Pedículo superomedial
+    empty_text: ""
+
+  - id: tipo_perfil_implante
+    type: single
+    required: false
+    required_if_proc_mamario: [Mamoplastia de aumento (implantes)]
+    required_if_tipo_reconstruccion_mama:
+      - Basada en implante
+      - Combinada (implante + colgajo)
+    label: Tipo / perfil de implante
+    options:
+      - Liso — redondo
+      - Liso — anatómico
+      - Texturizado — redondo
+      - Texturizado — anatómico
+    empty_text: ""
+
+  - id: marca_volumen_protesis
+    type: free
+    required: false
+    required_if_proc_mamario: [Mamoplastia de aumento (implantes)]
+    required_if_tipo_reconstruccion_mama:
+      - Basada en implante
+      - Combinada (implante + colgajo)
+    label: Marca y volumen de prótesis / expansor (cc)
+    empty_text: ""
+
+  - id: peso_resecado_der_g
+    type: free
+    required: false
+    required_if_proc_mamario: [Mamoplastia reductiva / mastopexia]
+    label: Peso de tejido resecado — derecha (g)
+    empty_text: ""
+
+  - id: peso_resecado_izq_g
+    type: free
+    required: false
+    required_if_proc_mamario: [Mamoplastia reductiva / mastopexia]
+    label: Peso de tejido resecado — izquierda (g)
+    empty_text: ""
+
+  # ========== 3. Contorno corporal ==========
+  - id: indicacion_contorno
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Contorno corporal / posbariátrica]
+    label: Indicación
+    options:
+      - Posbariátrica (pérdida masiva de peso)
+      - Estética primaria
+    empty_text: ""
+
+  - id: profilaxis_tev
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Contorno corporal / posbariátrica]
+    label: Profilaxis de tromboembolismo venoso
+    options:
+      - Mecánica (compresión neumática)
+      - Farmacológica
+      - Ambas
+      - No indicada (evaluar y documentar motivo)
+    empty_text: ""
+
+  - id: profilaxis_tev_motivo
+    type: free
+    required: false
+    required_if_profilaxis_tev: [No indicada (evaluar y documentar motivo)]
+    label: Motivo de no indicar profilaxis TEV
+    empty_text: ""
+
+  - id: proc_contorno
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Contorno corporal / posbariátrica]
+    label: Procedimiento específico
+    options:
+      - Dermolipectomía abdominal / abdominoplastia
+      - Liposucción / lipoescultura
+      - Cruroplastia (lifting de muslos)
+      - Braquioplastia (lifting de brazos)
+      - Lipectomía en cinturón / dermolipectomía circunferencial
+    join: "; "
+    empty_text: ""
+
+  - id: tipo_abdominoplastia
+    type: single
+    required: false
+    required_if_proc_contorno: [Dermolipectomía abdominal / abdominoplastia]
+    label: Tipo de abdominoplastia
+    options:
+      - Convencional
+      - En ancla / flor de lis
+      - Mini-abdominoplastia
+    empty_text: ""
+
+  - id: zonas_liposuccion
+    type: free
+    required: false
+    required_if_proc_contorno: [Liposucción / lipoescultura]
+    label: Zonas de liposucción
+    empty_text: ""
+
+  - id: volumen_aspirado_cc
+    type: free
+    required: false
+    required_if_proc_contorno: [Liposucción / lipoescultura]
+    label: Volumen aspirado total (cc)
+    empty_text: ""
+
+  - id: plicatura_rectos
+    type: single
+    required: false
+    required_if_proc_contorno: [Dermolipectomía abdominal / abdominoplastia]
+    label: Plicatura de la vaina de los rectos (diástasis)
+    options:
+      - Realizada
+      - No requerida
+    empty_text: ""
+
+  - id: plicatura_sutura
+    type: free
+    required: false
+    required_if_plicatura_rectos: [Realizada]
+    label: Sutura de plicatura
+    empty_text: ""
+
+  - id: umbilicoplastia
+    type: single
+    required: false
+    required_if_proc_contorno: [Dermolipectomía abdominal / abdominoplastia]
+    label: Reimplantación / neoombligo
+    options:
+      - Umbilicoplastia con fijación a la aponeurosis
+      - No realizada
+    empty_text: ""
+
+  # ========== 4. Facial ==========
+  - id: indicacion_facial
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Facial — estética / reconstructiva]
+    label: Indicación / diagnóstico
+    options:
+      - Estética primaria
+      - Funcional (ej. obstrucción nasal en rinoplastia)
+      - Reconstructiva (defecto congénito o adquirido)
+      - Otro
+    join: "; "
+    empty_text: ""
+
+  - id: indicacion_facial_otro
+    type: free
+    required: false
+    required_if_indicacion_facial: [Otro]
+    label: Indicación facial (otro)
+    empty_text: ""
+
+  - id: proc_facial
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Facial — estética / reconstructiva]
+    label: Procedimiento específico
+    options:
+      - Ritidoplastia / lifting facial
+      - Blefaroplastia
+      - Rinoplastia / rinoseptoplastia
+      - Otoplastia
+      - Reconstrucción de defectos auriculares / nasales / labiales complejos
+    join: "; "
+    empty_text: ""
+
+  - id: ritidoplastia_detalle
+    type: multi
+    required: false
+    required_if_proc_facial: [Ritidoplastia / lifting facial]
+    label: Ritidoplastia — detalle
+    options:
+      - Cervicofacial
+      - SMAS plicatura / SMASectomía
+    join: ", "
+    empty_text: ""
+
+  - id: nervio_facial
+    type: single
+    required: false
+    required_if_proc_facial: [Ritidoplastia / lifting facial]
+    label: Nervio facial
+    options:
+      - Identificado y preservado
+      - Lesión identificada intraoperatoriamente
+      - No disecado
+    empty_text: ""
+
+  - id: blefaroplastia_lado
+    type: multi
+    required: false
+    required_if_proc_facial: [Blefaroplastia]
+    label: Blefaroplastia — párpado
+    options:
+      - Superior
+      - Inferior
+    join: ", "
+    empty_text: ""
+
+  - id: via_blefaroplastia_inferior
+    type: single
+    required: false
+    required_if_blefaroplastia_lado: [Inferior]
+    label: Vía (blefaroplastia inferior)
+    options:
+      - Transconjuntival
+      - Subciliar
+    empty_text: ""
+
+  - id: soporte_parpado_inferior
+    type: single
+    required: false
+    required_if_blefaroplastia_lado: [Inferior]
+    label: Soporte de párpado inferior
+    options:
+      - Cantopexia realizada
+      - Cantoplastia realizada
+      - No requerido
+    empty_text: ""
+
+  - id: rinoplastia_via
+    type: single
+    required: false
+    required_if_proc_facial: [Rinoplastia / rinoseptoplastia]
+    label: Rinoplastia — vía / técnica
+    options:
+      - Abierta
+      - Cerrada
+      - Ultrasónica / piezoeléctrica
+    empty_text: ""
+
+  - id: otoplastia_tecnica
+    type: multi
+    required: false
+    required_if_proc_facial: [Otoplastia]
+    label: Otoplastia — técnica
+    options:
+      - Mustardé
+      - Furnas
+    join: ", "
+    empty_text: ""
+
+  # ========== 5. Quemados ==========
+  - id: sctq_porcentaje
+    type: free
+    required: false
+    required_if_procedimiento_grupo: [Quemados / secuelas]
+    label: Superficie corporal total quemada (% SCTQ)
+    empty_text: ""
+
+  - id: profundidad_quemadura
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Quemados / secuelas]
+    label: Profundidad de la quemadura
+    options:
+      - Superficial
+      - Espesor parcial superficial
+      - Espesor parcial profundo
+      - Espesor total
+    join: ", "
+    empty_text: ""
+
+  - id: fase_quemado
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Quemados / secuelas]
+    label: Fase
+    options:
+      - Aguda
+      - Crónica / secuelas
+    empty_text: ""
+
+  - id: proc_quemado_agudo
+    type: multi
+    required: false
+    required_if_fase_quemado: [Aguda]
+    label: Procedimiento — fase aguda
+    options:
+      - Escarotomía de descompresión
+      - Escarectomía / desbridamiento tangencial
+      - Cobertura temporal — aloinjerto / piel de cadáver
+      - Cobertura temporal — apósito sintético / sustituto cutáneo (Integra / Biobrane)
+    join: "; "
+    empty_text: ""
+
+  - id: ubicacion_escarotomia
+    type: multi
+    required: false
+    required_if_proc_quemado_agudo: [Escarotomía de descompresión]
+    label: Ubicación de escarotomía
+    options:
+      - Torácica
+      - Extremidades
+    join: ", "
+    empty_text: ""
+
+  - id: sangrado_escarectomia_cc
+    type: free
+    required: false
+    required_if_proc_quemado_agudo: [Escarectomía / desbridamiento tangencial]
+    label: Estimación de sangrado en escarectomía / desbridamiento (cc)
+    empty_text: ""
+
+  - id: proc_quemado_cronico
+    type: multi
+    required: false
+    required_if_fase_quemado: [Crónica / secuelas]
+    label: Procedimiento — fase crónica / secuelas
+    options:
+      - Liberación de bridas / cicatrices retráctiles
+      - Resección de cicatriz queloide / hipertrófica + infiltración triamcinolona
+      - Expansión tisular (colocación / extracción de expansor)
+    join: "; "
+    empty_text: ""
+
+  - id: tiempo_desde_quemadura
+    type: free
+    required: false
+    required_if_fase_quemado: [Crónica / secuelas]
+    label: Tiempo transcurrido desde la quemadura original
+    empty_text: ""
+
+  - id: liberacion_bridas_tecnica
+    type: multi
+    required: false
+    required_if_proc_quemado_cronico: [Liberación de bridas / cicatrices retráctiles]
+    label: Técnica de liberación de bridas
+    options:
+      - Z-plastias múltiples
+      - Injerto de piel
+    join: ", "
+    empty_text: ""
+
+  - id: volumen_expansor_cc
+    type: free
+    required: false
+    required_if_proc_quemado_cronico: [Expansión tisular (colocación / extracción de expansor)]
+    label: Volumen del expansor (cc)
+    empty_text: ""
+
+  # ========== 6. Drenajes / cierre / heridas ==========
+  - id: drenaje
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Drenajes / cierre / heridas]
+    label: Drenaje
+    options: [Sí, Sin drenaje]
+    empty_text: ""
+
+  - id: drenaje_tipo
+    type: single
+    required: false
+    required_if_drenaje: [Sí]
+    label: Tipo de drenaje
+    options:
+      - Aspirativo (Jackson-Pratt / Hemovac)
+      - Otro
+    empty_text: ""
+
+  - id: drenaje_tipo_otro
+    type: free
+    required: false
+    required_if_drenaje_tipo: [Otro]
+    label: Tipo de drenaje (otro)
+    empty_text: ""
+
+  - id: drenaje_cantidad
+    type: free
+    required: false
+    required_if_drenaje: [Sí]
+    label: Cantidad de drenajes
+    empty_text: ""
+
+  - id: drenaje_ubicacion
+    type: free
+    required: false
+    required_if_drenaje: [Sí]
+    label: Ubicación del drenaje
+    empty_text: ""
+
+  - id: tpn_vac
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Drenajes / cierre / heridas]
+    label: Terapia de presión negativa (TPN / VAC)
+    options: [Colocada, No colocada]
+    empty_text: ""
+
+  - id: tpn_presion_mmhg
+    type: free
+    required: false
+    required_if_tpn_vac: [Colocada]
+    label: Presión TPN / VAC (mmHg)
+    empty_text: ""
+
+  - id: tpn_modo
+    type: single
+    required: false
+    required_if_tpn_vac: [Colocada]
+    label: Modo TPN / VAC
+    options: [Continua, Intermitente]
+    empty_text: ""
+
+  - id: tipo_cierre
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Drenajes / cierre / heridas]
+    label: Tipo de sutura y cierre
+    options:
+      - Cierre intradérmico / subcuticular — irreabsorbible
+      - Cierre intradérmico / subcuticular — reabsorbible
+      - Cintas adhesivas cutáneas (Steristrips)
+      - Pegamento quirúrgico (Dermabond)
+    join: "; "
+    empty_text: ""
+
+plantilla_texto: |
+  Plástica — {{procedimiento_grupo}}. Abordaje {{abordaje}}{{conversion_causa}}.
+  Cobertura: {{indicacion_cobertura}}{{indicacion_cobertura_otro}}; injerto {{tipo_injerto_piel}} {{tecnica_injerto}} malla {{razon_malla}}; donante {{zona_donante}}{{zona_donante_otra}}; fijación {{fijacion_injerto}}; colgajo diseño {{colgajo_diseno}} irrigación {{colgajo_irrigacion}}; denom. {{colgajo_denominacion}}{{colgajo_denominacion_otro}} TRAM {{tram_modalidad}}; libre {{colgajo_libre}} anastomosis {{anastomosis_tecnica}} {{anastomosis_sutura}}; isquemia {{tiempo_isquemia_colgajo_min}} min; monitoreo {{monitoreo_viabilidad}}; viabilidad {{viabilidad_final_colgajo}}.
+  Mamaria: lat. {{lateralidad_mamaria}}; indicación {{indicacion_mamaria}}{{indicacion_mamaria_otro}}; {{proc_mamario}}; ginecomastia {{ginecomastia_tecnica}}; reconstrucción {{tipo_reconstruccion_mama}} {{momento_reconstruccion_mama}}; plano {{plano_implante}}; vía {{via_abordaje_mama}}; pedículo {{pediculo_reductiva}}; implante {{tipo_perfil_implante}} {{marca_volumen_protesis}}; resección Der {{peso_resecado_der_g}} g Izq {{peso_resecado_izq_g}} g.
+  Contorno: {{indicacion_contorno}}; TEV {{profilaxis_tev}}{{profilaxis_tev_motivo}}; {{proc_contorno}} tipo abd. {{tipo_abdominoplastia}}; lipo zonas {{zonas_liposuccion}} vol. {{volumen_aspirado_cc}} cc; plicatura {{plicatura_rectos}} {{plicatura_sutura}}; ombligo {{umbilicoplastia}}.
+  Facial: indicación {{indicacion_facial}}{{indicacion_facial_otro}}; {{proc_facial}}; ritidoplastia {{ritidoplastia_detalle}}; n. facial {{nervio_facial}}; blefaro {{blefaroplastia_lado}} vía {{via_blefaroplastia_inferior}} soporte {{soporte_parpado_inferior}}; rino {{rinoplastia_via}}; oto {{otoplastia_tecnica}}.
+  Quemados: SCTQ {{sctq_porcentaje}} %; profundidad {{profundidad_quemadura}}; fase {{fase_quemado}}; agudo {{proc_quemado_agudo}} escarotomía {{ubicacion_escarotomia}} sangrado {{sangrado_escarectomia_cc}} cc; crónico {{proc_quemado_cronico}} desde quemadura {{tiempo_desde_quemadura}}; bridas {{liberacion_bridas_tecnica}} expansor {{volumen_expansor_cc}} cc.
+  Drenaje/cierre: {{drenaje}} {{drenaje_tipo}}{{drenaje_tipo_otro}} n={{drenaje_cantidad}} {{drenaje_ubicacion}}; TPN {{tpn_vac}} {{tpn_presion_mmhg}} mmHg {{tpn_modo}}; cierre {{tipo_cierre}}.
+```
+
+---
+
+## Notas (OK de semilla)
+
+1. `procedimiento_grupo` **single**. Tipografía **Lateralidad**
+   (mamaria admite Bilateral).
+2. Validación: criterio AnesFact (Diego), **no** cirujano plástico ni
+   Dra. Huerta (ver cabecera) — salvedad se mantiene.
+3. §1: indicación; isquemia libre; viabilidad; TRAM ≠ DIEP + modalidad.
+4. §2: lateralidad; indicación mamaria (sin duplicar post-mastectomía);
+   perfil implante; tipo + momento reconstrucción.
+5. §3: indicación; profilaxis TEV (seguridad) + motivo si no indicada.
+6. §4: indicación facial; nervio facial (ritidoplastia); soporte párpado
+   inferior.
+7. §5: % SCTQ; profundidad multi; sangrado escarectomía; tiempo desde
+   quemadura (fase crónica).
+8. §6: drenaje tipo+cantidad+ubicación; TPN presión/modo propios.
+9. Numéricos sin `empty_text` inventado. Convertido + causa.
+10. Bruto completo (6 secciones) + 17 correcciones + hallazgos
+    post-tandas versionados acá.
+11. «Surcolateral» — término del bosquejo original, **sin confirmar**;
+    requiere aclaración de un cirujano plástico real antes de usarse en
+    producción. No reinterpretar.
+12. `viabilidad_final_colgajo`: varios `required_if_*` = OR (diseño,
+    denominación o libre).

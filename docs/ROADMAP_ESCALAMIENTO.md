@@ -788,6 +788,12 @@ muestra la misma sección genérica «Documentación electrónica»
 entre obras. Traditum + N° de Transacción = paso extra **solo** APROSS;
 la mecánica de adjuntos en evweb es la misma para las demás.
 
+**Idea futura (Diego, 2026-09-21 — no implementar aún):** en vez de
+subir qx + auth (y anest) con clasificación 1/2/7 por archivo, compactar
+todo en **un** PDF y clasificarlo como «Documentación completa» (opción
+ya existe en el desplegable), tras chequear en AnesFact que esté completo.
+Simplificaría el mapeo; hoy Lote 4 sigue de a uno + tipos.
+
 **Corrección:** la etiqueta «AUTORIZACIÓN DE OBRA SOCIAL» vista en un
 caso APROSS ya cargado (modo *ver*) **no** aparece como campo fijo en
 modo *agregar*, ni siquiera en APROSS. Probable nombre escrito a mano

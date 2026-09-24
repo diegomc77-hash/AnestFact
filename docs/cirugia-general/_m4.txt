@@ -1,0 +1,69 @@
+<timestamp>Monday, Sep 14, 2026, 12:00 AM (UTC-3)</timestamp>
+<user_query>
+Avanzamos con el **Módulo 4: Patología Anal y Periorificial / Proctología**.
+En este bloque cubrimos la patología orificial frecuente y compleja, clasificando los procedimientos por patología, abordaje, instrumentación y manejo de heridas o esfínteres.
+---
+# MÓDULO 4: PATOLOGÍA ANAL Y PERIORIFICIAL
+---
+## 1. Patología Hemorroidal
+* **Clasificación / Grado:** [ ] Grado I  [ ] Grado II  [ ] Grado III  [ ] Grado IV  [ ] Trombosis hemorroidal aguda
+* **Topografía / Paquetes Afectados:** [ ] 3 (Izquierdo)  [ ] 7 (Anteroderecho)  [ ] 11 (Posteroderecho)  [ ] Circunferencial
+* **Técnica Quirúrgica Realizada:**
+* **Resectiva / Abierta o Cerrada:**
+* [ ] Hemorroidectomía Abierta (Milligan-Morgan)
+* [ ] Hemorroidectomía Cerrada (Ferguson)
+* [ ] Hemorroidectomía Semi-cerrada (Parks)
+* **No Resectiva / Instrumental:**
+* [ ] Hemorroidopexia Mecánica (PPH / Procedimiento de Longo)
+* [ ] Desarterialización Hemorroidal Transanal Guiada por Doppler (THD / RAR)
+* [ ] Ligadura con Banda Elástica (LBL)
+* [ ] Fotocoagulación Láser / Escleroterapia
+* **Instrumento de Corte / Sellado:** [ ] Bisturí frío  [ ] Electrocauterio  [ ] Bisturí armónico / Ultrasónico  [ ] Ligasure / Radiofrecuencia  [ ] Láser
+---
+## 2. Físula y Absceso Perianal / Periorificial
+* **Absceso Perianal (Fase Aguda):**
+* Topografía: [ ] Perianal superficial  [ ] Isquiorrectal  [ ] Interesfinteriano  [ ] Supraelevador
+* Gesto: Incisión, drenaje, lavado y debridamiento. [ ] Embalaje / Mecha  [ ] Drenaje en asa (Loop)
+* **Fístula Anal (Fase Crónica):**
+* **Clasificación de Parks:** [ ] Interesfinteriana  [ ] Transesfinteriana ( [ ] Baja  [ ] Alta )  [ ] Supraesfinteriana  [ ] Extraesfinteriana
+* **Técnica Quirúrgica:**
+* [ ] Fistulotomía (Puesta a plano)
+* [ ] Fistulectomía
+* [ ] Colocación de Setón: [ ] Cortante (Terapéutico)  [ ] Laxo / De drenaje
+* [ ] Preservación Esfinteriana: [ ] LIFT (Ligadura del Trayecto Interesfinteriano)  [ ] Avance de Colgajo Endorrectal (Flap)  [ ] VAAFT (Tratamiento Videoasistido)  [ ] Tapón / Plug de Colágeno  [ ] Sellado con Láser (FiLaC)
+---
+## 3. Fisura Anal
+* **Ubicación:** [ ] Línea media posterior  [ ] Línea media anterior  [ ] Atípica / Lateral
+* **Tipo:** [ ] Aguda  [ ] Crónica (con triada de Brodie: papila hipertrófica, fisura, hemorroide centinela)
+* **Procedimiento:**
+* [ ] Esfinterotomía Lateral Interna (ELI): [ ] Abierta  [ ] Percutánea / Cerrada
+* [ ] Fisurectomía simple
+* [ ] Fisurectomía + Colgajo de avance cutáneo (Anoplastia)
+* [ ] Inyección de Toxina Botulínica (Dosis: _____ UI)
+---
+## 4. Quiste Sacrococcígeo / Enfermedad Pilonidal
+* **Fase:** [ ] Absceso agudo (Drenaje)  [ ] Sinus pilonidal crónico
+* **Técnica Quirúrgica:**
+* [ ] Resección y cierre primario por la línea media
+* [ ] Resección y cicatrización por segunda intención (Abierta)
+* [ ] Reconstrucción con Colgajo (Cierre fuera de la línea media): [ ] Karydakis  [ ] Bascom  [ ] Limberg (Plastia en Z / Romboide)
+* [ ] Técnica Mínimamente Invasiva / Videoasistida (EPSiT)  [ ] Ablación Láser (SiLaC)
+---
+## 5. Otras Lesiones Perianales y Patología Tumoral
+* **Lesiones Condilomatosas / HPV:**
+* [ ] Electrofulguración / Cauterización
+* [ ] Escisión quirúrgica simple de lesiones ampollares / verrucosas
+* **Neoplasia de Canal Anal / Tumores Perianales:**
+* Biopsia escisional / incisional de lesión ulcerada o tumoral (Margen marcadado: [ ] Sí  [ ] No)
+* **Incontinencia / Defectos Esfinterianos:**
+* [ ] Esfinteroplastia anal (Traslape / Overlapping)
+---
+## 6. Manejo Hemostático, Esfinteriano y Cierre de la Región Anal
+* **Preservación del Esfinter Anal Interno / Externo:** [ ] Íntegro  [ ] Sección parcial controlada  [ ] Sección reconstruida
+* **Hemostasia / Taponamiento:**
+* [ ] Cauterización / Puntos hemostáticos absorbibles
+* [ ] Taponamiento anal (Gasa furacinada / Esponja hemostática de gelatina / Tubo de descompresión)
+* [ ] Sin taponamiento
+* **Anestesia Utilizada:** [ ] General  [ ] Raquídea / Peridural  [ ] Local + Sedación
+---
+</user_query>

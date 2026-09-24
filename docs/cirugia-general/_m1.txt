@@ -1,0 +1,77 @@
+<timestamp>Sunday, Sep 13, 2026, 11:44 PM (UTC-3)</timestamp>
+<user_query>
+Terminamos de recibir el material en bruto de Cirugía General, el siguiente bloque después de Cabeza y Cuello. Es contenido clínico nuevo que todavía no conocés — te lo voy a pasar completo, en varios mensajes (son 6 módulos: Pared Abdominal, Gastrointestinal, Pancreato-Biliar, Proctología, Retroperitoneo, Esofagogástrico/Bariátrica/Hernias Internas). Todavía no hay ningún archivo en el repo, ni esqueleto de slots armado — es material en bruto, recién auditado a mano conmigo en otro chat.
+No hagas nada todavía con el primer mensaje salvo confirmar que lo recibiste — te voy a mandar los 6 módulos completos antes de pedirte cualquier corrección o auditoría. Perfecto, empezamos por **Pared Abdominal**.
+A continuación presento la plantilla y estructura detallada para los procedimientos de pared abdominal, contemplando las distintas patologías, abordajes, técnicas, uso de prótesis/mallas y hallazgos.
+---
+# MÓDULO 1: PARED ABDOMINAL
+---
+## 1. Hernioplastia Inguinal / Femoral (Crural)
+* **Laterallidad / Topografía:** [ ] Derecha  [ ] Izquierda  [ ] Bilateral
+* **Tipo de Hernia:** [ ] Inguinal Directa  [ ] Inguinal Indirecta  [ ] Mixta (Pantalón)  [ ] Femoral / Crural  [ ] Encarcelada / Estrangulada
+* **Abordaje:**
+* [ ] Abierto (Vía anterior)
+* [ ] Laparoscópico / Endoscópico: [ ] TAPP  [ ] TEP  [ ] eTEP
+* **Técnica Quirúrgica Utilizada:**
+* *Técnica con malla:* [ ] Lichtenstein  [ ] Plug & Patch  [ ] Gilbert  [ ] Otra: ____________
+* *Técnica tisular (sin malla):* [ ] Bassini  [ ] Shouldice  [ ] McVay
+* **Descripción de la Técnica y Hallazgos:**
+* **Identificación del saco:** Liberación y disección del saco herniario respecto a los elementos del cordón espermático / ligamento redondo.
+* **Tratamiento del saco:** [ ] Reintroducción indemne  [ ] Resección y ligadura proximal  [ ] Apertura y exploración del contenido.
+* **Contenido del saco:** [ ] Asa delgada  [ ] Epíplon  [ ] Colon  [ ] Sin contenido vital comprometido  [ ] Sufrimiento vascular (Describir: ________________).
+* **Material Protésico (si aplica):**
+* Malla: [ ] Polipropileno de alta densidad  [ ] Polipropileno de baja densidad / liviana  [ ] 3D / Preformada  [ ] Biológica
+* Medidas de la malla: _____ x _____ cm.
+* Fijación: [ ] Sutura monofilamento absorbible/no absorbible  [ ] Tacas / Tackers (absorbibles / metálicos)  [ ] Sellante de fibrina / pegamento.
+* **Cierre:** Reconstrucción del anillo inguinal profundo/pared posterior y cierre por planos.
+---
+## 2. Eventroplastia / Hernioplastia Ventral (Umbilical, Epigástrica, Incisional)
+* **Topografía:** [ ] Umbilical  [ ] Epigástrica  [ ] Incisional / Eventración (Línea media / Subcostal / Lapa anterior)  [ ] Lombares / Otras
+* **Defecto Anatómicamente Medido:** Ancho: _____ cm | Largo: _____ cm
+* **Abordaje:** [ ] Abierto / Convencional  [ ] Laparoscópico (IPOM / IPOM-Plus)  [ ] Robótico / Híbrido  [ ] eTEP / MILOS
+* **Técnica de Separación de Componentes (si fue requerida para grandes defectos):**
+* [ ] No requerida
+* [ ] Anterior (Ramirez)
+* [ ] Posterior (TAR - Transversus Abdominis Release)
+* **Plano de Colocación de la Malla:**
+* [ ] Onlay (Supraaponeurótica)
+* [ ] Inlay (Bridando el defecto sin aproximar aponeurosis)
+* [ ] Sublay / Retromuscular (Rives-Stoppa)
+* [ ] Preperitoneal
+* [ ] Intraabdominal / Intraperitoneal (IPOM)
+* **Material Protésico y Fijación:**
+* Tipo de Malla: [ ] Polipropileno  [ ] Malla dual / barrera antiadherente  [ ] Biológica / Sintética absorbible.
+* Tamaños de la Malla: _____ x _____ cm (Cobertura mínima del traslape/overlap: _____ cm).
+* Fijación: [ ] Puntos transfasciales  [ ] Tacas (absorbibles / helicoidales)  [ ] Sutura continua monofilamento.
+* **Manejo del Saco y Reducción:**
+* Reducción del contenido y adhesiólisis: [ ] Sí  [ ] No
+* Resección de saco / dermoepidermectomía (dermolipectomía de complemento): [ ] Sí  [ ] No
+---
+## 3. Hernia de la Línea Alba / Diástasis de Rectos
+* **Evaluación de Diástasis:** [ ] Presente (Distancia interrectos: _____ cm)  [ ] Ausente
+* **Técnica de Reparación:**
+* [ ] Plicatura simple de la aponeurosis posterior / anterior
+* [ ] Plicatura + Refuerzo protésico (Onlay / Sublay)
+* [ ] Reparación endoscópica / laparoscópica (SCOPA / REPA / eTEP)
+---
+## 4. Hernias Complejas / Reconstrucción de la Pared Abdominal
+* **Condición del Campo:** [ ] Limpio  [ ] Limpio-Contaminado  [ ] Contaminado / Infectado
+* **Técnica Específica de Reconstrucción:**
+* [ ] Cierre progresivo / Neoperitoneo neumático previo (Goni Moreno)
+* [ ] Utilización de toxina botulínica A preoperatoria (Sí / No)
+* [ ] Reconstrucción mediante colgajos musculoaponeuróticos
+* **Drenajes colocados:**
+* [ ] Sí: Tipo (Aspirativo / Jackson-Pratt / Redon), Cantidad: ____, Ubicación: (Subcutáneo / Retromuscular / Cavidad).
+* [ ] No
+---
+## 5. Eventración Estrangulada / Urgencia de Pared
+* **Hallazgos del contenido:**
+* [ ] Viable tras restitución / reducción.
+* [ ] Necrosis intestinal / Omental.
+* **Procedimiento Asociado:**
+* [ ] Resección intestinal y anastomosis (Describir en módulo GI).
+* [ ] Resección de epíplon mayor (Omentectomía parcial).
+* [ ] ¿Se colocó malla en contexto contaminado?: [ ] Sí (Tipo: ____________)  [ ] No (Cierre tisular primario / Abdomen abierto).
+---
+no contestes nada solo audita y revisa que esta bien, que ves mal y luego te voy a pasar otro prompt general para que analices en conjunto y vamos a ir auditando por sectores
+</user_query>

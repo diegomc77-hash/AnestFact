@@ -1,0 +1,831 @@
+# Módulo 2 — Gastrointestinal (tubo digestivo)
+
+**id:** `cg-gastrointestinal-v1` · especialidad: Cirugía General ·  
+**Estado:** esqueleto de slots — **OK de semilla** (2026-09-14). Motor P2
+pendiente. Correcciones finales: cierre colostomía en asa; drenaje_gi
+incluye Ostomía (confección/cierre). Uréteres condicionados a
+`proc_colorrecto`.
+
+Índice: [README.md](README.md) · Hallazgos: [HALLAZGOS_ESQUELETO.md](HALLAZGOS_ESQUELETO.md)
+
+Consentimiento / gasas / ATB = cáscara A4 de Foja Qx (no van acá).
+
+Hallazgos aplicados: uréteres (Regla 1); campo L/LC/C + decisión
+anastomosis/Hartmann (Regla 4); márgenes gástricos; hermeticidad
+unificada; ostomías `trayecto_muscular` + `fijacion_estoma`; apendicectomía
+sección propia; Sleeve = xref a M6 (sin definición acá); Hartmann §1
+procedimiento vs §5 restitución etiquetados.
+
+---
+
+## Proforma — Gastrointestinal
+
+```text
+id:            cg-gastrointestinal-v1
+especialidad:  "Cirugía General"
+operaciones: [
+  "Colectomía / resección colorrectal",
+  "Gastrectomía / procedimiento gástrico",
+  "Resección de intestino delgado / enterectomía",
+  "Laparotomía / laparoscopía exploradora",
+  "Ostomía (confección / cierre)",
+  "Apendicectomía"
+]
+titulo: "Cirugía gastrointestinal (tubo digestivo)"
+
+slots:
+
+  # ========== Índice ==========
+  - id: procedimiento_grupo
+    type: single
+    required: true
+    label: Procedimiento / foco
+    options:
+      - Colectomía / resección colorrectal
+      - Gastrectomía / procedimiento gástrico
+      - Resección de intestino delgado / enterectomía
+      - Laparotomía / laparoscopía exploradora
+      - Ostomía (confección / cierre)
+      - Apendicectomía
+
+  - id: abordaje
+    type: single
+    required: true
+    label: Abordaje
+    options:
+      - Abierto
+      - Laparoscópico
+      - Robótico
+      - Convertido a abierto
+
+  - id: conversion_causa
+    type: free
+    required: false
+    required_if_abordaje: [Convertido a abierto]
+    label: Causa de conversión
+    empty_text: ""
+
+  # ========== 1. Colorrecto ==========
+  - id: proc_colorrecto
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Colectomía / resección colorrectal]
+    label: Procedimiento colorrectal
+    options:
+      - Hemicolectomía derecha
+      - Colectomía transversa
+      - Hemicolectomía izquierda
+      - Sigmoidectomía
+      - Colectomía subtotal / total
+      - Resección anterior de recto (baja / ultrabaja)
+      - Operación de Miles (resección abdominoperineal)
+      - Operación de Hartmann (resección + colostomía terminal)
+      - Procedimiento de Garengeot / Mikulicz
+    empty_text: ""
+
+  - id: hemiderecha_extendida
+    type: single
+    required: false
+    required_if_proc_colorrecto: [Hemicolectomía derecha]
+    label: Hemicolectomía derecha extendida
+    options: [Sí, No]
+    empty_text: ""
+
+  - id: indicacion_colorrecto
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Colectomía / resección colorrectal]
+    label: Indicación / patología
+    options:
+      - Neoplasia maligna
+      - Enfermedad diverticular
+      - Isquemia intestinal
+      - Vólvulo
+      - EII (Crohn / CUCI)
+      - Urgencia / perforación
+    join: ", "
+    empty_text: ""
+
+  - id: linfadenectomia_colorrecto
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Colectomía / resección colorrectal]
+    label: Linfadenectomía / ligadura vascular
+    options:
+      - D2
+      - D3 / ligadura central
+    empty_text: ""
+
+  - id: vasos_ligadura_central
+    type: multi
+    required: false
+    required_if_linfadenectomia_colorrecto: [D3 / ligadura central]
+    label: Vasos (ligadura central)
+    options:
+      - Ileocólica
+      - Cólica derecha
+      - Cólica media
+      - Mesentérica inferior
+    join: ", "
+    empty_text: ""
+
+  - id: conservacion_colica_izq
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Colectomía / resección colorrectal]
+    label: Conservación de la arteria cólica izquierda
+    options: [Sí, No, No aplica]
+    empty_text: ""
+
+  - id: escision_mesorrectal
+    type: single
+    required: false
+    required_if_proc_colorrecto:
+      - Resección anterior de recto (baja / ultrabaja)
+      - Operación de Miles (resección abdominoperineal)
+    label: Escisión mesorrectal
+    options: [Total (TME), Parcial (PME)]
+    empty_text: ""
+
+  # --- Regla 1: uréteres (solo el lado relevante al procedimiento) ---
+  - id: ureter_derecho
+    type: single
+    required: false
+    required_if_proc_colorrecto:
+      - Hemicolectomía derecha
+      - Colectomía transversa
+      - Colectomía subtotal / total
+      - Resección anterior de recto (baja / ultrabaja)
+      - Operación de Miles (resección abdominoperineal)
+    label: Uréter derecho
+    options:
+      - Identificado y preservado
+      - Lesión identificada intraoperatoriamente
+      - No disecado
+    empty_text: ""
+
+  - id: ureter_izquierdo
+    type: single
+    required: false
+    required_if_proc_colorrecto:
+      - Hemicolectomía izquierda
+      - Sigmoidectomía
+      - Colectomía transversa
+      - Colectomía subtotal / total
+      - Resección anterior de recto (baja / ultrabaja)
+      - Operación de Miles (resección abdominoperineal)
+    label: Uréter izquierdo
+    options:
+      - Identificado y preservado
+      - Lesión identificada intraoperatoriamente
+      - No disecado
+    empty_text: ""
+
+  - id: ureter_lesion_detalle
+    type: free
+    required: false
+    label: Detalle de lesión ureteral (si aplica)
+    empty_text: ""
+
+  # --- Regla 4: campo + decisión restitución ---
+  - id: campo_colorrecto
+    type: single
+    required: false
+    required_if_indicacion_colorrecto: [Urgencia / perforación]
+    label: Clasificación del campo
+    options: [Limpio, Limpio-contaminado, Contaminado]
+    empty_text: ""
+
+  - id: decision_restitucion
+    type: single
+    required: false
+    required_if_indicacion_colorrecto: [Urgencia / perforación]
+    label: Decisión de restitución
+    options:
+      - Anastomosis primaria
+      - Hartmann
+      - Otro
+    empty_text: ""
+
+  - id: decision_restitucion_otra
+    type: free
+    required: false
+    required_if_decision_restitucion: [Otro]
+    label: Decisión de restitución (otra)
+    empty_text: ""
+
+  - id: tipo_anastomosis_cr
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Colectomía / resección colorrectal]
+    label: Tipo de anastomosis
+    options:
+      - Íleo-cólica
+      - Colo-cólica
+      - Colo-rectal
+      - Íleo-rectal
+      - Ninguna (estoma terminal)
+    empty_text: ""
+
+  - id: config_anastomosis_cr
+    type: single
+    required: false
+    required_if_tipo_anastomosis_cr:
+      - Íleo-cólica
+      - Colo-cólica
+      - Colo-rectal
+      - Íleo-rectal
+    label: Configuración de anastomosis
+    options:
+      - Término-terminal
+      - Término-lateral
+      - Látero-lateral
+      - Látero-terminal
+    empty_text: ""
+
+  - id: tecnica_anastomosis_cr
+    type: single
+    required: false
+    required_if_tipo_anastomosis_cr:
+      - Íleo-cólica
+      - Colo-cólica
+      - Colo-rectal
+      - Íleo-rectal
+    label: Técnica de confección
+    options: [Mecánica / engrapadora, Manual]
+    empty_text: ""
+
+  - id: engrapadora_circular_mm
+    type: free
+    required: false
+    required_if_tecnica_anastomosis_cr: [Mecánica / engrapadora]
+    label: Circular (mm)
+    empty_text: ""
+
+  - id: engrapadora_lineal_mm
+    type: free
+    required: false
+    required_if_tecnica_anastomosis_cr: [Mecánica / engrapadora]
+    label: Lineal cortante (mm)
+    empty_text: ""
+
+  - id: sutura_manual_cr
+    type: single
+    required: false
+    required_if_tecnica_anastomosis_cr: [Manual]
+    label: Sutura manual
+    options: [Monofilamento, Trenzado]
+    empty_text: ""
+
+  - id: planos_manual_cr
+    type: single
+    required: false
+    required_if_tecnica_anastomosis_cr: [Manual]
+    label: Planos (manual)
+    options: [1 plano, 2 planos]
+    empty_text: ""
+
+  - id: hermeticidad_cr
+    type: single
+    required: false
+    required_if_tipo_anastomosis_cr:
+      - Íleo-cólica
+      - Colo-cólica
+      - Colo-rectal
+      - Íleo-rectal
+    label: Prueba de hermeticidad
+    options:
+      - Fuga demostrada
+      - Sin fuga demostrada
+      - No realizada
+    empty_text: ""
+
+  - id: ostomia_proteccion
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Colectomía / resección colorrectal]
+    label: Ostomía de protección
+    options:
+      - No realizada
+      - Ileostomía en asa
+      - Colostomía en asa
+    empty_text: ""
+
+  # ========== 2. Gástrico ==========
+  - id: tipo_reseccion_gastrica
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Gastrectomía / procedimiento gástrico]
+    label: Tipo de resección / procedimiento gástrico
+    options:
+      - Gastrectomía total
+      - Gastrectomía subtotal / parcial (distal)
+      - Gastrectomía subtotal / parcial (proximal)
+      - Sleeve gástrico — ver M6 Esofagogástrico (cg-esofagogastrico-v1)
+      - Gastrostomía (alimentación / descompresión)
+      - Cierre de úlcera perforada + parche de omento (Graham)
+    empty_text: ""
+
+  - id: sleeve_xref_nota
+    type: single
+    required: false
+    required_if_tipo_reseccion_gastrica: [Sleeve gástrico — ver M6 Esofagogástrico (cg-esofagogastrico-v1)]
+    label: Sleeve (referencia / handoff)
+    options:
+      - Definición completa en M6 Esofagogástrico (cg-esofagogastrico-v1) — no completar slots acá
+    empty_text: ""
+
+  - id: linfadenectomia_gastrica
+    type: single
+    required: false
+    required_if_tipo_reseccion_gastrica:
+      - Gastrectomía total
+      - Gastrectomía subtotal / parcial (distal)
+      - Gastrectomía subtotal / parcial (proximal)
+    label: Linfadenectomía (neoplasia)
+    options: [D1, D1+, D2, No aplica]
+    empty_text: ""
+
+  - id: margen_proximal
+    type: single
+    required: false
+    required_if_tipo_reseccion_gastrica:
+      - Gastrectomía total
+      - Gastrectomía subtotal / parcial (distal)
+      - Gastrectomía subtotal / parcial (proximal)
+    label: Margen proximal
+    options: [Libre, Comprometido, No aplica]
+    empty_text: ""
+
+  - id: margen_proximal_distancia
+    type: free
+    required: false
+    required_if_margen_proximal: [Libre, Comprometido]
+    label: Margen proximal — distancia (mm/cm)
+    empty_text: ""
+
+  - id: margen_distal
+    type: single
+    required: false
+    required_if_tipo_reseccion_gastrica:
+      - Gastrectomía total
+      - Gastrectomía subtotal / parcial (distal)
+      - Gastrectomía subtotal / parcial (proximal)
+    label: Margen distal
+    options: [Libre, Comprometido, No aplica]
+    empty_text: ""
+
+  - id: margen_distal_distancia
+    type: free
+    required: false
+    required_if_margen_distal: [Libre, Comprometido]
+    label: Margen distal — distancia (mm/cm)
+    empty_text: ""
+
+  - id: reconstruccion_gastrica
+    type: single
+    required: false
+    required_if_tipo_reseccion_gastrica:
+      - Gastrectomía total
+      - Gastrectomía subtotal / parcial (distal)
+      - Gastrectomía subtotal / parcial (proximal)
+    label: Reconstrucción del tránsito
+    options:
+      - Y de Roux (yeyunal)
+      - Billroth I (gastroduodenoanastomosis)
+      - Billroth II (gastroenteroanastomosis)
+      - Asa al brown / interposición yeyunal
+      - Sin reconstrucción en este tiempo
+    empty_text: ""
+
+  - id: tecnica_anastomosis_gastrica
+    type: single
+    required: false
+    required_if_reconstruccion_gastrica:
+      - Y de Roux (yeyunal)
+      - Billroth I (gastroduodenoanastomosis)
+      - Billroth II (gastroenteroanastomosis)
+      - Asa al brown / interposición yeyunal
+    label: Confección de anastomosis
+    options: [Mecánica, Manual]
+    empty_text: ""
+
+  - id: refuerzo_linea_sutura
+    type: single
+    required: false
+    required_if_reconstruccion_gastrica:
+      - Y de Roux (yeyunal)
+      - Billroth I (gastroduodenoanastomosis)
+      - Billroth II (gastroenteroanastomosis)
+      - Asa al brown / interposición yeyunal
+    label: Refuerzo de línea de sutura
+    options: [Sí, No]
+    empty_text: ""
+
+  - id: hermeticidad_gastrica
+    type: single
+    required: false
+    required_if_reconstruccion_gastrica:
+      - Y de Roux (yeyunal)
+      - Billroth I (gastroduodenoanastomosis)
+      - Billroth II (gastroenteroanastomosis)
+      - Asa al brown / interposición yeyunal
+    label: Prueba de hermeticidad
+    options:
+      - Fuga demostrada
+      - Sin fuga demostrada
+      - No realizada
+    empty_text: ""
+
+  - id: campo_gastrico_urgencia
+    type: single
+    required: false
+    required_if_tipo_reseccion_gastrica: [Cierre de úlcera perforada + parche de omento (Graham)]
+    label: Clasificación del campo
+    options: [Limpio, Limpio-contaminado, Contaminado]
+    empty_text: ""
+
+  # ========== 3. Delgado ==========
+  - id: indicacion_delgado
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Resección de intestino delgado / enterectomía]
+    label: Indicación
+    options:
+      - Isquemia / necrosis
+      - Obstrucción / bridas
+      - Neoplasia / tumor neuroendocrino
+      - Perforación / trauma
+      - Divertículo de Meckel
+    join: ", "
+    empty_text: ""
+
+  - id: longitud_resecada_cm
+    type: free
+    required: false
+    required_if_procedimiento_grupo: [Resección de intestino delgado / enterectomía]
+    label: Longitud resecada (cm)
+    empty_text: ""
+
+  - id: intestino_remanente_cm
+    type: free
+    required: false
+    required_if_procedimiento_grupo: [Resección de intestino delgado / enterectomía]
+    label: Intestino remanente estimado (cm)
+    empty_text: ""
+
+  - id: ubicacion_reseccion_delgado
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Resección de intestino delgado / enterectomía]
+    label: Ubicación de la resección
+    options:
+      - Yeyuno
+      - Íleon proximal
+      - Íleon distal / válvula ileocecal
+    empty_text: ""
+
+  - id: reconstruccion_delgado
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Resección de intestino delgado / enterectomía]
+    label: Reconstrucción
+    options:
+      - Anastomosis entero-entérica
+      - Enterostomía temporaria (ileostomía / yeyunostomía)
+    empty_text: ""
+
+  - id: config_anastomosis_delgado
+    type: single
+    required: false
+    required_if_reconstruccion_delgado: [Anastomosis entero-entérica]
+    label: Configuración (entero-entérica)
+    options: [Látero-lateral, Término-terminal]
+    empty_text: ""
+
+  - id: tecnica_anastomosis_delgado
+    type: single
+    required: false
+    required_if_reconstruccion_delgado: [Anastomosis entero-entérica]
+    label: Técnica (entero-entérica)
+    options: [Manual, Mecánica]
+    empty_text: ""
+
+  - id: hermeticidad_delgado
+    type: single
+    required: false
+    required_if_reconstruccion_delgado: [Anastomosis entero-entérica]
+    label: Prueba de hermeticidad
+    options:
+      - Fuga demostrada
+      - Sin fuga demostrada
+      - No realizada
+    empty_text: ""
+
+  - id: campo_delgado
+    type: single
+    required: false
+    required_if_indicacion_delgado:
+      - Isquemia / necrosis
+      - Perforación / trauma
+    label: Clasificación del campo
+    options: [Limpio, Limpio-contaminado, Contaminado]
+    empty_text: ""
+
+  # ========== 4. Exploradora ==========
+  - id: objetivo_exploradora
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Laparotomía / laparoscopía exploradora]
+    label: Objetivo
+    options:
+      - Estadificación (staging de neoplasia)
+      - Síndrome abdomen agudo indeterminado
+      - Trauma abdominal
+      - Evaluación de peritonitis
+    empty_text: ""
+
+  - id: liquido_libre
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Laparotomía / laparoscopía exploradora]
+    label: Líquido libre en cavidad
+    options:
+      - No
+      - Seroso
+      - Hemático
+      - Purulento / fecaloide
+    empty_text: ""
+
+  - id: liquido_hematico_cc
+    type: free
+    required: false
+    required_if_liquido_libre: [Hemático]
+    label: Volumen hemático (cc)
+    empty_text: ""
+
+  - id: pci
+    type: free
+    required: false
+    required_if_objetivo_exploradora: [Estadificación (staging de neoplasia)]
+    label: PCI (índice de cáncer peritoneal) /39
+    empty_text: ""
+
+  - id: compromiso_organos
+    type: free
+    required: false
+    required_if_procedimiento_grupo: [Laparotomía / laparoscopía exploradora]
+    label: Compromiso de órganos (describir)
+    empty_text: ""
+
+  - id: biopsia_peritoneal
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Laparotomía / laparoscopía exploradora]
+    label: Biopsia peritoneal / omental
+    options: [Sí, No]
+    empty_text: ""
+
+  - id: biopsia_peritoneal_sitios
+    type: free
+    required: false
+    required_if_biopsia_peritoneal: [Sí]
+    label: Sitios de biopsia peritoneal / omental
+    empty_text: ""
+
+  - id: biopsia_hepatica_ganglionar
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Laparotomía / laparoscopía exploradora]
+    label: Biopsia hepática / ganglionar
+    options: [Sí, No]
+    empty_text: ""
+
+  - id: lavado_citologia
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Laparotomía / laparoscopía exploradora]
+    label: Lavado peritoneal para citología
+    options: [Sí, No]
+    empty_text: ""
+
+  - id: gesto_exploradora
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Laparotomía / laparoscopía exploradora]
+    label: Gesto quirúrgico realizado
+    options:
+      - Solamente biopsias y desbridamiento / lavado
+      - Adhesiólisis / liberación de bridas
+      - Colocación de drenaje y cierre
+      - Abdomen abierto / VAC / laparostomía contenida
+    join: "; "
+    empty_text: ""
+
+  - id: campo_exploradora
+    type: single
+    required: false
+    required_if_objetivo_exploradora:
+      - Síndrome abdomen agudo indeterminado
+      - Trauma abdominal
+      - Evaluación de peritonitis
+    label: Clasificación del campo
+    options: [Limpio, Limpio-contaminado, Contaminado]
+    empty_text: ""
+
+  # ========== 5. Ostomías ==========
+  - id: ostomia_acto
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Ostomía (confección / cierre)]
+    label: Acto sobre ostomía
+    options:
+      - Confección de estoma
+      - Cierre / restitución de tránsito (incl. reconstrucción de Hartmann)
+    empty_text: ""
+
+  - id: ostomia_tipo
+    type: single
+    required: false
+    required_if_ostomia_acto: [Confección de estoma]
+    label: Tipo de estoma
+    options:
+      - Ileostomía
+      - Colostomía sigmoidea
+      - Colostomía transversa
+    empty_text: ""
+
+  - id: ostomia_config
+    type: single
+    required: false
+    required_if_ostomia_acto: [Confección de estoma]
+    label: Configuración del estoma
+    options:
+      - Terminal
+      - En asa (sobre varilla / puente)
+    empty_text: ""
+
+  - id: trayecto_muscular
+    type: single
+    required: false
+    required_if_ostomia_acto: [Confección de estoma]
+    label: Trayecto a través de la pared
+    options:
+      - Trans-recto abdominal (a través del músculo recto del abdomen)
+      - Extramuscular
+      - Lateral
+    empty_text: ""
+
+  - id: fijacion_estoma
+    type: single
+    required: false
+    required_if_ostomia_acto: [Confección de estoma]
+    label: Fijación del estoma
+    options:
+      - Fijación mucocutánea con puntos reabsorbibles
+      - Eversión del cabo (técnica de Brooke)
+    empty_text: ""
+
+  - id: cierre_ostomia_tipo
+    type: single
+    required: false
+    required_if_ostomia_acto: [Cierre / restitución de tránsito (incl. reconstrucción de Hartmann)]
+    label: Tipo de cierre / restitución
+    options:
+      - Cierre de ileostomía en asa
+      - Cierre de colostomía en asa
+      - Reconstrucción de Hartmann (anastomosis colorrectal)
+    empty_text: ""
+
+  - id: control_cabo_distal
+    type: single
+    required: false
+    required_if_cierre_ostomia_tipo: [Reconstrucción de Hartmann (anastomosis colorrectal)]
+    label: Control del cabo distal antes de anastomosis
+    options:
+      - Manometría / endoscopía previa adecuada
+      - No realizado / no consignado
+    empty_text: ""
+
+  - id: hermeticidad_cierre_ostomia
+    type: single
+    required: false
+    required_if_cierre_ostomia_tipo: [Reconstrucción de Hartmann (anastomosis colorrectal)]
+    label: Prueba de hermeticidad (restitución)
+    options:
+      - Fuga demostrada
+      - Sin fuga demostrada
+      - No realizada
+    empty_text: ""
+
+  # ========== 6. Apendicectomía ==========
+  - id: apendicectomia_via
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Apendicectomía]
+    label: Vía
+    options:
+      - Abierta
+      - Laparoscópica
+      - Convertida a abierta
+    empty_text: ""
+
+  - id: apendicectomia_conversion_causa
+    type: free
+    required: false
+    required_if_apendicectomia_via: [Convertida a abierta]
+    label: Causa de conversión (apendicectomía)
+    empty_text: ""
+
+  - id: apendicectomia_hallazgo
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Apendicectomía]
+    label: Hallazgo del apéndice
+    options:
+      - Normal
+      - Flemonosa
+      - Gangrenosa
+      - Perforada
+    empty_text: ""
+
+  - id: apendicectomia_munon
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Apendicectomía]
+    label: Manejo del muñón
+    options:
+      - Ligadura / transfixación
+      - Endoloop
+      - Engrapadora lineal
+      - Invaginación del muñón
+      - Otro
+    empty_text: ""
+
+  - id: apendicectomia_munon_otro
+    type: free
+    required: false
+    required_if_apendicectomia_munon: [Otro]
+    label: Manejo del muñón (otro)
+    empty_text: ""
+
+  - id: campo_apendicectomia
+    type: single
+    required: false
+    required_if_apendicectomia_hallazgo: [Gangrenosa, Perforada]
+    label: Clasificación del campo
+    options: [Limpio, Limpio-contaminado, Contaminado]
+    empty_text: ""
+
+  - id: drenaje_gi
+    type: single
+    required: false
+    required_if_procedimiento_grupo:
+      - Colectomía / resección colorrectal
+      - Gastrectomía / procedimiento gástrico
+      - Resección de intestino delgado / enterectomía
+      - Laparotomía / laparoscopía exploradora
+      - Ostomía (confección / cierre)
+      - Apendicectomía
+    label: Drenaje
+    options: [Sí, Sin drenaje]
+    empty_text: ""
+
+  - id: drenaje_gi_detalle
+    type: free
+    required: false
+    required_if_drenaje_gi: [Sí]
+    label: Drenaje — tipo / cantidad / ubicación
+    empty_text: ""
+
+plantilla_texto: |
+  Gastrointestinal — {{procedimiento_grupo}}. Abordaje: {{abordaje}}{{conversion_causa}}.
+  Colorrecto: {{proc_colorrecto}}{{hemiderecha_extendida}}; indicación {{indicacion_colorrecto}}; linfadenectomía {{linfadenectomia_colorrecto}} {{vasos_ligadura_central}}; cólica izq. {{conservacion_colica_izq}}; mesorrecto {{escision_mesorrectal}}.
+  Uréteres: der. {{ureter_derecho}}; izq. {{ureter_izquierdo}}{{ureter_lesion_detalle}}.
+  Campo {{campo_colorrecto}}; restitución {{decision_restitucion}}{{decision_restitucion_otra}}.
+  Anastomosis {{tipo_anastomosis_cr}} {{config_anastomosis_cr}} {{tecnica_anastomosis_cr}} circ.{{engrapadora_circular_mm}} lin.{{engrapadora_lineal_mm}} {{sutura_manual_cr}} {{planos_manual_cr}}; hermeticidad {{hermeticidad_cr}}; ostomía protección {{ostomia_proteccion}}.
+  Gástrico: {{tipo_reseccion_gastrica}}{{sleeve_xref_nota}}; linfadenectomía {{linfadenectomia_gastrica}}; márgenes prox. {{margen_proximal}} {{margen_proximal_distancia}} / dist. {{margen_distal}} {{margen_distal_distancia}}; reconstrucción {{reconstruccion_gastrica}} {{tecnica_anastomosis_gastrica}} refuerzo {{refuerzo_linea_sutura}}; hermeticidad {{hermeticidad_gastrica}}; campo {{campo_gastrico_urgencia}}.
+  Delgado: {{indicacion_delgado}}; resecado {{longitud_resecada_cm}} cm / remanente {{intestino_remanente_cm}} cm; {{ubicacion_reseccion_delgado}}; {{reconstruccion_delgado}} {{config_anastomosis_delgado}} {{tecnica_anastomosis_delgado}}; hermeticidad {{hermeticidad_delgado}}; campo {{campo_delgado}}.
+  Exploradora: {{objetivo_exploradora}}; líquido {{liquido_libre}} {{liquido_hematico_cc}}; PCI {{pci}}; órganos {{compromiso_organos}}; biopsias peri. {{biopsia_peritoneal}} {{biopsia_peritoneal_sitios}} hep/gang. {{biopsia_hepatica_ganglionar}}; citología {{lavado_citologia}}; gesto {{gesto_exploradora}}; campo {{campo_exploradora}}.
+  Ostomía: {{ostomia_acto}} {{ostomia_tipo}} {{ostomia_config}}; trayecto {{trayecto_muscular}}; fijación {{fijacion_estoma}}; cierre {{cierre_ostomia_tipo}} cabo distal {{control_cabo_distal}}; hermeticidad {{hermeticidad_cierre_ostomia}}.
+  Apendicectomía: vía {{apendicectomia_via}}{{apendicectomia_conversion_causa}}; hallazgo {{apendicectomia_hallazgo}}; muñón {{apendicectomia_munon}}{{apendicectomia_munon_otro}}; campo {{campo_apendicectomia}}.
+  Drenaje: {{drenaje_gi}} {{drenaje_gi_detalle}}.
+```
+
+---
+
+## Notas de primera pasada (para auditar)
+
+1. `procedimiento_grupo` **single** (mismo criterio que M1).
+2. Sleeve: opción + `sleeve_xref_nota` → M6 Esofagogástrico
+   (`cg-esofagogastrico-v1`); **sin** slots bariátricos acá.
+3. Hartmann: en colorrecto = procedimiento índice (§1); en ostomías =
+   «Reconstrucción de Hartmann» (§5 restitución).
+4. Uréteres: slots der./izq. condicionados a `proc_colorrecto` (no forzar
+   ambos en hemicolaterales). Centrales/pélvicos (transversa, subtotal/
+   total, RAR, Miles) piden ambos.
+5. Campo L/LC/C: colorrecto si urgencia/perforación; Graham; delgado
+   isquemia/perforación; exploradora aguda; apéndice gangrenoso/perforado.
+6. Hermeticidad: siempre `Fuga demostrada` / `Sin fuga demostrada` /
+   `No realizada`.
+7. Numéricos (mm, cm, PCI, cc) sin `empty_text` inventado.

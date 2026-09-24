@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>AFG waitForPostbackEnd mock</title></head>
+<body>
+<pre id="out">running…</pre>
+<script>
+/* Mock Sys.WebForms.PageRequestManager — dispara endRequest ~800ms después de "change" */
+(function () {
+  var handlers = [];
+  window.Sys = {
+    WebForms: {
+      PageRequestManager: {
+        getInstance: function () {
+          return {
+            add_endRequest: function (fn) { handlers.push(fn); },
+            remove_endRequest: function (fn) {
+              handlers = handlers.filter(function (h) { return h !== fn; });
+            },
+            _fire: function () {
+              handlers.slice().forEach(function (h) { try { h(); } catch (e) {} });
+            }
+          };
+        }
+      }
+    }
+  };
+  window.__afgFirePostback = function () {
+    setTimeout(function () {
+      window.Sys.WebForms.PageRequestManager.getInstance()._fire();
+    }, 800);
+  };
+})();
+</script>
+<script>
+/* Misma lógica que content/evweb.js (mundo de página = MAIN aquí) */
+function waitForPostbackEnd(timeoutMs) {
+  timeoutMs = timeoutMs || 4000;
+  return new Promise(function (resolve) {
+    var evtName = 'afg_pr_end_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    var done = false;
+    function onEvt(e) {
+      if (done) return;
+      done = true;
+      window.removeEventListener(evtName, onEvt);
+      resolve(e.detail);
+    }
+    window.addEventListener(evtName, onEvt);
+    var script = document.createElement('script');
+    script.textContent = '(function(evtName, timeoutMs){' +
+      'try {' +
+      '  var mgr = window.Sys && window.Sys.WebForms && window.Sys.WebForms.PageRequestManager.getInstance();' +
+      '  if (!mgr) { window.dispatchEvent(new CustomEvent(evtName, {detail:{ok:false, reason:"no_page_request_manager"}})); return; }' +
+      '  var fired = false;' +
+      '  var handler = function(){' +
+      '    if (fired) return; fired = true;' +
+      '    try { mgr.remove_endRequest(handler); } catch(e){}' +
+      '    window.dispatchEvent(new CustomEvent(evtName, {detail:{ok:true, reason:"endRequest"}}));' +
+      '  };' +
+      '  mgr.add_endRequest(handler);' +
+      '  setTimeout(function(){' +
+      '    if (fired) return; fired = true;' +
+      '    try { mgr.remove_endRequest(handler); } catch(e){}' +
+      '    window.dispatchEvent(new CustomEvent(evtName, {detail:{ok:true, reason:"timeout"}}));' +
+      '  }, timeoutMs);' +
+      '} catch(err) {' +
+      '  window.dispatchEvent(new CustomEvent(evtName, {detail:{ok:false, reason:"error", error:String(err)}}));' +
+      '}' +
+      '})("' + evtName + '", ' + timeoutMs + ');';
+    (document.head || document.documentElement).appendChild(script);
+    script.remove();
+    setTimeout(function () {
+      if (done) return;
+      done = true;
+      window.removeEventListener(evtName, onEvt);
+      resolve({ ok: true, reason: 'hard_timeout_no_bridge' });
+    }, timeoutMs + 1000);
+  });
+}
+
+(async function () {
+  var out = document.getElementById('out');
+  var settleP = waitForPostbackEnd(4000);
+  window.__afgFirePostback(); // simula change de obra → postback
+  var detail = await settleP;
+  window.__AFG_SETTLE_RESULT__ = detail;
+  out.textContent = JSON.stringify(detail, null, 2);
+})();
+</script>
+</body></html>

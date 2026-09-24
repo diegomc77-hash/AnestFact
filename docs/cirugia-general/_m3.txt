@@ -1,0 +1,66 @@
+<timestamp>Sunday, Sep 13, 2026, 11:57 PM (UTC-3)</timestamp>
+<user_query>
+Módulo 3 — Pancreático y Biliar. Mismo criterio que los 2 anteriores: solo auditoría, sin esqueleto ni archivos todavía. Avanzamos con el **Módulo 3: Pancreático y Biliar**.
+En este bloque cubrimos en detalle las resecciones pancreáticas (distinguiendo la preservación pilórica, técnica de reconstrucción y linfadenectomía), la exploración y derivación de la vía biliar, así como las colecistectomías con sus posibles complicaciones intraoperatorias.
+---
+# MÓDULO 3: PANCREÁTICO Y BILIAR
+---
+## 1. Pancreatectomías y Resecciones Pancreáticas
+* **Tipo de Resección:**
+* [ ] Duodenopancreatectomía Cefálica (DPC / Procedimiento de Whipple)
+* [ ] DPC con Preservación Pilórica (Traverso-Longmire)
+* [ ] Pancreatectomía Corporocaudal ( Distal )
+* [ ] Pancreatectomía Central / Resección Segmentaria
+* [ ] Pancreatectomía Total
+* [ ] Enucleación de Neoplasia / Tumor Neuroendocrino
+* **Esplenectomía Asociada (en Resección Corporal/Caudal):**
+* [ ] Sí (Pancreatectomía distal con esplenectomía)
+* [ ] No (Preservación esplénica: [ ] Técnica de Warshaw  [ ] Preservación de vasos esplénicos)
+* **Abordaje Quirúrgico:** [ ] Abierto / Laparotómico  [ ] Laparoscópico  [ ] Robótico  [ ] Conversión a abierto
+* **Linfadenectomía / Ligadura Vascular:**
+* [ ] Estándar  [ ] Extendida
+* Compromiso/Resección Vascular: [ ] No  [ ] Venosa (Vena Mesentérica Superior / Vena Porta)  [ ] Arterial (Arteria Hepática / Tronco Celíaco)
+* Resección vascular con reconstrucción: [ ] Anastomosis primaria  [ ] Injerto autólogo / sintético
+* **Reconstrucción (en DPC / Whipple):**
+* **Anastomosis Pancreática:**
+* Tipo: [ ] Pancreatoyeyunoanastomosis  [ ] Pancreatogastroanastomosis
+* Técnica: [ ] Invaginante  [ ] Ducto-mucosa (Duct-to-mucosa)  [ ] Sutura con tutor intraductal / Stent
+* **Anastomosis Biliar:**
+* [ ] Hepaticoyeyunoanastomosis (Término-lateral en Y de Roux)  [ ] Coledocoyeyunoanastomosis
+* **Anastomosis Digestiva:**
+* [ ] Gastroyeyunoanastomosis  [ ] Duodenoyeyunoanastomosis  ( [ ] Antecólica  [ ] Retrocolica )
+---
+## 2. Cirugía de Vía Biliar y Derivaciones Bilio-Digestivas
+* **Procedimiento Específico:**
+* [ ] Exploración / Coledocotomía + Extracción de Litiasis (Coledocolitotomía)
+* [ ] Exploración Transcística de Vía Biliar (Laparoscópica)
+* [ ] Derivación Biliodigestiva: [ ] Coledocoduodenoanastomosis  [ ] Hepaticoyeyunoanastomosis en Y de Roux
+* [ ] Reconstrucción por Lesión Iatrogénica de Vía Biliar (Clasificación Strasberg / Bismuth: _____)
+* **Instrumentación y Drenaje Biliar:**
+* Instrumentación: [ ] Coledocoscopía directa / Fibroendoscopía  [ ] Colangiografía intraoperatoria (CIO)  [ ] Extracción con cesta de Dormia / Catéter Fogarty
+* Drenaje Biliar Colocado: [ ] Tubo en Kahr (T-tube / Tubo en T)  [ ] Stent / Tutor biliar transanastomótico  [ ] Drenaje transcístico
+---
+## 3. Colecistectomía y Procedimientos Vesiculares
+* **Abordaje:** [ ] Laparoscópico  [ ] Abierto / Minilaparotomía  [ ] Convertido (Causa: ________________)
+* **Hallazgos Intraoperatorios:**
+* [ ] Colecistitis Aguda ( [ ] Enfisematosa  [ ] Gangrenosa  [ ] Piocolecisto )
+* [ ] Colecistitis Crónica Litiasica / Escleroatrófica
+* [ ] Plastrón / Síndrome de Mirizzi (Grado: I / II / III / IV)
+* **Visión de Seguridad de Strasberg (CVS):** [ ] Lograda  [ ] No lograda
+* **Técnica / Resección:**
+* [ ] Colecistectomía Total (Retrógrada / Anterógrada)
+* [ ] Colecistectomía Subtotal / Subtotal de Rescate ( [ ] Fenestrada  [ ] Reconstitutiva )
+* **Colangiografía Intraoperatoria (CIO):**
+* [ ] No realizada
+* [ ] Realizada: Hallazgos ( [ ] Vía biliar expedita  [ ] Litiasis de VBP  [ ] Fuga / Variaciones anatómicas )
+* **Manejo del Conducto Cístico y Arteria Cística:**
+* Ligadura / Clipado: [ ] Clips titanio  [ ] Clips polímero (Hem-o-lok)  [ ] Sutura monofilamento / Ligadura manual
+---
+## 4. Drenajes y Cierre del Módulo Pancreato-Biliar
+* **Drenajes Cavitarios Colocados:**
+* [ ] Drenaje en Celda Hepática / Lecho Vesicular: (Cantidad: ____, Tipo: ____________)
+* [ ] Drenaje en Pancreatoyeyuno / Hepaticoyeyuno: (Cantidad: ____, Tipo: ____________)
+* [ ] Drenaje en Trascavidad de los Epiplones / Trasfondo: (Cantidad: ____, Tipo: ____________)
+* **Medición de Amilasa en Drenaje (para protocolo POD 3/5 si aplica):** [ ] Programado
+---
+</user_query>

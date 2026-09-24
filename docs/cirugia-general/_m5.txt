@@ -1,0 +1,58 @@
+<timestamp>Monday, Sep 14, 2026, 3:02 PM (UTC-3)</timestamp>
+<user_query>
+Excelente. Pasamos al **Módulo 5: Retroperitoneo**.
+En este bloque abordamos la cirugía de tumores retroperitoneales (sarcomas y otras masas), linfadenectomías retroperitoneales, abordaje de glándula suprarrenal y manejo de complicaciones vasculares o urológicas asociadas.
+---
+# MÓDULO 5: RETROPERITONEO
+---
+## 1. Resección de Tumores y Masas Retroperitoneales (ej. Sarcomas)
+* **Localización y Extensión:**
+* [ ] Retroperitoneo alto / Ilio-lumbar  [ ] Fosa ilíaca  [ ] Pelviano / Suprapúbico
+* Compromiso de línea media / Grandes vasos: [ ] Sí  [ ] No
+* **Abordaje Quirúrgico:**
+* [ ] Laparotomía exploradora (Mediana / Subcostal ampliada / Toracoabdominal)
+* [ ] Laparoscópico / Robótico (para masas seleccionadas)
+* **Intención de la Resección:** [ ] R0 (Resección microscópica completa)  [ ] R1 (Resección macroscópica completa con margen microscópico positivo)  [ ] R2 (Resección incompleta / Debulking)  [ ] Biopsia de masa inoperable
+* **Resecciones Multiviscerales Asociadas (por invasión de margen):**
+* [ ] Nefrectomía (Derecha / Izquierda)
+* [ ] Colectomía (Derecha / Izquierda / Colo-sigmoidea)
+* [ ] Pancreatectomía distal / Esplenectomía
+* [ ] Resección vascular (Vena Cava / Aorta / Vasos Ilíacos)
+* [ ] Resección muscular (Psoas / Pared posterior)
+---
+## 2. Linfadenectomía Retroperitoneal
+* **Indicación:** [ ] Tumor germinal de testículo  [ ] Tumor ginecológico / Oncológico  [ ] Estadificación / Debulking
+* **Extensión / Plantilla de Linfadenectomía:**
+* [ ] Paraaórtica  [ ] Interaortocava  [ ] Paracava  [ ] Ilíaca común / Externa / Interna  [ ] Obturatriz
+* **Preservación Nerviosa:** [ ] Sí (Preservación de plexo simpático lumbar)  [ ] No
+---
+## 3. Adrenalectomía / Cirugía Suprarrenal
+* **Laterallidad:** [ ] Derecha  [ ] Izquierda  [ ] Bilateral
+* **Abordaje Quirúrgico:**
+* [ ] Laparoscópico (Transperitoneal)
+* [ ] Retroperitoneoscópico (Posterior - RLA)
+* [ ] Abierto / Laparotómico
+* **Indicación / Patología:** [ ] Feocromocitoma  [ ] Incidentaloma / Adenoma  [ ] Síndrome de Cushing / Conn  [ ] Carcinoma suprarrenal (ACC)  [ ] Metástasis
+* **Control Vascular:**
+* Vena suprarrenal principal aislada y ligada antes de la manipulación: [ ] Sí  [ ] No
+* Manejo del lecho: [ ] Clipado  [ ] Sellado energético  [ ] Sutura manual
+---
+## 4. Compromiso y Reconstrucción Vascular / Urológica de Urgencia
+* **Estructuras Vasculares Abordadas:**
+* [ ] Vena Cava Inferior: [ ] Control venoso lateral / Venorrafia  [ ] Resección + Injerto / Prótesis  [ ] Ligadura
+* [ ] Vasos Ilíacos: [ ] Resección y sustitución protésica  [ ] Anastomosis directa
+* [ ] Vasos Renales: [ ] Preservados  [ ] Reconstruidos
+* **Manejo Urológico (en tumor retroperitoneal):**
+* [ ] Uréter aislado y preservado
+* [ ] Resección ureteral + [ ] Reimplante ureterovesical  [ ] Anastomosis término-terminal  [ ] Colocación de catéter Doble J intraoperatorio
+---
+## 5. Cierre, Hemostasia y Drenajes Retroperitoneales
+* **Hemostasia del Lecho:**
+* [ ] Coagulación monopolar / bipolar / sellado energético
+* [ ] Agentes hemostáticos tópicos (Matriz de gelatina / Fibrina / Celulosa oxidada)
+* **Drenajes:**
+* [ ] Drenaje aspirativo en lecho retroperitoneal: (Cantidad: ____, Ubicación: ____________)
+* [ ] Cierre aponeurótico por planos / Malla de refuerzo en pared posterior (si aplica)
+---
+audita, analiza y comenta
+</user_query>

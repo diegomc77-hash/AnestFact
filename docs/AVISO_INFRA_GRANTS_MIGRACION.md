@@ -198,6 +198,40 @@ La función que sí decide si se puede encolar, `afEvwebQueueValidate(i)` en `js
 - No agregar bloqueo duro (a diferencia de 9a) salvo que Diego confirme que sí hay documentos siempre obligatorios — eso lo tiene que decir él, no se asume desde el código.
 - No toca `fill.js`, IDs GECLISA, ni la lógica de la extensión (`evweb.js`) — solo hace visible en AnesFact lo que la extensión ya sabe que se está saltando. Riesgo: bajo.
 
-**Hecho Cursor (PWA 13.03):** 9a bloqueo en `afEvwebQueueValidate` + aviso en lista; 9b "Sin: …" persistente en lista; toast de "sin adjuntos" removido. Pendiente auditoría.
+**Auditoría 2026-09-23 — commit `205faea`, PWA reportada 13.03.** Lógica de 9a y 9b confirmada correcta en el código real:
+- `afEvwebQueueValidate(i)` ahora recorre `i.pracs` y bloquea con `'Práctica "X" sin código EVWEB — resolvela en Facturación antes de encolar'` si falta `codigoEvweb`; fojas sin prácticas quedan exentas, tal como se pidió.
+- `afEvwebQueueListHtml()` muestra `Sin código EVWEB: …` (9a) y `Sin: foja quirúrgica, autorización, …` (9b) por ítem, en rojo, de forma persistente.
+- El toast de "sin adjuntos" fue removido; queda comentario explícito de que el aviso ahora es persistente en la lista, no un toast.
+
+**Bug encontrado en 1ª vuelta de auditoría:** al leer `js/load-scripts.js` y `sw.js` desde la PC, `CACHE_V`/`CACHE_NAME` aparecían en 13.02 mientras el resto ya estaba en 13.03. Devuelto a Cursor.
+
+**Respuesta de Cursor:** en `origin/main` (`205faea`) ya estaban en 13.03 — el 13.02 leído era el working tree local sin sincronizar (restore de WIP después del push), no lo que quedó commiteado.
+
+**Re-verificación 2026-09-23 — CONFIRMADO, TICKET 9 (9a + 9b) CERRADO.** Se volvió a pedir el archivo fresco desde la PC (no desde caché de una lectura anterior) y ahora `js/load-scripts.js` tiene `CACHE_V = '13.03'` y `sw.js` tiene `CACHE_NAME = 'anesfact-v13.03'` — versión sincronizada en los 6 archivos de control. Lógica de 9a (bloqueo por práctica sin código EVWEB) y 9b (aviso persistente de documentos faltantes, sin bloquear) verificada correcta en el código real en la vuelta anterior. Ticket cerrado.
+
+## 10. Regresión de producción — cola EVWEB bloqueada por catálogo faltante (RESUELTA)
+
+**Origen:** Diego preguntó por qué no habíamos subido nada de "la dinámica de evweb", el nomenclador EVWEB, ni las mutuales nuevas con estrellas de favoritos. Al auditar producción (no solo la PC) se encontró algo peor que "no subido": **una regresión activa**.
+
+**Auditado en `anestfact.diegomc77.workers.dev` (producción real, con fetch en vivo, cache-busted):**
+- El bloqueo del Ticket 9a **sí estaba en producción** (correcto, funcionando).
+- Pero `data/evweb-practicas-match.js` (catálogo EVWEB, ~2,5 MB, códigos de las 15 mutuales) daba **404** — nunca se había pusheado, quedó `untracked` en el working tree de Cursor y no entró en los commits de Ticket 8/9.
+- Consecuencia real: sin catálogo, ninguna práctica podía resolver `codigoEvweb` (ni automático ni las opciones para elegir a mano), y con el bloqueo del 9a ya en producción, **toda foja con al menos una práctica cargada quedaba imposibilitada de encolar a EVWEB**. Regresión real causada por el propio Ticket 9a al exponer un hueco que antes pasaba desapercibido.
+- De paso se confirmó lo que Diego sospechaba: `data/obras-sociales.js` en producción era la lista genérica vieja (sin las 15 mutuales, sin semilla de favoritos) — no rompía nada (hay fallback seguro en el código), pero tampoco estaba.
+
+**Hotfix de Cursor — commit `be5115a`, PWA 13.04.** Subió `data/evweb-practicas-match.js` + `data/obras-sociales.js` (15 mutuales) + las entradas correspondientes en `load-scripts.js`/`sw.js`.
+
+**Re-verificación 2026-09-23 — CONFIRMADO EN VIVO, TICKET CERRADO.** Con fetch cache-busted (`?v=13.04`) a producción:
+- `CACHE_V` = `13.04`.
+- `data/evweb-practicas-match.js` → 200, `window.AF_EVWEB_PRACTICAS_CATALOG.byObraId` presente con datos reales.
+- `data/obras-sociales.js` → 200, `AF_OBRAS_HUERTA` con las 15 mutuales, `OBRAS_SOCIALES` con 373 entradas (catálogo completo para autocompletado + estrellas de favoritos).
+
+**Pendiente de Diego (prueba real, no auditable desde acá):** hacer hard-refresh a 13.04 y encolar de nuevo una foja con prácticas para confirmar que ahora sí resuelve el código y deja encolar.
+
+**Lección para el proceso:** de acá en más, antes de cerrar un ticket que toque la cola EVWEB o cualquier archivo de datos pesado (`data/*.js`), verificar explícitamente contra producción (fetch en vivo, no solo el reporte de Cursor ni el estado de la PC) que el archivo relevante no haya quedado `untracked` fuera del commit — es la segunda vez en esta sesión (después del bug del `manifest.json` en Ticket 3) que un archivo queda correcto en la lógica pero ausente en el deploy real.
+
+## Nota abierta — Ticket 2 (Storage) posiblemente no está en producción
+
+Durante la auditoría del punto anterior se notó que `js/41c-docs-storage.js` (el archivo del Ticket 2, migración de adjuntos a Supabase Storage, marcado ✅ cerrado en una sesión anterior) **tampoco aparece en el `SCRIPTS` de producción** (`anestfact.diegomc77.workers.dev/js/load-scripts.js?v=13.04`). No es urgente — los adjuntos siguen guardándose como antes (base64 en `anesfact_datos`), no se rompe nada — pero indica que ese cierre pudo haberse dado solo con el reporte de Cursor, sin verificar producción como se hizo recién acá. **Pendiente:** re-auditar el Ticket 2 contra producción real antes de asumir que sigue cerrado.
 
 Cada ticket lo implementa Cursor; Claude audita el resultado contra este documento antes de darlo por cerrado.

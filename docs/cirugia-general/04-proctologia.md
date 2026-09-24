@@ -1,0 +1,536 @@
+# Módulo 4 — Proctología (patología anal y periorificial)
+
+**id:** `cg-proctologia-v1` · especialidad: Cirugía General ·  
+**Estado:** esqueleto de slots — **OK de semilla** (2026-09-14). Motor P2
+pendiente. Hemostasia ampliada (electrocauterio / armónico / Ligasure /
+sutura / tópico / puntos absorbibles).
+
+Índice: [README.md](README.md) · Hallazgos: [HALLAZGOS_ESQUELETO.md](HALLAZGOS_ESQUELETO.md)
+
+Consentimiento / gasas / ATB = cáscara A4 de Foja Qx (no van acá).
+**Sin** «tipo de anestesia» (anti-patrón Regla 3; vive en foja anestesia).
+Miles / resección rectal → M2 Gastrointestinal (cg-gastrointestinal-v1)
+(no mezclar).
+
+Hallazgos aplicados: continencia **pre** (Regla 2) en fistulotomía /
+fistulectomía / setón cortante / ELI; neoplasia canal anal ampliada;
+infección activa en pilonidal crónico; mutex hemorroides resectiva vs no
+resectiva; typos Fístula / margen marcado; esfínter post condicionado;
+campo L/LC/C en absceso / fístula séptica / pilonidal infectado; Botox UI
+sin inventar dosis.
+
+---
+
+## Proforma — Proctología
+
+```text
+id:            cg-proctologia-v1
+especialidad:  "Cirugía General"
+operaciones: [
+  "Hemorroidectomía / hemorroidopexia",
+  "Drenaje de absceso perianal",
+  "Cirugía de fístula anal",
+  "Esfinterotomía / fisura anal",
+  "Cirugía de quiste / sinus pilonidal",
+  "Biopsia / escisión de lesión perianal",
+  "Esfinteroplastia anal"
+]
+titulo: "Proctología — patología anal y periorificial"
+
+slots:
+
+  # ========== Índice ==========
+  - id: procedimiento_grupo
+    type: single
+    required: true
+    label: Procedimiento / foco
+    options:
+      - Patología hemorroidal
+      - Absceso / fístula perianal
+      - Fisura anal
+      - Quiste sacrococcígeo / pilonidal
+      - Otras lesiones / neoplasia / esfinteroplastia
+
+  # ========== 1. Hemorroides ==========
+  - id: grado_hemorroides
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Patología hemorroidal]
+    label: Clasificación / grado
+    options:
+      - Grado I
+      - Grado II
+      - Grado III
+      - Grado IV
+      - Trombosis hemorroidal aguda
+    empty_text: ""
+
+  - id: paquetes_hemorroides
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Patología hemorroidal]
+    label: Topografía / paquetes afectados
+    options:
+      - 3 (izquierdo)
+      - 7 (anteroderecho)
+      - 11 (posteroderecho)
+      - Circunferencial
+    join: ", "
+    empty_text: ""
+
+  - id: enfoque_hemorroides
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Patología hemorroidal]
+    label: Enfoque de reparación
+    options:
+      - Resectiva (abierta / cerrada)
+      - No resectiva / instrumental
+    empty_text: ""
+
+  - id: tecnica_hemorroides_resectiva
+    type: single
+    required: false
+    required_if_enfoque_hemorroides: [Resectiva (abierta / cerrada)]
+    label: Técnica resectiva
+    options:
+      - Hemorroidectomía abierta (Milligan-Morgan)
+      - Hemorroidectomía cerrada (Ferguson)
+      - Hemorroidectomía semi-cerrada (Parks)
+    empty_text: ""
+
+  - id: tecnica_hemorroides_no_resectiva
+    type: single
+    required: false
+    required_if_enfoque_hemorroides: [No resectiva / instrumental]
+    label: Técnica no resectiva / instrumental
+    options:
+      - Hemorroidopexia mecánica (PPH / Longo)
+      - Desarterialización hemorroidal transanal (THD / RAR)
+      - Ligadura con banda elástica (LBL)
+      - Fotocoagulación láser / escleroterapia
+    empty_text: ""
+
+  - id: instrumento_corte_hemorroides
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Patología hemorroidal]
+    label: Instrumento de corte / sellado
+    options:
+      - Bisturí frío
+      - Electrocauterio
+      - Bisturí armónico / ultrasónico
+      - Ligasure / radiofrecuencia
+      - Láser
+      - No aplica
+    empty_text: ""
+
+  # ========== 2. Absceso / fístula ==========
+  - id: foco_absceso_fistula
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Absceso / fístula perianal]
+    label: Fase / foco
+    options:
+      - Absceso perianal (fase aguda)
+      - Fístula anal (fase crónica)
+    empty_text: ""
+
+  - id: topografia_absceso
+    type: single
+    required: false
+    required_if_foco_absceso_fistula: [Absceso perianal (fase aguda)]
+    label: Topografía del absceso
+    options:
+      - Perianal superficial
+      - Isquiorrectal
+      - Interesfinteriano
+      - Supraelevador
+    empty_text: ""
+
+  - id: gesto_absceso
+    type: multi
+    required: false
+    required_if_foco_absceso_fistula: [Absceso perianal (fase aguda)]
+    label: Gesto sobre el absceso
+    options:
+      - Incisión, drenaje, lavado y debridamiento
+      - Embalaje / mecha
+      - Drenaje en asa (loop)
+    join: ", "
+    empty_text: ""
+
+  - id: campo_absceso
+    type: single
+    required: false
+    required_if_foco_absceso_fistula: [Absceso perianal (fase aguda)]
+    label: Clasificación del campo
+    options: [Limpio, Limpio-contaminado, Contaminado]
+    empty_text: ""
+
+  - id: parks_fistula
+    type: single
+    required: false
+    required_if_foco_absceso_fistula: [Fístula anal (fase crónica)]
+    label: Clasificación de Parks
+    options:
+      - Interesfinteriana
+      - Transesfinteriana baja
+      - Transesfinteriana alta
+      - Supraesfinteriana
+      - Extraesfinteriana
+    empty_text: ""
+
+  - id: tecnica_fistula
+    type: single
+    required: false
+    required_if_foco_absceso_fistula: [Fístula anal (fase crónica)]
+    label: Técnica quirúrgica (fístula)
+    options:
+      - Fistulotomía (puesta a plano)
+      - Fistulectomía
+      - Setón cortante (terapéutico)
+      - Setón laxo / de drenaje
+      - LIFT
+      - Avance de colgajo endorrectal (flap)
+      - VAAFT
+      - Tapón / plug de colágeno
+      - Sellado con láser (FiLaC)
+    empty_text: ""
+
+  # Regla 2 — continencia previa (solo si se secciona esfínter a propósito)
+  - id: continencia_pre
+    type: single
+    required: false
+    required_if_tecnica_fistula:
+      - Fistulotomía (puesta a plano)
+      - Fistulectomía
+      - Setón cortante (terapéutico)
+    label: Continencia previa (antes del gesto sobre el esfínter)
+    options:
+      - Continente
+      - Incontinencia ocasional / leve
+      - Incontinencia significativa
+      - No evaluada / no consignada
+    empty_text: ""
+
+  - id: factores_riesgo_continencia
+    type: multi
+    required: false
+    required_if_tecnica_fistula:
+      - Fistulotomía (puesta a plano)
+      - Fistulectomía
+      - Setón cortante (terapéutico)
+    label: Factores de riesgo de continencia
+    options:
+      - Partos / traumatismo obstétrico
+      - Cirugía anal previa
+      - Enfermedad neurológica / otra
+    join: ", "
+    empty_text: ""
+    # Vacío = ninguno consignado (no opción «Ninguno» combinable).
+
+  - id: campo_fistula
+    type: single
+    required: false
+    required_if_foco_absceso_fistula: [Fístula anal (fase crónica)]
+    label: Clasificación del campo (si sepsis local / contaminación)
+    options: [Limpio, Limpio-contaminado, Contaminado, No aplica]
+    empty_text: ""
+
+  # ========== 3. Fisura ==========
+  - id: ubicacion_fisura
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Fisura anal]
+    label: Ubicación de la fisura
+    options:
+      - Línea media posterior
+      - Línea media anterior
+      - Atípica / lateral
+    empty_text: ""
+
+  - id: tipo_fisura
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Fisura anal]
+    label: Tipo de fisura
+    options:
+      - Aguda
+      - Crónica (tríada de Brodie)
+    empty_text: ""
+
+  - id: procedimiento_fisura
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Fisura anal]
+    label: Procedimiento
+    options:
+      - Esfinterotomía lateral interna (ELI) abierta
+      - Esfinterotomía lateral interna (ELI) percutánea / cerrada
+      - Fisurectomía simple
+      - Fisurectomía + anoplastia (colgajo de avance)
+      - Inyección de toxina botulínica
+    empty_text: ""
+
+  - id: continencia_pre_eli
+    type: single
+    required: false
+    required_if_procedimiento_fisura:
+      - Esfinterotomía lateral interna (ELI) abierta
+      - Esfinterotomía lateral interna (ELI) percutánea / cerrada
+    label: Continencia previa (antes de ELI)
+    options:
+      - Continente
+      - Incontinencia ocasional / leve
+      - Incontinencia significativa
+      - No evaluada / no consignada
+    empty_text: ""
+
+  - id: factores_riesgo_continencia_eli
+    type: multi
+    required: false
+    required_if_procedimiento_fisura:
+      - Esfinterotomía lateral interna (ELI) abierta
+      - Esfinterotomía lateral interna (ELI) percutánea / cerrada
+    label: Factores de riesgo de continencia (ELI)
+    options:
+      - Partos / traumatismo obstétrico
+      - Cirugía anal previa
+      - Enfermedad neurológica / otra
+    join: ", "
+    empty_text: ""
+
+  - id: botox_ui
+    type: free
+    required: false
+    required_if_procedimiento_fisura: [Inyección de toxina botulínica]
+    label: Toxina botulínica — dosis (UI)
+    empty_text: ""
+
+  # ========== 4. Pilonidal ==========
+  - id: fase_pilonidal
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Quiste sacrococcígeo / pilonidal]
+    label: Fase
+    options:
+      - Absceso agudo (drenaje)
+      - Sinus pilonidal crónico
+    empty_text: ""
+
+  - id: infeccion_activa_pilonidal
+    type: single
+    required: false
+    required_if_fase_pilonidal: [Sinus pilonidal crónico]
+    label: Infección activa al momento (electivo)
+    options: [Sí, No]
+    empty_text: ""
+
+  - id: tecnica_pilonidal
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Quiste sacrococcígeo / pilonidal]
+    label: Técnica quirúrgica
+    options:
+      - Resección y cierre primario por la línea media
+      - Resección y cicatrización por segunda intención (abierta)
+      - Colgajo Karydakis
+      - Colgajo Bascom
+      - Colgajo Limberg (plastia en Z / romboide)
+      - EPSiT (videoasistida)
+      - Ablación láser (SiLaC)
+      - Drenaje de absceso (solo)
+    empty_text: ""
+
+  - id: campo_pilonidal
+    type: single
+    required: false
+    required_if_fase_pilonidal: [Absceso agudo (drenaje)]
+    label: Clasificación del campo
+    options: [Limpio, Limpio-contaminado, Contaminado]
+    empty_text: ""
+
+  - id: campo_pilonidal_electivo
+    type: single
+    required: false
+    required_if_infeccion_activa_pilonidal: [Sí]
+    label: Clasificación del campo (pilonidal infectado)
+    options: [Limpio, Limpio-contaminado, Contaminado]
+    empty_text: ""
+
+  # ========== 5. Otras / neoplasia ==========
+  - id: foco_otras
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Otras lesiones / neoplasia / esfinteroplastia]
+    label: Foco
+    options:
+      - Lesiones condilomatosas / HPV
+      - Neoplasia de canal anal / tumores perianales
+      - Esfinteroplastia anal (incontinencia / defecto)
+    empty_text: ""
+
+  - id: tecnica_condilomas
+    type: single
+    required: false
+    required_if_foco_otras: [Lesiones condilomatosas / HPV]
+    label: Técnica (condilomas / HPV)
+    options:
+      - Electrofulguración / cauterización
+      - Escisión quirúrgica simple
+    empty_text: ""
+
+  - id: dx_presuntivo_neoplasia_anal
+    type: single
+    required: false
+    required_if_foco_otras: [Neoplasia de canal anal / tumores perianales]
+    label: Diagnóstico presuntivo
+    options:
+      - Epidermoide / escamoso
+      - Basocelular
+      - Melanoma anal
+      - Adenocarcinoma
+      - Otro
+    empty_text: ""
+
+  - id: dx_presuntivo_neoplasia_otro
+    type: free
+    required: false
+    required_if_dx_presuntivo_neoplasia_anal: [Otro]
+    label: Diagnóstico presuntivo (otro)
+    empty_text: ""
+
+  - id: localizacion_neoplasia_anal
+    type: single
+    required: false
+    required_if_foco_otras: [Neoplasia de canal anal / tumores perianales]
+    label: Localización
+    options:
+      - Canal anal
+      - Margen anal / perianal
+      - Ambos / extensión
+    empty_text: ""
+
+  - id: tamanio_neoplasia_anal
+    type: free
+    required: false
+    required_if_foco_otras: [Neoplasia de canal anal / tumores perianales]
+    label: Tamaño de la lesión (mm/cm)
+    empty_text: ""
+
+  - id: tipo_biopsia_neoplasia
+    type: single
+    required: false
+    required_if_foco_otras: [Neoplasia de canal anal / tumores perianales]
+    label: Tipo de biopsia / resección
+    options:
+      - Biopsia escisional
+      - Biopsia incisional
+    empty_text: ""
+
+  - id: margen_marcado
+    type: single
+    required: false
+    required_if_foco_otras: [Neoplasia de canal anal / tumores perianales]
+    label: Margen marcado
+    options: [Sí, No]
+    empty_text: ""
+
+  - id: tecnica_esfinteroplastia
+    type: single
+    required: false
+    required_if_foco_otras: [Esfinteroplastia anal (incontinencia / defecto)]
+    label: Técnica de esfinteroplastia
+    options:
+      - Traslape / overlapping
+      - Otra
+    empty_text: ""
+
+  # ========== 6. Esfínter post / hemostasia (sin anestesia) ==========
+  - id: esfinter_estado_post
+    type: single
+    required: false
+    required_if_tecnica_fistula:
+      - Fistulotomía (puesta a plano)
+      - Fistulectomía
+      - Setón cortante (terapéutico)
+    # También ELI — motor: required_if_any con procedimiento_fisura ELI
+    label: Estado del esfínter al cierre
+    options:
+      - Íntegro (preservado)
+      - Sección parcial controlada
+      - Sección reconstruida
+    empty_text: ""
+
+  - id: esfinter_estado_post_eli
+    type: single
+    required: false
+    required_if_procedimiento_fisura:
+      - Esfinterotomía lateral interna (ELI) abierta
+      - Esfinterotomía lateral interna (ELI) percutánea / cerrada
+    label: Estado del esfínter al cierre (ELI)
+    options:
+      - Íntegro (preservado)
+      - Sección parcial controlada
+      - Sección reconstruida
+    empty_text: ""
+
+  - id: hemostasia_metodo
+    type: multi
+    required: false
+    required_if_procedimiento_grupo:
+      - Patología hemorroidal
+      - Absceso / fístula perianal
+      - Fisura anal
+      - Otras lesiones / neoplasia / esfinteroplastia
+    label: Hemostasia
+    options:
+      - Electrocauterio
+      - Bisturí armónico / ultrasónico
+      - Ligasure / radiofrecuencia
+      - Sutura hemostática
+      - Agente tópico
+      - Cauterización / puntos hemostáticos absorbibles
+    join: ", "
+    empty_text: ""
+
+  - id: taponamiento_anal
+    type: single
+    required: false
+    required_if_procedimiento_grupo:
+      - Patología hemorroidal
+      - Absceso / fístula perianal
+      - Fisura anal
+      - Otras lesiones / neoplasia / esfinteroplastia
+    label: Taponamiento anal
+    options:
+      - Sí (gasa / esponja / tubo de descompresión)
+      - Sin taponamiento
+    empty_text: ""
+
+plantilla_texto: |
+  Proctología — {{procedimiento_grupo}}.
+  Hemorroides: grado {{grado_hemorroides}}; paquetes {{paquetes_hemorroides}}; enfoque {{enfoque_hemorroides}} {{tecnica_hemorroides_resectiva}}{{tecnica_hemorroides_no_resectiva}}; instrumento {{instrumento_corte_hemorroides}}.
+  Absceso/fístula: {{foco_absceso_fistula}}; topografía {{topografia_absceso}} {{gesto_absceso}}; Parks {{parks_fistula}}; técnica {{tecnica_fistula}}; continencia pre {{continencia_pre}} {{factores_riesgo_continencia}}; campo {{campo_absceso}}{{campo_fistula}}.
+  Fisura: {{ubicacion_fisura}} {{tipo_fisura}}; {{procedimiento_fisura}}; continencia pre ELI {{continencia_pre_eli}} {{factores_riesgo_continencia_eli}}; Botox {{botox_ui}} UI.
+  Pilonidal: {{fase_pilonidal}}; infección activa {{infeccion_activa_pilonidal}}; {{tecnica_pilonidal}}; campo {{campo_pilonidal}}{{campo_pilonidal_electivo}}.
+  Otras: {{foco_otras}} {{tecnica_condilomas}}; neoplasia {{dx_presuntivo_neoplasia_anal}}{{dx_presuntivo_neoplasia_otro}} {{localizacion_neoplasia_anal}} {{tamanio_neoplasia_anal}} {{tipo_biopsia_neoplasia}} margen marcado {{margen_marcado}}; esfinteroplastia {{tecnica_esfinteroplastia}}.
+  Esfínter post: {{esfinter_estado_post}}{{esfinter_estado_post_eli}}; hemostasia {{hemostasia_metodo}}; taponamiento {{taponamiento_anal}}.
+```
+
+---
+
+## Notas de primera pasada (para auditar)
+
+1. `procedimiento_grupo` **single**.
+2. Hemorroides: mutex vía `enfoque_hemorroides` (resectiva vs no resectiva).
+3. Regla 2: continencia pre + factores en fistulotomía / fistulectomía /
+   setón cortante / ELI — **no** en LBL, Botox solo, etc.
+4. **Sin** slot de anestesia genérica.
+5. Neoplasia: dx presuntivo + localización + tamaño + margen marcado.
+6. Pilonidal crónico: `infeccion_activa_pilonidal` Sí/No.
+7. Tipografía: **Fístula**; margen **marcado**.
+8. Miles / rectal onco → M2 Gastrointestinal (cg-gastrointestinal-v1)
+   (fuera de este módulo).
+9. Numéricos (UI Botox, tamaño) sin `empty_text` inventado.

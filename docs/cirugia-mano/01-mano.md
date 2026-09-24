@@ -1,0 +1,668 @@
+# Módulo — Cirugía de Mano y Miembro Superior
+
+**id:** `cmano-mano-v1` · especialidad: Cirugía de Mano y Miembro Superior ·  
+**Estado:** **OK de semilla** (2026-09-14). Tracking:
+[HALLAZGOS_ESQUELETO.md](HALLAZGOS_ESQUELETO.md).
+
+Índice: [README.md](README.md)
+
+Consentimiento / gasas / ATB = cáscara A4 de Foja Qx (no van acá).
+
+## Validación clínica (leer antes de auditar)
+
+**Este módulo no tiene el mismo nivel de validación directa que Cabeza y
+Cuello ni Cirugía General.** CyC y CG fueron validados por la Dra. Huerta
+en su disciplina. Ella **no** es cirujana de mano: el bosquejo y las
+correcciones aplicadas aquí son **criterio clínico del equipo AnesFact
+(Diego)** — auditoría con rigor de especialista de la disciplina,
+pensado para uso por cirujano/a de mano real, **sin** reemplazar la
+revisión futura de un/a especialista. Misma salvedad que Torácica /
+Urológica / Ginecológica / Traumatología / Vascular / Plástica /
+Neurocirugía / Cardiovascular.
+
+## Correcciones aplicadas al bosquejo (11)
+
+**§1 Osteoarticular:** (1) resultado reducción · (2) localización
+escafoides.
+
+**§2 Tendones:** (3) dedos Dupuytren · (4) grado contractura Dupuytren.
+
+**§3 Nervio/micro:** (5) Seddon · (6) nivel + viabilidad reimplante ·
+(11) `proc_reparacion_nerviosa` también si Amputación / reimplante.
+
+**§4 Artroscopia:** (7) Palmer CFCT.
+
+**§5 Infecciones:** (8) hallazgo IO · (9) second-look.
+
+**§6 Torniquete:** (10) exanguinación previa.
+
+Tipografía: **Lateralidad** (no «Laterallidad»).
+
+---
+
+## Proforma — Cirugía de mano y miembro superior
+
+```text
+id:            cmano-mano-v1
+especialidad:  "Cirugía de Mano y Miembro Superior"
+operaciones: [
+  "Patología osteoarticular y traumatológica de mano",
+  "Tendones y partes blandas",
+  "Nervio periférico y microcirugía",
+  "Artroscopia de muñeca",
+  "Infecciones y cobertura cutánea",
+  "Isquemia, torniquete y cierre"
+]
+titulo: "Cirugía de mano y miembro superior"
+
+slots:
+
+  # ========== Índice ==========
+  - id: procedimiento_grupo
+    type: single
+    required: true
+    label: Procedimiento / foco
+    options:
+      - Osteoarticular / traumatológica
+      - Tendones / partes blandas
+      - Nervio periférico / microcirugía
+      - Artroscopia de muñeca
+      - Infecciones / cobertura
+      - Isquemia / torniquete / cierre
+
+  - id: lateralidad
+    type: single
+    required: false
+    required_if_procedimiento_grupo:
+      - Osteoarticular / traumatológica
+      - Tendones / partes blandas
+      - Nervio periférico / microcirugía
+      - Artroscopia de muñeca
+      - Infecciones / cobertura
+    label: Lateralidad
+    options: [Derecha, Izquierda]
+    empty_text: ""
+
+  - id: abordaje
+    type: single
+    required: false
+    label: Abordaje (si aplica)
+    options:
+      - Abierto
+      - Percutáneo / mínimamente invasivo
+      - Artroscópico
+      - Endoscópico
+      - Convertido a abierto
+    empty_text: ""
+
+  - id: conversion_causa
+    type: free
+    required: false
+    required_if_abordaje: [Convertido a abierto]
+    label: Causa de conversión
+    empty_text: ""
+
+  # ========== 1. Osteoarticular / traumatológica ==========
+  - id: pieza_osea
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Osteoarticular / traumatológica]
+    label: Ubicación / pieza ósea
+    options:
+      - Radio distal
+      - Cúbito
+      - Escafoides
+      - Carpo (otros)
+      - Metacarpianos
+      - Falanges
+    join: ", "
+    empty_text: ""
+
+  - id: carpo_otros_detalle
+    type: free
+    required: false
+    required_if_pieza_osea: [Carpo (otros)]
+    label: Carpo — detalle
+    empty_text: ""
+
+  - id: metacarpiano_numero
+    type: multi
+    required: false
+    required_if_pieza_osea: [Metacarpianos]
+    label: Metacarpiano(s)
+    options: ["1.º", "2.º", "3.º", "4.º", "5.º"]
+    join: ", "
+    empty_text: ""
+
+  - id: falange_nivel
+    type: multi
+    required: false
+    required_if_pieza_osea: [Falanges]
+    label: Falange
+    options: [Proximal, Media, Distal]
+    join: ", "
+    empty_text: ""
+
+  - id: tipo_lesion_osea
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Osteoarticular / traumatológica]
+    label: Tipo de lesión
+    options:
+      - Fractura cerrada
+      - Fractura expuesta
+      - Luxación / luxofractura
+      - Seudoartrosis / artrosis
+    join: "; "
+    empty_text: ""
+
+  - id: gustilo_anderson_mano
+    type: single
+    required: false
+    required_if_tipo_lesion_osea: [Fractura expuesta]
+    label: Clasificación de Gustilo-Anderson
+    options: [I, II, IIIA, IIIB, IIIC]
+    empty_text: ""
+
+  - id: localizacion_escafoides
+    type: single
+    required: false
+    required_if_pieza_osea: [Escafoides]
+    label: Localización de fractura de escafoides
+    options:
+      - Polo proximal
+      - Cintura
+      - Polo distal
+    empty_text: ""
+
+  - id: proc_osteosintesis_mano
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Osteoarticular / traumatológica]
+    label: Osteosíntesis / fijación
+    options:
+      - RAFI con placa bloqueada / volar de radio
+      - Enclavijado percutáneo (K-wires)
+      - Tornillo canulado de compresión (Herbert)
+      - Fijación externa
+    join: "; "
+    empty_text: ""
+
+  - id: resultado_reduccion_mano
+    type: single
+    required: false
+    required_if_proc_osteosintesis_mano:
+      - RAFI con placa bloqueada / volar de radio
+      - Enclavijado percutáneo (K-wires)
+      - Tornillo canulado de compresión (Herbert)
+      - Fijación externa
+    label: Resultado de la reducción
+    options: [Anatómica, Aceptable, Insatisfactoria]
+    empty_text: ""
+
+  - id: proc_articular_mano
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Osteoarticular / traumatológica]
+    label: Cirugía articular / reconstructiva
+    options:
+      - Trapecectomía aislada
+      - Trapecectomía con plastia de suspensión / ligamentoplastia
+      - Artrodesis parcial del carpo
+      - Artrodesis total de muñeca
+      - Artrodesis interfalángica / MTC-F
+      - Artroplastia trapecio-metacarpiana
+      - Artroplastia interfalángica
+      - Carpectomía de la primera fila
+    join: "; "
+    empty_text: ""
+
+  # ========== 2. Tendones / partes blandas ==========
+  - id: patologia_tendinosa
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Tendones / partes blandas]
+    label: Patología / lesión
+    options:
+      - Sección / laceración tendinosa
+      - Tenosinovitis / dedo en gatillo
+      - Enfermedad de De Quervain
+      - Dupuytren
+    join: "; "
+    empty_text: ""
+
+  - id: zona_flexores
+    type: single
+    required: false
+    required_if_patologia_tendinosa: [Sección / laceración tendinosa]
+    label: Zona flexores (si aplica)
+    options:
+      - Zona I
+      - Zona II (No Man's Land)
+      - Zona III
+      - Zona IV
+      - Zona V
+      - No aplica (extensores / otra)
+    empty_text: ""
+
+  - id: tenorrafia_flexores
+    type: single
+    required: false
+    required_if_zona_flexores: [Zona I, Zona II (No Man's Land), Zona III, Zona IV, Zona V]
+    label: Tenorrafia de flexores
+    options: [Realizada, No realizada]
+    empty_text: ""
+
+  - id: tecnica_tenorrafia_flexores
+    type: multi
+    required: false
+    required_if_tenorrafia_flexores: [Realizada]
+    label: Técnica tenorrafia flexores
+    options:
+      - Kessler
+      - Tajima
+      - Strickland
+      - Sutura epitenon
+    join: ", "
+    empty_text: ""
+
+  - id: zona_extensores
+    type: single
+    required: false
+    required_if_patologia_tendinosa: [Sección / laceración tendinosa]
+    label: Zona extensores (si aplica)
+    options:
+      - Zona I (mallet)
+      - Zona II
+      - Zona III (boutonnière)
+      - Zona IV–VIII
+      - No aplica (flexores / otra)
+    empty_text: ""
+
+  - id: manejo_extensores
+    type: multi
+    required: false
+    required_if_zona_extensores: [Zona I (mallet), Zona II, Zona III (boutonnière), Zona IV–VIII]
+    label: Manejo de extensores
+    options:
+      - Tenorrafia directa
+      - Fijación del mallet con clavija K
+    join: "; "
+    empty_text: ""
+
+  - id: injerto_tendinoso
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Tendones / partes blandas]
+    label: Injerto tendinoso
+    options: [Realizado, No realizado]
+    empty_text: ""
+
+  - id: donante_injerto_tendinoso
+    type: single
+    required: false
+    required_if_injerto_tendinoso: [Realizado]
+    label: Donante del injerto tendinoso
+    options:
+      - Palmar mayor / longus
+      - Plantar delgado
+      - Otro
+    empty_text: ""
+
+  - id: transferencia_tendinosa
+    type: free
+    required: false
+    required_if_procedimiento_grupo: [Tendones / partes blandas]
+    label: Transferencia tendinosa (detalle, ej. EIP → EPL)
+    empty_text: ""
+
+  - id: proc_dupuytren
+    type: multi
+    required: false
+    required_if_patologia_tendinosa: [Dupuytren]
+    label: Procedimiento Dupuytren
+    options:
+      - Fasciotomía percutánea
+      - Fasciectomía selectiva / subtotal
+      - Dermofasciectomía + injerto
+    join: "; "
+    empty_text: ""
+
+  - id: dedos_dupuytren
+    type: multi
+    required: false
+    required_if_patologia_tendinosa: [Dupuytren]
+    label: Dedos afectados (Dupuytren)
+    options:
+      - Pulgar
+      - Índice
+      - Medio
+      - Anular
+      - Meñique
+    join: ", "
+    empty_text: ""
+
+  - id: grado_contractura_dupuytren
+    type: single
+    required: false
+    required_if_patologia_tendinosa: [Dupuytren]
+    label: Grado de contractura preoperatoria (Dupuytren)
+    options:
+      - Leve (<30°)
+      - Moderada (30–60°)
+      - Severa (>60°)
+    empty_text: ""
+
+  - id: proc_gatillo_dequervain
+    type: multi
+    required: false
+    required_if_patologia_tendinosa:
+      - Tenosinovitis / dedo en gatillo
+      - Enfermedad de De Quervain
+    label: Procedimiento (gatillo / De Quervain)
+    options:
+      - Liberación de polea / tenosinovectomía
+      - Liberación del primer compartimento dorsal
+    join: "; "
+    empty_text: ""
+
+  # ========== 3. Nervio periférico / microcirugía ==========
+  - id: patologia_nerviosa
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Nervio periférico / microcirugía]
+    label: Patología
+    options:
+      - Síndrome del túnel carpiano (STC)
+      - Síndrome del canal de Guyón
+      - Compresión del nervio cubital en codo
+      - Sección nerviosa accidental
+      - Amputación / reimplante
+    join: "; "
+    empty_text: ""
+
+  - id: clasificacion_seddon
+    type: single
+    required: false
+    required_if_patologia_nerviosa: [Sección nerviosa accidental]
+    label: Clasificación de lesión nerviosa (Seddon)
+    options:
+      - Neurapraxia
+      - Axonotmesis
+      - Neurotmesis
+    empty_text: ""
+
+  - id: proc_liberacion_nerviosa
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Nervio periférico / microcirugía]
+    label: Liberación / descompresión
+    options:
+      - Liberación del nervio mediano (túnel carpiano) — abierta
+      - Liberación del nervio mediano (túnel carpiano) — endoscópica
+      - Liberación / transposición del nervio cubital — subcutánea
+      - Liberación / transposición del nervio cubital — submuscular
+      - Liberación canal de Guyón
+    join: "; "
+    empty_text: ""
+
+  - id: proc_reparacion_nerviosa
+    type: multi
+    required: false
+    required_if_patologia_nerviosa: [Sección nerviosa accidental, Amputación / reimplante]
+    label: Reparación nerviosa (microcirugía)
+    options:
+      - Neurorrafia directa epineural / perineural
+      - Injerto nervioso autólogo
+      - Conduit / tubulización sintética
+    join: "; "
+    empty_text: ""
+
+  - id: sutura_neurorrafia
+    type: single
+    required: false
+    required_if_proc_reparacion_nerviosa: [Neurorrafia directa epineural / perineural]
+    label: Sutura de neurorrafia
+    options:
+      - Monofilamento 8-0
+      - Monofilamento 9-0
+      - Monofilamento 10-0
+    empty_text: ""
+
+  - id: nervio_donante
+    type: single
+    required: false
+    required_if_proc_reparacion_nerviosa: [Injerto nervioso autólogo]
+    label: Nervio donante (injerto)
+    options:
+      - Sural
+      - Cutáneo antebraquial
+      - Otro
+    empty_text: ""
+
+  - id: reimplante
+    type: single
+    required: false
+    required_if_patologia_nerviosa: [Amputación / reimplante]
+    label: Reimplante de dedo / mano
+    options: [Realizado, No realizado]
+    empty_text: ""
+
+  - id: nivel_amputacion_reimplante
+    type: single
+    required: false
+    required_if_reimplante: [Realizado]
+    label: Nivel anatómico de la amputación
+    options:
+      - Distal a IFD
+      - IFD / falange media
+      - IFP
+      - MTC-F / metacarpiano
+      - Muñeca / carpo
+      - Más proximal (antebrazo / brazo)
+      - Otro
+    empty_text: ""
+
+  - id: nivel_amputacion_reimplante_otro
+    type: free
+    required: false
+    required_if_nivel_amputacion_reimplante: [Otro]
+    label: Nivel de amputación (otro)
+    empty_text: ""
+
+  - id: viabilidad_final_reimplante
+    type: single
+    required: false
+    required_if_reimplante: [Realizado]
+    label: Viabilidad final al cierre (reimplante)
+    options:
+      - Viable — sin compromiso
+      - Viable — compromiso venoso resuelto
+      - Comprometido — requirió reexploración
+    empty_text: ""
+
+  # ========== 4. Artroscopia de muñeca ==========
+  - id: indicacion_artroscopia_muneca
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Artroscopia de muñeca]
+    label: Indicación
+    options:
+      - Lesión del complejo del fibrocartílago triangular (CFCT)
+      - Inestabilidad escafolunar / lunopiramidal
+      - Cuerpos libres articulares
+      - Otro
+    join: "; "
+    empty_text: ""
+
+  - id: indicacion_artroscopia_muneca_otro
+    type: free
+    required: false
+    required_if_indicacion_artroscopia_muneca: [Otro]
+    label: Indicación (otro)
+    empty_text: ""
+
+  - id: palmer_cfct
+    type: single
+    required: false
+    required_if_indicacion_artroscopia_muneca: [Lesión del complejo del fibrocartílago triangular (CFCT)]
+    label: Clasificación de Palmer (CFCT)
+    options:
+      - Clase 1 — traumática
+      - Clase 2 — degenerativa
+    empty_text: ""
+
+  - id: proc_artroscopia_muneca
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Artroscopia de muñeca]
+    label: Técnica
+    options:
+      - Artroscopia diagnóstica / debridamiento
+      - Reparación / sutura de fibrocartílago triangular
+      - Reconstrucción ligamentaria (escafolunar / arpones)
+    join: "; "
+    empty_text: ""
+
+  # ========== 5. Infecciones / cobertura ==========
+  - id: proc_infeccion_mano
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Infecciones / cobertura]
+    label: Infecciones complejas de la mano
+    options:
+      - Drenaje de panadizo / paroniquia
+      - Lavado y drenaje de tenosinovitis infecciosa de flexores (Kanavel)
+      - Drenaje de absceso de espacios cóncavos (thenar / hipotenar / midpalmar)
+    join: "; "
+    empty_text: ""
+
+  - id: hallazgo_io_infeccion
+    type: single
+    required: false
+    required_if_proc_infeccion_mano:
+      - Drenaje de panadizo / paroniquia
+      - Lavado y drenaje de tenosinovitis infecciosa de flexores (Kanavel)
+      - Drenaje de absceso de espacios cóncavos (thenar / hipotenar / midpalmar)
+    label: Hallazgo intraoperatorio
+    options:
+      - Purulento
+      - Necrótico
+      - Seroso
+      - Otro
+    empty_text: ""
+
+  - id: hallazgo_io_infeccion_otro
+    type: free
+    required: false
+    required_if_hallazgo_io_infeccion: [Otro]
+    label: Hallazgo (otro)
+    empty_text: ""
+
+  - id: second_look
+    type: single
+    required: false
+    required_if_proc_infeccion_mano: [Lavado y drenaje de tenosinovitis infecciosa de flexores (Kanavel)]
+    label: Planificación de reintervención / second-look
+    options:
+      - No planificada
+      - Planificada — próximo lavado programado
+    empty_text: ""
+
+  - id: proc_cobertura_mano
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Infecciones / cobertura]
+    label: Cobertura cutánea y colgajos focales
+    options:
+      - Colgajo Atasoy / Kutler (avance V-Y pulpejo)
+      - Colgajo de Brunelli
+      - Colgajo heterodigital (cross-finger)
+      - Colgajo chino / radial de antebrazo
+    join: "; "
+    empty_text: ""
+
+  # ========== 6. Isquemia / torniquete / cierre ==========
+  - id: torniquete_ubicacion
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Isquemia / torniquete / cierre]
+    label: Isquemia neumática — ubicación del manguito
+    options: [Brazo, Antebrazo]
+    empty_text: ""
+
+  - id: torniquete_presion_mmhg
+    type: free
+    required: false
+    required_if_procedimiento_grupo: [Isquemia / torniquete / cierre]
+    label: Presión del manguito (mmHg)
+    empty_text: ""
+
+  - id: torniquete_tiempo_min
+    type: free
+    required: false
+    required_if_procedimiento_grupo: [Isquemia / torniquete / cierre]
+    label: Tiempo total de isquemia (min)
+    empty_text: ""
+
+  - id: exanguinacion_previa
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Isquemia / torniquete / cierre]
+    label: Exanguinación previa al inflado
+    options:
+      - Realizada (venda de Esmarch u otro método)
+      - No realizada (elevación simple)
+    empty_text: ""
+
+  - id: drenaje_mano
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Isquemia / torniquete / cierre]
+    label: Drenaje
+    options:
+      - Sin drenaje
+      - Penrose pequeño
+      - Drenaje aspirativo micro
+    empty_text: ""
+
+  - id: inmovilizacion_postop
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Isquemia / torniquete / cierre]
+    label: Inmovilización postoperatoria
+    options:
+      - Férula — posición neutra
+      - Férula — posición funcional / anti-garra
+      - Inmovilización de pulgar / spica
+      - No aplicada
+    empty_text: ""
+
+plantilla_texto: |
+  Mano — {{procedimiento_grupo}}. Lateralidad {{lateralidad}}. Abordaje {{abordaje}}{{conversion_causa}}.
+  Osteo: {{pieza_osea}} {{carpo_otros_detalle}} MTC {{metacarpiano_numero}} falange {{falange_nivel}}; lesión {{tipo_lesion_osea}} Gustilo {{gustilo_anderson_mano}}; escafoides {{localizacion_escafoides}}; osteosíntesis {{proc_osteosintesis_mano}} reducción {{resultado_reduccion_mano}}; articular {{proc_articular_mano}}.
+  Tendones: {{patologia_tendinosa}}; flexores Z{{zona_flexores}} {{tenorrafia_flexores}} {{tecnica_tenorrafia_flexores}}; extensores Z{{zona_extensores}} {{manejo_extensores}}; injerto {{injerto_tendinoso}} {{donante_injerto_tendinoso}}; transferencia {{transferencia_tendinosa}}; Dupuytren {{proc_dupuytren}} dedos {{dedos_dupuytren}} grado {{grado_contractura_dupuytren}}; gatillo/DQ {{proc_gatillo_dequervain}}.
+  Nervio: {{patologia_nerviosa}}; Seddon {{clasificacion_seddon}}; liberación {{proc_liberacion_nerviosa}}; reparación {{proc_reparacion_nerviosa}} sutura {{sutura_neurorrafia}} donante {{nervio_donante}}; reimplante {{reimplante}} nivel {{nivel_amputacion_reimplante}}{{nivel_amputacion_reimplante_otro}} viabilidad {{viabilidad_final_reimplante}}.
+  Artroscopia: {{indicacion_artroscopia_muneca}}{{indicacion_artroscopia_muneca_otro}}; Palmer {{palmer_cfct}}; {{proc_artroscopia_muneca}}.
+  Infección/cobertura: {{proc_infeccion_mano}}; hallazgo {{hallazgo_io_infeccion}}{{hallazgo_io_infeccion_otro}}; second-look {{second_look}}; cobertura {{proc_cobertura_mano}}.
+  Torniquete/cierre: manguito {{torniquete_ubicacion}} {{torniquete_presion_mmhg}} mmHg {{torniquete_tiempo_min}} min; exanguinación {{exanguinacion_previa}}; drenaje {{drenaje_mano}}; inmovilización {{inmovilizacion_postop}}.
+```
+
+---
+
+## Notas de primera pasada (para auditar)
+
+1. `procedimiento_grupo` **single**. Tipografía **Lateralidad**.
+2. Validación: criterio AnesFact (Diego), **no** cirujano de mano ni
+   Dra. Huerta (ver cabecera).
+3. §1: resultado reducción; localización escafoides; Gustilo si expuesta.
+4. §2: dedos + grado Dupuytren (Leve/Moderada/Severa; no free numérico).
+5. §3: Seddon; reimplante nivel + viabilidad (patrón Plástica M13);
+   reparación nerviosa también si Amputación / reimplante.
+6. §4: Palmer CFCT.
+7. §5: hallazgo IO; second-look si tenosinovitis infecciosa.
+8. §6: exanguinación previa; drenaje con «Sin drenaje».
+9. Numéricos sin `empty_text` inventado. Convertido + causa.
+10. Bruto (6 secciones) + 11 correcciones versionados acá.
+11. Solape con Traumatología §2 (antebrazo/mano): este módulo es la
+    especialidad dedicada; no se fusionó con M11.

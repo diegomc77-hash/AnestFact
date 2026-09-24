@@ -1,0 +1,699 @@
+# Módulo — Cirugía Urológica
+
+**id:** `cu-urologia-v1` · especialidad: Cirugía Urológica ·  
+**Estado:** esqueleto de slots — **OK de semilla** (2026-09-14). Motor P2
+pendiente. Validación: criterio AnesFact (Diego), no urólogo ni Dra.
+Huerta (ver § Validación clínica). Corrección final: lateralidad también
+en orquiectomía simple/subcapsular.
+
+Índice: [README.md](README.md) · Hallazgos: [HALLAZGOS_ESQUELETO.md](HALLAZGOS_ESQUELETO.md)
+
+Consentimiento / gasas / ATB = cáscara A4 de Foja Qx (no van acá).
+
+## Validación clínica (leer antes de auditar)
+
+**Este módulo no tiene el mismo nivel de validación directa que Cabeza y
+Cuello ni Cirugía General.** CyC y CG fueron validados por la Dra. Huerta
+en su disciplina. Ella **no** es uróloga: el bosquejo y las correcciones
+aplicadas aquí son **criterio clínico del equipo AnesFact (Diego)** — con
+el mismo rigor de auditoría que el resto del catálogo, pero **sin**
+reemplazar la revisión futura de un/a urólogo/a real. Si un día lo
+revisa un especialista, debe partir de ese supuesto (misma salvedad que
+Cirugía Torácica).
+
+## Correcciones aplicadas al bosquejo (14)
+
+1. Margen nefrectomía parcial (+ distancia).
+2. Indicación renal (multi).
+3. Trombectomía VCI + nivel Neves-Zincke (patrón M5).
+4. Regla 1 ilíacos + obturador en Boari / Psoas hitch (+ No aplica).
+5. RTU-V → sección vesical/prostática (no litiasis).
+6. Profundidad RTU-V (Ta/T1 / T2 / No evaluable).
+7. Localización del cálculo (multi).
+7b. `nefrostomia_post_nlpc` (NLPC) + `complicacion_endourologia` (sección litiasis).
+8. Margen prostatectomía radical y cistectomía radical.
+9. Uréteres bilaterales Regla 1 en cistectomía radical.
+10. Indicación RTU-P.
+11. Lateralidad en orquidopexia / varicocelectomía / hidrocelectomía.
+12. Indicación quiste epidídimo / spermatocele.
+13. Foley: Fr / balón cc / días — campos separados.
+14. Drenaje cavitario: tipo single + cantidad numérica.
+
+Tipografía: **Lateralidad** (no «Laterallidad»).
+
+**Regla 3 / consideraciones (fase aparte P2 — no slots qx):**
+- `trombo_vci_nivel` ∈ {III, IV} → gatillo a `S.cur.foja.consideraciones`
+  (bypass cardiopulmonar / hemodinamia compleja); no slot qx.
+
+---
+
+## Proforma — Cirugía urológica
+
+```text
+id:            cu-urologia-v1
+especialidad:  "Cirugía Urológica"
+operaciones: [
+  "Nefrectomía / pieloplastia",
+  "Cirugía ureteral / reconstructiva",
+  "Endourología / litiasis",
+  "Cistectomía / próstata / RTU-V",
+  "Cirugía escrotal / peniana / uretral"
+]
+titulo: "Cirugía urológica"
+
+slots:
+
+  # ========== Índice ==========
+  - id: procedimiento_grupo
+    type: single
+    required: true
+    label: Procedimiento / foco
+    options:
+      - Cirugía renal / adrenal urológica
+      - Cirugía ureteral / reconstructiva
+      - Endourología / litiasis
+      - Cirugía vesical / prostato-vesical
+      - Patología genital masculina / escrotal / peniana
+
+  - id: abordaje
+    type: single
+    required: true
+    label: Abordaje
+    options:
+      - Abierto (lumbotomía / laparotomía)
+      - Laparoscópico
+      - Robótico
+      - Retroperitoneoscópico
+      - Endoscópico / transuretral
+      - Percutáneo
+      - Convertido a abierto
+
+  - id: conversion_causa
+    type: free
+    required: false
+    required_if_abordaje: [Convertido a abierto]
+    label: Causa de conversión
+    empty_text: ""
+
+  # ========== 1. Renal ==========
+  - id: proc_renal
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Cirugía renal / adrenal urológica]
+    label: Procedimiento renal
+    options:
+      - Nefrectomía radical
+      - Nefrectomía parcial (preservadora de nefronas / enucleación)
+      - Nefrectomía simple
+      - Nefroureterectomía radical (con rodete vesical)
+      - Pieloplastia (estenosis UPJ)
+    empty_text: ""
+
+  - id: lateralidad_renal
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Cirugía renal / adrenal urológica]
+    label: Lateralidad
+    options: [Derecha, Izquierda, Bilateral]
+    empty_text: ""
+
+  - id: indicacion_renal
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Cirugía renal / adrenal urológica]
+    label: Indicación
+    options:
+      - Neoplasia renal
+      - Estenosis UPJ
+      - Litiasis complicada
+      - Atrofia / exclusión funcional
+      - Trauma
+      - Otro
+    join: "; "
+    empty_text: ""
+
+  - id: indicacion_renal_otro
+    type: free
+    required: false
+    required_if_indicacion_renal: [Otro]
+    label: Indicación (otro)
+    empty_text: ""
+
+  - id: trombo_vci
+    type: single
+    required: false
+    required_if_proc_renal: [Nefrectomía radical]
+    label: Trombo en VCI / trombectomía
+    options: [No, Sí — trombectomía]
+    empty_text: ""
+
+  - id: trombo_vci_nivel
+    type: single
+    required: false
+    required_if_trombo_vci: [Sí — trombectomía]
+    label: Nivel del trombo (Neves-Zincke)
+    options:
+      - I (renal / infrahepático)
+      - II (infrahepático, por encima de venas renales)
+      - III (intrahepático / retrohepático)
+      - IV (suprahepático / auricular)
+    empty_text: ""
+    # III / IV → gatillo foja.consideraciones (bypass cardiopulmonar /
+    # hemodinamia); no slot qx. Mismo mecanismo feocromo / esofaguectomía.
+
+  - id: trombo_vci_detalle
+    type: free
+    required: false
+    required_if_trombo_vci: [Sí — trombectomía]
+    label: Trombo VCI — detalle (tumoral / no tumoral / extensión)
+    empty_text: ""
+
+  - id: isquemia_renal
+    type: single
+    required: false
+    required_if_proc_renal: [Nefrectomía parcial (preservadora de nefronas / enucleación)]
+    label: Clampado vascular / isquemia
+    options:
+      - Caliente (sin hielo)
+      - Frío
+      - Sin clampado (zero ischemia)
+    empty_text: ""
+
+  - id: tiempo_isquemia_min
+    type: free
+    required: false
+    required_if_isquemia_renal: [Caliente (sin hielo), Frío]
+    label: Tiempo de isquemia (minutos)
+    empty_text: ""
+
+  - id: margen_nefrectomia_parcial
+    type: single
+    required: false
+    required_if_proc_renal: [Nefrectomía parcial (preservadora de nefronas / enucleación)]
+    label: Margen quirúrgico
+    options: [Libre, Comprometido, No aplica]
+    empty_text: ""
+
+  - id: margen_nefrectomia_parcial_distancia
+    type: free
+    required: false
+    required_if_margen_nefrectomia_parcial: [Libre, Comprometido]
+    label: Margen — distancia (mm / cm)
+    empty_text: ""
+
+  # ========== 2. Ureteral / reconstructiva ==========
+  - id: proc_ureteral
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Cirugía ureteral / reconstructiva]
+    label: Procedimiento ureteral
+    options:
+      - Ureterolitotomía (abierta / laparoscópica)
+      - Reimplante ureterovesical
+      - Ureteroplastia / reconstrucción ureteral (Boari / Psoas hitch)
+      - Cateterismo ureteral / colocación de catéter Doble J
+    empty_text: ""
+
+  - id: lateralidad_ureteral
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Cirugía ureteral / reconstructiva]
+    label: Lateralidad
+    options: [Derecha, Izquierda, Bilateral]
+    empty_text: ""
+
+  - id: tecnica_reimplante
+    type: single
+    required: false
+    required_if_proc_ureteral: [Reimplante ureterovesical]
+    label: Técnica de reimplante
+    options:
+      - Politano-Leadbetter
+      - Lich-Gregoir
+      - Otra
+    empty_text: ""
+
+  - id: tecnica_reimplante_otra
+    type: free
+    required: false
+    required_if_tecnica_reimplante: [Otra]
+    label: Técnica de reimplante (otra)
+    empty_text: ""
+
+  - id: reconstruccion_ureteral_gesto
+    type: multi
+    required: false
+    required_if_proc_ureteral: [Ureteroplastia / reconstrucción ureteral (Boari / Psoas hitch)]
+    label: Gesto reconstructivo
+    options:
+      - Colgajo de Boari
+      - Psoas hitch
+      - Anastomosis término-terminal
+    join: ", "
+    empty_text: ""
+
+  - id: vasos_iliacos_ureteral
+    type: single
+    required: false
+    required_if_proc_ureteral: [Ureteroplastia / reconstrucción ureteral (Boari / Psoas hitch)]
+    label: Vasos ilíacos
+    options:
+      - Identificados y preservados
+      - Lesión identificada intraoperatoriamente
+      - No disecados
+      - No aplica
+    empty_text: ""
+
+  - id: nervio_obturador_ureteral
+    type: single
+    required: false
+    required_if_proc_ureteral: [Ureteroplastia / reconstrucción ureteral (Boari / Psoas hitch)]
+    label: Nervio obturador
+    options:
+      - Identificado y preservado
+      - Lesión identificada intraoperatoriamente
+      - No disecado
+      - No aplica
+    empty_text: ""
+
+  - id: doble_j_lateralidad
+    type: single
+    required: false
+    required_if_proc_ureteral: [Cateterismo ureteral / colocación de catéter Doble J]
+    label: Catéter Doble J — lado
+    options: [Unilateral, Bilateral]
+    empty_text: ""
+
+  # ========== 3. Endourología / litiasis ==========
+  - id: proc_endo_litiasis
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Endourología / litiasis]
+    label: Procedimiento
+    options:
+      - Ureterorrenoscopía (URS) rígida / flexible
+      - Cirugía intrarrenal retrógrada (RIR / RIRC) + litotricia láser
+      - Nefrolitotomía percutánea (NLPC / Mini-PERC)
+    empty_text: ""
+    # RTU-V reubicada en §4 vesical/prostática.
+
+  - id: tipo_laser_litotricia
+    type: single
+    required: false
+    required_if_proc_endo_litiasis: [Cirugía intrarrenal retrógrada (RIR / RIRC) + litotricia láser]
+    label: Láser de litotricia
+    options: [Holmium, Thulium, Otro]
+    empty_text: ""
+
+  - id: localizacion_calculo
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Endourología / litiasis]
+    label: Localización del cálculo
+    options:
+      - Renal — cáliz superior
+      - Renal — cáliz medio
+      - Renal — cáliz inferior
+      - Renal — pelvis
+      - Ureteral proximal
+      - Ureteral medio
+      - Ureteral distal
+      - Vesical
+    join: "; "
+    empty_text: ""
+
+  - id: extraccion_fragmentos
+    type: multi
+    required: false
+    required_if_procedimiento_grupo: [Endourología / litiasis]
+    label: Extracción de fragmentos
+    options:
+      - Basket / cesta
+      - Evacuación por irrigación
+      - Polvo (dusting)
+    join: ", "
+    empty_text: ""
+
+  - id: stent_post_litiasis
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Endourología / litiasis]
+    label: Stent / tutor post-procedimiento
+    options:
+      - Catéter Doble J
+      - Catéter ureteral simple
+      - Sin tutor
+    empty_text: ""
+
+  - id: nefrostomia_post_nlpc
+    type: single
+    required: false
+    required_if_proc_endo_litiasis: [Nefrolitotomía percutánea (NLPC / Mini-PERC)]
+    label: Nefrostomía post-NLPC (acceso percutáneo)
+    options:
+      - Nefrostomía dejada
+      - Tubeless (sin nefrostomía)
+    empty_text: ""
+    # Distinto de stent_post_litiasis (uréter); este es el tracto renal.
+
+  - id: complicacion_endourologia
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Endourología / litiasis]
+    label: Complicación endourológica intraoperatoria
+    options:
+      - Sin complicaciones
+      - Perforación ureteral
+      - Perforación pielocalicial
+      - Otra
+    empty_text: ""
+
+  - id: complicacion_endourologia_otra
+    type: free
+    required: false
+    required_if_complicacion_endourologia: [Otra]
+    label: Complicación endourológica (otra)
+    empty_text: ""
+
+  # ========== 4. Vesical / prostato-vesical ==========
+  - id: proc_vesico_prostatico
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Cirugía vesical / prostato-vesical]
+    label: Procedimiento
+    options:
+      - Cistectomía radical (con linfadenectomía pélvica)
+      - Cistectomía parcial
+      - Resección transuretral de tumor vesical (RTU-V)
+      - Resección transuretral de próstata (RTU-P)
+      - Enucleación prostática con láser (HoLEP / ThuLEP)
+      - Prostatectomía abierta / adenomectomía (Freyer / Millin)
+      - Prostatectomía radical (oncológica)
+    empty_text: ""
+
+  - id: derivacion_urinaria
+    type: single
+    required: false
+    required_if_proc_vesico_prostatico: [Cistectomía radical (con linfadenectomía pélvica)]
+    label: Reconstrucción / derivación urinaria
+    options:
+      - Neovejiga ortotópica (ileal)
+      - Conducto ileal (Bricker)
+      - Ureterocutaneostomía
+    empty_text: ""
+
+  - id: ureter_derecho_cistectomia
+    type: single
+    required: false
+    required_if_proc_vesico_prostatico: [Cistectomía radical (con linfadenectomía pélvica)]
+    label: Uréter derecho
+    options:
+      - Identificado y preservado
+      - Lesión identificada intraoperatoriamente
+      - No disecado
+    empty_text: ""
+    # Ambos uréteres siempre (disección pélvica central/amplia).
+
+  - id: ureter_izquierdo_cistectomia
+    type: single
+    required: false
+    required_if_proc_vesico_prostatico: [Cistectomía radical (con linfadenectomía pélvica)]
+    label: Uréter izquierdo
+    options:
+      - Identificado y preservado
+      - Lesión identificada intraoperatoriamente
+      - No disecado
+    empty_text: ""
+
+  - id: margen_cistectomia_radical
+    type: single
+    required: false
+    required_if_proc_vesico_prostatico: [Cistectomía radical (con linfadenectomía pélvica)]
+    label: Margen quirúrgico (cistectomía radical)
+    options: [Libre, Comprometido, No aplica]
+    empty_text: ""
+
+  - id: margen_cistectomia_radical_distancia
+    type: free
+    required: false
+    required_if_margen_cistectomia_radical: [Libre, Comprometido]
+    label: Margen cistectomía — distancia
+    empty_text: ""
+
+  - id: profundidad_rtuv
+    type: single
+    required: false
+    required_if_proc_vesico_prostatico: [Resección transuretral de tumor vesical (RTU-V)]
+    label: Profundidad / estadificación (RTU-V)
+    options:
+      - Ta / T1 (superficial — no invade detrusor)
+      - T2 (invade detrusor)
+      - No evaluable
+    empty_text: ""
+
+  - id: indicacion_rtup
+    type: single
+    required: false
+    required_if_proc_vesico_prostatico: [Resección transuretral de próstata (RTU-P)]
+    label: Indicación (RTU-P)
+    options:
+      - Obstructiva benigna (HPB)
+      - Retención urinaria recurrente
+      - Hematuria de origen prostático
+      - Otro
+    empty_text: ""
+
+  - id: indicacion_rtup_otro
+    type: free
+    required: false
+    required_if_indicacion_rtup: [Otro]
+    label: Indicación RTU-P (otro)
+    empty_text: ""
+
+  - id: energia_rtup
+    type: single
+    required: false
+    required_if_proc_vesico_prostatico: [Resección transuretral de próstata (RTU-P)]
+    label: Energía (RTU-P)
+    options: [Monopolar, Bipolar]
+    empty_text: ""
+
+  - id: abordaje_prostatectomia_radical
+    type: single
+    required: false
+    required_if_proc_vesico_prostatico: [Prostatectomía radical (oncológica)]
+    label: Abordaje (prostatectomía radical)
+    options: [Abierta, Laparoscópica, Robótica]
+    empty_text: ""
+
+  - id: preservacion_bandeletas
+    type: single
+    required: false
+    required_if_proc_vesico_prostatico: [Prostatectomía radical (oncológica)]
+    label: Preservación de bandeletas neurovasculares
+    options: [Sí, No]
+    empty_text: ""
+
+  - id: margen_prostatectomia_radical
+    type: single
+    required: false
+    required_if_proc_vesico_prostatico: [Prostatectomía radical (oncológica)]
+    label: Margen quirúrgico (prostatectomía radical)
+    options: [Libre, Comprometido, No aplica]
+    empty_text: ""
+
+  - id: margen_prostatectomia_radical_distancia
+    type: free
+    required: false
+    required_if_margen_prostatectomia_radical: [Libre, Comprometido]
+    label: Margen prostatectomía — distancia
+    empty_text: ""
+
+  # ========== 5. Genital / escrotal / peniana ==========
+  - id: proc_genital
+    type: single
+    required: false
+    required_if_procedimiento_grupo: [Patología genital masculina / escrotal / peniana]
+    label: Procedimiento
+    options:
+      - Orquiectomía radical (vía inguinal — neoplasia)
+      - Orquiectomía simple / subcapsular (vía escrotal)
+      - Orquidopexia (torsión / criptorquidia)
+      - Hidrocelectomía
+      - Varicocelectomía
+      - Exéresis de quiste de epidídimo / spermatocele
+      - Circuncisión / postectomía
+      - Penectomía
+      - Uretroplastia (estenosis uretral)
+    empty_text: ""
+
+  - id: lateralidad_genital
+    type: single
+    required: false
+    required_if_proc_genital:
+      - Orquiectomía radical (vía inguinal — neoplasia)
+      - Orquiectomía simple / subcapsular (vía escrotal)
+      - Orquidopexia (torsión / criptorquidia)
+      - Hidrocelectomía
+      - Varicocelectomía
+      - Exéresis de quiste de epidídimo / spermatocele
+    label: Lateralidad
+    options: [Derecha, Izquierda, Bilateral]
+    empty_text: ""
+    # Simple/subcapsular: a menudo bilateral (castración quirúrgica / ADT).
+
+  - id: tecnica_hidrocelectomia
+    type: single
+    required: false
+    required_if_proc_genital: [Hidrocelectomía]
+    label: Técnica de hidrocelectomía
+    options: [Jaboulay, Lord, Otra]
+    empty_text: ""
+
+  - id: tecnica_varicocelectomia
+    type: single
+    required: false
+    required_if_proc_genital: [Varicocelectomía]
+    label: Técnica de varicocelectomía
+    options:
+      - Subinguinal microquirúrgica
+      - Laparoscópica
+    empty_text: ""
+
+  - id: indicacion_quiste_epididimo
+    type: single
+    required: false
+    required_if_proc_genital: [Exéresis de quiste de epidídimo / spermatocele]
+    label: Indicación (quiste / spermatocele)
+    options:
+      - Sintomático
+      - Hallazgo incidental
+    empty_text: ""
+
+  - id: tipo_penectomia
+    type: single
+    required: false
+    required_if_proc_genital: [Penectomía]
+    label: Tipo de penectomía
+    options:
+      - Parcial
+      - Total con urostomía perineal
+    empty_text: ""
+
+  - id: uretroplastia_gesto
+    type: multi
+    required: false
+    required_if_proc_genital: [Uretroplastia (estenosis uretral)]
+    label: Uretroplastia — gesto
+    options:
+      - Injerto de mucosa bucal
+      - Cierre primario
+    join: ", "
+    empty_text: ""
+
+  # ========== 6. Sondas / drenajes ==========
+  - id: sonda_foley
+    type: single
+    required: false
+    label: Sonda vesical Foley
+    options: [Sí, No]
+    empty_text: ""
+
+  - id: sonda_foley_calibre_fr
+    type: free
+    required: false
+    required_if_sonda_foley: [Sí]
+    label: Foley — calibre (Fr)
+    empty_text: ""
+
+  - id: sonda_foley_balon_cc
+    type: free
+    required: false
+    required_if_sonda_foley: [Sí]
+    label: Foley — volumen de balón (cc)
+    empty_text: ""
+
+  - id: sonda_foley_dias_previstos
+    type: free
+    required: false
+    required_if_sonda_foley: [Sí]
+    label: Foley — días previstos
+    empty_text: ""
+
+  - id: cistostomia_percutanea
+    type: single
+    required: false
+    label: Sonda de talla vesical / cistostomía percutánea
+    options: [Sí, No]
+    empty_text: ""
+
+  - id: lavado_vesical_continuo
+    type: single
+    required: false
+    label: Lavado vesical continuo (solución fisiológica)
+    options: [Activo, No requerido]
+    empty_text: ""
+
+  - id: drenaje_cavitario
+    type: single
+    required: false
+    label: Drenaje cavitario / retroperitoneal (lecho prostático / renal / anastomosis)
+    options: [Sí, Sin drenaje]
+    empty_text: ""
+
+  - id: drenaje_cavitario_tipo
+    type: single
+    required: false
+    required_if_drenaje_cavitario: [Sí]
+    label: Tipo de drenaje
+    options:
+      - Aspirativo
+      - Jackson-Pratt
+      - Penrose
+      - Otro
+    empty_text: ""
+
+  - id: drenaje_cavitario_tipo_otro
+    type: free
+    required: false
+    required_if_drenaje_cavitario_tipo: [Otro]
+    label: Tipo de drenaje (otro)
+    empty_text: ""
+
+  - id: drenaje_cavitario_cantidad
+    type: free
+    required: false
+    required_if_drenaje_cavitario: [Sí]
+    label: Cantidad de drenajes
+    empty_text: ""
+
+plantilla_texto: |
+  Urológica — {{procedimiento_grupo}}. Abordaje: {{abordaje}}{{conversion_causa}}.
+  Renal: {{proc_renal}}; Lateralidad {{lateralidad_renal}}; indicación {{indicacion_renal}}{{indicacion_renal_otro}}; trombo VCI {{trombo_vci}} nivel {{trombo_vci_nivel}} {{trombo_vci_detalle}}; isquemia {{isquemia_renal}} {{tiempo_isquemia_min}} min; margen {{margen_nefrectomia_parcial}}{{margen_nefrectomia_parcial_distancia}}.
+  Ureteral: {{proc_ureteral}}; Lateralidad {{lateralidad_ureteral}}; reimplante {{tecnica_reimplante}}{{tecnica_reimplante_otra}}; reconstrucción {{reconstruccion_ureteral_gesto}}; ilíacos {{vasos_iliacos_ureteral}}; obturador {{nervio_obturador_ureteral}}; Doble J {{doble_j_lateralidad}}.
+  Litiasis: {{proc_endo_litiasis}} {{tipo_laser_litotricia}}; cálculo {{localizacion_calculo}}; fragmentos {{extraccion_fragmentos}}; stent {{stent_post_litiasis}}; nefrostomía NLPC {{nefrostomia_post_nlpc}}; complicación {{complicacion_endourologia}}{{complicacion_endourologia_otra}}.
+  Vesico-prostático: {{proc_vesico_prostatico}}; derivación {{derivacion_urinaria}}; uréter der. {{ureter_derecho_cistectomia}} izq. {{ureter_izquierdo_cistectomia}}; margen cistect. {{margen_cistectomia_radical}}{{margen_cistectomia_radical_distancia}}; RTU-V profundidad {{profundidad_rtuv}}; RTU-P {{indicacion_rtup}}{{indicacion_rtup_otro}} {{energia_rtup}}; PR {{abordaje_prostatectomia_radical}} bandeletas {{preservacion_bandeletas}} margen {{margen_prostatectomia_radical}}{{margen_prostatectomia_radical_distancia}}.
+  Genital: {{proc_genital}}; Lateralidad {{lateralidad_genital}}; hidrocele {{tecnica_hidrocelectomia}}; varicocele {{tecnica_varicocelectomia}}; quiste {{indicacion_quiste_epididimo}}; penectomía {{tipo_penectomia}}; uretroplastia {{uretroplastia_gesto}}.
+  Foley {{sonda_foley}} Fr {{sonda_foley_calibre_fr}} balón {{sonda_foley_balon_cc}} cc días {{sonda_foley_dias_previstos}}; cistostomía {{cistostomia_percutanea}}; lavado {{lavado_vesical_continuo}}; drenaje {{drenaje_cavitario}} {{drenaje_cavitario_tipo}}{{drenaje_cavitario_tipo_otro}} n={{drenaje_cavitario_cantidad}}.
+```
+
+---
+
+## Notas (OK de semilla)
+
+1. `procedimiento_grupo` **single**. Tipografía **Lateralidad**.
+2. Validación: criterio AnesFact (Diego), **no** urólogo ni Dra. Huerta
+   (ver cabecera) — misma salvedad que Tórax; mantener hasta revisión
+   por especialista.
+3. RTU-V en §4 (no litiasis). Profundidad Ta/T1 / T2 / No evaluable.
+4. Trombectomía VCI: patrón M5 + nivel Neves-Zincke I–IV; III/IV →
+   `foja.consideraciones`.
+5. Regla 1: ilíacos + obturador en Boari/Psoas hitch; uréteres bilaterales
+   siempre en cistectomía radical.
+6. Márgenes: nefrectomía parcial, cistectomía radical, prostatectomía
+   radical (Libre / Comprometido / No aplica + distancia).
+7. Foley y drenaje cavitario con campos separados (sin texto mezclado).
+8. NLPC: `nefrostomia_post_nlpc` ≠ stent; `complicacion_endourologia`.
+9. `lateralidad_genital` incluye orquiectomía **simple/subcapsular**
+   (uso frecuente bilateral / ADT).
+10. Numéricos sin `empty_text` inventado. Convertido + causa.

@@ -1,0 +1,405 @@
+==================== LINE 1972====================
+**Recibido: Módulo 1 — Pared Abdominal.** Solo auditoría (sin esqueleto ni archivos).
+
+### Bien
+- Cinco bloques claros (inguinal/femoral, ventral/eventro, diástasis, complejas, urgencia).
+- Laterality, tipo de hernia, abierto vs lap (TAPP/TEP/eTEP), técnicas con/sin malla.
+- Saco: identificación, tratamiento, contenido, sufrimiento vascular.
+- Malla: tipo, medidas, fijación — bien tipable a `single`/`multi`/`free`.
+- Ventral: defecto medido, plano de malla (onlay→IPOM), componentes (Ramirez/TAR).
+- Urgencia: viable vs necrosis + malla en contaminado (Sí/No + tipo).
+- Cross-ref a módulo GI si hay resección intestinal (no mezclar).
+
+### Mal / a corregir después
+- **“Laterallidad”** → tipografía: Lateralidad.
+- **Inguinal “Abordaje”:** abierto y lap no son excluyentes con subtécnica; falta dejar explícito que TAPP/TEP/eTEP solo si lap.
+- **Técnica con malla vs tisular:** hoy pueden tildarse juntas; hace falta mutex o “con malla / sin malla” primero.
+- **Fijación / tackers:** “absorbible/no absorbible” y “absorbibles/metálicos” mezclados en una línea — partir en slots.
+- **Medidas malla / defecto / overlap / interrectos:** libres numéricos; mismo criterio que CyC: no `empty_text` que invente cm.
+- **Diástasis:** “Presente + cm” vs Ausente — el cm solo required si Presente.
+- **Complejas — drenajes:** “Sí + tipo/cantidad/ubicación” vs No — condicionar; no afirmar drenaje por defecto.
+- **Urgencia — malla contaminada:** “Tipo: ____” si Sí; si No, opciones de cierre ya están bien.
+- **Eventro topografía “Lapa anterior”:** ¿laparotomía? confirmar wording.
+- **IPOM / IPOM-Plus, SCOPA / REPA:** OK como opciones; al armar slots, no fusionar con CyC.
+- **Falta respecto al marco Foja Qx global** (no es error del módulo, pero no está acá): consentimiento / gasas / ATB siguen siendo bloque fijo de entidad, no de esta plantilla.
+
+Listo para el siguiente módulo cuando lo mandes.
+
+==================== LINE 1974====================
+Solo tengo en este chat el **texto completo del Módulo 1 (Pared Abdominal)**. Los módulos 2–6 aparecen por tus notas de auditoría y las 4 reglas, no como material en bruto pegado acá. La auditoría abajo cruza lo que sí hay + tus reglas; **no puedo certificar palabra por palabra GI / pancreato-biliar / procto / retroperitoneo / esofagogástrico** hasta que los pegues (o confirmes que viven en otro hilo y los reenvíes).
+
+---
+
+## Opinión sobre las 4 reglas transversales
+
+| Regla | Veredicto | Ajuste sugerido |
+|---|---|---|
+| **1 — Integridad de estructura crítica** | Bien delimitada. Mismo patrón que NLR / facial / lingual-hipogloso en CyC: estado del acto, independiente de “complicación” o de checklist técnico (Strasberg ≠ lesión). | Ampliar el **modelo** a: `Identificada y preservada` / `Lesión identificada intraoperatoriamente` (+ free detalle si lesión). En inguinal: **varios nervios + deferente** → `multi` de estructuras + estado por estructura, o un `multi` de “preservadas” + `multi`/`free` de “lesionadas”. No un solo slot para todo el paquete. |
+| **2 — Riesgo funcional previo** | Bien **acotada** a actos que dividen a propósito una estructura funcional (esfínter). | No generalizar a “todo procto”. Si mañana hay esofaguectomía con riesgo de nervio recurrente laríngeo, sería otra instancia de la misma regla, no ensanchar la 2 a “todo riesgo preop”. |
+| **3 — Coordinación con anestesia** | Bien: solo lo que el cirujano debe **comunicar en el acto**, no tipo de anestesia genérico (tu retiro es correcto). Modelo MLS CyC OK. | Dejar explícito el **anti-patrón**: nunca `tipo_anestesia` / ASA / fármacos. Sí: ventilación selectiva, jet/tubo, eventos hemodinámicos feocromo, etc. Campo en proforma qx + **sync** hacia foja anestesia (mismo espíritu MLS). |
+| **4 — Clasificación del campo** | Bien y muy accionable (anastomosis vs Hartmann). | Ampliar el **alcance** a todo procedimiento de urgencia con contaminación plausible (no solo colorrecto): p. ej. eventración estrangulada con resección ya lo rozás en Pared; colecistectomía en peritonitis biliar; etc. Donde no cambie la decisión técnica, puede omitirse. |
+
+En conjunto: **bien delimitadas**. La 1 es la más reutilizable; la 2 debe seguir estrecha; la 3 es de producto (sync); la 4 conviene como “si urgencia + riesgo de contaminación → campo obligatorio”.
+
+---
+
+## Auditoría de consistencia (con lo disponible)
+
+### A. Cosas que vos ya marcaste — coincido
+- Strasberg ≠ integridad de VBP (Regla 1 en colecistectomía).
+- Continencia pre-fistulotomía / ESLI (Regla 2).
+- Ventilación selectiva en esofaguectomía TT + hemodinamia en feocromo (Regla 3).
+- Campo L/LC/C en colorrecto de urgencia (Regla 4).
+- Malla contaminada: cerrar opciones (biológica / sintética absorbible / no absorbible), no Sí/No + libre.
+- Márgenes gastrectomía oncológica = patrón CyC congelación.
+- Textura páncreas + Wirsung juntos.
+- Neoplasia canal anal subdesarrollada; infección activa en pilonidal electivo.
+- Diagnóstico presuntivo masa retroperitoneal.
+- Prueba de hermeticidad en esofaguectomía (paridad con bariátrica).
+- Apendicectomía ausente → confirmar con Huerta (hueco de catálogo, no solo de slots).
+
+### B. Inconsistencias / huecos que sumo yo
+
+**Entre módulos (por tus descripciones + Módulo 1):**
+1. **“Estructura crítica” vs “checklist técnico”** — Retroperitoneo como modelo de Regla 1; Strasberg queda como slot **aparte**. Misma dualidad puede aparecer en otras zonas (p. ej. “plano correcto” vs “nervio indemne”) — al esqueletonizar, no fusionar.
+2. **Prueba de hermeticidad / integridad anastomótica** — bariátrica sí, esófago no (ya lo dijiste). Revisar también: anastomosis colorrectal / ileocolónica en GI y pancreato-yeyuno / hepático-yeyuno en pancreato-biliar: ¿misma familia de slot (`prueba_hermeticidad`: Azul de metileno / Aire / Endoscopía / No realizada)? Hoy los nombres van a divergir (“prueba de hermeticidad” vs “verificación de integridad”).
+3. **Clasificación de campo** — en Pared solo en “hernias complejas”; en urgencia de pared (sección 5) no pedís L/LC/C aunque haya necrosis + malla contaminada. Inconsistencia **intra-módulo 1**: la Regla 4 debería vivir también en la sección de urgencia, no solo en “complejas”.
+4. **Malla en contaminado** — opciones cerradas OK; falta alinear con **plano de malla** / “no se colocó malla” (cierre tisular / abdomen abierto) que ya está en sección 5 — el slot no puede ser solo tipo de malla sin “No se colocó”.
+5. **Drenajes** — patrón distinto probable entre módulos (Sí+detalle vs libre). CyC ya exigió condicionar. Unificar: `drenaje` Sí/No → si Sí: tipo / n / ubicación.
+6. **Laterality naming** — “Laterallidad” en M1; en otros módulos puede ser “lado” / “topografía”. Unificar etiqueta **Lateralidad** en todo Cirugía General.
+7. **Abordaje abierto / lap / robótico** — M1 lo tiene; conviene el mismo vocabulario en GI y esófago (no “vía laparoscópica” en uno y “mínimamente invasiva” en otro sin mapa).
+8. **Apendicectomía** — si no está, el set de Cirugía General queda incompleto para el día a día; no inventar módulo: **pregunta abierta a Huerta** (¿GI? ¿módulo corto propio?).
+
+**Solo Módulo 1 (reafirmado + Regla 1):**
+9. Falta el bloque Regla 1 para inguinal/femoral (ilioinguinal, iliohipogástrico, genitofemoral, deferente) — vos lo pediste; el bruto actual no lo trae.
+10. Mutex malla vs tisular; subtécnicas lap solo si lap; fijación partida (sutura vs tacas vs sellante + absorbible/metálico).
+11. Diástasis más flaca: pregunta Huerta OK; no inventar hasta respuesta.
+12. Numéricos (cm malla, defecto, overlap, interrectos): sin `empty_text` que invente medidas (mismo criterio oclusión/lobulillos).
+
+### C. Lagunas de seguridad que no listaste
+1. **Conteo de gasas / consentimiento / ATB** — siguen siendo bloque fijo de Foja Qx, no de cada módulo; OK no repetirlos, pero al diseñar Cirugía General no olvidar que **no** reemplazan ese bloque.
+2. **Lesión de vía biliar** — además de integridad VBP + Strasberg: si hay lesión, ¿clasificación (p. ej. Strasberg A–E) o solo “lesión identificada + free”? Hoy no lo pedís; conviene al menos free obligatorio si eligió “Lesión…”.
+3. **Uréteres en colorrecto** — Regla 1: ¿bilateral siempre, o lado según resección? Si resección derecha vs izquierda, el slot debería poder ser uni/bilateral sin forzar “ambos indemnes” en blanco.
+4. **Contenido herniario con sufrimiento** → resección: el handoff a módulo GI debe quedar **explícito** (no solo “describir en GI”) para no perder el hallazgo en la qx de pared.
+5. **Anastomosis vs Hartmann** — Regla 4 ayuda; falta el **slot de decisión** (Anastomosis primaria / Hartmann / Otro) ligado al campo, no solo el campo suelto.
+6. **Feocromo** — además de eventos hemodinámicos: ¿bloqueo α previo consignado (Sí/No)? Es coordinación perioperatoria; si no está en anestesia de forma utilizable, es candidato Regla 3.
+7. **Esofaguectomía** — además de ventilación selectiva e integridad anastomótica: ¿posición / etapa torácica vs abdominal (Ivor Lewis, McKeown, etc.)? Si el bruto lo tiene, OK; si no, laguna de trazabilidad del abordaje.
+
+---
+
+## Qué falta de mi lado para cerrar “auditoría del conjunto”
+Pegá (o reenviá) el bruto de **módulos 2–6**. Con eso puedo hacer la misma pasada que con CyC: contradicciones de opciones, nombres de campos, y si Retroperitoneo realmente es el gold standard de Regla 1 frente al resto.
+
+Cuando eso esté + respuestas Huerta (diástasis, apendicectomía), recién ahí esqueleto proforma por proforma, **sin OK de semilla** hasta agotar revisión.
+
+==================== LINE 1976====================
+**Recibido: Módulo 2 — Gastrointestinal.** Solo auditoría (sin esqueleto).
+
+---
+
+### Cómo veo la separación (5 bloques)
+
+**Bien armada** para Foja Qx: colectomías/colorrecto · gástrico · delgado · exploradora/staging · ostomías.  
+Cubre el eje “resección → anastomosis/estoma” sin mezclar pared ni pancreato-biliar.
+
+**Fricciones a resolver después (no invalidan el corte):**
+- **Sleeve** está en §2 gástrico y también vivirá en Esofagogástrico/Bariátrica → definir dueño (o match a ambas proformas con la misma clave).
+- **Hartmann** aparece como procedimiento en §1 y como cierre en §5 → OK si §1 = índice/urgencia y §5 = restitución diferida; hay que etiquetarlo para no duplicar plantillas.
+- **Apendicectomía** sigue ausente en el set GI.
+
+---
+
+### Bien
+- Procedimientos colorrectales bien listados (incluye Miles, Hartmann, Garengeot/Mikulicz).
+- Abordaje + **convertido + causa**.
+- Indicación/patología (incluye urgencia/perforación).
+- Vascular/linfadenectomía + TME/PME en rectal.
+- Anastomosis: tipo, configuración, mecánica/manual, **prueba de hermeticidad**, ostomía de protección.
+- Delgado: cm resecados/remanente + ubicación.
+- Exploradora: líquido, PCI, biopsias, citología, abdomen abierto/VAC.
+- Ostomías: confección vs cierre + control cabo distal.
+
+---
+
+### Mal / faltantes (vs reglas ya cerradas + consistencia)
+
+**Regla 1 — uréteres**  
+En colectomías / RAR / Miles **no está** el slot de integridad (Identificado y preservado / Lesión…). Obligatorio al esqueletonizar; modelo Retroperitoneo.
+
+**Regla 4 — campo L / LC / C**  
+Indicación “Urgencia / Perforación” existe, pero **falta** la clasificación del campo. Sin eso no queda amarrada la decisión anastomosis primaria vs Hartmann.  
+Añadir además (o dejar explícito) el **gesto de restitución**: Anastomosis primaria / Hartmann / Otro — hoy Hartmann es solo un ítem de procedimiento, no el outcome condicionado al campo.
+
+**Regla 3**  
+Nada que objetar acá (no es el módulo de vía aérea/feocromo). OK no meter tipo de anestesia.
+
+**Gastrectomía oncológica**  
+- Faltan **márgenes** proximal/distal: Libre/Comprometido + distancia (patrón CyC).  
+- Linfadenectomía D1/D1+/D2 OK; no hay lateralidad/extensión distal-proximal más allá del tipo de resección (aceptable si Huerta no lo pide).  
+- Anastomosis gástrica: mecánica/manual + refuerzo; **no** hay prueba de hermeticidad (sí está en colorrecto). Paridad pendiente.
+
+**Sleeve en §2**  
+Si el módulo bariátrico trae prueba de hermeticidad y refuerzos propios, este ítem acá puede quedar corto o duplicado — decidir dueño.
+
+**Colectomía — hermeticidad**  
+Opciones Positiva/Negativa/No realizada: en lenguaje clínico “positiva” a veces = fuga. **Definir en etiqueta** (“fuga demostrada” vs “sin fuga”) para no invertir el sentido en el PDF.
+
+**Engrapadoras**  
+N° mm en free OK; sin `empty_text` que invente calibres.
+
+**Exploradora**  
+Hallazgos ricos; “Compromiso de órganos” libre OK. PCI free numérico sin inventar /39.
+
+**Ostomías §5**  
+“Vía de salida: Transrectal Sí/No” — confirmar si es **transrectal** o **a través del recto abdominal** (transrectus). Posible typo/clínico a chequear con Huerta.
+
+**Garengeot / Mikulicz**  
+Poco frecuentes; OK dejarlos, o “Otro (detallar)” si ensucian el UI.
+
+---
+
+### Lagunas de seguridad que sumo
+1. **Uréteres** (arriba) — principal hueco de Regla 1 en este módulo.  
+2. **Campo + decisión anastomosis/Hartmann** en urgencia.  
+3. **Márgenes** en gastrectomía oncológica.  
+4. **Hermeticidad** ausente en reconstrucción gástrica (y a unificar nombre con bariátrica/esófago).  
+5. **Apendicectomía** — hueco de catálogo del set Cirugía General.  
+6. Handoff desde Pared (hernia estrangulada → resección): este módulo debe poder **recibir** ese caso sin perder el hallazgo de pared.
+
+---
+
+### Veredicto del módulo
+Separación **aprobable** como estructura de proformas.  
+Antes de esqueleto: cerrar uréteres, campo L/LC/C + decisión restitución en urgencia, márgenes gástricos, sentido de hermeticidad, dueño del sleeve, y apendicectomía con Huerta.
+
+Cuando quieras, el **Módulo 3**.
+
+==================== LINE 1981====================
+**Recibido: Módulo 3 — Pancreático y Biliar.** Solo auditoría (sin esqueleto ni archivos).
+
+---
+
+### Cómo veo la separación (4 bloques)
+
+**Bien:** pancreatectomías · vía biliar/derivaciones · colecistectomía · drenajes/cierre.  
+Cubre Whipple/distal/enucleación, coledoco/derivación/lesión iatrogénica, colecistectomía + CVS, drenajes. Corte claro respecto de GI (M2).
+
+---
+
+### Bien
+- Tipos de resección pancreática + Traverso-Longmire vs Whipple clásico.
+- Esplenectomía vs preservación (Warshaw / vasos).
+- Abordaje + conversión.
+- Linfadenectomía + resección vascular (venosa/arterial) + reconstrucción.
+- Triple reconstrucción DPC (páncreas / biliar / digestiva) con técnicas útiles (invaginante, duct-to-mucosa, stent).
+- Vía biliar: coledocotomía, transcística, derivaciones, **reconstrucción por lesión** + Strasberg/Bismuth.
+- CIO / coledocoscopía / Dormia-Fogarty / T-tube / stent.
+- Colecistectomía: hallazgos agudos/crónicos/Mirizzi, CVS, total vs subtotal de rescate, clipado cístico.
+- Drenajes por zona + amilasa en drenaje (POD).
+
+---
+
+### Mal / faltantes (vs reglas ya cerradas + M2)
+
+**Regla 1 — integridad VBP (colecistectomía y exploración)**  
+Hoy solo está **CVS Lograda/No lograda**. Falta el slot hermano de integridad:
+`Vía biliar principal: Identificada y preservada / Lesión identificada intraoperatoriamente`  
+(+ free / clasificación si lesión).  
+CVS y lesión son datos **distintos** (como acordamos): pueden coexistir.
+
+**Sección 2 ya tiene** “Reconstrucción por lesión iatrogénica + Strasberg/Bismuth” — eso es el **gesto** si hubo lesión. Falta el **estado en el acto** en colecistectomía (§3) aunque no se pase a reconstrucción formal en el mismo tiempo.
+
+**Textura del páncreas remanente + Wirsung** (corrección puntual previa)  
+**No están** en §1. Obligatorios al esqueleto en DPC / anastomosis pancreática (y útiles en distal si hay remanente):  
+`[Blando / Fibroso-duro]` + diámetro Wirsung (mm), sin inventar números.
+
+**Hermeticidad**  
+No hay prueba de hermeticidad en anastomosis pancreática/biliar/digestiva del Whipple ni en derivaciones. Decidir con Huerta si aplica (azul/aire) o si en páncreas el proxy es drenaje + amilasa. Si hay prueba, **misma etiqueta** que M2: Fuga demostrada / Sin fuga demostrada / No realizada.
+
+**Campo L/LC/C (Regla 4)**  
+Ausente. En colecistectomía aguda gangrenosa / piocolecisto / conversión por plastrón y en coledocolitiasis complicada puede importar. Al menos en **urgencia / contaminación** (no hace falta en todo Whipple electivo limpio).
+
+**Esplenectomía**  
+Bien condicionada a corporal/caudal. Al esqueleto: `required_if` resecciones distales.
+
+**Conversión**  
+En §3 colecistectomía tiene causa; en §1 pancreatectomía solo “Conversión a abierto” **sin causa** — alinear con M2 (causa free).
+
+**CIO**  
+Aparece en §2 (instrumentación) y §3 (dedicado). OK si §3 es el flujo colecistectomía y §2 el de exploración; unificar opciones de hallazgos para no divergir.
+
+**“Tubo en Kahr”**  
+¿Kher /Kehr (T-tube)? Tipografía a corregir en el bruto.
+
+**Drenajes §4**  
+Patrón distinto al de Pared (Sí/No global). Acá son checkboxes por lecho — OK clínicamente; al esqueleto: condicionar cantidad/tipo solo si ese lecho está tildado; sin empty_text que invente.
+
+**Amilasa en drenaje**  
+Solo “Programado” — falta No / No aplica, si no el PDF puede quedar mudo o forzar un sí implícito.
+
+---
+
+### Lagunas de seguridad que sumo
+1. **Integridad VBP** explícita en colecistectomía (además de CVS).  
+2. **Textura páncreas + Wirsung** (riesgo de fístula).  
+3. **Lesión vascular / sangrado no previsto** en Whipple — no hay slot de evento vascular no planificado (solo resección vascular oncológica electiva).  
+4. **Preservación pilórica:** Traverso-Longmire está como tipo de resección; OK. Si falla y se convierte a antrectomía, ¿queda solo en plantilla libre? Convendría free o “piloro preservado / no”.  
+5. **Handoff** desde colecistectomía con lesión VBP → §2 reconstrucción (mismo caso, dos secciones): al diseño, una foja puede necesitar **ambas** secciones activas.
+
+---
+
+### Veredicto
+Separación **aprobable**.  
+Antes de esqueleto: VBP≠CVS, textura+Wirsung, Kehr typo, causa de conversión en §1, amilasa Sí/No/No aplica, y criterio de hermeticidad/campo en este módulo con Huerta.
+
+Listo para el **Módulo 4** cuando lo mandes.
+
+==================== LINE 1986====================
+**Recibido: Módulo 4 — Proctología.** Solo auditoría (sin esqueleto).
+
+---
+
+### Cómo veo la separación (6 bloques)
+
+**Bien:** hemorroides · absceso/fístula · fisura · pilonidal · otras/tumoral · hemostasia/esfínter/cierre.  
+Orden lógico agudo→crónico y por patología. Encaja como proformas distintas o un módulo con secciones activables.
+
+---
+
+### Bien
+- Hemorroides: grado, paquetes 3/7/11, Milligan-Morgan / Ferguson / Parks, PPH, THD, LBL, instrumento de corte.
+- Fístula: Parks completo + setón cortante/laxo + preservación (LIFT, flap, VAAFT, plug, FiLaC).
+- Absceso: topografía + mecha/loop.
+- Fisura: ubicación, aguda/crónica (tríada Brodie), ELI abierta/cerrada, anoplastia, Botox + UI.
+- Pilonidal: agudo vs crónico; Karydakis/Bascom/Limberg; EPSiT/SiLaC.
+- Cierre: estado del esfínter + taponamiento (incluye «Sin taponamiento» — bien, no inventa).
+
+---
+
+### Mal / faltantes (vs reglas ya cerradas)
+
+**Regla 2 — riesgo funcional previo (crítica en este módulo)**  
+Antes de **fistulotomía / fistulectomía / ELI / setón cortante** falta evaluación de continencia / factores de riesgo (partos, cirugías anales previas, tono). El §6 solo describe el **estado post** del esfínter, no el **pre**. Obligatoria al esqueleto.
+
+**Regla 3 — anestesia genérica**  
+§6 «Anestesia Utilizada: General / Raquídea / Local+sedación» — **sacar**. Es el anti-patrón que ya retiraste de Pared: vive en foja de anestesia. Acá no hay coordinación tipo MLS/feocromo/doble lumen.
+
+**Neoplasia canal anal (§5) — subdesarrollada** (ya marcada antes)  
+Faltan: diagnóstico presuntivo (epidermoide / basocelular / melanoma anal), localización específica, tamaño. Hoy solo biopsia ± margen marcado.
+
+**Pilonidal crónico electivo**  
+Falta **infección activa al momento** (Sí/No): condiciona cierre primario vs 2ª intención / colgajo.
+
+**Regla 1**  
+En fístula/fisura el “nervio” no aplica; el análogo es el **esfínter**. §6 lo cubre en parte — al esqueleto, ligar `required_if` a técnicas que seccionan esfínter (fistulotomía, ELI, setón cortante) y no pedirlo igual en LBL o Botox solo.
+
+**Regla 4 — campo L/LC/C**  
+No está. Valorar en absceso / fístula con sepsis local / pilonidal infectado (no hace falta en hemorroidectomía electiva limpia).
+
+**Hermeticidad**  
+No aplica acá (OK).
+
+**Typos**  
+«Físula» → Fístula; «Margen marcadado» → marcado; «Fotocoagulación» OK.
+
+**Hemorroides — técnica**  
+Resectiva vs no resectiva pueden tildarse juntas: mutex o “enfoque” primero (como malla vs tisular en Pared).
+
+**Botox UI**  
+Free numérico sin inventar dosis.
+
+---
+
+### Lagunas que sumo
+1. **Continencia pre** (Regla 2) — principal hueco de seguridad del módulo.  
+2. **Quitar tipo de anestesia** del §6.  
+3. **Neoplasia** ampliada + **infección activa** en pilonidal.  
+4. Si hay **resección rectal** asociada, no está acá (vive en M2) — OK; no mezclar Miles en procto orificial.  
+5. Condilomas: OK básico; si Huerta quiere tipificación/extensión, hoy no está.
+
+---
+
+### Veredicto
+Separación **aprobable**.  
+Antes de esqueleto: Regla 2 pre-esfínter, sacar anestesia genérica, desarrollar neoplasia, infección activa pilonidal, typos, mutex hemorroides.
+
+Cuando confirmes estos hallazgos (o ajustes), anoto el doc como M2/M3 y seguimos con el **Módulo 5**.
+
+==================== LINE 1988====================
+**Recibido: Módulo 5 — Retroperitoneo.** Solo auditoría (sin esqueleto).
+
+---
+
+### Cómo veo la separación (5 bloques)
+
+**Bien:** masas/sarcomas · linfadenectomía · adrenal · vascular/urológico de urgencia · hemostasia/drenajes.  
+Es el módulo que mejor anticipa la **Regla 1** (vasos, uréter, plexo). Corte claro vs GI/pancreato-biliar; las resecciones multiviscerales asociadas son handoffs explícitos (riñón, colon, páncreas/bazo, vasos).
+
+---
+
+### Bien (y por qué sirve de modelo Regla 1)
+- Intención R0/R1/R2 / biopsia inoperable — trazabilidad oncológica útil.
+- Multivisceral por invasión de margen (nefrectomía, colectomía, distal+bazo, cava/aorta/ilíacos, psoas).
+- Linfadenectomía: plantillas paraaórtica → obturatriz + **preservación de plexo simpático** (Sí/No).
+- Adrenal: lateralidad, lap vs RLA vs abierto, patologías (incluye feocromo), vena ligada antes de manipular, lecho.
+- Vascular/urológico: cava, ilíacos, renales; uréter preservado vs resección + reimplante/TT/Doble J.
+- Hemostasia tópica + drenaje aspirativo.
+
+Esto es, como habíamos dicho, el **gold standard** de “estructura crítica consignada en el acto” para el resto de CG.
+
+---
+
+### Mal / faltantes
+
+**Regla 3 — feocromocitoma (ya marcada, sigue ausente)**  
+Falta slot de coordinación con anestesia, p. ej.  
+`evento_hemodinamico_manipulacion`: Sin eventos / Crisis hipertensiva controlada / Otro (detalle).  
+Opcional hermano: bloqueo α preoperatorio consignado Sí/No (si no vive ya utilizable en foja anestesia).  
+El “vena ligada antes” es técnico quirúrgico; **no reemplaza** el registro de crisis hemodinámica.
+
+**Diagnóstico presuntivo de la masa (§1)**  
+Sigue faltando: liposarcoma / leiomiosarcoma / GIST / otro (free). La intención R0–R2 no dice *qué* se operó.
+
+**Regla 1 — pulir el modelo**  
+- Uréter en §4 está como gestos; falta el patrón unificado  
+  `Identificado y preservado / Lesión identificada…` **también cuando no hubo resección** (solo disección).  
+- Vasos: §4 mezcla planificado y de urgencia. Como en Whipple M3, separar  
+  **resección vascular oncológica electiva** (§1 ya la tiene) vs  
+  **`evento_vascular_no_planificado`** en el mismo espíritu (Sin eventos / controlada / reconstrucción de urgencia).  
+- Plexo simpático: en §2 solo Sí/No preservación; alinear a  
+  Identificado y preservado / Lesión… / No disecado (si la plantilla no lo aborda).
+
+**“Laterallidad”** → Lateralidad (mismo typo que Pared/Adrenal).
+
+**Campo L/LC/C**  
+No está. Valorar si hay víscera hueca abierta / contaminación en resección multivisceral; no forzar en toda adrenal electiva limpia.
+
+**Hermeticidad**  
+N/A salvo anastomosis digestiva asociada (entonces handoff a M2 + etiqueta Fuga/Sin fuga/No realizada).
+
+**Nefrectomía / colectomía asociadas**  
+Lado en el checkbox OK; al esqueleto, `required_if` Sí → lado.
+
+**Drenajes**  
+Cantidad/ubicación sin inventar; opción explícita **Sin drenaje**.
+
+**Toracoabdominal**  
+OK en abordaje; si abre tórax, ¿nota de ventilación/posición? Suele ser Regla 3 light — preguntar a Huerta si hace falta o alcanza la foja de anestesia.
+
+---
+
+### Lagunas que sumo
+1. Feocromo hemodinamia (Regla 3) — hueco de seguridad #1 de este módulo.  
+2. Dx presuntivo de masa retroperitoneal.  
+3. Estado de uréter/vasos **sin** resección (integridad del acto, no solo reconstrucción).  
+4. Evento vascular no planificado ≠ resección vascular electiva.  
+5. Si ACC / masa grande con trombo en cava: el bruto no tipifica trombectomía — ¿cubre “VCI: resección+injerto” o hace falta ítem propio?
+
+---
+
+### Veredicto
+Separación **muy sólida**; es el módulo de referencia para Regla 1.  
+Antes de esqueleto: feocromo Regla 3, dx presuntivo, integridad uréter/vasos en disección pura, tipografía Lateralidad, drenaje Sin/con detalle, y alinear vascular planificado vs no planificado como en M3.
+
+Cuando confirmes, lo anoto en `docs/cirugia-general/` y seguimos con el **Módulo 6**.
+
