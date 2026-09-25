@@ -1,0 +1,4 @@
+# PWA instaladas antes del fix de manifest (start_url /AnestFact/) → raíz Cloudflare
+/AnestFact / 301
+/AnestFact/ / 301
+/AnestFact/* / 301

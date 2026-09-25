@@ -229,7 +229,6 @@ function afCopiarUrlQxQr() {
 function afQxPublicBaseUrl() {
   if (typeof afPublicBaseUrl === 'function') return afPublicBaseUrl();
   var path = location.pathname || '/';
-  if (path.indexOf('/AnestFact') >= 0) return location.origin + '/AnestFact/';
   if (path.endsWith('/')) return location.origin + path;
   var i = path.lastIndexOf('/');
   return location.origin + (i >= 0 ? path.slice(0, i + 1) : '/');

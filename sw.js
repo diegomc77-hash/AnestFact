@@ -2,7 +2,7 @@
 // STATIC_CORE: shell + SCRIPTS (js/load-scripts.js) + vistas (js/load-views.js).
 // Si agregás un script o vista nueva, actualizá AMBOS lados (lista acá + SCRIPTS/VIEWS/FOJA_PARTS).
 // No incluir scripts propios de valoracion.html ni CDNs (QR paciente = online).
-var CACHE_NAME = 'anesfact-v13.15';
+var CACHE_NAME = 'anesfact-v13.16';
 var STATIC_CORE = [
   'index.html',
   'valoracion.html',
@@ -135,8 +135,15 @@ self.addEventListener('activate', function (e) {
 function isSupabase(url) { return url.indexOf('supabase.co') >= 0; }
 
 function isStaticAsset(url) {
-  if (url.indexOf('/AnestFact/') < 0 && url.indexOf('localhost') < 0 && url.indexOf('127.0.0.1') < 0) return false;
-  return /\.(html|css|js|png|json|woff2?)(\?|$)/.test(url) || /\/AnestFact\/?$/.test(url);
+  // Mismo origen = scope del SW (Cloudflare raíz o GitHub Pages /AnestFact/).
+  // NO depender de '/AnestFact/' hardcodeado: en workers.dev eso devolvía false
+  // para todo → nunca cache-first → app «clavada» en red.
+  var scope = self.registration.scope || '';
+  if (!scope || url.indexOf(scope) !== 0) return false;
+  var pathOnly = url.split('?')[0];
+  var scopeTrim = scope.replace(/\/$/, '');
+  if (pathOnly === scope || pathOnly === scopeTrim || pathOnly === scopeTrim + '/') return true;
+  return /\.(html|css|js|png|json|woff2?)(\?|$)/.test(url);
 }
 
 function notifyOffline(clients) {
