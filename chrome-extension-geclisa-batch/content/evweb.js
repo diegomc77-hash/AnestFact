@@ -315,31 +315,84 @@
     return null;
   }
 
-  function findEvwebPracticaAddButton() {
-    var ids = [
-      'body_btnAgregarPractica',
-      'body_btnAgregar',
-      'body_btnAddPractica'
-    ];
-    for (var i = 0; i < ids.length; i++) {
-      var el = document.getElementById(ids[i]);
-      if (el) return el;
+  function findEvwebPracticasGrid() {
+    return document.getElementById('body_grdPracticas')
+      || document.getElementById('body_GridViewPracticas')
+      || document.querySelector('[id$="grdPracticas"]')
+      || document.querySelector('[id*="grdPractica"]')
+      || document.querySelector('table[id*="Practica"]');
+  }
+
+  /** Filas de datos en la grilla de prácticas (sin header). */
+  function countEvwebPracticasGridRows() {
+    var grid = findEvwebPracticasGrid();
+    if (!grid) return { n: 0, missing: true, gridId: '' };
+    var rows = grid.querySelectorAll('tr');
+    var n = 0;
+    for (var i = 0; i < rows.length; i++) {
+      var tr = rows[i];
+      if (!tr) continue;
+      if (tr.querySelector('th')) continue;
+      var tds = tr.querySelectorAll('td');
+      if (!tds.length) continue;
+      n++;
     }
-    var buttons = document.querySelectorAll('a, button, input[type="button"], input[type="submit"]');
-    for (var j = 0; j < buttons.length; j++) {
-      var b = buttons[j];
-      var label = String(
-        (b.value || '') + ' ' + (b.textContent || '') + ' ' + (b.title || '')
-      ).toLowerCase();
-      if (/agregar.*practic|practic.*agregar|add.*practic/i.test(label)) return b;
+    return { n: n, missing: false, gridId: grid.id || '' };
+  }
+
+  /**
+   * BG → MAIN: arma endRequest y espera (mismo mecanismo que Obra Social).
+   * Armar ANTES del click de autocomplete; si falla executeScript → sleep de red.
+   */
+  function waitEvwebEndRequestViaBackground(tabId, frameId, timeoutMs) {
+    timeoutMs = timeoutMs || 5000;
+    if (!tabId || frameId == null || frameId === '') {
+      return sleep(timeoutMs).then(function () {
+        return { ok: false, reason: 'missing_tab_or_frame', fallbackSleepMs: timeoutMs };
+      });
     }
-    return null;
+    return new Promise(function (resolve) {
+      try {
+        chrome.runtime.sendMessage({
+          type: 'AFG_EVW_WAIT_END_REQUEST',
+          tabId: tabId,
+          frameId: frameId,
+          timeoutMs: timeoutMs
+        }, function (res) {
+          var errMsg = chrome.runtime.lastError && chrome.runtime.lastError.message;
+          if (errMsg) {
+            resolve({ ok: false, reason: 'executeScript_failed', error: errMsg });
+            return;
+          }
+          resolve(res || { ok: false, reason: 'executeScript_failed', error: 'empty_response' });
+        });
+      } catch (e) {
+        resolve({
+          ok: false,
+          reason: 'executeScript_failed',
+          error: String(e && e.message || e)
+        });
+      }
+    }).then(function (settle) {
+      if (
+        settle.reason === 'executeScript_failed' ||
+        settle.reason === 'no_page_request_manager' ||
+        settle.reason === 'error'
+      ) {
+        return sleep(Math.min(timeoutMs, 2500)).then(function () {
+          return Object.assign({}, settle, { fallbackSleepMs: Math.min(timeoutMs, 2500) });
+        });
+      }
+      return settle;
+    });
   }
 
   /**
    * Por cada práctica: escribe descripción con tecleo real.
    * Si hay codigoEvweb resuelto → elige esa opción exacta del desplegable.
    * Si no → deja el desplegable abierto (Huerta elige a mano). Nunca autoselect por texto.
+   * Ticket 17: NO clickear body_btnAgregar (es Finalizar). Seleccionar del autocomplete
+   * ya agrega a grdPracticas. Re-buscar input cada vuelta; esperar endRequest; verificar grilla.
    */
   async function fillEvwebPracticas(pracs, meta) {
     meta = meta || {};
@@ -363,13 +416,11 @@
     if (!pracs.length) {
       return { ok: true, skipped: true, attempted: 0, results: [] };
     }
-    var input = document.getElementById('body_txtCodigoPractica');
-    if (!input) {
-      return { ok: false, error: 'txtCodigoPractica_not_found', attempted: 0, results: [] };
-    }
 
     var results = [];
     var leftOpenForManual = false;
+    var tabId = meta.tabId || null;
+    var frameId = meta.frameId != null ? meta.frameId : null;
 
     for (var i = 0; i < pracs.length; i++) {
       var p = pracs[i] || {};
@@ -391,17 +442,42 @@
         continue;
       }
 
+      // ASP.NET reemplaza el nodo en cada postback — re-buscar siempre
+      var input = document.getElementById('body_txtCodigoPractica');
+      if (!input) {
+        return {
+          ok: false,
+          error: 'txtCodigoPractica_not_found',
+          attempted: i,
+          results: results,
+          message: 'No encontr\u00e9 el campo de pr\u00e1cticas (se perdi\u00f3 tras un postback). Abortado.'
+        };
+      }
+
+      var gridBefore = countEvwebPracticasGridRows();
+
       try {
         input.scrollIntoView({ block: 'center', inline: 'nearest' });
       } catch (eSc) {}
 
+      // Limpiar antes de tipear para no leer el desplegable anterior
+      try {
+        input.focus();
+        input.value = '';
+        fireChange(input);
+      } catch (eClr) {}
+      await sleep(80);
+
       var typeRes = await typeIntoEvwebPracticaInput(input, desc || code);
-      await sleep(500);
+      await sleep(400);
       var items = await waitEvwebAutocomplete(4000);
 
       if (code) {
         var hit = pickAutocompleteByCodigoEvweb(items, code);
         if (hit && hit.el) {
+          // Armar endRequest ANTES del click (mismo patrón Obra Social)
+          var waitP = waitEvwebEndRequestViaBackground(tabId, frameId, 5000);
+          await sleep(80);
           try {
             hit.el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
             hit.el.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
@@ -409,12 +485,60 @@
           } catch (eClick) {
             try { hit.el.click(); } catch (e2) {}
           }
-          await sleep(400);
-          var addBtn = findEvwebPracticaAddButton();
-          if (addBtn && i < pracs.length - 1) {
-            try { addBtn.click(); } catch (eAdd) {}
-            await sleep(500);
+          var settle = await waitP;
+
+          // Verificar que la grilla creció (fallar fuerte — facturación)
+          var gridAfter = gridBefore;
+          var grew = false;
+          var pollStart = Date.now();
+          while (Date.now() - pollStart < 3000) {
+            gridAfter = countEvwebPracticasGridRows();
+            if (!gridAfter.missing && gridAfter.n > gridBefore.n) {
+              grew = true;
+              break;
+            }
+            await sleep(150);
           }
+          if (!grew) {
+            gridAfter = countEvwebPracticasGridRows();
+            grew = !gridAfter.missing && gridAfter.n > gridBefore.n;
+          }
+          if (!grew) {
+            try {
+              chrome.runtime.sendMessage({
+                type: 'AFG_DIAG_LOG',
+                src: 'evweb',
+                tag: 'prac_grid_not_grown',
+                detail: {
+                  codigoEvweb: code,
+                  desc: desc,
+                  rowsBefore: gridBefore.n,
+                  rowsAfter: gridAfter.n,
+                  gridMissing: !!gridAfter.missing,
+                  settle: settle && settle.reason
+                }
+              }, function () { void chrome.runtime.lastError; });
+            } catch (eDg) {}
+            results.push({
+              ok: false,
+              selected: true,
+              error: 'prac_not_added_to_grid',
+              codigoEvweb: code,
+              desc: desc,
+              rowsBefore: gridBefore.n,
+              rowsAfter: gridAfter.n,
+              settle: settle
+            });
+            return {
+              ok: false,
+              error: 'prac_not_added_to_grid',
+              attempted: i + 1,
+              results: results,
+              message: 'La pr\u00e1ctica ' + code + ' no se agreg\u00f3 a la grilla (filas ' +
+                gridBefore.n + '\u2192' + gridAfter.n + '). Abortado para no facturar mal.'
+            };
+          }
+
           results.push({
             ok: true,
             selected: true,
@@ -422,7 +546,10 @@
             desc: desc,
             optionText: hit.text.slice(0, 120),
             typed: typeRes.value,
-            optionsSeen: items.length
+            optionsSeen: items.length,
+            rowsBefore: gridBefore.n,
+            rowsAfter: gridAfter.n,
+            settle: settle && settle.reason
           });
           try {
             chrome.runtime.sendMessage({
@@ -433,7 +560,10 @@
                 codigoEvweb: code,
                 desc: desc,
                 optionText: hit.text.slice(0, 120),
-                optionsSeen: items.length
+                optionsSeen: items.length,
+                rowsBefore: gridBefore.n,
+                rowsAfter: gridAfter.n,
+                settle: settle && settle.reason
               }
             }, function () { void chrome.runtime.lastError; });
           } catch (eD) {}

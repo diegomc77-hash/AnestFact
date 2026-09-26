@@ -164,9 +164,10 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- **Ticket 16 URGENTE:** rama `ticket-16-sw-cloudflare-paths` — SW `isStaticAsset` por `registration.scope` (no hardcode `/AnestFact/`), `_redirects` 301 `/AnestFact/*` → `/`, QR sin path viejo. PWA **13.16**. Pendiente audit + merge a main.
+- **Ticket 17 URGENTE:** rama `ticket-17-evweb-practicas-finalizar` — fill prácticas no clickea Finalizar; re-find input; endRequest; verificar grilla. Ext **0.6.29**. Pendiente audit + smoke PAMI+9000.
+- **Ticket 16 CERRADO** en **main** `c8bff18` (PWA **13.16**) — SW scope + `_redirects` /AnestFact.
 - **Tickets 12+13 CERRADOS** en **main** `4efe0d1` (PWA **13.15**).
-- **Ticket 15:** regenerar anest — WIP en stash local; va después de Ticket 16.
+- **Ticket 15:** regenerar anest — WIP en stash local; después de Ticket 17.
 - **UI toast + Aero/IOSFA:** PWA **13.14** — toast wrap si msg >50 chars; `onSanChange` autocompleta `#f-obra` = IOSFA al elegir Aeronáutico.
 - **Sync payload / timeout 57014:** PWA **13.13** — `syncBuildCloudSafePayload` migra data-URLs → IDB y sube solo meta (ya no rehidrata blobs a `anesfact_datos`). Helpers `afDocsAuditInlineData` / `afSyncMeasureRemoteRowSize` / `afSyncRepairInlineDocsAndPush`. Pendiente: Diego logueado → medir fila antes/después.
 - **Infra:** ver `docs/AVISO_INFRA_GRANTS_MIGRACION.md`. **Ext 0.6.28**. PWA **13.07**. **Ticket 5** POSPUESTO.

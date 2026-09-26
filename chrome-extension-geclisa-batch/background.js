@@ -348,6 +348,23 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       });
     return true;
   }
+  // CS → MAIN: solo esperar endRequest (post-selección de práctica EVWEB)
+  if (msg && msg.type === 'AFG_EVW_WAIT_END_REQUEST') {
+    waitEvwebEndRequestOnly(
+      msg.tabId,
+      msg.frameId,
+      msg.timeoutMs || 5000
+    )
+      .then(function (r) { sendResponse(r); })
+      .catch(function (e) {
+        sendResponse({
+          ok: false,
+          reason: 'executeScript_failed',
+          error: String(e && e.message || e)
+        });
+      });
+    return true;
+  }
   // CS → MAIN: File + click/__doPostBack de #body_btnUploadArchivo (mundo página)
   if (msg && msg.type === 'AFG_EVW_SET_FILE_AND_CLICK_UPLOAD') {
     setEvwebFileAndClickUpload(msg)
@@ -4384,6 +4401,90 @@ async function uploadEvwebDocsViaBackground(tabId, frameId, docs) {
     }, {})
   }, 'bg');
   return out;
+}
+
+/**
+ * MAIN world: solo arma endRequest y espera (sin setear nada).
+ * Para postback tras seleccionar práctica del autocomplete.
+ * Reasons: endRequest | timeout | no_page_request_manager | executeScript_failed | error
+ */
+async function waitEvwebEndRequestOnly(tabId, frameId, timeoutMs) {
+  timeoutMs = timeoutMs || 5000;
+  if (!tabId || frameId == null || frameId === '') {
+    return {
+      ok: false,
+      reason: 'executeScript_failed',
+      error: 'missing_tab_or_frame',
+      tabId: tabId || null,
+      frameId: frameId == null ? null : frameId
+    };
+  }
+  var fid = Number(frameId);
+  if (!Number.isFinite(fid)) {
+    return {
+      ok: false,
+      reason: 'executeScript_failed',
+      error: 'bad_frameId',
+      frameId: frameId
+    };
+  }
+  try {
+    var results = await chrome.scripting.executeScript({
+      target: { tabId: tabId, frameIds: [fid] },
+      world: 'MAIN',
+      args: [timeoutMs],
+      func: function (timeoutMsArg) {
+        return new Promise(function (resolve) {
+          try {
+            var mgr = window.Sys && window.Sys.WebForms &&
+              window.Sys.WebForms.PageRequestManager &&
+              window.Sys.WebForms.PageRequestManager.getInstance &&
+              window.Sys.WebForms.PageRequestManager.getInstance();
+            if (!mgr) {
+              resolve({ ok: false, reason: 'no_page_request_manager' });
+              return;
+            }
+            var fired = false;
+            var handler = function () {
+              if (fired) return;
+              fired = true;
+              try { mgr.remove_endRequest(handler); } catch (eRm) {}
+              resolve({ ok: true, reason: 'endRequest' });
+            };
+            try { mgr.add_endRequest(handler); } catch (eAdd) {
+              resolve({
+                ok: false,
+                reason: 'error',
+                error: String(eAdd && eAdd.message || eAdd)
+              });
+              return;
+            }
+            // Si ya hay postback en curso, el handler lo atrapa; si no, timeout.
+            setTimeout(function () {
+              if (fired) return;
+              fired = true;
+              try { mgr.remove_endRequest(handler); } catch (eRm2) {}
+              resolve({ ok: false, reason: 'timeout', timeoutMs: timeoutMsArg });
+            }, timeoutMsArg);
+          } catch (e) {
+            resolve({
+              ok: false,
+              reason: 'error',
+              error: String(e && e.message || e)
+            });
+          }
+        });
+      }
+    });
+    var r = results && results[0] && results[0].result;
+    return r || { ok: false, reason: 'executeScript_failed', error: 'empty_result' };
+  } catch (e) {
+    return {
+      ok: false,
+      reason: 'executeScript_failed',
+      error: String(e && e.message || e)
+    };
+  }
 }
 
 /**
