@@ -966,6 +966,8 @@ function afMayoPdfMeta(intervId){
 
 /**
  * PDF combinado GECLISA → docs.anest. No rasteriza. No pisa adjunto manual.
+ * Ticket 19a: escribe en IndexedDB (como afCommitAdjunto) y guarda solo meta;
+ * si IDB falla, degrada a inline (no perder el archivo).
  * Toast solo si el combinado está completo.
  */
 function afCommitGeclisaPdf(intervId,payload,opts){
@@ -997,39 +999,83 @@ function afCommitGeclisaPdf(intervId,payload,opts){
     size:size
   };
 
+  /**
+   * Persiste anest (+ alias qx) y NO resuelve hasta terminar IDB.
+   * @returns {Promise<object>}
+   */
   function inspect(look){
     look=look||{parseOk:false,complete:false};
     var complete=!!look.complete;
-    if(!it.docs)it.docs={};
-    it.docs.anest=doc;
-    it.mayo_pdf_qx_pendiente=!complete;
-    afSyncGeclisaQxAlias(it, complete, {fromCommit:true});
-    it._ts=Date.now();
-    var idx=S.intervs.findIndex(function(x){return String(x.id)===id;});
-    if(idx>=0)S.intervs[idx]=it;
-    if(S.cur&&String(S.cur.id)===id)S.cur=it;
-    saveIntervsToStorage();
-    if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
-    if(typeof afGeclisaQueueSetPdfPending==='function')afGeclisaQueueSetPdfPending(id,!complete);
-    if(S.cur&&String(S.cur.id)===id&&typeof renderDocBadges==='function')renderDocBadges();
-    if(complete&&opts.toast!==false&&typeof toast==='function'){
-      toast('Foja GECLISA (qx + anestesia) guardada \u2713');
+
+    function applyAnestSlot(stored){
+      if(!it.docs)it.docs={};
+      it.docs.anest=stored;
+      it.mayo_pdf_qx_pendiente=!complete;
+      it.mayo_pdf_perdido=false;
+      afSyncGeclisaQxAlias(it, complete, {fromCommit:true});
+      it._ts=Date.now();
+      var idx=S.intervs.findIndex(function(x){return String(x.id)===id;});
+      if(idx>=0)S.intervs[idx]=it;
+      if(S.cur&&String(S.cur.id)===id)S.cur=it;
+      try{saveIntervsToStorage();}catch(eSave){
+        try{console.warn('[AFG] PDF GECLISA saveIntervs',eSave);}catch(eL0){}
+      }
+      if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+      if(typeof afGeclisaQueueSetPdfPending==='function')afGeclisaQueueSetPdfPending(id,!complete);
+      if(S.cur&&String(S.cur.id)===id&&typeof renderDocBadges==='function')renderDocBadges();
+      if(complete&&opts.toast!==false&&typeof toast==='function'){
+        toast('Foja GECLISA (qx + anestesia) guardada \u2713');
+      }
+      try{
+        console.log('[AFG] PDF GECLISA commit',id,'complete=',complete,'parseOk=',!!look.parseOk,'size=',size,'idb=',!!(stored&&stored.idb&&!stored.data));
+      }catch(eL){}
+      return{
+        ok:true,
+        intervId:id,
+        complete:complete,
+        pendingQx:!complete,
+        parseOk:!!look.parseOk,
+        hasQx:!!look.hasQx,
+        hasAnest:!!look.hasAnest,
+        verify:look.verify||null,
+        wide:!!opts.wide,
+        size:size,
+        idb:!!(stored&&stored.idb&&!stored.data)
+      };
     }
-    try{
-      console.log('[AFG] PDF GECLISA commit',id,'complete=',complete,'parseOk=',!!look.parseOk,'size=',size);
-    }catch(eL){}
-    return{
-      ok:true,
-      intervId:id,
-      complete:complete,
-      pendingQx:!complete,
-      parseOk:!!look.parseOk,
-      hasQx:!!look.hasQx,
-      hasAnest:!!look.hasAnest,
-      verify:look.verify||null,
-      wide:!!opts.wide,
-      size:size
-    };
+
+    function finishInlineDegraded(reason){
+      try{console.warn('[AFG] PDF GECLISA IDB falló — queda inline',id,reason||'');}catch(eW){}
+      return applyAnestSlot(doc);
+    }
+
+    function finishWithIdbMeta(){
+      // Calentar mem para la sesión (afDocIdbPut ya lo hace; refuerzo explícito).
+      if(typeof afDocMemSet==='function'){
+        try{afDocMemSet(id,'anest',doc);}catch(eMem){}
+      }
+      var meta=(typeof afDocMetaFromFull==='function')
+        ? afDocMetaFromFull(doc)
+        : {
+            nombre:doc.nombre,
+            tipo:doc.tipo,
+            fecha:doc.fecha,
+            fuente:doc.fuente,
+            size:doc.size,
+            idb:true
+          };
+      return applyAnestSlot(meta);
+    }
+
+    if(typeof afDocIdbPut==='function'&&doc.data){
+      return afDocIdbPut(id,'anest',doc).then(function(ok){
+        if(ok) return finishWithIdbMeta();
+        return finishInlineDegraded('put_returned_false');
+      }).catch(function(e){
+        return finishInlineDegraded(e&&e.message||e);
+      });
+    }
+    return Promise.resolve(finishInlineDegraded('no_afDocIdbPut'));
   }
 
   var meta={
@@ -1042,7 +1088,7 @@ function afCommitGeclisaPdf(intervId,payload,opts){
 
   if(typeof afPdfLooksComplete!=='function'){
     if(dry) return Promise.resolve({ok:true,dryRun:true,intervId:id,complete:false,parseOk:false,wide:meta.wide});
-    return Promise.resolve(inspect({parseOk:false,complete:false}));
+    return inspect({parseOk:false,complete:false});
   }
   return afPdfLooksComplete(data, meta).then(function(look){
     if(dry){
@@ -1078,6 +1124,93 @@ function afCommitGeclisaPdf(intervId,payload,opts){
       };
     }
     return inspect(look);
+  });
+}
+
+/**
+ * Ticket 19b: ¿PDF GECLISA marcado o remanente sin blob usable?
+ * (Heurística sync para cola/Facturación; la auditoría async confirma IDB.)
+ */
+function afGeclisaPdfPerdidoSync(it){
+  if(!it)return false;
+  if(it.mayo_pdf_perdido)return true;
+  var d=it.docs&&it.docs.anest;
+  if(!d||d.fuente!=='geclisa_p1b')return false;
+  if(d.data)return false;
+  // Pre-19a: quedó meta/nombre en nube/LS sin flag idb ni storage → blob perdido
+  if(!d.idb&&!d.storage&&!d.storagePath)return true;
+  return false;
+}
+
+/**
+ * Ticket 19b: lista fojas con fuente geclisa_p1b, sin .data y sin blob en IDB.
+ * Uso: afAuditGeclisaPdfsPerdidos() en consola. Marca mayo_pdf_perdido y persiste.
+ */
+function afAuditGeclisaPdfsPerdidos(opts){
+  opts=opts||{};
+  var list=(typeof S!=='undefined'&&S.intervs)||[];
+  var candidates=[];
+  list.forEach(function(it){
+    if(!it||!it.id)return;
+    var d=it.docs&&it.docs.anest;
+    if(!d||d.fuente!=='geclisa_p1b')return;
+    if(d.data)return;
+    candidates.push(it);
+  });
+  var lost=[];
+  var okIdb=0;
+  var chain=Promise.resolve();
+  candidates.forEach(function(it){
+    chain=chain.then(function(){
+      if(typeof afDocIdbGet!=='function'){
+        it.mayo_pdf_perdido=true;
+        lost.push({id:String(it.id),pac:it.pac||'',fecha:it.fecha||'',san:it.san||'',reason:'no_afDocIdbGet'});
+        return;
+      }
+      return afDocIdbGet(String(it.id),'anest').then(function(stored){
+        if(stored&&stored.data){
+          okIdb+=1;
+          it.mayo_pdf_perdido=false;
+          // Asegurar meta idb si faltaba (sesión post-repair)
+          if(!it.docs.anest.idb&&typeof afDocMetaFromFull==='function'){
+            it.docs.anest=afDocMetaFromFull(Object.assign({},it.docs.anest,stored));
+          }
+          return;
+        }
+        it.mayo_pdf_perdido=true;
+        lost.push({
+          id:String(it.id),
+          pac:it.pac||'',
+          fecha:it.fecha||'',
+          san:it.san||'',
+          reason:'no_idb_blob'
+        });
+      }).catch(function(e){
+        it.mayo_pdf_perdido=true;
+        lost.push({
+          id:String(it.id),
+          pac:it.pac||'',
+          fecha:it.fecha||'',
+          san:it.san||'',
+          reason:String((e&&e.message)||e||'idb_error')
+        });
+      });
+    });
+  });
+  return chain.then(function(){
+    if(lost.length||okIdb){
+      try{saveIntervsToStorage();}catch(eS){}
+      if(typeof syncAutoPushDebounced==='function')syncAutoPushDebounced();
+      if(typeof afRenderEvwebQueueHub==='function')afRenderEvwebQueueHub();
+      if(typeof renderDocBadges==='function')renderDocBadges();
+    }
+    var report={ok:true,checked:candidates.length,lost:lost,okIdb:okIdb};
+    try{console.log('[AF audit] geclisa PDFs perdidos',report);}catch(eL){}
+    if(!opts.silent&&typeof toast==='function'){
+      if(lost.length)toast(lost.length+' foja(s) con PDF GECLISA perdido — volvé a bajarlas');
+      else toast('Auditoría GECLISA PDF: ninguna perdida ('+candidates.length+' candidata(s))');
+    }
+    return report;
   });
 }
 function adjuntarDoc(input,tipo){
@@ -1206,13 +1339,43 @@ function renderDocBadges(){
   ['anest','qx','auth'].forEach(function(tipo){
     var raw=docs[tipo];
     if(!raw||raw.data||raw.aliasOf)return;
-    if(raw.idb&&typeof afDocIdbGet==='function'&&intervId&&!afDocMemGet(intervId,tipo)){
+    if(raw.idb&&typeof afDocIdbGet==='function'&&intervId&&!(typeof afDocMemGet==='function'&&afDocMemGet(intervId,tipo))){
       needWarm=true;
-      afDocIdbGet(intervId,tipo).then(function(){ renderDocBadges(); });
+      afDocIdbGet(intervId,tipo).then(function(full){
+        // Ticket 19b: meta geclisa_p1b + idb sin blob → PDF perdido
+        if((!full||!full.data)&&tipo==='anest'&&raw.fuente==='geclisa_p1b'&&S.cur&&String(S.cur.id)===String(intervId)){
+          S.cur.mayo_pdf_perdido=true;
+          var idxL=S.intervs.findIndex(function(i){return String(i.id)===String(intervId);});
+          if(idxL>=0)S.intervs[idxL]=S.cur;
+          try{saveIntervsToStorage();}catch(eP){}
+        }
+        renderDocBadges();
+      });
     }
   });
   if(needWarm){
     // Primera pasada: mostrar badge por metadata mientras llega el blob
+  }
+  // Banner Facturación: PDF GECLISA perdido
+  var lostBanner=document.getElementById('docs-geclisa-lost-banner');
+  if(!lostBanner){
+    var cardBody=document.getElementById('docs-card-body');
+    if(cardBody){
+      lostBanner=document.createElement('div');
+      lostBanner.id='docs-geclisa-lost-banner';
+      lostBanner.style.cssText='display:none;font-size:12px;color:var(--red);background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.35);border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.4';
+      cardBody.insertBefore(lostBanner,cardBody.firstChild);
+    }
+  }
+  if(lostBanner){
+    var lostNow=typeof afGeclisaPdfPerdidoSync==='function'&&afGeclisaPdfPerdidoSync(S.cur);
+    if(lostNow){
+      lostBanner.style.display='block';
+      lostBanner.textContent='Archivo perdido — volvé a bajarlo de Geclisa (cola GECLISA / Mayo).';
+    }else{
+      lostBanner.style.display='none';
+      lostBanner.textContent='';
+    }
   }
   ['anest','qx','auth'].forEach(function(tipo){
     var badge=document.getElementById('doc-'+tipo+'-badge');
@@ -1225,6 +1388,19 @@ function renderDocBadges(){
     var hasData=!!(d&&d.data);
     var pendingIdb=!!(raw&&raw.idb&&!hasData&&!raw.aliasOf);
     var pendingStorage=!!(raw&&raw.storage&&raw.storagePath&&!hasData&&!raw.aliasOf);
+    var slotLost=typeof afGeclisaPdfPerdidoSync==='function'&&afGeclisaPdfPerdidoSync(S.cur)
+      &&(tipo==='anest'||(tipo==='qx'&&raw&&raw.aliasOf==='anest'));
+    if(slotLost){
+      badge.style.display='inline-block';
+      if(prev){
+        prev.innerHTML='<div style="display:flex;align-items:center;gap:8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.4);border-radius:8px;padding:8px 10px;margin-top:4px">'
+          +'<span style="font-size:24px">!</span>'
+          +'<div style="flex:1;overflow:hidden"><div style="font-size:12px;font-weight:500">'+(raw&&raw.nombre||getNombreDoc(tipo))+'</div>'
+          +'<div style="font-size:11px;color:var(--red)">archivo perdido — volvé a bajarlo de Geclisa</div></div></div>';
+      }
+      if(label)label.style.borderColor='var(--red)';
+      return;
+    }
     if(hasSlot&&(hasData||pendingIdb||pendingStorage||raw.aliasOf)){
       badge.style.display='inline-block';
       var isImg=hasData&&d.tipo&&d.tipo.startsWith('image/');

@@ -625,6 +625,27 @@ function afEvwebQueueMissingDocLabels(it){
   return miss;
 }
 
+/**
+ * Ticket 19b: mensaje distinto a "falta foja" cuando el PDF GECLISA se perdió
+ * (hubo fuente geclisa_p1b y ya no hay blob). Mira la intervención viva por id.
+ */
+function afEvwebQueueGeclisaPdfPerdidoMsg(queueItem){
+  var id = queueItem && queueItem.id;
+  var interv = null;
+  if (typeof afFindIntervById === 'function') interv = afFindIntervById(id);
+  if (!interv && typeof S !== 'undefined' && S.intervs) {
+    for (var i = 0; i < S.intervs.length; i++) {
+      if (String(S.intervs[i].id) === String(id)) { interv = S.intervs[i]; break; }
+    }
+  }
+  // También aceptar meta en el snapshot de cola (por si quedó fuente sin data)
+  var probe = interv || queueItem;
+  if (typeof afGeclisaPdfPerdidoSync === 'function' && afGeclisaPdfPerdidoSync(probe)) {
+    return 'archivo perdido — volvé a bajarlo de Geclisa';
+  }
+  return '';
+}
+
 function afEvwebQueueListHtml(){
   var q = afEvwebQueueLoad();
   var items = (q && q.items) ? q.items : [];
@@ -676,11 +697,16 @@ function afEvwebQueueListHtml(){
         + unresolved.map(function(d){ return String(d).replace(/</g,'&lt;'); }).join(', ')
         + '</div>';
     }
-    var missingDocs = afEvwebQueueMissingDocLabels(it);
-    if (missingDocs.length) {
-      html += '<div style="color:var(--red);margin-top:2px;font-size:11px">Sin: '
-        + missingDocs.join(', ')
-        + '</div>';
+    var lostPdf = afEvwebQueueGeclisaPdfPerdidoMsg(it);
+    if (lostPdf) {
+      html += '<div style="color:var(--red);margin-top:2px;font-size:11px">' + lostPdf + '</div>';
+    } else {
+      var missingDocs = afEvwebQueueMissingDocLabels(it);
+      if (missingDocs.length) {
+        html += '<div style="color:var(--red);margin-top:2px;font-size:11px">Sin: '
+          + missingDocs.join(', ')
+          + '</div>';
+      }
     }
     html += '</div>';
     html += '<div class="afg-q-item-actions">';
