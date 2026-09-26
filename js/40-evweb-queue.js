@@ -401,11 +401,183 @@ function afEvwebQueueStatusLabel(st){
   var map = {
     queued: 'En cola',
     running: 'En curso',
-    awaiting_confirm: 'Revisá en ADAARC',
+    awaiting_confirm: 'Esperando confirmación',
     done: 'Listo',
     paused_error: 'Pausa'
   };
   return map[st] || st || 'En cola';
+}
+
+/** Ticket 18b: texto legible para evwebStatus en foja / Facturación. */
+function afEvwebIntervStatusLabel(st){
+  var map = {
+    queued: 'En cola evweb',
+    running: 'Cargando en ADAARC…',
+    awaiting_confirm: 'Esperando confirmación en ADAARC',
+    done: 'Confirmado en ADAARC (enviado)',
+    paused_error: 'Pausa / error en cola evweb'
+  };
+  return map[st] || (st ? String(st) : '');
+}
+
+function afEvwebFmtAt(isoOrMs){
+  if (isoOrMs == null || isoOrMs === '') return '';
+  try {
+    var d = (typeof isoOrMs === 'number') ? new Date(isoOrMs) : new Date(String(isoOrMs));
+    if (isNaN(d.getTime())) return '';
+    var dd = String(d.getDate()).padStart(2, '0');
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    var yy = d.getFullYear();
+    var hh = String(d.getHours()).padStart(2, '0');
+    var mi = String(d.getMinutes()).padStart(2, '0');
+    return dd + '/' + mm + '/' + yy + ' ' + hh + ':' + mi;
+  } catch (e) {
+    return '';
+  }
+}
+
+/**
+ * Ticket 18b: persiste en la intervención el estado que devolvió la extensión.
+ * awaiting_confirm ≠ facturado. Solo status===done pone estado='enviado_evweb'.
+ */
+function afEvwebPersistExtStatus(intervId, status, opts){
+  opts = opts || {};
+  var id = String(intervId || '').trim();
+  var st = String(status || '').trim();
+  if (!id || !st) return { ok: false, error: 'missing' };
+  if (typeof S === 'undefined' || !S.intervs) return { ok: false, error: 'no_state' };
+
+  var idx = -1;
+  for (var i = 0; i < S.intervs.length; i++) {
+    if (String(S.intervs[i].id) === id) { idx = i; break; }
+  }
+  if (idx < 0) return { ok: false, error: 'interv_not_found', intervId: id };
+
+  var at = opts.at || new Date().toISOString();
+  var it = S.intervs[idx];
+  it.evwebStatus = st;
+  it.evwebAt = at;
+  it._ts = Date.now();
+
+  if (st === 'done') {
+    it.estado = 'enviado_evweb';
+    it.enviadoAt = at;
+    it.enviadoVia = opts.via || 'extension_ack';
+    it.enviadoDestino = 'evweb';
+  }
+
+  if (S.cur && String(S.cur.id) === id) {
+    S.cur.evwebStatus = it.evwebStatus;
+    S.cur.evwebAt = it.evwebAt;
+    if (st === 'done') {
+      S.cur.estado = it.estado;
+      S.cur.enviadoAt = it.enviadoAt;
+      S.cur.enviadoVia = it.enviadoVia;
+      S.cur.enviadoDestino = it.enviadoDestino;
+    }
+  }
+
+  try {
+    if (typeof saveIntervsToStorage === 'function') saveIntervsToStorage();
+  } catch (eSave) {}
+  try {
+    if (typeof syncAutoPushDebounced === 'function') syncAutoPushDebounced();
+  } catch (eSync) {}
+  try {
+    if (typeof refreshFacturacionHeader === 'function') refreshFacturacionHeader();
+  } catch (eH) {}
+  try {
+    if (typeof afUpdateEstadoAccionesUI === 'function') afUpdateEstadoAccionesUI(S.cur);
+  } catch (eUi) {}
+  try {
+    if (typeof renderHome === 'function' && document.getElementById('view-home') &&
+        document.getElementById('view-home').classList.contains('active')) {
+      renderHome();
+    }
+  } catch (eR) {}
+
+  return { ok: true, intervId: id, evwebStatus: st, evwebAt: at };
+}
+
+/** Actualiza status de un ítem en afg_evweb_queue (LS) y re-pinta hubs. */
+function afEvwebQueueSetItemStatus(intervId, status, message){
+  var id = String(intervId || '').trim();
+  if (!id) return { ok: false };
+  var q = afEvwebQueueLoad();
+  var hit = false;
+  for (var i = 0; i < (q.items || []).length; i++) {
+    if (String(q.items[i].id) === id) {
+      q.items[i].status = status || q.items[i].status;
+      if (message != null) q.items[i].message = message;
+      q.items[i].updatedAt = Date.now();
+      hit = true;
+      break;
+    }
+  }
+  if (hit) {
+    afEvwebQueueSave(q);
+    if (typeof afRenderEvwebQueueHub === 'function') afRenderEvwebQueueHub();
+  }
+  return { ok: hit };
+}
+
+/**
+ * Aplica ACK / estado del runner a cola LS + intervención.
+ * result.state: { status, currentIntervId, processedIds, message, ... }
+ */
+function afEvwebApplyExtAckResult(result, action){
+  if (!result) return;
+  var state = result.state || null;
+  var act = String(action || '').toUpperCase();
+
+  // Ids ya cerrados en esta corrida (NEXT marca done antes de seguir).
+  var processed = (state && state.processedIds) || result.processedIds || [];
+  if (Array.isArray(processed)) {
+    processed.forEach(function(pid){
+      var idDone = String(pid || '').trim();
+      if (!idDone) return;
+      afEvwebQueueSetItemStatus(idDone, 'done', '');
+      afEvwebPersistExtStatus(idDone, 'done', { via: 'extension_ack:' + act });
+    });
+  }
+
+  var st = (state && state.status) || (result.awaitingConfirm ? 'awaiting_confirm' : '') || '';
+  var id = (state && state.currentIntervId) || result.intervId || result.currentIntervId || '';
+
+  // Mapear estados del runner que no son del ítem (idle / done_all) → no pisar foja.
+  if (st === 'idle' || st === 'done_all') {
+    st = '';
+  }
+
+  if (id && st) {
+    afEvwebQueueSetItemStatus(id, st, (state && state.message) || result.message || '');
+    afEvwebPersistExtStatus(id, st, { via: 'extension_ack:' + act });
+  } else if (id && result.ok && result.awaitingConfirm) {
+    afEvwebQueueSetItemStatus(id, 'awaiting_confirm', result.message || '');
+    afEvwebPersistExtStatus(id, 'awaiting_confirm', { via: 'extension_ack:' + act });
+  }
+}
+
+function afEvwebHandleQueueActionAck(action, result){
+  try {
+    console.log('[AF evweb] QUEUE_ACTION_ACK', {
+      action: action,
+      ok: result && result.ok,
+      error: (result && result.error) || null,
+      message: result && result.message,
+      status: result && result.state && result.state.status,
+      currentIntervId: result && result.state && result.state.currentIntervId
+    });
+  } catch (eAckL) {}
+  try {
+    afEvwebApplyExtAckResult(result, action);
+  } catch (eApply) {
+    try { console.warn('[AF evweb] apply ACK', eApply); } catch (e2) {}
+  }
+  if (result && result.ok === false && typeof toast === 'function') {
+    toast('Cola evweb: ' + (result.message || result.error || 'error'));
+  }
+  if (typeof afRenderEvwebQueueHub === 'function') afRenderEvwebQueueHub();
 }
 
 /** HTML de la cola (misma fuente afg_evweb_queue) para cualquier host.
@@ -489,6 +661,11 @@ function afEvwebQueueListHtml(){
     html += '<div style="color:var(--text3);margin-top:2px">' + metaParts.join(' · ') + '</div>';
     if (it.dni) {
       html += '<div style="color:var(--text3);margin-top:2px;font-size:11px">DNI ' + it.dni + '</div>';
+    }
+    var stAt = afEvwebFmtAt(it.updatedAt || it.addedAt);
+    if (stAt && (st === 'awaiting_confirm' || st === 'done' || st === 'paused_error' || st === 'running')) {
+      html += '<div style="color:var(--text3);margin-top:2px;font-size:11px">'
+        + afEvwebQueueStatusLabel(st) + ' · ' + stAt + '</div>';
     }
     if (it.message) {
       html += '<div style="color:var(--red);margin-top:2px;font-size:11px">' + String(it.message).slice(0, 120) + '</div>';
@@ -705,6 +882,62 @@ function afEvwebEnsureAnestDoc(interv){
   });
 }
 
+/**
+ * Ticket 18a: hidrata slots requeridos desde IDB/mem antes del snapshot de cola.
+ * Tras reload, afDocMem está vacío y afeDocSnap devolvía null aunque el blob
+ * siguiera en IndexedDB. No depende del flag meta.idb.
+ */
+function afEvwebHydrateDocsForQueue(interv){
+  if (!interv || !interv.docs) {
+    return Promise.resolve(interv && interv.docs ? interv.docs : null);
+  }
+  var docs = interv.docs;
+  var id = interv.id != null ? String(interv.id) : '';
+  var slots = afEvwebRequiredDocSlots(interv, { forBlock: false });
+  if (!slots.length) return Promise.resolve(docs);
+
+  function slotNeedsBlob(t){
+    var meta = docs[t];
+    if (!meta) return false;
+    if (meta.data) return false;
+    if (meta.aliasOf) {
+      var src = docs[meta.aliasOf];
+      return !(src && src.data);
+    }
+    return !!(meta.nombre || meta.idb || meta.storage || meta.storagePath || meta.tipo || meta.fecha);
+  }
+
+  var chain = Promise.resolve();
+  var any = false;
+  slots.forEach(function(t){
+    if (!slotNeedsBlob(t)) return;
+    any = true;
+    chain = chain.then(function(){
+      var ensure = (typeof afDocEnsureLocalData === 'function')
+        ? afDocEnsureLocalData(docs, t, id)
+        : Promise.resolve(null);
+      return ensure.then(function(full){
+        if (full && full.data) {
+          docs[t] = Object.assign({}, docs[t] || {}, full);
+          return;
+        }
+        if (typeof afDocIdbGet !== 'function' || !id) return;
+        return afDocIdbGet(id, t).then(function(stored){
+          if (!stored || !stored.data) return;
+          if (typeof afDocMemSet === 'function') {
+            try { afDocMemSet(id, t, stored); } catch (eMem) {}
+          }
+          docs[t] = Object.assign({}, docs[t] || {}, stored, { idb: true });
+        }).catch(function(){});
+      }).catch(function(){});
+    });
+  });
+  if (any && typeof toast === 'function') {
+    try { toast('Preparando adjuntos para cola evweb…'); } catch (eT) {}
+  }
+  return chain.then(function(){ return docs; });
+}
+
 function afEvwebQueueAdd(interv){
   afEvwebQueueHydrateCurFromDom(interv);
   var errs = afEvwebQueueValidate(interv);
@@ -746,41 +979,16 @@ function afEvwebQueueAdd(interv){
     });
   }
 
-  // Si adjuntos están en IndexedDB o solo en Storage, hidratar antes del snapshot.
-  if (interv && interv.docs) {
-    var needsHydrate = ['anest','qx','auth'].some(function(t){
-      var d = interv.docs[t];
-      return d && !d.data && !d.aliasOf && (d.idb || d.storage || d.storagePath);
-    });
-    if (needsHydrate && typeof afDocEnsureLocalData === 'function') {
-      if (typeof toast === 'function') toast('Preparando adjuntos para cola evweb…');
-      return Promise.all(['anest','qx','auth'].map(function(t){
-        return afDocEnsureLocalData(interv.docs, t, interv.id).then(function(full){
-          if (full && full.data) {
-            interv.docs = interv.docs || {};
-            interv.docs[t] = Object.assign({}, interv.docs[t] || {}, full);
-          }
-        });
-      })).then(function(){
-        return finishEnqueue(interv.docs);
-      }).catch(function(){
-        return finishEnqueue(interv.docs);
-      });
-    }
-    if (needsHydrate && typeof afDocsHydrateIntervsForSync === 'function') {
-      if (typeof toast === 'function') toast('Preparando adjuntos para cola evweb…');
-      return afDocsHydrateIntervsForSync([interv]).then(function(list){
-        var hydrated = (list && list[0]) || interv;
-        if (hydrated && hydrated.docs) interv.docs = hydrated.docs;
-        return finishEnqueue(interv.docs);
-      }).catch(function(){
-        return finishEnqueue(interv.docs);
-      });
-    }
-  }
-  // Siempre devolver la promesa de finishEnqueue (generate+confirm anest) —
-  // el caller debe esperar antes de afCommitGuardarLocal.
-  return finishEnqueue(interv.docs);
+  // Ticket 18a: siempre hidratar IDB antes de generate/snapshot (promesa).
+  var hydrate = (typeof afEvwebHydrateDocsForQueue === 'function')
+    ? afEvwebHydrateDocsForQueue(interv)
+    : Promise.resolve(interv.docs);
+  return hydrate.then(function(docs){
+    if (docs) interv.docs = docs;
+    return finishEnqueue(interv.docs);
+  }).catch(function(){
+    return finishEnqueue(interv.docs);
+  });
 }
 
 function afAgregarAColaEvweb(){
@@ -850,18 +1058,7 @@ function afEvwebQueueRequestExtAction(action){
       if (d && d.source === 'AFG_EXT' && d.type === 'QUEUE_ACTION_ACK' && d.action === action) {
         ackSeen = true;
         window.removeEventListener('message', onAck);
-        try {
-          console.log('[AF evweb] QUEUE_ACTION_ACK', {
-            action: action,
-            ok: d.result && d.result.ok,
-            error: (d.result && d.result.error) || d.error,
-            message: d.result && d.result.message
-          });
-        } catch (eAckL) {}
-        if (d.result && d.result.ok === false && typeof toast === 'function') {
-          toast('Cola evweb: ' + (d.result.message || d.result.error || 'error'));
-        }
-        if (typeof afRenderEvwebQueueHub === 'function') afRenderEvwebQueueHub();
+        afEvwebHandleQueueActionAck(action, d.result || null);
       }
     };
     window.addEventListener('message', onAck);
@@ -917,10 +1114,7 @@ function afEvwebQueueRequestExtAction(action){
               '*'
             );
           } catch (eAck) {}
-          if (res && res.ok === false && typeof toast === 'function') {
-            toast('Cola evweb: ' + (res.message || res.error || 'error'));
-          }
-          if (typeof afRenderEvwebQueueHub === 'function') afRenderEvwebQueueHub();
+          afEvwebHandleQueueActionAck(action, res || null);
         }
       );
       toastStarting();

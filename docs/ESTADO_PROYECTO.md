@@ -164,10 +164,11 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- **Ticket 17 URGENTE:** rama `ticket-17-evweb-practicas-finalizar` — fill prácticas no clickea Finalizar; re-find input; endRequest; verificar grilla. Ext **0.6.29**. Pendiente audit + smoke PAMI+9000.
+- **Ticket 18:** rama `ticket-18-evweb-estado-docs` — PWA **13.17**. (18a) hidratar docs desde IDB antes del snapshot de cola (`afDocEnsureLocalData` + siempre hidratar slots requeridos). (18b) ACK extensión → `interv.evwebStatus`/`evwebAt`; `done` → `enviado_evweb`; `awaiting_confirm` ≠ facturado; UI Facturación + cola + ck4. (18c) checklist Resumen solo slots de `afEvwebRequiredDocSlots`. **Probar 18a con foja real antes de merge.** GECLISA no comparte el patrón de docs.
+- **Ticket 17 CERRADO** en **main** `372175b` (ext **0.6.29**) — fill prácticas no clickea Finalizar.
 - **Ticket 16 CERRADO** en **main** `c8bff18` (PWA **13.16**) — SW scope + `_redirects` /AnestFact.
 - **Tickets 12+13 CERRADOS** en **main** `4efe0d1` (PWA **13.15**).
-- **Ticket 15:** regenerar anest — WIP en stash local; después de Ticket 17.
+- **Ticket 15:** regenerar anest — WIP en stash local; después de Ticket 18.
 - **UI toast + Aero/IOSFA:** PWA **13.14** — toast wrap si msg >50 chars; `onSanChange` autocompleta `#f-obra` = IOSFA al elegir Aeronáutico.
 - **Sync payload / timeout 57014:** PWA **13.13** — `syncBuildCloudSafePayload` migra data-URLs → IDB y sube solo meta (ya no rehidrata blobs a `anesfact_datos`). Helpers `afDocsAuditInlineData` / `afSyncMeasureRemoteRowSize` / `afSyncRepairInlineDocsAndPush`. Pendiente: Diego logueado → medir fila antes/después.
 - **Infra:** ver `docs/AVISO_INFRA_GRANTS_MIGRACION.md`. **Ext 0.6.28**. PWA **13.07**. **Ticket 5** POSPUESTO.

@@ -9,13 +9,40 @@ function renderResumen(){
   var mods=calcMods(i);
   var modsHtml=mods.length?'<div class="card"><div class="ct">Modificadores</div>'+mods.map(function(m){return'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span>'+m.l+'</span>'+(m.r?'<span class="badge by">+'+m.r+'%</span>':'')+(m.cp?'<span class="badge by">+'+m.cp+' comp.</span>':'')+'</div>';}).join('')+'</div>':'';
   var pracsHtml=i.pracs&&i.pracs.length?'<div class="card"><div class="ct">Prácticas ADAARC</div>'+i.pracs.map(function(p){return'<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--text3);margin-bottom:3px">'+p.cod+' · comp.'+p.comp+'</div><div class="cp-row"><span style="font-family:monospace;font-size:13px">'+p.desc+'</span><button onclick="copyVal(\''+p.cod+'\',\'Código\')" style="background:none;border:none;font-size:18px;cursor:pointer">📋</button></div></div>';}).join('')+'</div>':'';
-  var chkItems=[
-    {id:'ck1',txt:'<b>Foja anestésica</b> — impresa con firma y sello',done:typeof afEvwebIntervHasDoc==='function'?afEvwebIntervHasDoc(i,'anest'):!!(i.docs&&i.docs.anest)},
-    {id:'ck2',txt:'<b>Foja quirúrgica</b> — cargada en GECLISA o adjuntada',done:typeof afEvwebIntervHasDoc==='function'?afEvwebIntervHasDoc(i,'qx'):!!(i.docs&&i.docs.qx)},
-    {id:'ck3',txt:'<b>Autorización</b> — recibida por WhatsApp/mail',done:typeof afEvwebIntervHasDoc==='function'?afEvwebIntervHasDoc(i,'auth'):!!(i.docs&&i.docs.auth)},
-    // ck4: misma señal que marcarEnviado() — manual; no hay feedback automático de la extensión todavía
-    {id:'ck4',txt:'<b>Subida a evweb</b> — 3 documentos a ADAARC',done:i.estado==='enviado_evweb'||i.estado==='enviado_geclisa'}
-  ];
+  var chkItems=[];
+  // Ticket 18c: solo slots que esa mutual pide (PAMI sin auth; APROSS sin fojas).
+  var reqSlots=(typeof afEvwebRequiredDocSlots==='function')
+    ? afEvwebRequiredDocSlots(i,{forBlock:false})
+    : ['anest','qx','auth'];
+  var slotSet={};
+  (reqSlots||[]).forEach(function(t){ slotSet[t]=true; });
+  if(slotSet.anest){
+    chkItems.push({id:'ck1',txt:'<b>Foja anestésica</b> — impresa con firma y sello',done:typeof afEvwebIntervHasDoc==='function'?afEvwebIntervHasDoc(i,'anest'):!!(i.docs&&i.docs.anest)});
+  }
+  if(slotSet.qx){
+    chkItems.push({id:'ck2',txt:'<b>Foja quirúrgica</b> — cargada en GECLISA o adjuntada',done:typeof afEvwebIntervHasDoc==='function'?afEvwebIntervHasDoc(i,'qx'):!!(i.docs&&i.docs.qx)});
+  }
+  if(slotSet.auth){
+    chkItems.push({id:'ck3',txt:'<b>Autorización</b> — recibida por WhatsApp/mail',done:typeof afEvwebIntervHasDoc==='function'?afEvwebIntervHasDoc(i,'auth'):!!(i.docs&&i.docs.auth)});
+  }
+  // Ticket 18b: ck4 lee evwebStatus (awaiting_confirm ≠ facturado)
+  var evSt=i.evwebStatus||'';
+  var ck4Done=evSt==='done'||i.estado==='enviado_evweb'||i.estado==='enviado_geclisa';
+  var ck4Txt;
+  if(evSt==='awaiting_confirm'){
+    ck4Txt='<b>Subida a evweb</b> — esperando confirmación en ADAARC'
+      +(i.evwebAt&&typeof afEvwebFmtAt==='function'?' · '+afEvwebFmtAt(i.evwebAt):'');
+  }else if(evSt==='done'||i.estado==='enviado_evweb'){
+    ck4Txt='<b>Subida a evweb</b> — confirmado en ADAARC'
+      +(i.evwebAt&&typeof afEvwebFmtAt==='function'?' · '+afEvwebFmtAt(i.evwebAt):'');
+  }else if(evSt==='running'){
+    ck4Txt='<b>Subida a evweb</b> — cargando en ADAARC…';
+  }else if(evSt==='paused_error'){
+    ck4Txt='<b>Subida a evweb</b> — pausa / error en cola';
+  }else{
+    ck4Txt='<b>Subida a evweb</b> — documentos a ADAARC';
+  }
+  chkItems.push({id:'ck4',txt:ck4Txt,done:ck4Done});
   var chkHtml='<div class="card"><div class="ct">Checklist evweb</div>'
     +chkItems.map(function(x){
       return'<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border)">'

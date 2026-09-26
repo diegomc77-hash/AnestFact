@@ -715,6 +715,15 @@ function refreshFacturacionHeader(){
   var t=S.cur.pac||'Sin nombre';
   if(S.cur.fecha) t+=' · '+fmt(S.cur.fecha);
   if(S.cur.san) t+=' · '+S.cur.san;
+  // Ticket 18b: estado evweb persistido desde ACK de la extensión
+  var evSt=S.cur.evwebStatus||'';
+  if(evSt&&typeof afEvwebIntervStatusLabel==='function'){
+    var lab=afEvwebIntervStatusLabel(evSt);
+    var when=(typeof afEvwebFmtAt==='function')?afEvwebFmtAt(S.cur.evwebAt):'';
+    if(lab) t+=' · '+lab+(when?' ('+when+')':'');
+  }else if(S.cur.estado==='enviado_evweb'){
+    t+=' · Enviado a evweb';
+  }
   el.textContent=t;
 }
 /** Copia el formulario a S.cur en memoria. No toca localStorage ni sync. */

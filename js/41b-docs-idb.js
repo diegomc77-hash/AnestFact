@@ -303,6 +303,49 @@ function afDocIdbGet(intervId, tipo) {
     });
 }
 
+/**
+ * Ticket 18a: asegura blob local (IDB/mem) para un slot.
+ * Tras reload, afDocMem está vacío; afeDocSnap / verDoc necesitan este camino.
+ * Si existe afDocEnsureFromStorage (Storage remoto), se usa como fallback.
+ * Intenta IDB siempre que haya intervId, aunque meta no tenga flag idb.
+ */
+function afDocEnsureLocalData(docs, tipo, intervId) {
+  docs = docs || {};
+  var raw = docs[tipo];
+  if (!raw) return Promise.resolve(null);
+  if (raw.aliasOf) {
+    return afDocEnsureLocalData(docs, raw.aliasOf, intervId).then(function (src) {
+      if (!src || !src.data) return raw;
+      return {
+        nombre: src.nombre,
+        tipo: src.tipo,
+        data: src.data,
+        fecha: src.fecha,
+        fuente: src.fuente || raw.fuente,
+        size: src.size,
+        aliasOf: raw.aliasOf
+      };
+    });
+  }
+  if (raw.data) return Promise.resolve(raw);
+  var id = intervId != null ? String(intervId) : '';
+  function fromStorage() {
+    if (typeof afDocEnsureFromStorage === 'function') {
+      return afDocEnsureFromStorage(raw, id, tipo);
+    }
+    return Promise.resolve(raw);
+  }
+  if (typeof afDocIdbGet === 'function' && id) {
+    return afDocIdbGet(id, tipo).then(function (fromIdb) {
+      if (fromIdb && fromIdb.data) return fromIdb;
+      return fromStorage();
+    }).catch(function () {
+      return fromStorage();
+    });
+  }
+  return fromStorage();
+}
+
 function afDocIdbDelete(intervId, tipo) {
   afDocMemClear(intervId, tipo);
   return afDocIdbOpen()
