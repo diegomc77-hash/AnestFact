@@ -164,7 +164,7 @@ Versiones: salir de `node tools/check-version-sync.mjs`, no de este archivo. Sna
 
 ## En curso
 
-- **Ticket 19:** rama `ticket-19-geclisa-pdf-idb` — PWA **13.18**. (19a) `afCommitGeclisaPdf` → `afDocIdbPut` + meta (como `afCommitAdjunto`); IDB fail → inline degradado. (19b) `afAuditGeclisaPdfsPerdidos()` + mensaje «archivo perdido — volvé a bajarlo de Geclisa» en cola/Facturación. **Probar:** cola Mayo → logout → login → PDF sigue; encolar evweb sin faltantes.
+- **Ticket 19 CERRADO** en **main** `f7dac6a` (PWA **13.18**) — PDF GECLISA P1b → IndexedDB + meta; `afAuditGeclisaPdfsPerdidos()`; mensaje «archivo perdido — volvé a bajarlo de Geclisa». Smoke Mayo logout/login recomendado tras Pages.
 - **Ticket 18 CERRADO** en **main** `0da4d87` (PWA **13.17**) — hidratar docs IDB al encolar; ACK → `evwebStatus`/`evwebAt` (`awaiting_confirm` ≠ facturado; `done` → `enviado_evweb`); checklist Resumen por mutual.
 - **Ticket 17 CERRADO** en **main** `372175b` (ext **0.6.29**) — fill prácticas no clickea Finalizar.
 - **Ticket 16 CERRADO** en **main** `c8bff18` (PWA **13.16**) — SW scope + `_redirects` /AnestFact.
